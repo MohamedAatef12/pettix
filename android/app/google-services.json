@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "774297250092",
+    "project_id": "pettix-5c3c9",
+    "storage_bucket": "pettix-5c3c9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:774297250092:android:9b7a48ee3dbb09fccc2489",
+        "android_client_info": {
+          "package_name": "com.example.pettix.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "774297250092-pjtorlmekp18k440eqtn33rclv3jh03c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pettix.dev",
+            "certificate_hash": "9fc492721fd3945a7a34ab2bba4ff0051859e84d"
+          }
+        },
+        {
+          "client_id": "774297250092-fn7ffva50ev5onfcbvhprkcgn3of01ct.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCesZqgsTqhKjB8Pr-79_20sPo6rDt2ka8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "774297250092-fn7ffva50ev5onfcbvhprkcgn3of01ct.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

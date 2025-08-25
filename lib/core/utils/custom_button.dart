@@ -12,6 +12,11 @@ class CustomFilledButton extends StatelessWidget {
   final TextStyle? textStyle;
   final bool isLoading;
 
+  // 🔹 Instead of ImageProvider, make it Widget
+  final bool hasLeading;
+  final Widget? leading;
+  final double spacing;
+
   const CustomFilledButton({
     super.key,
     required this.text,
@@ -23,6 +28,9 @@ class CustomFilledButton extends StatelessWidget {
     this.textColor,
     this.textStyle,
     this.isLoading = false,
+    this.hasLeading = false,
+    this.leading,
+    this.spacing = 8.0,
   });
 
   @override
@@ -34,33 +42,42 @@ class CustomFilledButton extends StatelessWidget {
       width: widthFactor != null ? screenWidth * widthFactor! : null,
       height: heightFactor != null ? screenHeight * heightFactor! : null,
       child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed, // 🔹 Disable if loading
+
+        onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor ?? AppColors.current.blue,
+          backgroundColor: backgroundColor ?? AppColors.current.lightBlue,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
           ),
         ),
-        child:
-            isLoading
-                ? SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
+        child: isLoading
+            ? SizedBox(
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(
+            color: textColor ?? AppColors.current.white,
+            strokeWidth: 2.5,
+          ),
+        )
+            : Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (hasLeading && leading != null) ...[
+              leading!,
+              SizedBox(width: spacing),
+            ],
+            Text(
+              text,
+              style: textStyle ??
+                  TextStyle(
                     color: textColor ?? AppColors.current.white,
-                    strokeWidth: 2.5,
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w600,
                   ),
-                )
-                : Text(
-                  text,
-                  style:
-                      textStyle ??
-                      TextStyle(
-                        color: textColor ?? AppColors.current.white,
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w600,
-                      ),
-                ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pettix/config/di/di.config.dart';
+import 'package:pettix/data/caching/cache_manager.dart';
+import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/data/network/dio_factory.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
@@ -24,4 +26,6 @@ abstract class RegisterModule {
 
   @lazySingleton
   Dio dio(DioFactory dioFactory, Talker talker) => dioFactory.createDio(talker);
+  @lazySingleton
+  ICacheManager get cacheManager => CacheManager();
 }

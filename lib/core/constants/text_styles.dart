@@ -1,85 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:pettix/core/themes/app_colors.dart';
 
-class TextStyles {
-  // Regular Text Styles
-  static TextStyle small = TextStyle(
-    fontSize: 12.0,
-    fontWeight: FontWeight.normal,
-    color: AppColors.current.text,
-  );
-  static TextStyle medium = TextStyle(
-    fontSize: 16.0,
-    fontWeight: FontWeight.normal,
-    color: AppColors.current.text,
-  );
-  static TextStyle large = TextStyle(
-    fontSize: 20.0,
-    fontWeight: FontWeight.normal,
-    color: AppColors.current.text,
-  );
-  static TextStyle extraLarge = TextStyle(
-    fontSize: 24.0,
-    fontWeight: FontWeight.normal,
-    color: AppColors.current.text,
+class AppTextStyles {
+
+  static const TextStyle title = TextStyle(
+    fontFamily: 'Roboto',
+    fontSize: 32,
+    fontWeight: FontWeight.w600, // semi-bold
   );
 
-  // Bold Text Styles
-  static TextStyle smallBold = TextStyle(
-    fontSize: 12.0,
-    fontWeight: FontWeight.bold,
-    color: AppColors.current.text,
-  );
-  static TextStyle mediumBold = TextStyle(
-    fontSize: 16.0,
-    fontWeight: FontWeight.bold,
-    color: AppColors.current.text,
-  );
-  static TextStyle largeBold = TextStyle(
-    fontSize: 20.0,
-    fontWeight: FontWeight.bold,
-    color: AppColors.current.text,
-  );
-  static TextStyle extraLargeBold = TextStyle(
-    fontSize: 24.0,
-    fontWeight: FontWeight.bold,
-    color: AppColors.current.text,
+
+  static const TextStyle bodyTitle = TextStyle(
+    fontFamily: 'Roboto',
+    fontSize: 16,
+    fontWeight: FontWeight.w500, // medium
   );
 
-  // Italic Text Styles
-  static TextStyle smallItalic = TextStyle(
-    fontSize: 12.0,
-    fontStyle: FontStyle.italic,
-    color: AppColors.current.text,
-  );
-  static TextStyle mediumItalic = TextStyle(
-    fontSize: 16.0,
-    fontStyle: FontStyle.italic,
-    color: AppColors.current.text,
-  );
-  static TextStyle largeItalic = TextStyle(
-    fontSize: 20.0,
-    fontStyle: FontStyle.italic,
-    color: AppColors.current.text,
-  );
-  static TextStyle extraLargeItalic = TextStyle(
-    fontSize: 24.0,
-    fontStyle: FontStyle.italic,
-    color: AppColors.current.text,
+
+  static const TextStyle description = TextStyle(
+    fontFamily: 'Roboto',
+    fontSize: 16,
+    fontWeight: FontWeight.w400, // regular
   );
 
-  // Customizable Text Styles
-  static TextStyle custom({
-    double fontSize = 14.0,
-    FontWeight fontWeight = FontWeight.normal,
-    FontStyle fontStyle = FontStyle.normal,
-    Color color = Colors.black,
-  }) {
-    return TextStyle(
-      fontSize: fontSize,
-      fontWeight: fontWeight,
-      fontStyle: fontStyle,
-      color: color,
-    );
-  }
+
+  static const TextStyle smallDescription = TextStyle(
+    fontFamily: 'Roboto',
+    fontSize: 12,
+    fontWeight: FontWeight.w400, // regular
+  );
+
+
+  static const TextStyle button = TextStyle(
+    fontFamily: 'Roboto',
+    fontSize: 16,
+    fontWeight: FontWeight.w400, // regular
+  );
+
+  static const TextStyle bold = TextStyle(
+    fontFamily: 'Roboto',
+    fontSize: 16,
+    fontWeight: FontWeight.w700, // bold
+  );
 }

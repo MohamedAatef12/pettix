@@ -8,7 +8,7 @@ android.apply {
     productFlavors {
         create("dev") {
             dimension = "app"
-            applicationId = "com.example.myapp.dev"
+            applicationId = "com.example.pettix.dev"
             resValue(type = "string", name = "app_name", value = "MyApp Dev")
         }
         create("prod") {

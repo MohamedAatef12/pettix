@@ -9,4 +9,13 @@ abstract class Env {
 
   @EnviedField(varName: 'API_KEY')
   static String apiKey = _Env.apiKey;
+
+  @EnviedField(varName: 'TWILIO_ACCOUNT_SID')
+  static String twilioAccountSid = _Env.twilioAccountSid;
+
+  @EnviedField(varName: 'TWILIO_AUTH_TOKEN')
+  static String twilioAuthToken = _Env.twilioAuthToken;
+
+  @EnviedField(varName: 'TWILIO_SERVICE_SID')
+  static String twilioServiceSid = _Env.twilioServiceSid;
 }
