@@ -6,7 +6,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.7.2
+  sdk: ">=3.7.2 <4.0.0"
 
 dependencies:
   flutter:
@@ -34,7 +34,7 @@ dependencies:
   # Networking
   dio: ^5.8.0+1
   pretty_dio_logger: ^1.4.0
-  intl: ^0.19.0
+  intl: ^0.20.2
 
   # Caching & Storage
   shared_preferences: ^2.5.3
