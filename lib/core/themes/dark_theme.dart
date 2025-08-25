@@ -1,0 +1,12 @@
+import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+ThemeData darkTheme = FlexThemeData.dark(
+  scheme: FlexScheme.blueM3,
+  fontFamily: GoogleFonts.cairo().fontFamily,
+  useMaterial3: true,
+  surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+  blendLevel: 15,
+  appBarElevation: 0.5,
+);
