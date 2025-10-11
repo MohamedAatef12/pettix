@@ -18,16 +18,17 @@ class SplashScreen extends StatelessWidget {
       create: (_) => SplashBloc()..add(StartAnimation()),
       child: BlocListener<SplashBloc, SplashState>(
         listener: (context, state) {
-          if (state is SplashFinished) {
+          if (state is SplashNavigateToOnBoarding) {
             context.pushReplacement(AppRoutes.selectLanguage);
-
+          } else if (state is SplashNavigateToHome) {
+            context.pushReplacement(AppRoutes.bottomNav);
           }
         },
         child: Scaffold(
           backgroundColor: AppColors.current.lightBlue,
           body: const SplashBody(),
-        ),
-      ),
+        )
+      )
     );
   }
 }

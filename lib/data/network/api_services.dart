@@ -7,7 +7,6 @@ import 'constants.dart';
 @lazySingleton
 class ApiService {
   final Dio _dio;
-
   ApiService(this._dio);
 
   Future<Map<String, dynamic>> get(

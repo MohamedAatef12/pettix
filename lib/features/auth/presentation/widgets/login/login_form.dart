@@ -27,46 +27,50 @@ class LoginForm extends StatelessWidget {
         children: [
           Text('Email or phone number', style: AppTextStyles.smallDescription),
           SizedBox(height: 4.h),
-          CustomTextFormField(
-            controller: bloc.emailLoginController,
-            labelText: 'Email',
-            hintText: 'Enter your email',
-            keyboardType: TextInputType.emailAddress,
-            validator: (value) =>
-            (value == null || value.isEmpty) ? "Required" : null,
-            fillColor: true,
-            fillColorValue: AppColors.current.white,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: AppColors.current.lightGray),
+          GestureDetector(
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: CustomTextFormField(
+              controller: bloc.emailLoginController,
+              labelText: 'Email',
+              hintText: 'Enter your email',
+              keyboardType: TextInputType.emailAddress,
+              validator: (value) =>
+              (value == null || value.isEmpty) ? "Required" : null,
+              fillColor: true,
+              fillColorValue: AppColors.current.white,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AppColors.current.lightGray),
+              ),
             ),
           ),
           SizedBox(height: 10.h),
 
           Text('Password', style: AppTextStyles.smallDescription),
           SizedBox(height: 4.h),
-
-          // 👇 خلي BlocBuilder هنا بس
           BlocBuilder<AuthBloc, AuthState>(
             buildWhen: (previous, current) =>
             current is LoginPasswordVisibilityChanged,
             builder: (context, state) {
-              return CustomTextFormField(
-                controller: bloc.passwordLoginController,
-                labelText: 'Password',
-                hintText: 'Enter your password',
+              return GestureDetector(
+                onTap: () => FocusScope.of(context).unfocus(),
+                child: CustomTextFormField(
+                  controller: bloc.passwordLoginController,
+                  labelText: 'Password',
+                  hintText: 'Enter your password',
 
-                validator: (value) =>
-                (value == null || value.isEmpty) ? "Required" : null,
-                fillColor: true,
-                fillColorValue: AppColors.current.white,
-                enablePasswordToggle: true,
-                onToggleObscureText: () {
-                  bloc.add(LoginTogglePasswordVisibility());
-                },
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: AppColors.current.lightGray),
+                  validator: (value) =>
+                  (value == null || value.isEmpty) ? "Required" : null,
+                  fillColor: true,
+                  fillColorValue: AppColors.current.white,
+                  enablePasswordToggle: true,
+                  onToggleObscureText: () {
+                    bloc.add(LoginTogglePasswordVisibility());
+                  },
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: AppColors.current.lightGray),
+                  ),
                 ),
               );
             },
@@ -125,6 +129,7 @@ class LoginForm extends StatelessWidget {
                   ),
                 );
               }
+
             },
             text: 'Sign In',
             backgroundColor: AppColors.current.primary,
@@ -163,7 +168,9 @@ class LoginForm extends StatelessWidget {
           SizedBox(height: 10.h),
           CustomFilledButton(
             onPressed: () {
-              context.read<AuthBloc>().add(GoogleLoginSubmitted());
+              context.read<AuthBloc>().add(GoogleLoginSubmitted(
+                rememberMe: bloc.rememberMe,
+              ));
             },
             text: 'Continue with Google',
             backgroundColor: AppColors.current.white,

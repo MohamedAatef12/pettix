@@ -48,7 +48,10 @@ class ToggleRememberMe extends AuthEvent {
   ToggleRememberMe(this.value);
 }
 
-class GoogleLoginSubmitted extends AuthEvent {}
+class GoogleLoginSubmitted extends AuthEvent {
+  final bool rememberMe;
+  GoogleLoginSubmitted({required this.rememberMe});
+}
 class SendOtpEvent extends AuthEvent {
   final String phoneNumber;
   SendOtpEvent(this.phoneNumber);

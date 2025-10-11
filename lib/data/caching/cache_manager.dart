@@ -1,9 +1,7 @@
 import 'dart:convert';
-
 import 'package:pettix/features/auth/data/models/register/register_model.dart';
 import 'package:pettix/features/auth/data/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'i_cache_manager.dart';
 
 class CacheManager implements ICacheManager {
@@ -17,14 +15,16 @@ class CacheManager implements ICacheManager {
   }
 
   @override
-  setUserData(UserModel value) async {
-    String jsonString = json.encode(value.toJson());
+  Future<void> setUserData(UserModel value) async {
+    final jsonString = json.encode(value.toJson());
     await _prefs?.setString('user', jsonString);
+    await _prefs?.setBool('logged_in', true); // ✅ mark user as logged in
   }
 
   @override
   bool? logout() {
     _prefs?.remove('user');
+    _prefs?.setBool('logged_in', false);
     return true;
   }
 
@@ -39,32 +39,23 @@ class CacheManager implements ICacheManager {
   }
 
   @override
-  UserModel? getUserData() {
-    String? jsonString = _prefs?.getString('user');
-
+  RegisterModel? getUserData() {
+    final jsonString = _prefs?.getString('user');
     if (jsonString != null) {
       final userJson = json.decode(jsonString);
-      return UserModel.fromJson(userJson);
+      return RegisterModel.fromJson(userJson);
     }
     return null;
   }
 
   @override
   Future<void> saveLogin(bool rememberMe) async {
-    if (rememberMe) {
-      await _prefs?.setBool('remember_me', rememberMe);
-    } else {
-      await clearLogin();
-    }
+    await _prefs?.setBool('remember_me', rememberMe);
   }
 
   @override
   Future<bool> isRemembered() async {
     return _prefs?.getBool('remember_me') ?? false;
-  }
-
-  Future<String?> getRememberMe() async {
-    return _prefs?.getString('remember_me');
   }
 
   @override
@@ -74,12 +65,13 @@ class CacheManager implements ICacheManager {
 
   @override
   getSavedLogin() async {
-    final rememberMe = await getRememberMe();
+    final rememberMe = await _prefs?.getBool('remember_me');
     if (rememberMe != null) {
       return {'remember_me': rememberMe};
     }
     return null;
   }
+
   @override
   Future<void> setThemeDark(bool isDark) async {
     await _prefs?.setBool('is_dark_theme', isDark);
@@ -89,4 +81,22 @@ class CacheManager implements ICacheManager {
   Future<bool> isThemeDark() async {
     return _prefs?.getBool('is_dark_theme') ?? false;
   }
+
+  @override
+  Future<bool> isLoggedIn() async {
+    final loggedIn = _prefs?.getBool('logged_in') ?? false;
+    final userJson = _prefs?.getString('user');
+    return loggedIn && userJson != null;
+  }
+
+  @override
+  Future<void> setToken(String token) async {
+    await _prefs?.setString('token', token);
+  }
+
+  @override
+  Future<String?> getToken() async {
+    return _prefs?.getString('token');
+  }
+
 }

@@ -48,12 +48,16 @@ class OnBoardingBody extends StatelessWidget {
                       final slide = bloc.slides[index];
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          SvgPicture.asset(
-                            slide.image,
-                            fit: BoxFit.cover,
-                            width: 369.w,
-                            height: 369.h,
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: Image.asset(
+                              slide.image,
+                              fit: BoxFit.fill,
+                              width: double.infinity,
+                              height: 300.h,
+                            ),
                           ),
                           SizedBox(height: 20.h),
                           Text(

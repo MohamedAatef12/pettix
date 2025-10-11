@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-class PostCard extends StatelessWidget {
-  const PostCard({
-    super.key,
-  });
+import 'package:pettix/features/home/domain/entities/post_entity.dart';
+import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
+import 'package:pettix/features/home/presentation/blocs/home_state.dart';
 
+class PostCard extends StatelessWidget {
+  const PostCard({super.key, required this.post});
+  final PostEntity post;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -26,17 +29,20 @@ class PostCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 30.r,
-                  backgroundImage: AssetImage(
-                    'assets/images/profile_photo.png',
-                  ),
+                  backgroundImage: NetworkImage(post.imageUrl),
+                  onBackgroundImageError: (_, __) {
+                    AssetImage(
+                     'assets/images/no_user_photo.svg'
+                    );
+                  },
                 ),
                 SizedBox(width: 10.w),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('John Doe', style: AppTextStyles.bold),
+                    Text(post.username, style: AppTextStyles.bold),
                     Text(
-                      '6 h ago',
+                      post.date,
                       style: AppTextStyles.description.copyWith(
                         fontSize: 12.sp,
                       ),
@@ -55,34 +61,42 @@ class PostCard extends StatelessWidget {
               ],
             ),
             SizedBox(height: 10.h),
-            Text(
-              'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s', style: AppTextStyles.description,
-            ),
+            Text(post.text, style: AppTextStyles.description),
             SizedBox(height: 10.h),
             Row(
               children: [
                 GestureDetector(
-                    onTap: () {},
-                    child: SvgPicture.asset('assets/icons/like.svg')),
-                Text('24', style: AppTextStyles.description),
+                  onTap: () {},
+                  child: SvgPicture.asset('assets/icons/like.svg'),
+                ),
+                Text(
+                  post.likesCount.toString(),
+                  style: AppTextStyles.description,
+                ),
                 SizedBox(width: 10.w),
                 GestureDetector(
-                    onTap: () {
-                 context.push('/comments');
-                    },
-                    child: SvgPicture.asset('assets/icons/comment.svg')),
-                Text('8', style: AppTextStyles.description),
+                  onTap: () {
+                    context.push('/comments');
+                  },
+                  child: SvgPicture.asset('assets/icons/comment.svg'),
+                ),
+                Text(
+                  post.commentsCount.toString(),
+                  style: AppTextStyles.description,
+                ),
                 Spacer(),
                 GestureDetector(
-                    onTap: () {},
-                    child: SvgPicture.asset('assets/icons/share.svg')),
+                  onTap: () {},
+                  child: SvgPicture.asset('assets/icons/share.svg'),
+                ),
                 Text('2', style: AppTextStyles.description),
                 SizedBox(width: 10.w),
                 GestureDetector(
-                    onTap: () {},
-                    child: SvgPicture.asset('assets/icons/save_post.svg')),
+                  onTap: () {},
+                  child: SvgPicture.asset('assets/icons/save_post.svg'),
+                ),
               ],
-            )
+            ),
           ],
         ),
       ),

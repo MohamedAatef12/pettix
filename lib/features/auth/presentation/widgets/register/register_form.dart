@@ -129,7 +129,9 @@ class RegisterForm extends StatelessWidget {
             SizedBox(height: 10.h,),
             CustomFilledButton(
               onPressed: () {
-                context.read<AuthBloc>().add(GoogleLoginSubmitted());
+                context.read<AuthBloc>().add(GoogleLoginSubmitted(
+                  rememberMe: bloc.rememberMe,
+                ));
               },
               text: 'Continue with Google',
               backgroundColor: AppColors.current.white,

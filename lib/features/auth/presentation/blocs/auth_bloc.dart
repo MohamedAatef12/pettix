@@ -4,9 +4,11 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/data/network/twilio_service.dart';
+import 'package:pettix/features/auth/data/models/login/google_login_model.dart';
 import 'package:pettix/features/auth/data/models/user_model.dart';
 import 'package:pettix/features/auth/domain/entities/google_login_entity.dart';
 import 'package:pettix/features/auth/domain/entities/register_domain_entity.dart';
+import 'package:pettix/features/auth/domain/entities/user_entity.dart';
 import 'package:pettix/features/auth/domain/usecases/google_login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/register_usecase.dart';
@@ -150,24 +152,28 @@ final fullNameController = TextEditingController();
     );
   }
 
-
-  /// Handle Login
-  Future<void> _loginSubmitted(
-      LoginSubmitted event, Emitter<AuthState> emit) async {
+@override
+  Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) async {
     emit(LoginLoading());
+
     final result = await loginUseCase(event.model);
-    result.fold(
-          (failure) => emit(LoginFailure(failure.message)),
-          (loginResponse) {
+    await result.fold(
+          (failure) async => emit(LoginFailure(failure.message)),
+          (loginResponse) async {
+        await DI.find<ICacheManager>()
+            .setUserData(UserModel.fromEntity(loginResponse.user)); // ✅ stores user + logged_in = true
+
         if (event.rememberMe) {
-          DI.find<ICacheManager>().saveLogin(true);
+          await DI.find<ICacheManager>().saveLogin(true);
         } else {
-          DI.find<ICacheManager>().clearLogin();
+          await DI.find<ICacheManager>().clearLogin();
         }
+
         emit(LoginSuccess(loginResponse.user));
       },
     );
   }
+
   Future<void> _googleLoginSubmitted(
       GoogleLoginSubmitted event, Emitter<AuthState> emit) async {
     emit(GoogleLoginLoading());
@@ -202,7 +208,16 @@ final fullNameController = TextEditingController();
         },
             (loginResponse) async {
               await DI.find<ICacheManager>().setUserData(UserModel.fromEntity(loginResponse.user));
+              await DI
+                  .find<ICacheManager>()
+                  .setToken(loginResponse.token); // Store token
           debugPrint("✅ Backend login success, user: ${loginResponse.user.email}");
+              debugPrint("✅ Backend login success, user: ${loginResponse.token}");
+             if (event.rememberMe) {
+                await DI.find<ICacheManager>().saveLogin(true);
+              } else {
+                await DI.find<ICacheManager>().clearLogin();
+              }
           emit(GoogleLoginSuccess(loginResponse.user));
         },
       );
