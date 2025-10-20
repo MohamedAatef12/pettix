@@ -19,7 +19,9 @@ class AppTextStyles {
   static const TextStyle description = TextStyle(
     fontFamily: 'Roboto',
     fontSize: 16,
-    fontWeight: FontWeight.w400, // regular
+    fontWeight: FontWeight.w400,
+
+                             // regular
   );
 
 
@@ -40,5 +42,10 @@ class AppTextStyles {
     fontFamily: 'Roboto',
     fontSize: 16,
     fontWeight: FontWeight.w700, // bold
+  );
+  static const TextStyle appbar = TextStyle(
+    fontFamily: 'Roboto',
+    fontSize: 20,
+    fontWeight: FontWeight.w400, // bold
   );
 }

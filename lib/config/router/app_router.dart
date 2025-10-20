@@ -1,3 +1,4 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/features/auth/presentation/pages/forgot_password/forgot_password_page.dart';
 import 'package:pettix/features/auth/presentation/pages/login/login_page.dart';
@@ -8,12 +9,16 @@ import 'package:pettix/features/auth/presentation/pages/forgot_password/reset_pa
 import 'package:pettix/features/auth/presentation/pages/register/set_password_page.dart';
 import 'package:pettix/features/auth/presentation/pages/register/verified_page.dart';
 import 'package:pettix/features/bottom_bar/views/pages/bottom_bar_page.dart';
+import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
+import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 import 'package:pettix/features/home/presentation/pages/add_post_page.dart';
 import 'package:pettix/features/home/presentation/pages/comments_page.dart';
 import 'package:pettix/features/home/presentation/pages/home_page.dart';
 import 'package:pettix/features/home/presentation/pages/home_search.dart';
+import 'package:pettix/features/notification/presentation/view/pages/notification_page.dart';
 import 'package:pettix/features/on_boarding/presentation/view/on_boarding_screen.dart';
 import 'package:pettix/features/select_language/presentation/view/select_language_screen.dart';
+import 'package:pettix/features/side_menu/presentation/view/pages/side_menu_page.dart';
 import 'package:pettix/features/splash/persentation/view/splash_screen.dart';
 
 import 'routes.dart';
@@ -114,13 +119,35 @@ GoRouter appRouter() => GoRouter(
     ),
     GoRoute(
       path: AppRoutes.comments,
-      name: AppRouteNames.comments,
-      builder: (context, state) => const CommentsPage(),
+      builder: (context, state) {
+        final postId = state.extra as int;
+
+        // ✅ نستخدم BlocProvider مستقل من DI أو نمرر الـ bloc الموجود من صفحة Home
+        return BlocProvider(
+          create: (_) => HomeBloc.fromDI()
+            ..add(
+              FetchPostsCommentsEvent(postId),
+            ),
+          child: CommentsPage(postId: postId),
+        );
+      },
     ),
+
+
     GoRoute(
       path: AppRoutes.homeSearch,
       name: AppRouteNames.homeSearch,
       builder: (context, state) => const HomeSearch(),
+    ),
+    GoRoute(
+      path: AppRoutes.notifications,
+      name: AppRouteNames.notifications,
+      builder: (context, state) => const NotificationPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.sideMenu,
+      name: AppRouteNames.sideMenu,
+      builder: (context, state) => const SideMenuPage(),
     ),
 
     // GoRoute(

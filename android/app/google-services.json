@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "774297250092-vpp3dbd8k4i4hc05o5tl7ktfiqs6a0i8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pettix.dev",
+            "certificate_hash": "6678d62b78027d0abafaeccd5a1d39ec45f58922"
+          }
+        },
+        {
           "client_id": "774297250092-fn7ffva50ev5onfcbvhprkcgn3of01ct.apps.googleusercontent.com",
           "client_type": 3
         }

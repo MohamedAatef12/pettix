@@ -34,11 +34,11 @@ class AuthRepositoryImpl implements AuthRepository {
     return await remoteDataSource.loginWithGoogle(googleLoginModel);
   }
   @override
-  Future<Either<Failure, bool>> sendOtp(String phoneNumber) async {
-    return await remoteDataSource.sendOtp(phoneNumber);
+  Future<Either<Failure, bool>> sendOtp(String email) async {
+    return await remoteDataSource.sendOtp(email);
   }
   @override
-  Future<Either<Failure, bool>> verifyOtp(String phoneNumber, String code) async {
-    return await remoteDataSource.verifyOtp(phoneNumber, code);
+  Future<Either<Failure, bool>> verifyOtp(String email, String code) async {
+    return await remoteDataSource.verifyOtp(email, code);
   }
 }

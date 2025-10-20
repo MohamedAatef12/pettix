@@ -1,5 +1,5 @@
+import 'dart:io';
 import 'package:equatable/equatable.dart';
-
 import '../../domain/entities/comments_entity.dart';
 import '../../domain/entities/likes_entity.dart';
 import '../../domain/entities/post_entity.dart';
@@ -8,47 +8,49 @@ class HomeState extends Equatable {
   final List<PostEntity> posts;
   final List<CommentEntity> comments;
   final List<LikesEntity> likes;
-  final Set<int> likedPostIds;
+  final List<int> likedPostIds;
   final Map<int, int> postLikesCount;
   final Map<int, int> postCommentsCount;
   final bool isPostsLoading;
+  final bool isAddPostLoading;
   final bool isCommentsLoading;
   final bool isLikesLoading;
-  final bool isAddPostLoading;
   final bool isPostAdded;
-  final bool isPostLiked;
   final String? error;
+
+  // 🆕 for AddPost UI
+  final File? selectedImage;
 
   const HomeState({
     this.posts = const [],
     this.comments = const [],
     this.likes = const [],
-    this.likedPostIds = const {},
+    this.likedPostIds = const [],
     this.postLikesCount = const {},
     this.postCommentsCount = const {},
     this.isPostsLoading = false,
+    this.isAddPostLoading = false,
     this.isCommentsLoading = false,
     this.isLikesLoading = false,
-    this.isAddPostLoading = false,
     this.isPostAdded = false,
-    this.isPostLiked = false,
     this.error,
+    this.selectedImage,
   });
 
   HomeState copyWith({
     List<PostEntity>? posts,
     List<CommentEntity>? comments,
     List<LikesEntity>? likes,
-    Set<int>? likedPostIds,
+    List<int>? likedPostIds,
     Map<int, int>? postLikesCount,
     Map<int, int>? postCommentsCount,
     bool? isPostsLoading,
+    bool? isAddPostLoading,
     bool? isCommentsLoading,
     bool? isLikesLoading,
-    bool? isAddPostLoading,
     bool? isPostAdded,
-    bool? isPostLiked,
     String? error,
+    File? selectedImage,
   }) {
     return HomeState(
       posts: posts ?? this.posts,
@@ -57,13 +59,13 @@ class HomeState extends Equatable {
       likedPostIds: likedPostIds ?? this.likedPostIds,
       postLikesCount: postLikesCount ?? this.postLikesCount,
       postCommentsCount: postCommentsCount ?? this.postCommentsCount,
-      isLikesLoading: isLikesLoading ?? this.isLikesLoading,
       isPostsLoading: isPostsLoading ?? this.isPostsLoading,
-      isCommentsLoading: isCommentsLoading ?? this.isCommentsLoading,
       isAddPostLoading: isAddPostLoading ?? this.isAddPostLoading,
+      isCommentsLoading: isCommentsLoading ?? this.isCommentsLoading,
+      isLikesLoading: isLikesLoading ?? this.isLikesLoading,
       isPostAdded: isPostAdded ?? this.isPostAdded,
-      isPostLiked: isPostLiked ?? this.isPostLiked,
       error: error,
+      selectedImage: selectedImage ?? this.selectedImage,
     );
   }
 
@@ -76,11 +78,11 @@ class HomeState extends Equatable {
     postLikesCount,
     postCommentsCount,
     isPostsLoading,
+    isAddPostLoading,
     isCommentsLoading,
     isLikesLoading,
-    isAddPostLoading,
     isPostAdded,
-    isPostLiked,
     error,
+    selectedImage,
   ];
 }

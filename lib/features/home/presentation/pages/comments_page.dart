@@ -1,16 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pettix/config/di/di_wrapper.dart';
+import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
+import 'package:pettix/data/caching/i_cache_manager.dart';
+import 'package:pettix/features/home/domain/entities/comments_entity.dart';
+import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
+import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 import 'package:pettix/features/home/presentation/widgets/comments_body.dart';
 
 class CommentsPage extends StatelessWidget {
-  const CommentsPage({super.key});
+  final int postId;
+  const CommentsPage({super.key, required this.postId});
 
   @override
   Widget build(BuildContext context) {
+    final bloc = context.read<HomeBloc>();
+    final user = DI.find<ICacheManager>().getUserData();
     return Scaffold(
       backgroundColor: AppColors.current.white,
       appBar: AppBar(
@@ -36,9 +46,7 @@ class CommentsPage extends StatelessWidget {
           ),
         ),
       ),
-      body: const CommentsBody(),
-
-      // 👇 الجزء المثبت أسفل الشاشة
+      body: CommentsBody(postId: postId,),
       bottomNavigationBar: Container(
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
         decoration: BoxDecoration(
@@ -57,24 +65,52 @@ class CommentsPage extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 22.r,
-                backgroundImage: const AssetImage('assets/images/profile_photo.png'),
+                backgroundImage:  NetworkImage(user!.image.toString()),
               ),
               SizedBox(width: 10.w),
               Expanded(
-                child: CustomTextFormField(
-                  fillColor: true,
-                    fillColorValue: AppColors.current.lightGray,
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 20.w,
-                      vertical: 10.h,
+                child: TextField(
+                  controller: bloc.commentTextController,
+                  decoration: InputDecoration(
+                    hintText: 'Add a comment...',
+                    hintStyle: AppTextStyles.description,
+                    filled: true,
+                    fillColor: AppColors.current.gray.withOpacity(0.1),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                      borderSide: BorderSide.none,
                     ),
+                  ),
                   ),
                 ),
               SizedBox(width: 10.w),
               GestureDetector(
                 onTap: () {
-                  // send comment action
-                },
+                    final text = bloc.commentTextController.text.trim();
+                    if (text.isEmpty) return;
+
+                    final user = bloc.getUserDataUseCase.call();
+                    user.then((result) {
+                      result.fold(
+                            (failure) => ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(failure.message)),
+                        ),
+                            (userData) {
+                          final comment = CommentEntity(
+                            id: 0, // backend will assign
+                            text: text,
+                            postID: postId,
+                            userID: userData.id,
+                            date: DateTime.now().toIso8601String(),
+                            // userName: userData.userName,
+                            // userImage: userData.image.toString(),
+                          );
+                          bloc.add(AddCommentEvent(comment));
+                          bloc.commentTextController.clear();
+                        },
+                      );
+                    });
+                  },
                 child: SvgPicture.asset('assets/icons/add_comment.svg'),
               ),
             ],

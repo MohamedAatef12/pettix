@@ -8,7 +8,7 @@ class SendOtpUseCase {
 
   SendOtpUseCase(this.repository);
 
-  Future<Either<Failure,bool>> call(String phoneNumber) async {
-    return await repository.sendOtp(phoneNumber);
+  Future<Either<Failure,bool>> call(String email) async {
+    return await repository.sendOtp(email);
   }
 }

@@ -17,6 +17,7 @@ import 'package:talker_flutter/talker_flutter.dart' as _i207;
 import '../../data/caching/i_cache_manager.dart' as _i694;
 import '../../data/network/api_services.dart' as _i655;
 import '../../data/network/dio_factory.dart' as _i719;
+import '../../data/network/email_auth_service.dart' as _i1;
 import '../../data/network/twilio_service.dart' as _i718;
 import '../../features/auth/data/repos/auth_repo_impl.dart' as _i152;
 import '../../features/auth/data/sources/remote/auth_remote_data_source.dart'
@@ -62,6 +63,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i207.Talker>(() => registerModule.talker);
     gh.lazySingleton<_i719.DioFactory>(() => registerModule.dioFactory);
     gh.lazySingleton<_i694.ICacheManager>(() => registerModule.cacheManager);
+    gh.lazySingleton<_i1.EmailAuthService>(() => _i1.EmailAuthService());
     gh.lazySingleton<_i718.TwilioService>(() => _i718.TwilioService());
     gh.factory<_i526.GetUserLocalDataSource>(
       () => _i298.GetUserDataSourceImpl(gh<_i694.ICacheManager>()),
@@ -73,7 +75,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i865.AuthRemoteDataSource>(
       () => _i523.AuthRemoteDataSourceImpl(
         gh<_i655.ApiService>(),
-        gh<_i718.TwilioService>(),
+        gh<_i1.EmailAuthService>(),
       ),
     );
     gh.factory<_i787.AuthRepository>(

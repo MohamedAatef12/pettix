@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
+import 'package:pettix/data/network/email_auth_service.dart';
 import 'package:pettix/data/network/twilio_service.dart';
 import 'package:pettix/features/auth/data/models/login/google_login_model.dart';
 import 'package:pettix/features/auth/data/models/user_model.dart';
@@ -19,7 +20,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final RegisterUseCase registerUseCase;
   final LoginUseCase loginUseCase;
   final GoogleLoginUseCase googleLoginUseCase;
-  final TwilioService twilioService;
+  final EmailAuthService emailAuthService;
 
   // Controllers for Register
 final fullNameController = TextEditingController();
@@ -42,7 +43,7 @@ final fullNameController = TextEditingController();
     required this.registerUseCase,
     required this.loginUseCase,
     required this.googleLoginUseCase,
-    required this.twilioService,
+    required this.emailAuthService,
   }) : super(AuthInitial()) {
     // Register events
     on<RegisterStepOneSubmitted>(_registerStepOne);
@@ -91,7 +92,7 @@ final fullNameController = TextEditingController();
     );
 
     // نرسل OTP عبر Twilio
-    final otpSent = await twilioService.sendOtp(event.phone);
+    final otpSent = await emailAuthService.sendOtp(event.email);
 
     if (otpSent) {
       emit(RegisterStepOneSuccess());
@@ -131,8 +132,8 @@ final fullNameController = TextEditingController();
 
     emit(RegisterLoading());
 
-    final verified = await twilioService.verifyOtp(
-      _tempRegisterData!.phone,
+    final verified = await emailAuthService.verifyOtp(
+      _tempRegisterData!.email,
       event.otp,
     );
 

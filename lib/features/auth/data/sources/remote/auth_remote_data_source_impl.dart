@@ -3,6 +3,7 @@ import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/data/network/api_services.dart';
 import 'package:pettix/data/network/constants.dart';
+import 'package:pettix/data/network/email_auth_service.dart';
 import 'package:pettix/data/network/twilio_service.dart';
 import 'package:pettix/features/auth/data/models/login/google_login_model.dart';
 import 'package:pettix/features/auth/data/models/login/login_response_model.dart';
@@ -16,8 +17,8 @@ import 'package:pettix/data/network/failure.dart';
 @Injectable(as: AuthRemoteDataSource)
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final ApiService apiService;
-  final TwilioService twilioService;
-  AuthRemoteDataSourceImpl(this.apiService, this.twilioService);
+  final EmailAuthService emailAuthService;
+  AuthRemoteDataSourceImpl(this.apiService, this.emailAuthService);
 
   @override
   Future<Either<Failure, LoginResponseModel>> login(LoginModel model) async {
@@ -92,13 +93,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<Either<Failure, bool>> sendOtp(String phoneNumber) async {
+  Future<Either<Failure, bool>> sendOtp(String email) async {
     try {
-      final result = await twilioService.sendOtp(phoneNumber);
+      final result = await emailAuthService.sendOtp(email);
       if (result) {
         return Right(true);
       } else {
-        return Left(Failure('Twilio OTP send failed'));
+        return Left(Failure('Email OTP send failed'));
       }
     } catch (e) {
       return Left(Failure(e.toString()));
@@ -106,13 +107,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<Either<Failure, bool>> verifyOtp(String phoneNumber, String code) async {
+  Future<Either<Failure, bool>> verifyOtp(String email, String code) async {
     try {
-      final result = await twilioService.verifyOtp(phoneNumber, code);
+      final result = await emailAuthService.verifyOtp(email, code);
       if (result) {
         return Right(true);
       } else {
-        return Left(Failure('Twilio OTP verification failed'));
+        return Left(Failure('Email OTP verification failed'));
       }
     } catch (e) {
       return Left(Failure(e.toString()));

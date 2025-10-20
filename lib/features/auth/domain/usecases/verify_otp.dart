@@ -8,7 +8,7 @@ class VerifyOtp {
 
   VerifyOtp(this.repository);
 
-  Future<Either<Failure,bool>> call(String phoneNumber, String code) async {
-    return await repository.verifyOtp(phoneNumber,code);
+  Future<Either<Failure,bool>> call(String email, String code) async {
+    return await repository.verifyOtp(email,code);
   }
 }

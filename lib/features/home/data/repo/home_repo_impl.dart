@@ -82,6 +82,8 @@ class HomeRepositoryImpl implements HomeDomainRepository {
                   postID: model.postID,
                   userID: model.userID,
                   date: model.date,
+                  // userName: model.userName,
+                  // userImage: model.userImage,
                 ),
               ))
           .toList()),

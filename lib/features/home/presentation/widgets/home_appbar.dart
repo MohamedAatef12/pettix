@@ -1,9 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
+
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -16,31 +16,32 @@ class HomeAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = DI.find<ICacheManager>().getUserData();
     return Padding(
       padding: PaddingConstants.medium,
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 30.r,
-            backgroundImage: NetworkImage(DI.find<ICacheManager>().getUserData()!.image.toString()),
+          GestureDetector(
+            onTap: () {
+              context.push('/side_menu');
+            },
+            child: CircleAvatar(
+              radius: 30.r,
+              backgroundColor: AppColors.current.lightGray,
+              backgroundImage: NetworkImage(user!.image.toString()),
+              onBackgroundImageError: (_, __) {
+                const AssetImage('assets/images/no_user.png');
+              },
+            ),
           ),
           SizedBox(width: 10.w,),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Hi', style: AppTextStyles.description.copyWith(
-                  fontSize: 12.sp
-              )),
-              SizedBox(height: 2.h,),
-              SizedBox(
-                  width:120.w,child: Text(DI.find<ICacheManager>().getUserData()!.userName, style: AppTextStyles.bold)),
-            ],
-          ),
+          SizedBox(
+                  width:120.w,child: Text(user.userName, style: AppTextStyles.bold)),
+
           Spacer(),
           GestureDetector(
             onTap: () {
               context.push('/home_search');
-              final userToken = DI.find<ICacheManager>().getToken();
             },
             child: CircleAvatar(
                 radius: 20.r,
@@ -49,7 +50,9 @@ class HomeAppBar extends StatelessWidget {
           ),
           SizedBox(width: 10.w,),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              context.push('/notifications');
+            },
             child: CircleAvatar(
                 radius: 20.r,
                 backgroundColor:AppColors.current.white,

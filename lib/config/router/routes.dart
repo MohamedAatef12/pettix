@@ -15,6 +15,8 @@ class AppRoutes {
   static const String addPost = '/add_post';
   static const String comments = '/comments';
   static const String homeSearch = '/home_search';
+  static const String notifications = '/notifications';
+  static const String sideMenu = '/side_menu';
 }
 
 class AppRouteNames {
@@ -34,4 +36,6 @@ class AppRouteNames {
   static const String addPost = 'add_post';
   static const String comments = 'comments';
   static const String homeSearch = '/home_search';
+  static const String notifications = 'notifications';
+  static const String sideMenu = 'side_menu';
 }

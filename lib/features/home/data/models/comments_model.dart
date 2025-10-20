@@ -7,6 +7,8 @@ class CommentModel extends CommentEntity {
     required super.postID,
     required super.userID,
     required super.date,
+    // required super.userName,
+    // required super.userImage,
   });
 
   factory CommentModel.fromJson(Map<String, dynamic> json) {
@@ -16,6 +18,8 @@ class CommentModel extends CommentEntity {
       postID: json['postID'],
       userID: json['userID'],
       date: json['date'],
+      // userName: json['userName'],
+      // userImage: json['userImage'],
     );
   }
 
@@ -26,6 +30,8 @@ class CommentModel extends CommentEntity {
       'postID': postID,
       'userID': userID,
       'date': date,
+      // 'userName': userName,
+      // 'userImage': userImage,
     };
   }
 
@@ -36,6 +42,8 @@ class CommentModel extends CommentEntity {
           postID: commentEntity.postID,
           userID: commentEntity.userID,
           date: commentEntity.date,
+          // userName: commentEntity.userName,
+          // userImage: commentEntity.userImage,
         );
 
   CommentEntity toEntity(CommentModel commentModel) => CommentEntity(
@@ -44,5 +52,7 @@ class CommentModel extends CommentEntity {
         postID: commentModel.postID,
         userID: commentModel.userID,
         date: commentModel.date,
+        // userName: commentModel.userName,
+        // userImage: commentModel.userImage,
       );
 }
