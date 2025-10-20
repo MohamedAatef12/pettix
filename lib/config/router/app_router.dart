@@ -9,6 +9,8 @@ import 'package:pettix/features/auth/presentation/pages/forgot_password/reset_pa
 import 'package:pettix/features/auth/presentation/pages/register/set_password_page.dart';
 import 'package:pettix/features/auth/presentation/pages/register/verified_page.dart';
 import 'package:pettix/features/bottom_bar/views/pages/bottom_bar_page.dart';
+import 'package:pettix/features/chat/presentation/view/pages/chat_list_page.dart';
+import 'package:pettix/features/chat/presentation/view/pages/chat_page.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 import 'package:pettix/features/home/presentation/pages/add_post_page.dart';
@@ -116,6 +118,20 @@ GoRouter appRouter() => GoRouter(
       path: AppRoutes.addPost,
       name: AppRouteNames.addPost,
       builder: (context, state) => const AddPostPage(),
+    ),
+    GoRoute(
+      path: '${AppRoutes.chat}/:index',
+      name: AppRouteNames.chat,
+      builder: (context, state) {
+        final index = int.tryParse(state.pathParameters['index'] ?? '0') ?? 0;
+        return ChatPage(index: index);
+      },
+    ),
+
+    GoRoute(
+      path: AppRoutes.chatList,
+      name: AppRouteNames.chatList,
+      builder: (context, state) => const ChatListPage(),
     ),
     GoRoute(
       path: AppRoutes.comments,

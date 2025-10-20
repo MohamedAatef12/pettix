@@ -159,7 +159,9 @@ class PostCard extends StatelessWidget {
 
                     /// 💾 SAVE BUTTON
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        context.push('/chat_list');
+                      },
                       child: SvgPicture.asset('assets/icons/save_post.svg'),
                     ),
                   ],
