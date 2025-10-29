@@ -2,11 +2,14 @@ import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pettix/data/network/failure.dart';
 import 'package:pettix/features/auth/domain/entities/register_domain_entity.dart';
+import 'package:pettix/features/auth/domain/entities/user_entity.dart';
+import 'package:pettix/features/home/data/models/author_model.dart';
 import 'package:pettix/features/home/data/models/comments_model.dart';
 import 'package:pettix/features/home/data/models/likes_model.dart';
 import 'package:pettix/features/home/data/models/post_model.dart';
 import 'package:pettix/features/home/data/sources/local/local_data_source.dart';
 import 'package:pettix/features/home/data/sources/remote/home_remote_data_source.dart';
+import 'package:pettix/features/home/domain/entities/author_entity.dart';
 import 'package:pettix/features/home/domain/entities/comments_entity.dart';
 import 'package:pettix/features/home/domain/entities/likes_entity.dart';
 import 'package:pettix/features/home/domain/entities/post_entity.dart';
@@ -33,15 +36,13 @@ class HomeRepositoryImpl implements HomeDomainRepository {
           .map((model) => model.toEntity(
                 PostModel(
                   id: model.id,
-                  text: model.text,
-                  username: model.username,
-                  date: model.date,
-                  authorID: model.authorID,
-                  imageUrl: model.imageUrl,
                   author: model.author,
-                  commentsCount: model.commentsCount,
-                  likesCount: model.likesCount,
-                  liked: model.liked,
+                  comments: model.comments,
+                  likes: model.likes,
+                  content: model.content,
+                  creationDate: model.creationDate,
+                  modifyDate: model.modifyDate,
+                  images: model.images,
                 ),
               ))
           .toList()),
@@ -79,11 +80,12 @@ class HomeRepositoryImpl implements HomeDomainRepository {
                 CommentModel(
                   id: model.id,
                   text: model.text,
-                  postID: model.postID,
-                  userID: model.userID,
-                  date: model.date,
-                  // userName: model.userName,
-                  // userImage: model.userImage,
+                  author: model.author,
+                  creationDate: model.creationDate,
+                  postId: model.postId,
+                  parentCommentId: model.parentCommentId,
+                  replies: model.replies,
+
                 ),
               ))
           .toList()),
@@ -119,9 +121,10 @@ class HomeRepositoryImpl implements HomeDomainRepository {
           .map((like) => like.toEntity(
                 LikesModel(
                   id: like.id,
-                  postID: like.postID,
-                  userID: like.userID,
-                  date: like.date,
+                  author: like.author,
+                  creationDate: like.creationDate,
+                  postId: like.postId,
+
                 ),
               ))
           .toList()),
@@ -137,9 +140,21 @@ class HomeRepositoryImpl implements HomeDomainRepository {
 
       return Right(LikesModel(
         id: 0,
-        postID: postId,
-        userID: userId,
-        date: DateTime.now().toIso8601String(),
+        author: AuthorModel(
+          id: userId,
+          nameAr: '',
+          nameEn: '',
+          avatar: '',
+          email: null,
+          phone: null,
+          genderId: null,
+          genderName: null,
+          contactTypeId: 4,
+          statusId: 1,
+          age: null,
+        ),
+        postId: 0,
+        creationDate: DateTime.now().toIso8601String(),
       ));
     });
   }
@@ -156,7 +171,7 @@ class HomeRepositoryImpl implements HomeDomainRepository {
   }
 
   @override
-  Future<Either<Failure, RegisterEntity>> getCachedUserData() async {
+  Future<Either<Failure, UserEntity>> getCachedUserData() async {
     try {
       return Right(homeLocalDataSource.getUserData());
     } catch (e) {

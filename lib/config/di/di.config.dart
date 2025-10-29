@@ -71,7 +71,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i361.Dio>(
       () => registerModule.dio(gh<_i719.DioFactory>(), gh<_i207.Talker>()),
     );
-    gh.lazySingleton<_i655.ApiService>(() => _i655.ApiService(gh<_i361.Dio>()));
+    gh.lazySingleton<_i655.ApiService>(
+      () => _i655.ApiService(gh<_i361.Dio>(), gh<_i694.ICacheManager>()),
+    );
     gh.factory<_i865.AuthRemoteDataSource>(
       () => _i523.AuthRemoteDataSourceImpl(
         gh<_i655.ApiService>(),

@@ -9,11 +9,13 @@ abstract class ICacheManager {
   Future<void> setCrossOnBoardingPage();
   bool isCrossedOnBoardingPage();
 
-  RegisterModel? getUserData();
+  UserModel? getUserData();
   Future<void> setToken(String token);
 
   Future<String?> getToken();
   Future<void> saveLogin(bool rememberMe);
+  Future<void> setRefreshToken(String refreshToken);
+  Future<String?> getRefreshToken();
   Future<bool> isRemembered();
   Future<Map<String, dynamic>?> getSavedLogin();
   Future<void> clearLogin();

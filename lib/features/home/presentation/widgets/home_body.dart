@@ -15,71 +15,75 @@ class HomeBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-   return Expanded(
-     child: BlocBuilder<HomeBloc,HomeState>(
-          builder: (context,state) {
-            if (state.isPostsLoading) {
-              return Center(child: HomeShimmer());
-            }
-            if (state.error != null) {
-              return Center(
-                child: Text(
-                  state.error!,
-                  style: const TextStyle(color: Colors.red),
-                ),
-              );
-            }
-            if (state.posts.isEmpty) {
-              return Center(
-                child: SvgPicture.asset(
-                  'assets/images/no_content_photo.svg',
-                  fit: BoxFit.cover,
-                ),
-              );
-            }
+    return Expanded(
+      child: BlocBuilder<HomeBloc, HomeState>(
+        builder: (context, state) {
+          Widget content;
 
-            return Stack(
-              children: [ListView.builder(
-                itemCount: state.posts.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: PaddingConstants.verticalSmall,
-                    child: PostCard(
-                      post: state.posts[index],
-                    ),
-                  );
-                },
+          if (state.isPostsLoading) {
+            content = const Center(child: HomeShimmer());
+          } else if (state.error != null) {
+            content = Center(
+              child: Text(
+                state.error!,
+                style: const TextStyle(color: Colors.red),
               ),
-              Positioned(
-                  bottom: 10.h,
-                  right: 10.w,
-                  child: GestureDetector(
-                    onTap: () {
-                      context.push('/add_post');
-                    },
-                    child: Container(
-                      width: 50.w,
-                      height: 50.h,
-                      decoration: BoxDecoration(
-                        color: AppColors.current.primary,
-                        shape: BoxShape.circle,
+            );
+          } else if (state.posts.isEmpty) {
+            content = Center(
+              child: SvgPicture.asset(
+                'assets/images/no_content_photo.svg',
+                fit: BoxFit.cover,
+              ),
+            );
+          } else {
+            content = ListView.builder(
+              itemCount: state.posts.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: PaddingConstants.verticalSmall,
+                  child: PostCard(post: state.posts[index]),
+                );
+              },
+            );
+          }
 
-                      ),
-                      child: Center(
-                        child: SvgPicture.asset(
-                          'assets/icons/add_circle.svg',
-                          width: 24.w,
-                          height: 24.h,
-                          colorFilter: ColorFilter.mode(AppColors.current.white, BlendMode.srcIn),
+          return Stack(
+            children: [
+              content,
+              Positioned(
+                bottom: 10.h,
+                right: 10.w,
+                child: GestureDetector(
+                  onTap: () {
+                    context.push('/add_post');
+                  },
+                  child: Container(
+                    width: 50.w,
+                    height: 50.h,
+                    decoration: BoxDecoration(
+                      color: AppColors.current.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: SvgPicture.asset(
+                        'assets/icons/add_circle.svg',
+                        width: 24.w,
+                        height: 24.h,
+                        colorFilter: ColorFilter.mode(
+                          AppColors.current.white,
+                          BlendMode.srcIn,
                         ),
                       ),
                     ),
                   ),
                 ),
-                  ],
-                );
-        }
+              ),
+            ],
+          );
+        },
       ),
-   );
+    );
   }
+
 }

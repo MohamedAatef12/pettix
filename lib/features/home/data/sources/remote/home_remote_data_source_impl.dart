@@ -22,18 +22,20 @@ class RemoteDataSourceImpl implements RemoteDataSource {
 
   @override
   Future<Either<Failure, List<PostModel>>> getPosts() async {
-    final userToken =await DI.find<ICacheManager>().getToken();
+    final userToken = await DI.find<ICacheManager>().getToken();
     print('🔑 userToken: $userToken');
     try {
       final data = await apiService.getList(
         endPoint: Constants.postsEndpoint,
-        headers: {
-      'Authorization': 'Bearer $userToken'},
+        headers: {'Authorization': 'Bearer $userToken'},
       );
       final posts = data.map((e) => PostModel.fromJson(e)).toList();
       // Sort posts by date descending (latest first)
       posts.sort(
-          (a, b) => DateTime.parse(b.date).compareTo(DateTime.parse(a.date)));
+        (a, b) => DateTime.parse(
+          b.creationDate,
+        ).compareTo(DateTime.parse(a.creationDate)),
+      );
 
       return Right(posts);
     } catch (e) {
@@ -64,28 +66,39 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   @override
   Future<Either<Failure, void>> editPost(PostModel post) async {
     try {
+      final jsonData = await post.toJson(); // 👈 ضروري await هنا
+
       await apiService.put(
         endPoint: '${Constants.postsEndpoint}/${post.id}',
-        data: post.toJson(),
+        data: jsonData,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
       );
+
       return const Right(null);
     } catch (e) {
       return Left(DioFailure.fromDioError(e));
     }
   }
 
+
   @override
   Future<Either<Failure, void>> addPost(PostModel post) async {
     try {
-      log('Adding post: ${post.toJson()}');
+      log('Adding post: ${post.id}');
+      final jsonData = await post.toJson(); // مهم جداً await هنا
+
       await apiService.post(
         endPoint: Constants.postsEndpoint,
-        data: post.toJson(),
+        data: jsonData,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
       );
+
       return const Right(null);
     } catch (e) {
       log('Error adding post: $e');
@@ -107,7 +120,8 @@ class RemoteDataSourceImpl implements RemoteDataSource {
 
   @override
   Future<Either<Failure, List<CommentModel>>> getPostComments(
-      int postId) async {
+    int postId,
+  ) async {
     try {
       final data = await apiService.getList(
         endPoint: '${Constants.commentsEndpoint}/PostComments/$postId',
@@ -116,7 +130,10 @@ class RemoteDataSourceImpl implements RemoteDataSource {
       final comments = data.map((e) => CommentModel.fromJson(e)).toList();
       // Sort comments by date descending (latest first)
       comments.sort(
-          (a, b) => DateTime.parse(b.date).compareTo(DateTime.parse(a.date)));
+        (a, b) => DateTime.parse(
+          b.creationDate,
+        ).compareTo(DateTime.parse(a.creationDate)),
+      );
 
       if (comments.isEmpty) {
         return const Right([]);
@@ -171,13 +188,16 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   Future<Either<Failure, List<LikesModel>>> getPostLikes(int postId) async {
     try {
       final data = await apiService.getList(
-        endPoint: '${Constants.likesEndpoint}/Postlikes/$postId',
+        endPoint: '${Constants.getPostLikes}/$postId',
       );
 
       final likes = data.map((e) => LikesModel.fromJson(e)).toList();
       // Sort likes by date descending (latest first)
       likes.sort(
-          (a, b) => DateTime.parse(b.date).compareTo(DateTime.parse(a.date)));
+        (a, b) => DateTime.parse(
+          b.creationDate,
+        ).compareTo(DateTime.parse(a.creationDate)),
+      );
       if (likes.isEmpty) {
         return const Right([]);
       }
@@ -191,33 +211,53 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   @override
   Future<Either<Failure, LikesModel>> likePost(int postId, int userId) async {
     try {
-      final data = await apiService.post(
-        endPoint: Constants.likesEndpoint,
+      // ✅ Get token from cache
+      final userToken = await DI.find<ICacheManager>().getToken();
+
+      // ✅ Send token in headers, not body
+      final response = await apiService.post(
+        endPoint: '${Constants.postLikesEndpoint}/$postId',
         data: {
-          'postID': postId,
-          'userID': userId,
+          'userId': userId,
           'date': DateTime.now().toIso8601String(),
         },
+        headers: {
+          'Authorization': 'Bearer $userToken',
+          'Content-Type': 'application/json',
+        },
       );
-      print('[RemoteDataSource] Sending like request for post $postId');
 
-      return Right(LikesModel.fromJson(data));
+      print('[RemoteDataSource] Sent like for post $postId by user $userId');
+
+      return Right(LikesModel.fromJson(response));
+    } on DioException catch (dioError) {
+      return Left(DioFailure.fromDioError(dioError));
     } catch (e) {
-      return Left(DioFailure.fromDioError(e));
+      return Left(Failure('Unexpected error: ${e.toString()}'));
     }
   }
+
+
 
   @override
   Future<Either<Failure, void>> unlikePost(int postId) async {
     try {
-      final response = await apiService.delete(
-        endPoint: '${Constants.likesEndpoint}/$postId',
-      );
+      final userToken = await DI.find<ICacheManager>().getToken();
+      log("==============================");
+      log(userToken.toString());
+      log("==============================");
 
-      return Right(null);
+      final response = await apiService.delete(
+        endPoint: '${Constants.postLikesEndpoint}/$postId',
+        headers: {
+          'Authorization': 'Bearer $userToken',
+          'Content-Type': 'application/json',
+        },
+      );
+      return Right (response);
     } on DioException catch (dioError) {
       return Left(DioFailure.fromDioError(dioError));
-    } catch (e, stackTrace) {
+    } catch (e) {
       return Left(Failure('Unexpected error: ${e.toString()}'));
     }
   }

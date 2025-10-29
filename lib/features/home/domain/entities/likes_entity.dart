@@ -1,18 +1,19 @@
 import 'package:equatable/equatable.dart';
+import 'package:pettix/features/home/domain/entities/author_entity.dart';
 
 class LikesEntity extends Equatable {
   final int id;
-  final int userID;
-  final int postID;
-  final String date;
+  final AuthorEntity author;
+  final String creationDate;
+  final int? postId ;
 
   const LikesEntity({
     required this.id,
-    required this.userID,
-    required this.postID,
-    required this.date,
+   required this.author,
+    required this.creationDate,
+     this.postId,
   });
 
   @override
-  List<Object?> get props => [id, userID, postID, date];
+  List<Object?> get props => [id, author, creationDate, postId];
 }

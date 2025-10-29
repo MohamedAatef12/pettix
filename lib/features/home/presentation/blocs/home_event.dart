@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 import '../../domain/entities/comments_entity.dart';
 import '../../domain/entities/post_entity.dart';
@@ -57,15 +59,20 @@ class DeleteLikeEvent extends HomeEvent {
   @override
   List<Object?> get props => [postId];
 }
-
 class ClearPostDetailsEvent extends HomeEvent {}
-
-// 🆕 Add-post body specific events
 class PickImageEvent extends HomeEvent {}
-
-class RemoveSelectedImageEvent extends HomeEvent {}
-
 class SubmitPostEvent extends HomeEvent {}
-class PickImageFromGalleryEvent extends HomeEvent {}
+class PickImagesFromGalleryEvent extends HomeEvent {}
+class AddImageFromCameraEvent extends HomeEvent {
+  final File image;
+  AddImageFromCameraEvent(this.image);
+  @override
+  List<Object?> get props => [image];
+}
 
-class PickImageFromCameraEvent extends HomeEvent {}
+class RemoveSelectedImageEvent extends HomeEvent {
+  final int index;
+  RemoveSelectedImageEvent(this.index);
+  @override
+  List<Object?> get props => [index];
+}

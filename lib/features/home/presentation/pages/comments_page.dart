@@ -8,6 +8,7 @@ import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
+import 'package:pettix/features/home/data/models/author_model.dart';
 import 'package:pettix/features/home/domain/entities/comments_entity.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
@@ -46,7 +47,7 @@ class CommentsPage extends StatelessWidget {
           ),
         ),
       ),
-      body: CommentsBody(postId: postId,),
+      body: CommentsBody(postId: postId),
       bottomNavigationBar: Container(
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
         decoration: BoxDecoration(
@@ -65,7 +66,7 @@ class CommentsPage extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 22.r,
-                backgroundImage:  NetworkImage(user!.image.toString()),
+                backgroundImage: NetworkImage(user!.image.toString()),
               ),
               SizedBox(width: 10.w),
               Expanded(
@@ -81,36 +82,47 @@ class CommentsPage extends StatelessWidget {
                       borderSide: BorderSide.none,
                     ),
                   ),
-                  ),
                 ),
+              ),
               SizedBox(width: 10.w),
               GestureDetector(
                 onTap: () {
-                    final text = bloc.commentTextController.text.trim();
-                    if (text.isEmpty) return;
+                  final text = bloc.commentTextController.text.trim();
+                  if (text.isEmpty) return;
 
-                    final user = bloc.getUserDataUseCase.call();
-                    user.then((result) {
-                      result.fold(
-                            (failure) => ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(failure.message)),
-                        ),
-                            (userData) {
-                          final comment = CommentEntity(
-                            id: 0, // backend will assign
-                            text: text,
-                            postID: postId,
-                            userID: userData.id,
-                            date: DateTime.now().toIso8601String(),
-                            // userName: userData.userName,
-                            // userImage: userData.image.toString(),
-                          );
-                          bloc.add(AddCommentEvent(comment));
-                          bloc.commentTextController.clear();
-                        },
-                      );
-                    });
-                  },
+                  final user = bloc.getUserDataUseCase.call();
+                  user.then((result) {
+                    result.fold(
+                      (failure) => ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(SnackBar(content: Text(failure.message))),
+                      (userData) {
+                        final comment = CommentEntity(
+                          id: 0, // backend will assign
+                          text: text,
+                          author: AuthorModel(
+                            id: userData.id,
+                            email: userData.email,
+                            nameAr: '',
+                            nameEn: userData.userName,
+                            phone: userData.phone,
+                            genderId: userData.genderId,
+                            genderName: userData.gender,
+                            contactTypeId: userData.contactTypeId,
+                            statusId: userData.statusId,
+                            avatar: userData.avatar,
+                            age: userData.age,
+                          ),
+                          creationDate: DateTime.now().toIso8601String(),
+                          postId: postId,
+                          replies: [],
+                        );
+                        bloc.add(AddCommentEvent(comment));
+                        bloc.commentTextController.clear();
+                      },
+                    );
+                  });
+                },
                 child: SvgPicture.asset('assets/icons/add_comment.svg'),
               ),
             ],

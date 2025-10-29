@@ -40,7 +40,7 @@ class LoginBody extends StatelessWidget {
               current is GoogleLoginSuccess || current is LoginSuccess, // ✅ include both
               listener: (context, state) {
                 if (state is GoogleLoginSuccess || state is LoginSuccess) {
-                  context.go(AppRoutes.bottomNav);
+                  context.push(AppRoutes.bottomNav);
                 }
               },
               child: const LoginForm(),

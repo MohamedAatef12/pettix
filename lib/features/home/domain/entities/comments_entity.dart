@@ -1,22 +1,31 @@
 import 'package:equatable/equatable.dart';
+import 'package:pettix/features/home/domain/entities/author_entity.dart';
 
 class CommentEntity extends Equatable {
   final int id;
+  final int postId;
   final String text;
-  final int postID;
-  // final String userName;
-  // final String userImage;
-  final int userID;
-  final String date;
+  final String creationDate;
+  final AuthorEntity author;
+  final int? parentCommentId;
+  final List<CommentEntity> replies;
   const CommentEntity({
     required this.id,
     required this.text,
-    required this.postID,
-    required this.userID,
-    required this.date,
-    // required this.userName,
-    // required this.userImage,
+    required this.postId,
+    required this.author,
+    required this.creationDate,
+    this.parentCommentId,
+    required this.replies,
   });
   @override
-  List<Object?> get props => [id, text, postID, userID, date];
+  List<Object?> get props => [
+    id,
+    text,
+    postId,
+    author,
+    creationDate,
+    parentCommentId,
+    replies,
+  ];
 }

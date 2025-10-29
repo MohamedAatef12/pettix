@@ -31,7 +31,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final message = response['message'] ?? '';
 
       if (message == 'Login successful') {
-        final userJson = response['user'];
+        final userJson = response['contact'];
         final userModel = UserModel.fromJson(userJson);
         final token = response['token'] as String;
         await DI.find<ICacheManager>().setUserData(userModel);
@@ -41,6 +41,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             user: userModel,
             token: token,
             message: response['message'] ?? 'Login successful',
+            role: response['role'] ?? '',
+            refreshToken: response['refreshToken'] ?? '',
+            success: response['success'] ?? true,
           ),
         );
       }
@@ -62,8 +65,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return Left(DioFailure.fromDioError(e));
     }
   }
+
   @override
-  Future<Either<Failure, LoginResponseModel>> loginWithGoogle(GoogleLoginModel model) async {
+  Future<Either<Failure, LoginResponseModel>> loginWithGoogle(
+    GoogleLoginModel model,
+  ) async {
     try {
       final response = await apiService.post(
         endPoint: Constants.googleLoginEndpoint,
@@ -73,7 +79,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final message = response['message']?.toString() ?? '';
 
       if (message.contains('Login successful')) {
-        final userJson = response['user'];
+        final userJson = response['contact'];
         final token = response['token'];
 
         if (userJson == null || token == null) {
@@ -83,7 +89,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         final userModel = UserModel.fromJson(userJson);
         await DI.find<ICacheManager>().setUserData(userModel);
 
-        return Right(LoginResponseModel(user: userModel, token: token, message: message));
+        return Right(
+          LoginResponseModel(
+            user: userModel,
+            token: token,
+            message: message,
+            refreshToken: response["refreshToken"],
+            success: response["success"],
+            role: response["role"],
+          ),
+        );
       }
 
       return Left(Failure(response['message'] ?? 'Google login failed'));
@@ -119,5 +134,4 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return Left(Failure(e.toString()));
     }
   }
-
 }

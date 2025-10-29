@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
@@ -44,9 +45,10 @@ class AddPostBody extends StatelessWidget {
                   GestureDetector(
                     onTap: state.isAddPostLoading
                         ? null
-                        : ()=> {bloc.add(SubmitPostEvent()),
+                        : ()=> {
+                      bloc.add(SubmitPostEvent()),
                       state.isPostAdded?
-                    context.pushReplacement('/bottom_nav'):null
+                      context.pushReplacement('/bottom_nav'):null
                     },
 
                     child: Container(
@@ -88,70 +90,71 @@ class AddPostBody extends StatelessWidget {
                   CircleAvatar(
                     radius: 25.r,
                     backgroundImage:
-                    NetworkImage(userData!.image),
+                    NetworkImage(userData!.avatar.toString()),
                   ),
                   SizedBox(width: 10.w),
                   Text(userData.userName, style: AppTextStyles.bold),
                 ],
               ),
-
               SizedBox(height: 20.h),
-
-              // 🔹 Caption Input
               CustomTextFormField(
                 controller: bloc.postTextController,
                 hintText: 'Write a caption...',
                 maxLines: 5,
-                contentPadding: EdgeInsets.all(12.w),
+
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
               ),
-
-              // 🔹 Image Preview (if selected)
-              if (state.selectedImage != null) ...[
-                SizedBox(height: 12.h),
-                Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12.r),
-                      child: Image.file(
-                        File(state.selectedImage!.path),
-                        height: 200.h,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: GestureDetector(
-                        onTap: () =>
-                            bloc.add(RemoveSelectedImageEvent()), // 🧠 BLoC
-                        child: Container(
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.black54,
+              if (state.selectedImages.isNotEmpty) ...[
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
+                  ),
+                  itemCount: state.selectedImages.length,
+                  itemBuilder: (context, index) {
+                    final file = state.selectedImages[index];
+                    return Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12.r),
+                          child: Image.file(
+                            file,
+                            fit: BoxFit.cover,
                           ),
-                          padding: const EdgeInsets.all(4),
-                          child:
-                          const Icon(Icons.close, color: Colors.white, size: 20),
                         ),
-                      ),
-                    ),
-                  ],
+                        Positioned(
+                          top: 6,
+                          right: 6,
+                          child: GestureDetector(
+                            onTap: () => bloc.add(RemoveSelectedImageEvent(index)),
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                color: Colors.black54,
+                                shape: BoxShape.circle,
+                              ),
+                              padding: const EdgeInsets.all(4),
+                              child: const Icon(Icons.close, color: Colors.white, size: 18),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ],
-
               const Spacer(),
-
-              // 🔹 Bottom Row (Gallery + Camera)
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   GestureDetector(
-                    onTap: () => bloc.add(PickImageFromGalleryEvent()),
+                    onTap: () => bloc.add(PickImagesFromGalleryEvent()),
                     child: Container(
                       decoration: BoxDecoration(
                         color: AppColors.current.lightGray,
@@ -165,7 +168,12 @@ class AddPostBody extends StatelessWidget {
                   ),
                   SizedBox(width: 20.h),
                   GestureDetector(
-                    onTap: () => bloc.add(PickImageFromCameraEvent()),
+                    onTap: ()async{
+                      final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
+                      if (pickedFile != null) {
+                        bloc.add(AddImageFromCameraEvent(File(pickedFile.path)));
+                      }
+                    },
                     child: Container(
                       decoration: BoxDecoration(
                         color: AppColors.current.lightGray,

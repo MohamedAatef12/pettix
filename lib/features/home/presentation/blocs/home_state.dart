@@ -17,10 +17,7 @@ class HomeState extends Equatable {
   final bool isLikesLoading;
   final bool isPostAdded;
   final String? error;
-
-  // 🆕 for AddPost UI
-  final File? selectedImage;
-
+  final List<File> selectedImages;
   const HomeState({
     this.posts = const [],
     this.comments = const [],
@@ -34,7 +31,7 @@ class HomeState extends Equatable {
     this.isLikesLoading = false,
     this.isPostAdded = false,
     this.error,
-    this.selectedImage,
+    this.selectedImages = const [],
   });
 
   HomeState copyWith({
@@ -50,7 +47,7 @@ class HomeState extends Equatable {
     bool? isLikesLoading,
     bool? isPostAdded,
     String? error,
-    File? selectedImage,
+    List<File>? selectedImages,
   }) {
     return HomeState(
       posts: posts ?? this.posts,
@@ -65,7 +62,7 @@ class HomeState extends Equatable {
       isLikesLoading: isLikesLoading ?? this.isLikesLoading,
       isPostAdded: isPostAdded ?? this.isPostAdded,
       error: error,
-      selectedImage: selectedImage ?? this.selectedImage,
+      selectedImages: selectedImages ?? this.selectedImages,
     );
   }
 
@@ -83,6 +80,6 @@ class HomeState extends Equatable {
     isLikesLoading,
     isPostAdded,
     error,
-    selectedImage,
+    selectedImages,
   ];
 }

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -159,10 +161,14 @@ final fullNameController = TextEditingController();
 
     final result = await loginUseCase(event.model);
     await result.fold(
-          (failure) async => emit(LoginFailure(failure.message)),
+          (failure) async {
+            print('failure message: ${failure.message}');
+            emit(LoginFailure(failure.message));} ,
           (loginResponse) async {
         await DI.find<ICacheManager>()
-            .setUserData(UserModel.fromEntity(loginResponse.user)); // ✅ stores user + logged_in = true
+            .setUserData(UserModel.fromEntity(loginResponse.user));
+        await DI.find<ICacheManager>().setToken(loginResponse.token);
+        await DI.find<ICacheManager>().setRefreshToken(loginResponse.refreshToken.toString());// ✅ stores user + logged_in = true
 
         if (event.rememberMe) {
           await DI.find<ICacheManager>().saveLogin(true);

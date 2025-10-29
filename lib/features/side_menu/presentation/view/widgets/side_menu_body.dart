@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_button.dart';
+import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/features/side_menu/presentation/view/widgets/app_settings_card.dart';
 import 'package:pettix/features/side_menu/presentation/view/widgets/app_terms_card.dart';
 import 'package:pettix/features/side_menu/presentation/view/widgets/logout.dart';
@@ -35,9 +37,7 @@ class SideMenuBody extends StatelessWidget {
             height: 18.h,
             ),
             text: 'Switch to clinic',
-            onPressed: () {
-              // Handle delete account action
-            },
+            onPressed: () {},
             backgroundColor: AppColors.current.primary,
             textColor: AppColors.current.white,
           ),

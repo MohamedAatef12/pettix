@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:pettix/data/network/failure.dart';
 import 'package:pettix/features/auth/domain/entities/register_domain_entity.dart';
+import 'package:pettix/features/auth/domain/entities/user_entity.dart';
 import 'package:pettix/features/home/domain/entities/comments_entity.dart';
 import 'package:pettix/features/home/domain/entities/likes_entity.dart';
 import 'package:pettix/features/home/domain/entities/post_entity.dart';
@@ -26,5 +27,5 @@ abstract class HomeDomainRepository {
   Future<Either<Failure, void>> unlikePost(int postId);
 
   // Cached Data
-  Future<Either<Failure, RegisterEntity>> getCachedUserData();
+  Future<Either<Failure, UserEntity>> getCachedUserData();
 }

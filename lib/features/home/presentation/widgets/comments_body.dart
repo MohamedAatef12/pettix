@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -58,6 +59,7 @@ class CommentsBody extends StatelessWidget {
   }
 
   Widget _buildCommentItem(CommentEntity comment) {
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -70,18 +72,42 @@ class CommentsBody extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('${comment.userID}', style: AppTextStyles.bold),
+              Text('${comment.author.id}', style: AppTextStyles.bold),
               SizedBox(height: 4.h),
               Text(comment.text, style: AppTextStyles.description),
               SizedBox(height: 4.h),
-              Text(
-                comment.date,
-                style: AppTextStyles.smallDescription
-                    .copyWith(color: AppColors.current.gray),
+              Row(
+                children: [
+                  Text(
+                    DateFormat('hh:mm a').format(
+                      DateTime.parse(comment.creationDate)),
+                    style: AppTextStyles.smallDescription
+                        .copyWith(color: AppColors.current.gray),
+                  ),
+                  SizedBox(width: 20.w),
+                  Text(
+                    '2 Likes',
+                    style: AppTextStyles.smallDescription
+                        .copyWith(color: AppColors.current.gray),
+                  ),
+                  SizedBox(width: 20.w),
+                  GestureDetector(
+                    onTap: (){},
+                    child: Text(
+                      '1 Reply',
+                      style: AppTextStyles.smallDescription
+                          .copyWith(color: AppColors.current.primary),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
         ),
+        GestureDetector(
+          onTap: (){},
+          child: SvgPicture.asset('assets/icons/like.svg'),
+        )
       ],
     );
   }
