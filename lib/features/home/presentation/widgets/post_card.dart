@@ -38,9 +38,12 @@ class PostCard extends StatelessWidget {
                 CircleAvatar(
                   radius: 30,
                   backgroundColor: AppColors.current.blueGray,
-                  backgroundImage: (post.author.avatar != null && post.author.avatar!.isNotEmpty)
-                      ? NetworkImage(post.author.avatar!)
-                      : const AssetImage('assets/images/no_user.png') as ImageProvider,
+                  backgroundImage:
+                      (post.author.avatar != null &&
+                              post.author.avatar!.isNotEmpty)
+                          ? NetworkImage(post.author.avatar!)
+                          : const AssetImage('assets/images/no_user.png')
+                              as ImageProvider,
                 ),
                 SizedBox(width: 10.w),
                 Column(
@@ -79,14 +82,16 @@ class PostCard extends StatelessWidget {
                 padding: EdgeInsets.symmetric(vertical: 10.h),
                 child: Builder(
                   builder: (context) {
-                    final validImages = post.images
-                        .where((e) =>
-                    e.isNotEmpty &&
-                        (e.startsWith('http') ||
-                            e.startsWith('data:image') ||
-                            File(e).existsSync()))
-                        .toList();
-
+                    final validImages =
+                        post.images
+                            .where(
+                              (e) =>
+                                  e.isNotEmpty &&
+                                  (e.startsWith('http') ||
+                                      e.startsWith('data:image') ||
+                                      File(e).existsSync()),
+                            )
+                            .toList();
 
                     if (validImages.isEmpty) return const SizedBox.shrink();
 
@@ -109,10 +114,11 @@ class PostCard extends StatelessWidget {
                           imageWidget = Image.network(
                             image,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Container(
-                              color: AppColors.current.lightGray,
-                              child: const Icon(Icons.broken_image),
-                            ),
+                            errorBuilder:
+                                (_, __, ___) => Container(
+                                  color: AppColors.current.lightGray,
+                                  child: const Icon(Icons.broken_image),
+                                ),
                           );
                         } else if (image.startsWith('data:image')) {
                           // 🧩 Base64 image
@@ -122,10 +128,11 @@ class PostCard extends StatelessWidget {
                             imageWidget = Image.memory(
                               bytes,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Container(
-                                color: AppColors.current.lightGray,
-                                child: const Icon(Icons.broken_image),
-                              ),
+                              errorBuilder:
+                                  (_, __, ___) => Container(
+                                    color: AppColors.current.lightGray,
+                                    child: const Icon(Icons.broken_image),
+                                  ),
                             );
                           } catch (_) {
                             imageWidget = Container(
@@ -137,10 +144,11 @@ class PostCard extends StatelessWidget {
                           imageWidget = Image.file(
                             File(image),
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Container(
-                              color: AppColors.current.lightGray,
-                              child: const Icon(Icons.broken_image),
-                            ),
+                            errorBuilder:
+                                (_, __, ___) => Container(
+                                  color: AppColors.current.lightGray,
+                                  child: const Icon(Icons.broken_image),
+                                ),
                           );
                         } else {
                           imageWidget = Container(
@@ -161,7 +169,6 @@ class PostCard extends StatelessWidget {
             else
               const SizedBox.shrink(),
 
-
             /// --- ACTION ROW (Like, Comment, Share, Save)
             BlocBuilder<HomeBloc, HomeState>(
               buildWhen:
@@ -175,21 +182,16 @@ class PostCard extends StatelessWidget {
                 final likesCount =
                     state.postLikesCount[post.id] ?? post.likes.length;
 
-                final isThrottled = homeBloc.throttledPostIds.contains(post.id);
-
                 return Row(
                   children: [
                     GestureDetector(
-                      onTap:
-                          isThrottled
-                              ? null
-                              : () {
-                                if (isLiked) {
-                                  homeBloc.add(DeleteLikeEvent(post.id));
-                                } else {
-                                  homeBloc.add(AddLikeEvent(post.id));
-                                }
-                              },
+                      onTap: () {
+                        if (isLiked) {
+                          homeBloc.add(DeleteLikeEvent(post.id));
+                        } else {
+                          homeBloc.add(AddLikeEvent(post.id));
+                        }
+                      },
                       child: SvgPicture.asset(
                         'assets/icons/like.svg',
                         colorFilter: ColorFilter.mode(

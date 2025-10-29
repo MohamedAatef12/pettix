@@ -1,11 +1,10 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pettix/config/di/di.dart';
 import 'package:pettix/features/home/data/models/author_model.dart';
-import 'package:pettix/features/home/data/models/likes_model.dart';
-import 'package:pettix/features/home/domain/entities/likes_entity.dart';
 import 'package:pettix/features/home/domain/entities/post_entity.dart';
 import 'package:pettix/features/home/domain/usecases/add_comment.dart';
 import 'package:pettix/features/home/domain/usecases/add_post.dart';
@@ -79,11 +78,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   // 📰 FETCH POSTS
-// 📰 FETCH POSTS
+  // 📰 FETCH POSTS
   Future<void> _onFetchPosts(
-      FetchPostsEvent event,
-      Emitter<HomeState> emit,
-      ) async {
+    FetchPostsEvent event,
+    Emitter<HomeState> emit,
+  ) async {
     emit(state.copyWith(isPostsLoading: true, error: null));
     final result = await getPostsUseCase.call();
 
@@ -92,9 +91,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     userResult.fold((_) {}, (user) => currentUserId = user.id);
 
     result.fold(
-          (failure) =>
+      (failure) =>
           emit(state.copyWith(isPostsLoading: false, error: failure.message)),
-          (posts) {
+      (posts) {
         final postLikesMap = <int, int>{};
         final postCommentsMap = <int, int>{};
         final likedPostIds = <int>[];
@@ -122,8 +121,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       },
     );
   }
-
-
 
   // 📝 ADD POST (from backend)
   Future<void> _onAddPost(AddPostEvent event, Emitter<HomeState> emit) async {
@@ -157,11 +154,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
   }
 
-// 📸 Pick multiple from gallery
+  // 📸 Pick multiple from gallery
   Future<void> _onPickImagesFromGallery(
-      PickImagesFromGalleryEvent event,
-      Emitter<HomeState> emit,
-      ) async {
+    PickImagesFromGalleryEvent event,
+    Emitter<HomeState> emit,
+  ) async {
     final pickedFiles = await _picker.pickMultiImage();
     if (pickedFiles.isNotEmpty) {
       final files = pickedFiles.map((e) => File(e.path)).toList();
@@ -169,28 +166,31 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
   }
 
-// 📷 Add from camera
+  // 📷 Add from camera
   Future<void> _onAddImageFromCamera(
-      AddImageFromCameraEvent event,
-      Emitter<HomeState> emit,
-      ) async {
-    emit(state.copyWith(selectedImages: [...state.selectedImages, event.image]));
+    AddImageFromCameraEvent event,
+    Emitter<HomeState> emit,
+  ) async {
+    emit(
+      state.copyWith(selectedImages: [...state.selectedImages, event.image]),
+    );
   }
 
-// ❌ Remove image
+  // ❌ Remove image
   void _onRemoveSelectedImage(
-      RemoveSelectedImageEvent event,
-      Emitter<HomeState> emit,
-      ) {
-    final updated = List<File>.from(state.selectedImages)..removeAt(event.index);
+    RemoveSelectedImageEvent event,
+    Emitter<HomeState> emit,
+  ) {
+    final updated = List<File>.from(state.selectedImages)
+      ..removeAt(event.index);
     emit(state.copyWith(selectedImages: updated));
   }
 
   // 🚀 Submit Post
   Future<void> _onSubmitPost(
-      SubmitPostEvent event,
-      Emitter<HomeState> emit,
-      ) async {
+    SubmitPostEvent event,
+    Emitter<HomeState> emit,
+  ) async {
     final text = postTextController.text.trim();
 
     // ✅ تأكد أن فيه محتوى أو صور
@@ -200,10 +200,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     final userResult = await getUserDataUseCase.call();
     await userResult.fold(
-          (failure) async {
+      (failure) async {
         emit(state.copyWith(isAddPostLoading: false, error: failure.message));
       },
-          (user) async {
+      (user) async {
         final author = AuthorModel(
           id: user.id,
           nameEn: user.userName,
@@ -219,7 +219,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         );
 
         // ✅ لو فيه صور، حولها لقائمة من الـ paths
-        final imagePaths = state.selectedImages.map((file) => file.path).toList();
+        final imagePaths =
+            state.selectedImages.map((file) => file.path).toList();
 
         final post = PostEntity(
           id: 0,
@@ -233,12 +234,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
         final result = await addPostUseCase.call(post);
         result.fold(
-              (failure) {
+          (failure) {
             emit(
               state.copyWith(isAddPostLoading: false, error: failure.message),
             );
           },
-              (_) {
+          (_) {
             postTextController.clear();
             emit(
               state.copyWith(
@@ -400,12 +401,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final updatedLiked = List<int>.from(state.likedPostIds)
       ..remove(event.postId);
 
+    // Optimistic UI update
     emit(
       state.copyWith(
         likedPostIds: updatedLiked,
         postLikesCount: {
           ...state.postLikesCount,
-          event.postId: currentCount - 1,
+          event.postId: (currentCount > 0 ? currentCount - 1 : 0),
         },
       ),
     );
@@ -415,33 +417,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       await cached.fold((failure) async => _revertUnlike(event.postId, emit), (
         user,
       ) async {
-        final post = state.posts.firstWhere(
-              (p) => p.id == event.postId,
-        );
-
-        final likeEntity = post.likes.firstWhere(
-              (l) => l.author.id == user.id,
-          orElse: () => LikesModel(
-            id: 0,
-            author: AuthorModel(
-              id: user.id,
-              email: user.email,
-              nameAr: user.userName,
-              nameEn: user.userName,
-              phone: user.phone,
-              genderId: user.genderId,
-              genderName: user.gender,
-              contactTypeId: user.contactTypeId,
-              statusId: user.statusId,
-              avatar: user.avatar,
-              age: user.age,
-            ),
-            postId: event.postId,
-            creationDate: DateTime.now().toIso8601String(),
-          ),
-        );
-        if (likeEntity.id == 0) return;
-        final result = await unlikePostUseCase.call(likeEntity.id);
+        final result = await unlikePostUseCase.call(event.postId);
         await result.fold(
           (failure) async => _revertUnlike(event.postId, emit),
           (_) async => add(FetchPostsLikesEvent(event.postId)),
