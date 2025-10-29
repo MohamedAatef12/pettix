@@ -15,6 +15,17 @@ class AppRoutes {
   static const String addPost = '/add_post';
   static const String comments = '/comments';
   static const String homeSearch = '/home_search';
+  static const String adoption = '/adoption';
+  static const String petProfile = '/pet_profile';
+  static const String petApplication = '/pet_application';
+  static const String applications = '/applications';
+  static const String profile = '/profile';
+  static const String editProfile = '/edit_profile';
+  static const String settings = '/settings';
+  static const String notifications = '/notifications';
+  static const String chat = '/chat';
+  static const String messages = '/messages';
+  static const String friends = '/friends';
 }
 
 class AppRouteNames {
@@ -33,5 +44,9 @@ class AppRouteNames {
   static const String home = 'home';
   static const String addPost = 'add_post';
   static const String comments = 'comments';
-  static const String homeSearch = '/home_search';
+  static const String homeSearch = 'home_search';
+  static const String adoption = 'adoption';
+  static const String petProfile = 'pet_profile';
+  static const String petApplication = 'pet_application';
+  static const String applications = 'applications';
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/features/adoption/presentation/widgets/adoption/adoption_body.dart';
 
 class AdoptionScreen extends StatelessWidget {
   const AdoptionScreen({super.key});
@@ -7,10 +7,8 @@ class AdoptionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.current.lightGray,
-      body: Center(
-        child: Text('Adoption Screen'),
-      ),
+      backgroundColor: const Color(0xFFFAFAFF),
+      body: SafeArea(child: AdoptionBody()),
     );
   }
 }

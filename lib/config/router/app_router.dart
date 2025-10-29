@@ -1,10 +1,13 @@
 import 'package:go_router/go_router.dart';
+import 'package:pettix/features/adoption/presentation/view/adoption_screen.dart';
+import 'package:pettix/features/adoption/presentation/view/pet_application.dart';
+import 'package:pettix/features/adoption/presentation/view/pet_profile_screen.dart';
 import 'package:pettix/features/auth/presentation/pages/forgot_password/forgot_password_page.dart';
+import 'package:pettix/features/auth/presentation/pages/forgot_password/password_reset_done_page.dart';
+import 'package:pettix/features/auth/presentation/pages/forgot_password/reset_password_page.dart';
 import 'package:pettix/features/auth/presentation/pages/login/login_page.dart';
 import 'package:pettix/features/auth/presentation/pages/register/otp_page.dart';
-import 'package:pettix/features/auth/presentation/pages/forgot_password/password_reset_done_page.dart';
 import 'package:pettix/features/auth/presentation/pages/register/register_page.dart';
-import 'package:pettix/features/auth/presentation/pages/forgot_password/reset_password_page.dart';
 import 'package:pettix/features/auth/presentation/pages/register/set_password_page.dart';
 import 'package:pettix/features/auth/presentation/pages/register/verified_page.dart';
 import 'package:pettix/features/bottom_bar/views/pages/bottom_bar_page.dart';
@@ -16,10 +19,11 @@ import 'package:pettix/features/on_boarding/presentation/view/on_boarding_screen
 import 'package:pettix/features/select_language/presentation/view/select_language_screen.dart';
 import 'package:pettix/features/splash/persentation/view/splash_screen.dart';
 
+import '../../features/adoption/presentation/view/application_view.dart';
 import 'routes.dart';
 
 GoRouter appRouter() => GoRouter(
-  initialLocation: AppRoutes.splash,
+  initialLocation: AppRoutes.bottomNav,
   // redirect: (context, state) async {
   //   final isSignedUp = await AuthService.hasSignedUp();
   //   final isLoggedIn = await AuthService.checkAuth();
@@ -70,7 +74,7 @@ GoRouter appRouter() => GoRouter(
     GoRoute(
       path: AppRoutes.setPassword,
       name: AppRouteNames.setPassword,
-        builder: (context, state) => const SetPasswordScreen(),
+      builder: (context, state) => const SetPasswordScreen(),
     ),
     GoRoute(
       path: AppRoutes.otpVerification,
@@ -122,7 +126,26 @@ GoRouter appRouter() => GoRouter(
       name: AppRouteNames.homeSearch,
       builder: (context, state) => const HomeSearch(),
     ),
-
+    GoRoute(
+      path: AppRoutes.adoption,
+      name: AppRouteNames.adoption,
+      builder: (context, state) => AdoptionScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.petProfile,
+      name: AppRouteNames.petProfile,
+      builder: (context, state) => const PetProfileScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.petApplication,
+      name: AppRouteNames.petApplication,
+      builder: (context, state) => const PetApplicationScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.applications,
+      name: AppRouteNames.applications,
+      builder: (context, state) => const ApplicationScreens(),
+    ),
     // GoRoute(
     //   path: AppRoutes.signUp,
     //   name: AppRouteNames.signUp,

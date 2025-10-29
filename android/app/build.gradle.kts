@@ -22,7 +22,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.pettix.dev"
-        minSdk = flutter.minSdkVersion       // ✅ fixed
+        minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
