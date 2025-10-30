@@ -10,6 +10,7 @@ import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_state.dart';
 import 'package:pettix/features/home/presentation/widgets/post_card.dart';
 
+import '../blocs/home_event.dart';
 class HomeBody extends StatelessWidget {
   const HomeBody({super.key});
 
@@ -37,14 +38,20 @@ class HomeBody extends StatelessWidget {
               ),
             );
           } else {
-            content = ListView.builder(
-              itemCount: state.posts.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: PaddingConstants.verticalSmall,
-                  child: PostCard(post: state.posts[index]),
-                );
+            content = RefreshIndicator(
+              onRefresh: () async {
+                context.read<HomeBloc>().add(FetchPostsEvent());
               },
+              child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(), // لازم للـ RefreshIndicator
+                itemCount: state.posts.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: PaddingConstants.verticalSmall,
+                    child: PostCard(post: state.posts[index]),
+                  );
+                },
+              ),
             );
           }
 
@@ -85,5 +92,5 @@ class HomeBody extends StatelessWidget {
       ),
     );
   }
-
 }
+
