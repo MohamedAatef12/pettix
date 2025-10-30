@@ -133,21 +133,21 @@ GoRouter appRouter() => GoRouter(
       name: AppRouteNames.chatList,
       builder: (context, state) => const ChatListPage(),
     ),
-    GoRoute(
-      path: AppRoutes.comments,
-      builder: (context, state) {
-        final postId = state.extra as int;
-
-        // ✅ نستخدم BlocProvider مستقل من DI أو نمرر الـ bloc الموجود من صفحة Home
-        return BlocProvider(
-          create: (_) => HomeBloc.fromDI()
-            ..add(
-              FetchPostsCommentsEvent(postId),
-            ),
-          child: CommentsPage(postId: postId),
-        );
-      },
-    ),
+    // GoRoute(
+    //   path: AppRoutes.comments,
+    //   builder: (context, state) {
+    //     final postId = state.extra as int;
+    //
+    //     // ✅ نستخدم BlocProvider مستقل من DI أو نمرر الـ bloc الموجود من صفحة Home
+    //     return BlocProvider(
+    //       create: (_) => HomeBloc.fromDI()
+    //         ..add(
+    //           FetchPostsCommentsEvent(postId),
+    //         ),
+    //       child: CommentsPage(postId: postId),
+    //     );
+    //   },
+    // ),
 
 
     GoRoute(

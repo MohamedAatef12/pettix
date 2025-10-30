@@ -14,10 +14,10 @@ abstract class HomeDomainRepository {
   Future<Either<Failure, void>> addPost(PostEntity post);
   Future<Either<Failure, void>> deletePost(int id);
   Future<Either<Failure, void>> editPost(PostEntity post);
-
+  Future<Either<Failure,int>> getPostCommentsCount(int postId);
   // Comments
   Future<Either<Failure, List<CommentEntity>>> getPostComments(int id);
-  Future<Either<Failure, void>> addComment(CommentEntity comment);
+  Future<Either<Failure, void>> addComment(CommentEntity comment,int postId, int? parentCommentId,);
   Future<Either<Failure, void>> deleteComment(int id);
   Future<Either<Failure, void>> editComment(CommentEntity comment);
 
@@ -25,7 +25,6 @@ abstract class HomeDomainRepository {
   Future<Either<Failure, List<LikesEntity>>> getPostLikes(int postId);
   Future<Either<Failure, LikesEntity>> likePost(int postId, int id);
   Future<Either<Failure, void>> unlikePost(int postId);
-
   // Cached Data
   Future<Either<Failure, UserEntity>> getCachedUserData();
 }

@@ -7,6 +7,7 @@ import 'package:pettix/features/home/domain/usecases/add_post.dart';
 import 'package:pettix/features/home/domain/usecases/delete_post.dart';
 import 'package:pettix/features/home/domain/usecases/dislike_post.dart';
 import 'package:pettix/features/home/domain/usecases/get_comments_id.dart';
+import 'package:pettix/features/home/domain/usecases/get_post_comments_count.dart';
 import 'package:pettix/features/home/domain/usecases/get_posts.dart';
 import 'package:pettix/features/home/domain/usecases/get_posts_likes.dart';
 import 'package:pettix/features/home/domain/usecases/get_user_cached%20_data.dart';
@@ -34,6 +35,7 @@ class AddPostPage extends StatelessWidget {
                 unlikePostUseCase: getIt<UnLikePostUseCase>(),
                 likePostUseCase: getIt<LikePostUseCase>(),
                 getUserDataUseCase: getIt<GetUserDataUseCase>(),
+                getPostCommentsCountUseCase: getIt<GetPostCommentsCountsUseCase>()
               ),
           child: AddPostBody(),
         ),

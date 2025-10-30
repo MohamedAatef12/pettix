@@ -93,9 +93,9 @@ class HomeRepositoryImpl implements HomeDomainRepository {
   }
 
   @override
-  Future<Either<Failure, void>> addComment(CommentEntity comment) async {
+  Future<Either<Failure, void>> addComment(CommentEntity comment,int postId, int? parentCommentId,) async {
     final commentModel = CommentModel.fromEntity(comment);
-    return remoteDataSource.addComment(commentModel);
+    return remoteDataSource.addComment(commentModel,postId,parentCommentId);
   }
 
   @override
@@ -175,6 +175,19 @@ class HomeRepositoryImpl implements HomeDomainRepository {
     try {
       return Right(homeLocalDataSource.getUserData());
     } catch (e) {
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
+  @override
+  Future<Either<Failure,int>> getPostCommentsCount(int postId) async {
+    try{
+      final result = await remoteDataSource.getPostCommentsCount(postId);
+      return result.fold(
+            (failure) => Left(failure),
+            (success) => Right(success),
+      );
+    }
+    catch (e){
       return Left(DioFailure.fromDioError(e));
     }
   }

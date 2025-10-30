@@ -18,6 +18,8 @@ class HomeState extends Equatable {
   final bool isPostAdded;
   final String? error;
   final List<File> selectedImages;
+  final CommentEntity? replyingTo;
+  final Map<int, bool> expandedComments;
   const HomeState({
     this.posts = const [],
     this.comments = const [],
@@ -32,6 +34,8 @@ class HomeState extends Equatable {
     this.isPostAdded = false,
     this.error,
     this.selectedImages = const [],
+    this.replyingTo,
+    this.expandedComments = const {},
   });
 
   HomeState copyWith({
@@ -48,6 +52,8 @@ class HomeState extends Equatable {
     bool? isPostAdded,
     String? error,
     List<File>? selectedImages,
+    CommentEntity? replyingTo,
+    Map<int, bool>? expandedComments,
   }) {
     return HomeState(
       posts: posts ?? this.posts,
@@ -63,6 +69,8 @@ class HomeState extends Equatable {
       isPostAdded: isPostAdded ?? this.isPostAdded,
       error: error,
       selectedImages: selectedImages ?? this.selectedImages,
+      replyingTo: replyingTo ?? this.replyingTo,
+      expandedComments: expandedComments ?? this.expandedComments,
     );
   }
 
@@ -81,5 +89,7 @@ class HomeState extends Equatable {
     isPostAdded,
     error,
     selectedImages,
+    replyingTo,
+    expandedComments
   ];
 }

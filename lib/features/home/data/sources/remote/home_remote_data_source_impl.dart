@@ -23,7 +23,6 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   @override
   Future<Either<Failure, List<PostModel>>> getPosts() async {
     final userToken = await DI.find<ICacheManager>().getToken();
-    print('🔑 userToken: $userToken');
     try {
       final data = await apiService.getList(
         endPoint: Constants.postsEndpoint,
@@ -124,7 +123,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   ) async {
     try {
       final data = await apiService.getList(
-        endPoint: '${Constants.commentsEndpoint}/PostComments/$postId',
+        endPoint: '${Constants.commentsEndpoint}/$postId',
       );
 
       final comments = data.map((e) => CommentModel.fromJson(e)).toList();
@@ -146,11 +145,16 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   }
 
   @override
-  Future<Either<Failure, void>> addComment(CommentModel comment) async {
+  Future<Either<Failure, void>> addComment(CommentModel comment,int postId, int? parentCommentId,) async {
+    final userToken = await DI.find<ICacheManager>().getToken();
     try {
       await apiService.post(
-        endPoint: Constants.commentsEndpoint,
+        endPoint: '${Constants.commentsEndpoint}/$postId',
         data: comment.toJson(),
+        headers: {
+          'Authorization': 'Bearer $userToken',
+          'Content-Type': 'application/json',
+        },
       );
 
       return const Right(null);
@@ -237,16 +241,10 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     }
   }
 
-
-
   @override
   Future<Either<Failure, void>> unlikePost(int postId) async {
     try {
       final userToken = await DI.find<ICacheManager>().getToken();
-      log("==============================");
-      log(userToken.toString());
-      log("==============================");
-
       final response = await apiService.delete(
         endPoint: '${Constants.postLikesEndpoint}/$postId',
         headers: {
@@ -261,4 +259,26 @@ class RemoteDataSourceImpl implements RemoteDataSource {
       return Left(Failure('Unexpected error: ${e.toString()}'));
     }
   }
+  @override
+  Future<Either<Failure, int>> getPostCommentsCount(int postId) async {
+    try {
+      final userToken = await DI.find<ICacheManager>().getToken();
+      final response = await apiService.get(
+        endPoint: '${Constants.commentsEndpoint}/$postId/count',
+        headers: {
+          'Authorization': 'Bearer $userToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      final count = response['commentsCount'] ?? 0; // ✅ استخدم المفتاح الصحيح
+      return Right(count);
+    } on DioException catch (dioError) {
+      return Left(DioFailure.fromDioError(dioError));
+    } catch (e) {
+      return Left(Failure('Unexpected error: ${e.toString()}'));
+    }
+  }
+
+
 }

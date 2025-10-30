@@ -5,12 +5,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pettix/config/di/di.dart';
 import 'package:pettix/features/home/data/models/author_model.dart';
+import 'package:pettix/features/home/domain/entities/comments_entity.dart';
 import 'package:pettix/features/home/domain/entities/post_entity.dart';
 import 'package:pettix/features/home/domain/usecases/add_comment.dart';
 import 'package:pettix/features/home/domain/usecases/add_post.dart';
 import 'package:pettix/features/home/domain/usecases/delete_post.dart';
 import 'package:pettix/features/home/domain/usecases/dislike_post.dart';
 import 'package:pettix/features/home/domain/usecases/get_comments_id.dart';
+import 'package:pettix/features/home/domain/usecases/get_post_comments_count.dart';
 import 'package:pettix/features/home/domain/usecases/get_posts.dart';
 import 'package:pettix/features/home/domain/usecases/get_posts_likes.dart';
 import 'package:pettix/features/home/domain/usecases/get_user_cached%20_data.dart';
@@ -28,6 +30,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final UnLikePostUseCase unlikePostUseCase;
   final LikePostUseCase likePostUseCase;
   final GetUserDataUseCase getUserDataUseCase;
+  final GetPostCommentsCountsUseCase getPostCommentsCountUseCase;
 
   final Set<int> throttledPostIds = {};
   final Set<int> loadedBottomSheetPostIds = {};
@@ -47,6 +50,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       unlikePostUseCase: getIt<UnLikePostUseCase>(),
       likePostUseCase: getIt<LikePostUseCase>(),
       getUserDataUseCase: getIt<GetUserDataUseCase>(),
+      getPostCommentsCountUseCase: getIt<GetPostCommentsCountsUseCase>(),
     );
   }
 
@@ -60,6 +64,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required this.unlikePostUseCase,
     required this.likePostUseCase,
     required this.getUserDataUseCase,
+    required this.getPostCommentsCountUseCase,
   }) : super(const HomeState()) {
     // Existing events
     on<FetchPostsEvent>(_onFetchPosts);
@@ -75,52 +80,125 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<AddImageFromCameraEvent>(_onAddImageFromCamera);
     on<RemoveSelectedImageEvent>(_onRemoveSelectedImage);
     on<SubmitPostEvent>(_onSubmitPost);
+    on<AddReplyEvent>(_onAddReply);
+    on<SetReplyingToEvent>(_onSetReplyingTo);
+    on<ToggleCommentRepliesEvent>((event, emit) {
+      final newExpanded = Map<int, bool>.from(state.expandedComments);
+      final current = newExpanded[event.commentId] ?? false;
+      newExpanded[event.commentId] = !current; // Toggle value
+
+      emit(state.copyWith(expandedComments: newExpanded));
+    });
+    on<UpdatePostCommentsCountEvent>(_onUpdatePostCommentsCount);
+    on<RefreshCommentsSilentlyEvent>(_onRefreshCommentsSilently);
+    on<GetPostCommentsCountsEvent>(_getPostCommentsCount);
+  }
+  Future<void> _getPostCommentsCount(
+      GetPostCommentsCountsEvent event,
+      Emitter<HomeState> emit,
+      ) async {
+    final result = await getPostCommentsCountUseCase(event.postId);
+
+    result.fold(
+          (failure) => emit(state.copyWith(error: failure.message)),
+          (count) {
+        final updatedMap = Map<int, int>.from(state.postCommentsCount);
+        updatedMap[event.postId] = count;
+        emit(state.copyWith(postCommentsCount: updatedMap));
+      },
+    );
+  }
+  Future<void> _onUpdatePostCommentsCount(
+      UpdatePostCommentsCountEvent event,
+      Emitter<HomeState> emit,
+      ) async {
+    final result = await getPostCommentsCountUseCase.call(event.postId);
+    result.fold(
+          (failure) => emit(state.copyWith(error: failure.message)),
+          (count) {
+        final updatedMap = Map<int, int>.from(state.postCommentsCount)
+          ..[event.postId] = count;
+        emit(state.copyWith(postCommentsCount: updatedMap));
+      },
+    );
+  }
+  Future<void> _onRefreshCommentsSilently(
+      RefreshCommentsSilentlyEvent event,
+      Emitter<HomeState> emit,
+      ) async {
+    final result = await getCommentsIdUseCase.call(event.postId);
+
+    result.fold(
+          (failure) => emit(state.copyWith(error: failure.message)),
+          (comments) {
+        emit(state.copyWith(comments: comments, error: null));
+      },
+    );
   }
 
-  // 📰 FETCH POSTS
-  // 📰 FETCH POSTS
   Future<void> _onFetchPosts(
-    FetchPostsEvent event,
-    Emitter<HomeState> emit,
-  ) async {
+      FetchPostsEvent event,
+      Emitter<HomeState> emit,
+      ) async {
     emit(state.copyWith(isPostsLoading: true, error: null));
-    final result = await getPostsUseCase.call();
 
+    final result = await getPostsUseCase.call();
     final userResult = await getUserDataUseCase.call();
+
     int? currentUserId;
     userResult.fold((_) {}, (user) => currentUserId = user.id);
 
-    result.fold(
-      (failure) =>
-          emit(state.copyWith(isPostsLoading: false, error: failure.message)),
-      (posts) {
+    await result.fold(
+          (failure) async {
+        emit(state.copyWith(isPostsLoading: false, error: failure.message));
+      },
+          (posts) async {
         final postLikesMap = <int, int>{};
         final postCommentsMap = <int, int>{};
         final likedPostIds = <int>[];
 
-        for (var post in posts) {
+        // ✅ نستخدم Future.wait بدل await في اللوب
+        await Future.wait(posts.map((post) async {
           postLikesMap[post.id] = post.likes.length;
           postCommentsMap[post.id] = post.comments.length;
 
-          // ✅ Detect if the current user has liked this post
+          // ✅ Detect liked posts
           if (currentUserId != null &&
               post.likes.any((like) => like.author.id == currentUserId)) {
             likedPostIds.add(post.id);
           }
-        }
 
+          // ✅ Call endpoint to get comment count safely
+          final countResult = await getPostCommentsCountUseCase.call(post.id);
+
+          countResult.fold(
+                (failure) {
+              print("❌ Failed to fetch count for post ${post.id}: ${failure.message}");
+            },
+                (count) {
+              print("✅ Comments count for post ${post.id}: $count");
+              postCommentsMap[post.id] = count; // ✅ استخدم الماب المحلي مش state
+            },
+          );
+        }));
+
+
+        // ✅ بعد ما تخلص كل الكولات
         emit(
           state.copyWith(
             posts: posts,
             postLikesCount: postLikesMap,
-            postCommentsCount: postCommentsMap,
+            postCommentsCount: postCommentsMap, // ✅ هنا القيم الصح بعد الـ API
             likedPostIds: likedPostIds,
             isPostsLoading: false,
           ),
         );
-      },
+
+          },
     );
   }
+
+
 
   // 📝 ADD POST (from backend)
   Future<void> _onAddPost(AddPostEvent event, Emitter<HomeState> emit) async {
@@ -217,8 +295,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           statusId: user.statusId,
           age: user.age,
         );
-
-        // ✅ لو فيه صور، حولها لقائمة من الـ paths
         final imagePaths =
             state.selectedImages.map((file) => file.path).toList();
 
@@ -245,8 +321,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
               state.copyWith(
                 isAddPostLoading: false,
                 isPostAdded: true,
-                selectedImages: [], // ✅ نرجعها فاضية بدل null
-              ),
+                selectedImages: [],       ),
             );
           },
         );
@@ -302,41 +377,130 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       },
     );
   }
-
   Future<void> _onAddComment(
-    AddCommentEvent event,
-    Emitter<HomeState> emit,
-  ) async {
-    emit(state.copyWith(isCommentsLoading: true, error: null));
-    final result = await addCommentUseCase.call(event.comment);
+      AddCommentEvent event,
+      Emitter<HomeState> emit,
+      ) async {
+   final replyingToBeforeSend = state.replyingTo;
+    emit(state.copyWith(replyingTo: null));
+    if (event.comment.parentCommentId != null &&
+        replyingToBeforeSend != null &&
+        replyingToBeforeSend.id == event.comment.parentCommentId) {
+      add(AddReplyEvent(event.comment, event.comment.parentCommentId!));
+      return;
+    }
+   final tempComment = CommentEntity(
+      id: -DateTime.now().millisecondsSinceEpoch,
+      postId: event.comment.postId,
+      parentCommentId: null,
+      author: event.comment.author,
+      text: 'Posting…',
+      creationDate: DateTime.now().toIso8601String(),
+      replies: [],
+    );
+    final updatedComments = List<CommentEntity>.from(state.comments)
+      ..insert(0, tempComment);
+    emit(state.copyWith(comments: updatedComments, error: null));
+
+    final result = await addCommentUseCase.call(
+      event.comment,
+      event.comment.postId,
+      null,
+    );
+   result.fold(
+         (failure) {
+       final reverted = List<CommentEntity>.from(state.comments)
+         ..removeWhere((c) => c.id == tempComment.id);
+       emit(state.copyWith(comments: reverted, error: failure.message));
+     },
+         (_) {
+       final finalComments = List<CommentEntity>.from(state.comments)
+         ..removeWhere((c) => c.id == tempComment.id)
+         ..insert(0, event.comment);
+       emit(state.copyWith(comments: finalComments, error: null));
+       add(RefreshCommentsSilentlyEvent(event.comment.postId));
+       add(GetPostCommentsCountsEvent(event.comment.postId));
+     },
+   );
+
+   commentTextController.clear();
+  }
+
+
+
+  Future<void> _onSetReplyingTo(
+      SetReplyingToEvent event,
+      Emitter<HomeState> emit,
+      ) async {
+    emit(state.copyWith(replyingTo: event.comment));
+  }
+
+  Future<void> _onAddReply(
+      AddReplyEvent event,
+      Emitter<HomeState> emit,
+      ) async {
+    emit(state.copyWith(error: null));
+
+    final tempReply = event.reply.copyWith(
+      id: -DateTime.now().millisecondsSinceEpoch,
+      text: 'Posting…',
+    );
+
+    final optimisticComments = state.comments.map((comment) {
+      if (comment.id == event.parentCommentId) {
+        final updatedReplies = List<CommentEntity>.from(comment.replies)
+          ..add(tempReply);
+        return comment.copyWith(replies: updatedReplies);
+      }
+      return comment;
+    }).toList();
+
+    emit(state.copyWith(comments: optimisticComments));
+
+    final result = await addCommentUseCase.call(
+      event.reply,
+      event.reply.postId,
+      event.parentCommentId,
+    );
 
     await result.fold(
-      (failure) async {
-        emit(state.copyWith(isCommentsLoading: false, error: failure.message));
-      },
-      (_) async {
-        final commentsResult = await getCommentsIdUseCase.call(
-          event.comment.postId,
-        );
-        await commentsResult.fold(
           (failure) async {
-            emit(
-              state.copyWith(isCommentsLoading: false, error: failure.message),
-            );
-          },
-          (comments) async {
-            emit(
-              state.copyWith(
-                comments: comments,
-                isCommentsLoading: false,
-                error: null,
-              ),
-            );
-          },
-        );
+        final revertedComments = state.comments.map((comment) {
+          if (comment.id == event.parentCommentId) {
+            final updatedReplies = List<CommentEntity>.from(comment.replies)
+              ..removeWhere((r) => r.id == tempReply.id);
+            return comment.copyWith(replies: updatedReplies);
+          }
+          return comment;
+        }).toList();
+
+        emit(state.copyWith(comments: revertedComments, error: failure.message));
+      },
+          (_) async {
+        final updatedComments = state.comments.map((comment) {
+          if (comment.id == event.parentCommentId) {
+            final replies = List<CommentEntity>.from(comment.replies)
+              ..removeWhere((r) => r.id == tempReply.id)
+              ..add(event.reply);
+            return comment.copyWith(replies: replies);
+          }
+          return comment;
+        }).toList();
+
+        emit(state.copyWith(comments: updatedComments, error: null));
+        add(RefreshCommentsSilentlyEvent(event.reply.postId));
+        add(GetPostCommentsCountsEvent(event.reply.postId));
+
       },
     );
+    commentTextController.clear();
+
+    await Future.delayed(Duration(milliseconds: 100));
+
+    emit(state.copyWith(replyingTo: null));
   }
+
+
 
   Future<void> _onFetchPostsLikes(
     FetchPostsLikesEvent event,

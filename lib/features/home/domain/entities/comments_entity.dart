@@ -9,6 +9,7 @@ class CommentEntity extends Equatable {
   final AuthorEntity author;
   final int? parentCommentId;
   final List<CommentEntity> replies;
+
   const CommentEntity({
     required this.id,
     required this.text,
@@ -18,6 +19,27 @@ class CommentEntity extends Equatable {
     this.parentCommentId,
     required this.replies,
   });
+
+  CommentEntity copyWith({
+    int? id,
+    int? postId,
+    String? text,
+    String? creationDate,
+    AuthorEntity? author,
+    int? parentCommentId,
+    List<CommentEntity>? replies,
+  }) {
+    return CommentEntity(
+      id: id ?? this.id,
+      text: text ?? this.text,
+      postId: postId ?? this.postId,
+      author: author ?? this.author,
+      creationDate: creationDate ?? this.creationDate,
+      parentCommentId: parentCommentId ?? this.parentCommentId,
+      replies: replies ?? List<CommentEntity>.from(this.replies),
+    );
+  }
+
   @override
   List<Object?> get props => [
     id,

@@ -13,6 +13,7 @@ import 'package:pettix/features/home/domain/entities/post_entity.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 import 'package:pettix/features/home/presentation/blocs/home_state.dart';
+import 'package:pettix/features/home/presentation/pages/comments_page.dart';
 
 class PostCard extends StatelessWidget {
   const PostCard({super.key, required this.post});
@@ -173,11 +174,11 @@ class PostCard extends StatelessWidget {
             BlocBuilder<HomeBloc, HomeState>(
               buildWhen:
                   (prev, curr) =>
-                      prev.likedPostIds != curr.likedPostIds ||
-                      prev.postLikesCount != curr.postLikesCount,
+    prev.likedPostIds != curr.likedPostIds ||
+    prev.postLikesCount != curr.postLikesCount ,
               builder: (context, state) {
                 final homeBloc = context.read<HomeBloc>();
-
+                final commentsCount = state.postCommentsCount[post.id] ?? 0;
                 final isLiked = state.likedPostIds.contains(post.id);
                 final likesCount =
                     state.postLikesCount[post.id] ?? post.likes.length;
@@ -215,16 +216,24 @@ class PostCard extends StatelessWidget {
                     /// 💬 COMMENT BUTTON
                     GestureDetector(
                       onTap: () {
-                        context.push('/comments', extra: post.id);
+                        debugPrint('🔵 Adding GetPostCommentsCountsEvent for post ${post.id}');
+                        context.read<HomeBloc>().add(GetPostCommentsCountsEvent(post.id));
+                        CommentsBottomSheet.show(context, post.id);
                       },
-
-                      child: SvgPicture.asset('assets/icons/comment.svg'),
+                      child: SvgPicture.asset(
+                        'assets/icons/comment.svg',
+                        height: 22.h,
+                        width: 22.w,
+                      ),
                     ),
                     SizedBox(width: 4.w),
+
                     Text(
-                      post.comments.length.toString(),
+                      (commentsCount).toString(),
                       style: AppTextStyles.description,
                     ),
+
+
 
                     const Spacer(),
 

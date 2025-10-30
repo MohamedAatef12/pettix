@@ -52,7 +52,12 @@ class AddLikeEvent extends HomeEvent {
   @override
   List<Object?> get props => [postId];
 }
-
+class GetPostCommentsCountsEvent extends HomeEvent {
+  final int postId;
+  GetPostCommentsCountsEvent(this.postId);
+  @override
+  List<Object?> get props => [postId];
+}
 class DeleteLikeEvent extends HomeEvent {
   final int postId;
   DeleteLikeEvent(this.postId);
@@ -76,3 +81,36 @@ class RemoveSelectedImageEvent extends HomeEvent {
   @override
   List<Object?> get props => [index];
 }
+class AddReplyEvent extends HomeEvent {
+  final CommentEntity reply;
+  final int parentCommentId;
+  AddReplyEvent(this.reply, this.parentCommentId);
+  @override
+  List<Object?> get props => [reply, parentCommentId];
+}
+class SetReplyingToEvent extends HomeEvent {
+  final CommentEntity? comment;
+  SetReplyingToEvent(this.comment);
+}
+class ToggleCommentRepliesEvent extends HomeEvent {
+  final int commentId;
+   ToggleCommentRepliesEvent(this.commentId);
+  @override
+  List<Object?> get props => [commentId];
+}
+class RefreshCommentsSilentlyEvent extends HomeEvent {
+  final int postId;
+  RefreshCommentsSilentlyEvent(this.postId);
+
+  @override
+  List<Object?> get props => [postId];
+}
+class UpdatePostCommentsCountEvent extends HomeEvent {
+  final int postId;
+  UpdatePostCommentsCountEvent(this.postId);
+
+  @override
+  List<Object?> get props => [postId];
+}
+
+
