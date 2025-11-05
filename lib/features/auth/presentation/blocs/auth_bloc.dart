@@ -4,12 +4,9 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/data/network/email_auth_service.dart';
-import 'package:pettix/data/network/twilio_service.dart';
-import 'package:pettix/features/auth/data/models/login/google_login_model.dart';
 import 'package:pettix/features/auth/data/models/user_model.dart';
 import 'package:pettix/features/auth/domain/entities/google_login_entity.dart';
 import 'package:pettix/features/auth/domain/entities/register_domain_entity.dart';
-import 'package:pettix/features/auth/domain/entities/user_entity.dart';
 import 'package:pettix/features/auth/domain/usecases/google_login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/register_usecase.dart';
@@ -23,7 +20,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final EmailAuthService emailAuthService;
 
   // Controllers for Register
-final fullNameController = TextEditingController();
+  final fullNameController = TextEditingController();
   final emailRegisterController = TextEditingController();
   final phoneController = TextEditingController();
   final passwordRegisterController = TextEditingController();
@@ -39,7 +36,7 @@ final fullNameController = TextEditingController();
   bool rememberMe = false;
   bool obscurePasswordLogin = true;
   RegisterEntity? _tempRegisterData;
-  AuthBloc( {
+  AuthBloc({
     required this.registerUseCase,
     required this.loginUseCase,
     required this.googleLoginUseCase,
@@ -73,7 +70,9 @@ final fullNameController = TextEditingController();
 
   /// Handle Register
   Future<void> _registerStepOne(
-      RegisterStepOneSubmitted event, Emitter<AuthState> emit) async {
+    RegisterStepOneSubmitted event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(RegisterLoading());
 
     _tempRegisterData = RegisterEntity(
@@ -101,10 +100,11 @@ final fullNameController = TextEditingController();
     }
   }
 
-
-// Step 2: Confirm Password
+  // Step 2: Confirm Password
   Future<void> _registerStepTwo(
-      RegisterStepTwoSubmitted event, Emitter<AuthState> emit) async {
+    RegisterStepTwoSubmitted event,
+    Emitter<AuthState> emit,
+  ) async {
     if (_tempRegisterData == null) {
       emit(RegisterFailure("Step one not completed"));
       return;
@@ -115,16 +115,16 @@ final fullNameController = TextEditingController();
       return;
     }
 
-    _tempRegisterData = _tempRegisterData!.copyWith(
-      password: event.password,
-    );
+    _tempRegisterData = _tempRegisterData!.copyWith(password: event.password);
 
     emit(RegisterStepTwoSuccess());
   }
 
-// Step 3: OTP
+  // Step 3: OTP
   Future<void> _registerOtp(
-      RegisterOtpSubmitted event, Emitter<AuthState> emit) async {
+    RegisterOtpSubmitted event,
+    Emitter<AuthState> emit,
+  ) async {
     if (_tempRegisterData == null) {
       emit(RegisterFailure("Previous steps not completed"));
       return;
@@ -148,35 +148,39 @@ final fullNameController = TextEditingController();
     final result = await registerUseCase(_tempRegisterData!);
 
     result.fold(
-          (failure) => emit(RegisterFailure(failure.message)),
-          (_) => emit(RegisterOtpSuccess()),
+      (failure) => emit(RegisterFailure(failure.message)),
+      (_) => emit(RegisterOtpSuccess()),
     );
   }
 
-@override
-  Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) async {
+  Future<void> _loginSubmitted(
+    LoginSubmitted event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(LoginLoading());
 
     final result = await loginUseCase(event.model);
-    await result.fold(
-          (failure) async => emit(LoginFailure(failure.message)),
-          (loginResponse) async {
-        await DI.find<ICacheManager>()
-            .setUserData(UserModel.fromEntity(loginResponse.user)); // ✅ stores user + logged_in = true
+    await result.fold((failure) async => emit(LoginFailure(failure.message)), (
+      loginResponse,
+    ) async {
+      await DI.find<ICacheManager>().setUserData(
+        UserModel.fromEntity(loginResponse.user),
+      ); // ✅ stores user + logged_in = true
 
-        if (event.rememberMe) {
-          await DI.find<ICacheManager>().saveLogin(true);
-        } else {
-          await DI.find<ICacheManager>().clearLogin();
-        }
+      if (event.rememberMe) {
+        await DI.find<ICacheManager>().saveLogin(true);
+      } else {
+        await DI.find<ICacheManager>().clearLogin();
+      }
 
-        emit(LoginSuccess(loginResponse.user));
-      },
-    );
+      emit(LoginSuccess(loginResponse.user));
+    });
   }
 
   Future<void> _googleLoginSubmitted(
-      GoogleLoginSubmitted event, Emitter<AuthState> emit) async {
+    GoogleLoginSubmitted event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(GoogleLoginLoading());
 
     try {
@@ -202,23 +206,27 @@ final fullNameController = TextEditingController();
         GoogleLoginEntity(idToken: googleAuth.idToken!),
       );
 
-     await result.fold(
-            (failure) {
+      await result.fold(
+        (failure) {
           debugPrint("❌ Backend rejected login: ${failure.message}");
           emit(GoogleLoginFailure(failure.message));
         },
-            (loginResponse) async {
-              await DI.find<ICacheManager>().setUserData(UserModel.fromEntity(loginResponse.user));
-              await DI
-                  .find<ICacheManager>()
-                  .setToken(loginResponse.token); // Store token
-          debugPrint("✅ Backend login success, user: ${loginResponse.user.email}");
-              debugPrint("✅ Backend login success, user: ${loginResponse.token}");
-             if (event.rememberMe) {
-                await DI.find<ICacheManager>().saveLogin(true);
-              } else {
-                await DI.find<ICacheManager>().clearLogin();
-              }
+        (loginResponse) async {
+          await DI.find<ICacheManager>().setUserData(
+            UserModel.fromEntity(loginResponse.user),
+          );
+          await DI.find<ICacheManager>().setToken(
+            loginResponse.token,
+          ); // Store token
+          debugPrint(
+            "✅ Backend login success, user: ${loginResponse.user.email}",
+          );
+          debugPrint("✅ Backend login success, user: ${loginResponse.token}");
+          if (event.rememberMe) {
+            await DI.find<ICacheManager>().saveLogin(true);
+          } else {
+            await DI.find<ICacheManager>().clearLogin();
+          }
           emit(GoogleLoginSuccess(loginResponse.user));
         },
       );
@@ -228,11 +236,10 @@ final fullNameController = TextEditingController();
     }
   }
 
-
   @override
   Future<void> close() {
     // Dispose controllers to prevent memory leaks
-  fullNameController.dispose();
+    fullNameController.dispose();
     emailRegisterController.dispose();
     phoneController.dispose();
     passwordRegisterController.dispose();

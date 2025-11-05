@@ -1,11 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/features/auth/presentation/pages/forgot_password/forgot_password_page.dart';
+import 'package:pettix/features/auth/presentation/pages/forgot_password/password_reset_done_page.dart';
+import 'package:pettix/features/auth/presentation/pages/forgot_password/reset_password_page.dart';
 import 'package:pettix/features/auth/presentation/pages/login/login_page.dart';
 import 'package:pettix/features/auth/presentation/pages/register/otp_page.dart';
-import 'package:pettix/features/auth/presentation/pages/forgot_password/password_reset_done_page.dart';
 import 'package:pettix/features/auth/presentation/pages/register/register_page.dart';
-import 'package:pettix/features/auth/presentation/pages/forgot_password/reset_password_page.dart';
 import 'package:pettix/features/auth/presentation/pages/register/set_password_page.dart';
 import 'package:pettix/features/auth/presentation/pages/register/verified_page.dart';
 import 'package:pettix/features/bottom_bar/views/pages/bottom_bar_page.dart';
@@ -24,7 +24,7 @@ import 'package:pettix/features/splash/persentation/view/splash_screen.dart';
 import 'routes.dart';
 
 GoRouter appRouter() => GoRouter(
-  initialLocation: AppRoutes.splash,
+  initialLocation: AppRoutes.otpVerification,
   // redirect: (context, state) async {
   //   final isSignedUp = await AuthService.hasSignedUp();
   //   final isLoggedIn = await AuthService.checkAuth();
@@ -75,7 +75,7 @@ GoRouter appRouter() => GoRouter(
     GoRoute(
       path: AppRoutes.setPassword,
       name: AppRouteNames.setPassword,
-        builder: (context, state) => const SetPasswordScreen(),
+      builder: (context, state) => const SetPasswordScreen(),
     ),
     GoRoute(
       path: AppRoutes.otpVerification,
@@ -124,15 +124,12 @@ GoRouter appRouter() => GoRouter(
 
         // ✅ نستخدم BlocProvider مستقل من DI أو نمرر الـ bloc الموجود من صفحة Home
         return BlocProvider(
-          create: (_) => HomeBloc.fromDI()
-            ..add(
-              FetchPostsCommentsEvent(postId),
-            ),
+          create:
+              (_) => HomeBloc.fromDI()..add(FetchPostsCommentsEvent(postId)),
           child: CommentsPage(postId: postId),
         );
       },
     ),
-
 
     GoRoute(
       path: AppRoutes.homeSearch,
