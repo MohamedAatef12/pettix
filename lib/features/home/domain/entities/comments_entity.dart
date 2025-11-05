@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:pettix/features/home/domain/entities/author_entity.dart';
+import 'package:pettix/features/home/domain/entities/comment_like_entity.dart';
 
 class CommentEntity extends Equatable {
   final int id;
@@ -9,6 +10,7 @@ class CommentEntity extends Equatable {
   final AuthorEntity author;
   final int? parentCommentId;
   final List<CommentEntity> replies;
+  final List<CommentLikeEntity> likes;
 
   const CommentEntity({
     required this.id,
@@ -18,6 +20,7 @@ class CommentEntity extends Equatable {
     required this.creationDate,
     this.parentCommentId,
     required this.replies,
+    required this.likes,
   });
 
   CommentEntity copyWith({
@@ -28,6 +31,7 @@ class CommentEntity extends Equatable {
     AuthorEntity? author,
     int? parentCommentId,
     List<CommentEntity>? replies,
+    List<CommentLikeEntity>? likes,
   }) {
     return CommentEntity(
       id: id ?? this.id,
@@ -37,6 +41,7 @@ class CommentEntity extends Equatable {
       creationDate: creationDate ?? this.creationDate,
       parentCommentId: parentCommentId ?? this.parentCommentId,
       replies: replies ?? List<CommentEntity>.from(this.replies),
+      likes: likes ?? List<CommentLikeEntity>.from(this.likes),
     );
   }
 
@@ -49,5 +54,6 @@ class CommentEntity extends Equatable {
     creationDate,
     parentCommentId,
     replies,
+    likes,
   ];
 }

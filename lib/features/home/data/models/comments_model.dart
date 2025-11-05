@@ -1,4 +1,5 @@
 import 'package:pettix/features/home/data/models/author_model.dart';
+import 'package:pettix/features/home/data/models/comments_like_model.dart';
 
 import '../../domain/entities/comments_entity.dart';
 
@@ -11,6 +12,7 @@ class CommentModel extends CommentEntity {
     required super.parentCommentId,
     required super.replies,
     required super.postId,
+    required super.likes
   });
 
   factory CommentModel.fromJson(Map<String, dynamic> json) {
@@ -23,6 +25,10 @@ class CommentModel extends CommentEntity {
       parentCommentId: json['parentCommentId'] as int?,
       replies: (json['replies'] as List<dynamic>?)
           ?.map((e) => CommentModel.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+          [],
+      likes: (json['likes'] as List<dynamic>?)
+          ?.map((e) => CommentsLikeModel.fromJson(e as Map<String, dynamic>))
           .toList() ??
           [],
     );
@@ -38,6 +44,7 @@ class CommentModel extends CommentEntity {
       'parentCommentId': parentCommentId,
       'replies': replies,
       'postId': postId,
+      'likes':likes
     };
   }
 
@@ -50,6 +57,7 @@ class CommentModel extends CommentEntity {
         parentCommentId: commentEntity.parentCommentId,
         replies: commentEntity.replies,
         postId: commentEntity.postId,
+      likes: commentEntity.likes
       );
 
   CommentEntity toEntity(CommentModel commentModel) => CommentEntity(
@@ -60,5 +68,6 @@ class CommentModel extends CommentEntity {
     creationDate: commentModel.creationDate,
     parentCommentId: commentModel.parentCommentId,
     replies: commentModel.replies,
+    likes: commentModel.likes
   );
 }

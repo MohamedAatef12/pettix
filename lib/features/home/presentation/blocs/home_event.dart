@@ -112,5 +112,37 @@ class UpdatePostCommentsCountEvent extends HomeEvent {
   @override
   List<Object?> get props => [postId];
 }
-
+class AddCommentLikeEvent extends HomeEvent{
+  final int commentId;
+  AddCommentLikeEvent(this.commentId);
+  @override
+  List<Object?> get props => [commentId];
+}
+class GetCommentsLikeEvent extends HomeEvent{
+  final int commentId;
+  GetCommentsLikeEvent(this.commentId);
+  @override
+  List<Object?> get props => [commentId];
+}
+class UnLikeCommentEvent extends HomeEvent{
+  final int commentId;
+  UnLikeCommentEvent(this.commentId);
+  @override
+  List<Object?> get props => [commentId];
+}
+class ReportPostEvent extends HomeEvent{
+  final int postId;
+  final int reasonId;
+  final String reason;
+  ReportPostEvent(this.postId, this.reasonId, this.reason);
+  @override
+  List<Object?> get props => [postId, reasonId, reason];
+}
+class GetReportReasonsEvent extends HomeEvent{}
+class GetReportedPostsEvent extends HomeEvent{
+  final int postId;
+  GetReportedPostsEvent(this.postId);
+  @override
+  List<Object?> get props => [postId];
+}
 

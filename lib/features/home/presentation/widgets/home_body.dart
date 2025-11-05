@@ -25,10 +25,23 @@ class HomeBody extends StatelessWidget {
             content = const Center(child: HomeShimmer());
           } else if (state.error != null) {
             content = Center(
-              child: Text(
-                state.error!,
-                style: const TextStyle(color: Colors.red),
-              ),
+           child: CircleAvatar(
+             backgroundColor: AppColors.current.lightGray,
+             radius: 100.r,
+             child: Column(
+               mainAxisAlignment: MainAxisAlignment.center,
+               children: [
+                 Icon(
+                    Icons.cloud_off_outlined,
+                    color: AppColors.current.primary,
+                    size: 50.w,
+                 ),
+                 Text(state.error.toString(),
+                  style: TextStyle(fontSize: 16.sp, color: AppColors.current.primary )
+                 )
+               ],
+             ),
+           ),
             );
           } else if (state.posts.isEmpty) {
             content = Center(

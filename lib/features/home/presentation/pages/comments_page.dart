@@ -24,7 +24,11 @@ import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/features/home/presentation/widgets/comments_body.dart';
 
 class CommentsBottomSheet {
-  static void show(BuildContext context, int postId) {
+  static void show({
+    required BuildContext context,
+    required int postId,
+    required BuildContext parentContext,
+  }) {
     final user = DI.find<ICacheManager>().getUserData();
 
     showModalBottomSheet(
@@ -32,29 +36,17 @@ class CommentsBottomSheet {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
-       return BlocProvider(
-          create: (context) =>HomeBloc(
-            getPostCommentsCountUseCase: getIt<GetPostCommentsCountsUseCase>(),
-            getUserDataUseCase: getIt<GetUserDataUseCase>(),
-            getCommentsIdUseCase: getIt<GetPostCommentsUseCase>(),
-            getPostsLikesUseCase: getIt<GetPostLikesUseCase>(),
-            getPostsUseCase: getIt<GetPostsUseCase>(),
-              addPostUseCase: getIt<AddPostUseCase>(),
-            addCommentUseCase: getIt<AddCommentUseCase>(),
-              unlikePostUseCase: getIt<UnLikePostUseCase>(),
-            likePostUseCase: getIt<LikePostUseCase>(),
-            deletePostUseCase: getIt<DeletePostUseCase>(),
-
-
-          )..add(FetchPostsCommentsEvent(postId))
-           ..add(SetReplyingToEvent(null))..add(UpdatePostCommentsCountEvent(postId))..add(GetPostCommentsCountsEvent(postId)),
+        return BlocProvider.value(
+          value: parentContext.read<HomeBloc>()
+            ..add(FetchPostsCommentsEvent(postId))
+            ..add(SetReplyingToEvent(null)),
           child: DraggableScrollableSheet(
             expand: false,
             initialChildSize: 0.95,
             minChildSize: 0.5,
             maxChildSize: 0.95,
             builder: (context, scrollController) {
-             final bloc = context.read<HomeBloc>();
+              final bloc = context.read<HomeBloc>();
               return Container(
                 decoration: BoxDecoration(
                   color: AppColors.current.white,
@@ -62,7 +54,6 @@ class CommentsBottomSheet {
                 ),
                 child: Column(
                   children: [
-                    // Handle bar
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 8.h),
                       child: Container(
@@ -74,7 +65,6 @@ class CommentsBottomSheet {
                         ),
                       ),
                     ),
-                    // AppBar imitation
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
                       child: Row(
@@ -84,25 +74,18 @@ class CommentsBottomSheet {
                             child: Icon(Icons.chevron_left, size: 35.r),
                           ),
                           SizedBox(width: 10.w),
-                          Text(
-                            'Comments',
-                            style: AppTextStyles.bold.copyWith(fontSize: 20.sp),
-                          ),
+                          Text('Comments', style: AppTextStyles.bold.copyWith(fontSize: 20.sp)),
                         ],
                       ),
                     ),
-                    // Comments list
                     Expanded(
                       child: CommentsBody(
                         postId: postId,
                         scrollController: scrollController,
                       ),
                     ),
-                    // Bottom TextField
                     Padding(
-                      padding: EdgeInsets.all(
-                       30
-                      ),
+                      padding: const EdgeInsets.all(30),
                       child: Row(
                         children: [
                           CircleAvatar(
@@ -138,7 +121,7 @@ class CommentsBottomSheet {
                                 ),
                                     (userData) {
                                   final hasMention = text.startsWith('@') || text.contains(RegExp(r'\s@'));
-                                   final parentCommentId = hasMention ? bloc.state.replyingTo?.id : null;
+                                  final parentCommentId = hasMention ? bloc.state.replyingTo?.id : null;
 
                                   final comment = CommentEntity(
                                     id: 0,
@@ -160,16 +143,17 @@ class CommentsBottomSheet {
                                     postId: postId,
                                     parentCommentId: parentCommentId,
                                     replies: [],
+                                    likes: []
                                   );
-                                 bloc.add(AddCommentEvent(comment));
-                                 bloc.commentTextController.clear();
+
+                                  bloc.add(AddCommentEvent(comment));
+                                  bloc.commentTextController.clear();
                                   bloc.add(SetReplyingToEvent(null));
                                 },
                               );
                             },
                             child: SvgPicture.asset('assets/icons/add_comment.svg'),
                           ),
-
                         ],
                       ),
                     ),
@@ -182,5 +166,6 @@ class CommentsBottomSheet {
       },
     );
   }
+
 }
 

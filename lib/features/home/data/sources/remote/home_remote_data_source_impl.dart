@@ -7,6 +7,7 @@ import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/data/network/api_services.dart';
 import 'package:pettix/data/network/constants.dart';
 import 'package:pettix/data/network/failure.dart';
+import 'package:pettix/features/home/data/models/comments_like_model.dart';
 import 'package:pettix/features/home/data/models/comments_model.dart';
 import 'package:pettix/features/home/data/models/likes_model.dart';
 import 'package:pettix/features/home/data/models/post_model.dart';
@@ -82,7 +83,6 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     }
   }
 
-
   @override
   Future<Either<Failure, void>> addPost(PostModel post) async {
     try {
@@ -145,7 +145,11 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   }
 
   @override
-  Future<Either<Failure, void>> addComment(CommentModel comment,int postId, int? parentCommentId,) async {
+  Future<Either<Failure, void>> addComment(
+    CommentModel comment,
+    int postId,
+    int? parentCommentId,
+  ) async {
     final userToken = await DI.find<ICacheManager>().getToken();
     try {
       await apiService.post(
@@ -221,18 +225,12 @@ class RemoteDataSourceImpl implements RemoteDataSource {
       // ✅ Send token in headers, not body
       final response = await apiService.post(
         endPoint: '${Constants.postLikesEndpoint}/$postId',
-        data: {
-          'userId': userId,
-          'date': DateTime.now().toIso8601String(),
-        },
+        data: {'userId': userId, 'date': DateTime.now().toIso8601String()},
         headers: {
           'Authorization': 'Bearer $userToken',
           'Content-Type': 'application/json',
         },
       );
-
-      print('[RemoteDataSource] Sent like for post $postId by user $userId');
-
       return Right(LikesModel.fromJson(response));
     } on DioException catch (dioError) {
       return Left(DioFailure.fromDioError(dioError));
@@ -252,13 +250,14 @@ class RemoteDataSourceImpl implements RemoteDataSource {
           'Content-Type': 'application/json',
         },
       );
-      return Right (response);
+      return Right(response);
     } on DioException catch (dioError) {
       return Left(DioFailure.fromDioError(dioError));
     } catch (e) {
       return Left(Failure('Unexpected error: ${e.toString()}'));
     }
   }
+
   @override
   Future<Either<Failure, int>> getPostCommentsCount(int postId) async {
     try {
@@ -280,5 +279,114 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     }
   }
 
+  @override
+  Future<Either<Failure, List<CommentsLikeModel>>> getCommentsLikesCount(
+    int commentId,
+  ) async {
+    try {
+      final data = await apiService.getList(
+        endPoint: '${Constants.commentLikesEndpoint}/comment/$commentId',
+      );
 
+      final commentsLikes =
+          data.map((e) => CommentsLikeModel.fromJson(e)).toList();
+      // Sort commentsLikes by date descending (latest first)
+      commentsLikes.sort(
+        (a, b) => DateTime.parse(
+          b.creationDate,
+        ).compareTo(DateTime.parse(a.creationDate)),
+      );
+      if (commentsLikes.isEmpty) {
+        return const Right([]);
+      }
+
+      return Right(commentsLikes);
+    } catch (e) {
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> likeComment(int commentId) async {
+    try {
+      final userToken = await DI.find<ICacheManager>().getToken();
+      final data = await apiService.post(
+        endPoint: '${Constants.commentLikesEndpoint}/$commentId',
+        headers: {
+          'Authorization': 'Bearer $userToken',
+          'Content-Type': 'application/json',
+        },
+      );
+      return Right(null);
+    } on DioException catch (dioError) {
+      return Left(DioFailure.fromDioError(dioError));
+    } catch (e) {
+      return Left(Failure('Unexpected error: ${e.toString()}'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> unlikeComment(int commentId) async {
+    try {
+      final userToken = await DI.find<ICacheManager>().getToken();
+      final data = await apiService.delete(
+        endPoint: '${Constants.commentLikesEndpoint}/$commentId',
+        headers: {
+          'Authorization': 'Bearer $userToken',
+          'Content-Type': 'application/json',
+        },
+      );
+      return Right(null);
+    } on DioException catch (dioError) {
+      return Left(DioFailure.fromDioError(dioError));
+    } catch (e) {
+      return Left(Failure('Unexpected error: ${e.toString()}'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> reportPost(
+    int postId,
+    int reasonId,
+    String reason,
+  ) async {
+    try {
+      final userToken = await DI.find<ICacheManager>().getToken();
+      await apiService.post(
+        endPoint: Constants.reportPostEndpoint,
+        data: {'postId':postId,'reasonId': reasonId, 'customReason': reason},
+        headers: {
+          'Authorization': 'Bearer $userToken',
+          'Content-Type': 'application/json',
+        },
+      );
+      return const Right(null);
+    } catch (e) {
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<dynamic>>> getReportReasons() async {
+    try {
+      final data = await apiService.getList(
+        endPoint: Constants.reportReasonsEndpoint,
+      );
+      return Right(data);
+    } catch (e) {
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<dynamic>>> reportedPosts(int postId) async {
+    try {
+      final data = await apiService.getList(
+        endPoint: '${Constants.reportedPostsEndpoint}/$postId',
+      );
+      return Right(data);
+    } catch (e) {
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
 }

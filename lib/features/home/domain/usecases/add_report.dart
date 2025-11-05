@@ -3,18 +3,13 @@ import 'package:injectable/injectable.dart';
 import 'package:pettix/data/network/failure.dart';
 import 'package:pettix/features/home/domain/repositories/home_domain_repo.dart';
 
-
 @injectable
-class UnLikePostUseCase {
+class AddReportUseCase {
   final HomeDomainRepository repository;
 
-  UnLikePostUseCase(this.repository);
+  AddReportUseCase(this.repository);
 
-  Future<Either<Failure, void>> call(
-    int postId
-  ) {
-    return repository.unlikePost(
-      postId,
-    );
+  Future<Either<Failure, void>> call(int postId, int reasonId, String reason) {
+    return repository.reportPost(postId, reasonId, reason);
   }
 }

@@ -1,8 +1,9 @@
 class Constants {
-  static const String baseUrl = 'https://4e23a97bc8c2.ngrok-free.app';
+  static const String baseUrl = 'https://aa2c9993be46.ngrok-free.app';
   // static const String baseUrl = 'http://alefak.runasp.net';
 
   static const commentsEndpoint = '/api/Comments/post';
+  static const commentLikesEndpoint = '/api/CommentLikes';
   static const usersEndpoint = '/api/Users';
   static const postsEndpoint = '/api/Posts';
   static const likesEndpoint = '/api/Likes';
@@ -10,6 +11,9 @@ class Constants {
   static const String getPostLikes = '/api/PostLikes/post';
   static const String loginEndpoint = '/api/Authentication/login';
   static const String googleLoginEndpoint = '/api/Authentication/google-login';
+  static const String reportPostEndpoint = '/api/PostReport';
+  static const String reportReasonsEndpoint = '/api/PostReport/reasons';
+  static const String reportedPostsEndpoint = '/api/PostReport/post';
 
   // Headers
   static const String contentTypeHeader = 'Content-Type';

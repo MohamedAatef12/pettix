@@ -1,5 +1,8 @@
 import 'dart:io';
 import 'package:equatable/equatable.dart';
+import 'package:pettix/features/home/domain/entities/comment_like_entity.dart';
+import 'package:pettix/features/home/domain/entities/report_entity.dart';
+import 'package:pettix/features/home/domain/entities/report_reason_entity.dart';
 import '../../domain/entities/comments_entity.dart';
 import '../../domain/entities/likes_entity.dart';
 import '../../domain/entities/post_entity.dart';
@@ -8,7 +11,10 @@ class HomeState extends Equatable {
   final List<PostEntity> posts;
   final List<CommentEntity> comments;
   final List<LikesEntity> likes;
+  final List<CommentLikeEntity> commentLikes;
+  final List<int> likedCommentId;
   final List<int> likedPostIds;
+  final Map<int, int> commentLikesCount;
   final Map<int, int> postLikesCount;
   final Map<int, int> postCommentsCount;
   final bool isPostsLoading;
@@ -20,6 +26,9 @@ class HomeState extends Equatable {
   final List<File> selectedImages;
   final CommentEntity? replyingTo;
   final Map<int, bool> expandedComments;
+  final List<ReportReasonEntity> reportReasons;
+  final List<ReportEntity> reports;
+  final bool isReportLoading;
   const HomeState({
     this.posts = const [],
     this.comments = const [],
@@ -36,6 +45,12 @@ class HomeState extends Equatable {
     this.selectedImages = const [],
     this.replyingTo,
     this.expandedComments = const {},
+    this.commentLikes = const [],
+    this.likedCommentId = const [],
+    this.commentLikesCount = const {},
+    this.reportReasons = const [],
+    this.reports = const [],
+    this.isReportLoading = false,
   });
 
   HomeState copyWith({
@@ -54,6 +69,12 @@ class HomeState extends Equatable {
     List<File>? selectedImages,
     CommentEntity? replyingTo,
     Map<int, bool>? expandedComments,
+    List<CommentLikeEntity>? commentLikes,
+    List<int>? likedCommentId,
+    Map<int, int>? commentLikesCount,
+    List<ReportReasonEntity>? reportReasons,
+    List<ReportEntity>? reports,
+    bool? isReportLoading,
   }) {
     return HomeState(
       posts: posts ?? this.posts,
@@ -71,6 +92,12 @@ class HomeState extends Equatable {
       selectedImages: selectedImages ?? this.selectedImages,
       replyingTo: replyingTo ?? this.replyingTo,
       expandedComments: expandedComments ?? this.expandedComments,
+      commentLikes: commentLikes ?? this.commentLikes,
+      likedCommentId: likedCommentId ?? this.likedCommentId,
+      commentLikesCount: commentLikesCount ?? this.commentLikesCount,
+      reportReasons: reportReasons ?? this.reportReasons,
+      reports: reports ?? this.reports,
+      isReportLoading: isReportLoading ?? this.isReportLoading
     );
   }
 
@@ -90,6 +117,12 @@ class HomeState extends Equatable {
     error,
     selectedImages,
     replyingTo,
-    expandedComments
+    expandedComments,
+    commentLikes,
+    likedCommentId,
+    commentLikesCount,
+    reportReasons,
+    reports,
+    isReportLoading
   ];
 }
