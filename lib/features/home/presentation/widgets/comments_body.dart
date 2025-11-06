@@ -34,24 +34,21 @@ class CommentsBody extends StatelessWidget {
         if (state.isCommentsLoading) return Center(child: CommentsShimmer());
         if (state.error != null) {
           return Center(
-            child: CircleAvatar(
-              backgroundColor: AppColors.current.lightGray,
-              radius: 100.r,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.cloud_off_outlined,
-                    color: AppColors.current.primary,
-                    size: 50.w,
-                  ),
-                  Text(state.error.toString(),
-                      style: TextStyle(fontSize: 16.sp, color: AppColors.current.primary )
-                  )
-                ],
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline_outlined,
+                color: AppColors.current.red,
+                size: 50.w,
               ),
-            ),
-          );
+              Text(
+                  'Something went wrong ..!\n   Please try again later.',
+                  style: TextStyle(fontSize: 16.sp, color: AppColors.current.red )
+              )
+            ],
+          ),
+        );
         }
         if (state.comments.isEmpty) return const Center(child: Text('No comments yet.'));
 
@@ -104,18 +101,44 @@ class CommentsBody extends StatelessWidget {
                     children: [
                       Text(comment.author.nameEn.toString(),
                           style: AppTextStyles.bold.copyWith(
-                              fontSize: isReply ? 10.sp : 14.sp)),
+                              fontSize: isReply ? 12.sp : 14.sp)),
                       SizedBox(height: isReply ? 2.h : 4.h),
-                      Text(comment.text,
-                          style: AppTextStyles.description.copyWith(
-                              fontSize: isReply ? 10.sp : 14.sp)),
+                      SizedBox(
+                        width: 150.w,
+                        child: RichText(
+                          text: TextSpan(
+                            children: [
+                              if (comment.parentCommentId != null) ...[
+                                TextSpan(
+                                  text:
+                                  '@${_findParentAuthorName(comment.parentCommentId, bloc.state.comments)}: ',
+                                  style: AppTextStyles.description.copyWith(
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: isReply ? 12.sp : 14.sp,
+                                  ),
+                                ),
+                              ],
+                              TextSpan(
+                                text: comment.text,
+                                style: AppTextStyles.description.copyWith(
+                                  fontSize: isReply ? 12.sp : 14.sp,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                      ),
+
                       SizedBox(height: isReply ? 2.h : 4.h),
                       Row(
                         children: [
                           Text(
                               _formatCreationDate(comment.creationDate),
                               style: AppTextStyles.smallDescription.copyWith(
-                                fontSize: isReply ? 10.sp : 12.sp,
+                                fontSize: isReply ? 12.sp : 12.sp,
                                 color: AppColors.current.gray,
                               )),
                           SizedBox(width: 20.w),
@@ -123,7 +146,7 @@ class CommentsBody extends StatelessWidget {
                             onTap: () {
                               bloc.add(SetReplyingToEvent(comment));
                               bloc.commentTextController.text =
-                              '@${comment.author.nameEn} ';
+                              '@${comment.author.nameEn}: ';
                             },
                             child: Text('Reply (${_getTotalRepliesCount(comment)})',
                                 style: AppTextStyles.smallDescription.copyWith(
@@ -226,6 +249,17 @@ class CommentsBody extends StatelessWidget {
     } catch (_) {
       return rawDate;
     }
+  }
+  String _findParentAuthorName(int? parentId, List<CommentEntity> comments) {
+    if (parentId == null) return '';
+    for (final comment in comments) {
+      if (comment.id == parentId) return comment.author.nameEn ?? '';
+      for (final reply in comment.replies) {
+        final name = _findParentAuthorName(parentId, [reply]);
+        if (name.isNotEmpty) return name;
+      }
+    }
+    return '';
   }
 
 }

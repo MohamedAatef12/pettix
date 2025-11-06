@@ -19,25 +19,31 @@ class TokenInterceptor extends Interceptor {
 
   @override
   void onError(DioError err, ErrorInterceptorHandler handler) async {
-    // لو حصل 401
     if (err.response?.statusCode == 401) {
       final refreshToken = await DI.find<ICacheManager>().getRefreshToken();
 
       if (refreshToken != null) {
         try {
-          // جدد التوكن
-          final response = await dio.post('/auth/refresh', data: {
-            'refresh_token': refreshToken,
-          });
+          // استخدم Dio مؤقت بدون Interceptors
+          final refreshDio = Dio(BaseOptions(baseUrl: dio.options.baseUrl));
 
-          final newToken = response.data['access_token'];
-          final newRefreshToken = response.data['refresh_token'];
+          // Endpoint الصحيح لتجديد التوكن
+          final response = await refreshDio.post(
+            '/api/Authentication/refresh-token',
+            data: {
+              'refreshToken': refreshToken,
+            },
+          );
 
-          // خزّن التوكن الجديد
+          // استخدم المفاتيح الصحيحة من الـ backend
+          final newToken = response.data['accessToken'];
+          final newRefreshToken = response.data['refreshToken'];
+
+          // خزّن القيم الجديدة
           await DI.find<ICacheManager>().setToken(newToken);
           await DI.find<ICacheManager>().setRefreshToken(newRefreshToken);
 
-          // كرر الريكوست الأصلي مع التوكن الجديد
+          // أعد تنفيذ الريكوست الأصلي
           final opts = err.requestOptions;
           opts.headers['Authorization'] = 'Bearer $newToken';
 
@@ -53,7 +59,6 @@ class TokenInterceptor extends Interceptor {
 
           return handler.resolve(cloneReq);
         } catch (e) {
-          // لو فشل التجديد
           return handler.reject(err);
         }
       }
@@ -62,3 +67,4 @@ class TokenInterceptor extends Interceptor {
     super.onError(err, handler);
   }
 }
+

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -48,6 +49,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final TextEditingController commentTextController = TextEditingController();
   final TextEditingController postTextController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
+   String _mentionPrefix = '';
+
 
   factory HomeBloc.fromDI() {
     return HomeBloc(
@@ -88,7 +91,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required this.getReportedPostsUseCase,
     required this.addReportUseCase,
   }) : super(const HomeState()) {
-    // Existing events
     on<FetchPostsEvent>(_onFetchPosts);
     on<AddPostEvent>(_onAddPost);
     on<DeletePostEvent>(_onDeletePost);
@@ -107,9 +109,34 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<ToggleCommentRepliesEvent>((event, emit) {
       final newExpanded = Map<int, bool>.from(state.expandedComments);
       final current = newExpanded[event.commentId] ?? false;
-      newExpanded[event.commentId] = !current; // Toggle value
+      newExpanded[event.commentId] = !current;
 
       emit(state.copyWith(expandedComments: newExpanded));
+      commentTextController.addListener(() {
+        final text = commentTextController.text;
+        final selection = commentTextController.selection;
+
+        // لو في mention موجود
+        if (_mentionPrefix.isNotEmpty) {
+          // لو المستخدم حذف البداية أو كتب قبل mention
+          if (!text.startsWith(_mentionPrefix)) {
+            commentTextController.text = _mentionPrefix;
+            commentTextController.selection = TextSelection.fromPosition(
+              TextPosition(offset: _mentionPrefix.length),
+            );
+            return;
+          }
+
+          // لو المؤشر جوه mention
+          if (selection.start < _mentionPrefix.length) {
+            commentTextController.selection = TextSelection.fromPosition(
+              TextPosition(offset: _mentionPrefix.length),
+            );
+          }
+        }
+      });
+
+
     });
     on<UpdatePostCommentsCountEvent>(_onUpdatePostCommentsCount);
     on<RefreshCommentsSilentlyEvent>(_onRefreshCommentsSilently);
@@ -185,19 +212,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         final postCommentsMap = <int, int>{};
         final likedPostIds = <int>[];
 
-        // ✅ نستخدم Future.wait بدل await في اللوب
         await Future.wait(
           posts.map((post) async {
             postLikesMap[post.id] = post.likes.length;
             postCommentsMap[post.id] = post.comments.length;
 
-            // ✅ Detect liked posts
             if (currentUserId != null &&
                 post.likes.any((like) => like.author.id == currentUserId)) {
               likedPostIds.add(post.id);
             }
 
-            // ✅ Call endpoint to get comment count safely
             final countResult = await getPostCommentsCountUseCase.call(post.id);
 
             countResult.fold(
@@ -209,18 +233,17 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
               (count) {
                 print("✅ Comments count for post ${post.id}: $count");
                 postCommentsMap[post.id] =
-                    count; // ✅ استخدم الماب المحلي مش state
+                    count;
               },
             );
           }),
         );
 
-        // ✅ بعد ما تخلص كل الكولات
         emit(
           state.copyWith(
             posts: posts,
             postLikesCount: postLikesMap,
-            postCommentsCount: postCommentsMap, // ✅ هنا القيم الصح بعد الـ API
+            postCommentsCount: postCommentsMap,
             likedPostIds: likedPostIds,
             isPostsLoading: false,
           ),
@@ -229,7 +252,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
   }
 
-  // 📝 ADD POST (from backend)
   Future<void> _onAddPost(AddPostEvent event, Emitter<HomeState> emit) async {
     emit(state.copyWith(isAddPostLoading: true, error: null));
     final result = await addPostUseCase.call(event.post);
@@ -261,7 +283,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
   }
 
-  // 📸 Pick multiple from gallery
   Future<void> _onPickImagesFromGallery(
     PickImagesFromGalleryEvent event,
     Emitter<HomeState> emit,
@@ -273,7 +294,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
   }
 
-  // 📷 Add from camera
   Future<void> _onAddImageFromCamera(
     AddImageFromCameraEvent event,
     Emitter<HomeState> emit,
@@ -283,7 +303,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
   }
 
-  // ❌ Remove image
   void _onRemoveSelectedImage(
     RemoveSelectedImageEvent event,
     Emitter<HomeState> emit,
@@ -293,14 +312,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     emit(state.copyWith(selectedImages: updated));
   }
 
-  // 🚀 Submit Post
   Future<void> _onSubmitPost(
     SubmitPostEvent event,
     Emitter<HomeState> emit,
   ) async {
     final text = postTextController.text.trim();
 
-    // ✅ تأكد أن فيه محتوى أو صور
     if (text.isEmpty && state.selectedImages.isEmpty) return;
 
     emit(state.copyWith(isAddPostLoading: true));
@@ -331,7 +348,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           id: 0,
           author: author,
           content: text,
-          images: imagePaths, // 🧠 هنا التعديل
+          images: imagePaths,
           creationDate: DateTime.now().add(const Duration(hours: 2)).toString(),
 
           comments: [],
@@ -360,7 +377,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
   }
 
-  // 🗑️ DELETE POST
   Future<void> _onDeletePost(
     DeletePostEvent event,
     Emitter<HomeState> emit,
@@ -385,7 +401,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
   }
 
-  // 💬 COMMENTS
   Future<void> _onFetchPostsComments(
       FetchPostsCommentsEvent event,
       Emitter<HomeState> emit,
@@ -403,12 +418,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           (comments) async {
         final updatedLikedCommentIds = <int>{};
 
-        // جلب بيانات المستخدم
         final userResult = await getUserDataUseCase.call();
         int? currentUserId;
         userResult.fold((_) {}, (user) => currentUserId = user.id);
 
-        // ✅ استخدم Future.wait لجلب likes لكل كومنت
         await Future.wait(comments.map((comment) async {
           final likesResult = await getCommentsLike.call(comment.id);
           likesResult.fold(
@@ -442,7 +455,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final replyingToBeforeSend = state.replyingTo;
     emit(state.copyWith(replyingTo: null));
 
-    // 🔹 لو الكومنت ده رد
     if (event.comment.parentCommentId != null &&
         replyingToBeforeSend != null &&
         replyingToBeforeSend.id == event.comment.parentCommentId) {
@@ -450,7 +462,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       return;
     }
 
-    // 🔹 تعليق مؤقت
     final tempComment = CommentEntity(
       id: -DateTime.now().millisecondsSinceEpoch,
       postId: event.comment.postId,
@@ -465,7 +476,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final updatedComments = List<CommentEntity>.from(state.comments)
       ..insert(0, tempComment);
 
-    // 🧩 تحديث عداد الكومنتات في الواجهة فوراً
     final currentCount = state.postCommentsCount[event.comment.postId] ?? 0;
     final updatedCount = Map<int, int>.from(state.postCommentsCount)
       ..[event.comment.postId] = currentCount + 1;
@@ -486,7 +496,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     result.fold(
       (failure) {
-        // ❌ لو فشل، نحذف الكومنت المؤقت ونرجع العداد
         final revertedComments = List<CommentEntity>.from(state.comments)
           ..removeWhere((c) => c.id == tempComment.id);
 
@@ -505,7 +514,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         );
       },
       (_) {
-        // ✅ نجاح → استبدل الكومنت المؤقت بالحقيقي
         final finalComments =
             List<CommentEntity>.from(state.comments)
               ..removeWhere((c) => c.id == tempComment.id)
@@ -513,7 +521,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
         emit(state.copyWith(comments: finalComments, error: null));
 
-        // 🔄 تحديث فعلي بعد الرجوع من السيرفر
         add(RefreshCommentsSilentlyEvent(event.comment.postId));
         add(GetPostCommentsCountsEvent(event.comment.postId));
       },
@@ -521,13 +528,30 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     commentTextController.clear();
   }
-
   Future<void> _onSetReplyingTo(
-    SetReplyingToEvent event,
-    Emitter<HomeState> emit,
-  ) async {
+      SetReplyingToEvent event,
+      Emitter<HomeState> emit,
+      ) async {
     emit(state.copyWith(replyingTo: event.comment));
+
+    final replyingTo = event.comment;
+    final controller = commentTextController;
+
+    if (replyingTo != null) {
+      final mentionPrefix = '@${replyingTo.author.nameEn}: ';
+      controller.text = '$mentionPrefix ';
+      controller.selection = TextSelection.fromPosition(
+        TextPosition(offset: controller.text.length),
+      );
+
+      _mentionPrefix = mentionPrefix;
+    } else {
+      controller.clear();
+      _mentionPrefix = '';
+    }
   }
+
+
 
   Future<void> _onAddReply(AddReplyEvent event, Emitter<HomeState> emit) async {
     emit(state.copyWith(error: null));
@@ -538,51 +562,58 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
 
     final optimisticComments =
+    state.comments.map((comment) {
+      if (comment.id == event.parentCommentId) {
+        final updatedReplies = List<CommentEntity>.from(comment.replies)
+          ..add(tempReply);
+        return comment.copyWith(replies: updatedReplies);
+      }
+      return comment;
+    }).toList();
+
+    emit(state.copyWith(comments: optimisticComments));
+
+    final originalText = event.reply.text;
+
+    final cleanText = event.reply.text.contains(':')
+        ? event.reply.text.split(':').last.trim()
+        : event.reply.text.trim();
+
+    final replyForUpload = event.reply.copyWith(text: cleanText);
+
+    final result = await addCommentUseCase.call(
+      replyForUpload,
+      event.reply.postId,
+      event.parentCommentId,
+    );
+    await result.fold(
+          (failure) async {
+        final revertedComments =
         state.comments.map((comment) {
           if (comment.id == event.parentCommentId) {
             final updatedReplies = List<CommentEntity>.from(comment.replies)
-              ..add(tempReply);
+              ..removeWhere((r) => r.id == tempReply.id);
             return comment.copyWith(replies: updatedReplies);
           }
           return comment;
         }).toList();
 
-    emit(state.copyWith(comments: optimisticComments));
-
-    final result = await addCommentUseCase.call(
-      event.reply,
-      event.reply.postId,
-      event.parentCommentId,
-    );
-
-    await result.fold(
-      (failure) async {
-        final revertedComments =
-            state.comments.map((comment) {
-              if (comment.id == event.parentCommentId) {
-                final updatedReplies = List<CommentEntity>.from(comment.replies)
-                  ..removeWhere((r) => r.id == tempReply.id);
-                return comment.copyWith(replies: updatedReplies);
-              }
-              return comment;
-            }).toList();
-
         emit(
           state.copyWith(comments: revertedComments, error: failure.message),
         );
       },
-      (_) async {
+          (_) async {
         final updatedComments =
-            state.comments.map((comment) {
-              if (comment.id == event.parentCommentId) {
-                final replies =
-                    List<CommentEntity>.from(comment.replies)
-                      ..removeWhere((r) => r.id == tempReply.id)
-                      ..add(event.reply);
-                return comment.copyWith(replies: replies);
-              }
-              return comment;
-            }).toList();
+        state.comments.map((comment) {
+          if (comment.id == event.parentCommentId) {
+            final replies =
+            List<CommentEntity>.from(comment.replies)
+              ..removeWhere((r) => r.id == tempReply.id)
+              ..add(event.reply.copyWith(text: originalText));
+            return comment.copyWith(replies: replies);
+          }
+          return comment;
+        }).toList();
 
         emit(state.copyWith(comments: updatedComments, error: null));
         add(RefreshCommentsSilentlyEvent(event.reply.postId));
@@ -591,7 +622,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
     commentTextController.clear();
 
-    await Future.delayed(Duration(milliseconds: 100));
+    await Future.delayed(const Duration(milliseconds: 100));
 
     emit(state.copyWith(replyingTo: null));
   }
@@ -659,7 +690,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final updatedLiked = List<int>.from(state.likedPostIds)
       ..remove(event.postId);
 
-    // Optimistic UI update
     emit(
       state.copyWith(
         likedPostIds: updatedLiked,
@@ -734,7 +764,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     if (throttledPostIds.contains(commentId)) return;
     throttledPostIds.add(commentId);
 
-    // 🔹 Optimistic update: نزوّد اللايك والعداد مباشرة
     final updatedCommentLikes = Map<int, int>.from(state.commentLikesCount);
     final updatedLikedComments = List<int>.from(state.likedCommentId);
 
@@ -758,7 +787,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           final result = await likeCommentUseCase.call(commentId);
           await result.fold(
                 (failure) async => _revertCommentLike(commentId, emit),
-                (_) async => add(GetCommentsLikeEvent(commentId)), // sync with server
+                (_) async => add(GetCommentsLikeEvent(commentId)),
           );
         },
       );
@@ -850,7 +879,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
   }
 
-  // 🧩 Revert helpers
   void _revertCommentLike(int commentId, Emitter<HomeState> emit) {
     final updatedLikedComments =
     List<int>.from(state.likedCommentId ?? [])..remove(commentId);
@@ -932,7 +960,6 @@ Future<void> _onReportPost(
         emit(state.copyWith(error: failure.message));
       },
           (_) {
-        // ✅ نجاح التبليغ
       },
     );
   }

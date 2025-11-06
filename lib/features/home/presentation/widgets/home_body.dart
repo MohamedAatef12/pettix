@@ -28,18 +28,10 @@ class HomeBody extends StatelessWidget {
            child: CircleAvatar(
              backgroundColor: AppColors.current.lightGray,
              radius: 100.r,
-             child: Column(
-               mainAxisAlignment: MainAxisAlignment.center,
-               children: [
-                 Icon(
-                    Icons.cloud_off_outlined,
-                    color: AppColors.current.primary,
-                    size: 50.w,
-                 ),
-                 Text(state.error.toString(),
-                  style: TextStyle(fontSize: 16.sp, color: AppColors.current.primary )
-                 )
-               ],
+             child: Icon(
+                Icons.cloud_off_outlined,
+                color: AppColors.current.primary,
+                size: 50.w,
              ),
            ),
             );
