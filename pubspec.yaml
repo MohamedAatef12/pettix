@@ -66,6 +66,7 @@ dependencies:
   # Permissions & Connectivity
   permission_handler: ^12.0.0+1
   connectivity_plus: ^6.1.4
+  pinput: ^5.0.2
 
 
 dev_dependencies:

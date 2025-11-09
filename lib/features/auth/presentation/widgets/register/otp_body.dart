@@ -10,10 +10,11 @@ import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_event.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_state.dart';
+import 'package:pinput/pinput.dart';
 
 class OTPBody extends StatelessWidget {
    OTPBody({super.key});
-  final _otpControllers = List.generate(4, (_) => TextEditingController());
+  final _otpController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -31,16 +32,21 @@ class OTPBody extends StatelessWidget {
               SizedBox(height: 10.h,),
               Text('Enter the OTP we sent to +45472****', style: AppTextStyles.smallDescription),
               SizedBox(height: 40.h,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(4, (i) => SizedBox(
-                  width: 50,
-                  child: CustomTextFormField(
-                    keyboardType: TextInputType.number,
-                    controller: _otpControllers[i],
+              Pinput(
+                length: 6,
+                controller: _otpController,
+                keyboardType: TextInputType.number,
+                defaultPinTheme: PinTheme(
+                  width: 60,
+                  height: 60,
+                  textStyle: const TextStyle(fontSize: 22),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                )),
+                ),
               ),
+
               SizedBox(height: 20.h,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -62,7 +68,7 @@ class OTPBody extends StatelessWidget {
               SizedBox(height: 40.h,),
               CustomFilledButton(
                 onPressed: () {
-                  final otp = _otpControllers.map((c) => c.text).join();
+                  final otp =  _otpController.text;
                   context.read<AuthBloc>().add(RegisterOtpSubmitted(otp));
                   context.go('/verified');
                 },

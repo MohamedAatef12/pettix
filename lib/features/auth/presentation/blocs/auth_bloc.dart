@@ -235,18 +235,5 @@ final fullNameController = TextEditingController();
   }
 
 
-  @override
-  Future<void> close() {
-    // Dispose controllers to prevent memory leaks
-  fullNameController.dispose();
-    emailRegisterController.dispose();
-    phoneController.dispose();
-    passwordRegisterController.dispose();
-    confirmPasswordController.dispose();
 
-    emailLoginController.dispose();
-    passwordLoginController.dispose();
-
-    return super.close();
-  }
 }

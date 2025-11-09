@@ -91,7 +91,8 @@ class RegisterForm extends StatelessWidget {
                  name: bloc.fullNameController.text,
                  phone: bloc.phoneController.text,
                ));
-               context.go('/set_password');
+               context.push('/set_password',
+               extra: context.read<AuthBloc>(),);
               },
               text: 'Continue',
               backgroundColor: AppColors.current.primary,
