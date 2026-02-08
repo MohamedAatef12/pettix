@@ -19,4 +19,3 @@ class Constants {
   static const String contentTypeHeader = 'Content-Type';
   static const String applicationJson = 'application/json';
 }
-
