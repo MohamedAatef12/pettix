@@ -1,8 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
+import 'package:pettix/data/network/email_auth_service.dart';
 import 'package:pettix/data/network/twilio_service.dart';
 import 'package:pettix/features/auth/data/models/login/google_login_model.dart';
 import 'package:pettix/features/auth/data/models/user_model.dart';
@@ -19,7 +22,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final RegisterUseCase registerUseCase;
   final LoginUseCase loginUseCase;
   final GoogleLoginUseCase googleLoginUseCase;
-  final TwilioService twilioService;
+  final EmailAuthService emailAuthService;
 
   // Controllers for Register
 final fullNameController = TextEditingController();
@@ -42,7 +45,7 @@ final fullNameController = TextEditingController();
     required this.registerUseCase,
     required this.loginUseCase,
     required this.googleLoginUseCase,
-    required this.twilioService,
+    required this.emailAuthService,
   }) : super(AuthInitial()) {
     // Register events
     on<RegisterStepOneSubmitted>(_registerStepOne);
@@ -91,7 +94,7 @@ final fullNameController = TextEditingController();
     );
 
     // نرسل OTP عبر Twilio
-    final otpSent = await twilioService.sendOtp(event.phone);
+    final otpSent = await emailAuthService.sendOtp(event.email);
 
     if (otpSent) {
       emit(RegisterStepOneSuccess());
@@ -131,8 +134,8 @@ final fullNameController = TextEditingController();
 
     emit(RegisterLoading());
 
-    final verified = await twilioService.verifyOtp(
-      _tempRegisterData!.phone,
+    final verified = await emailAuthService.verifyOtp(
+      _tempRegisterData!.email,
       event.otp,
     );
 
@@ -158,10 +161,14 @@ final fullNameController = TextEditingController();
 
     final result = await loginUseCase(event.model);
     await result.fold(
-          (failure) async => emit(LoginFailure(failure.message)),
+          (failure) async {
+            print('failure message: ${failure.message}');
+            emit(LoginFailure(failure.message));} ,
           (loginResponse) async {
         await DI.find<ICacheManager>()
-            .setUserData(UserModel.fromEntity(loginResponse.user)); // ✅ stores user + logged_in = true
+            .setUserData(UserModel.fromEntity(loginResponse.user));
+        await DI.find<ICacheManager>().setToken(loginResponse.token);
+        await DI.find<ICacheManager>().setRefreshToken(loginResponse.refreshToken.toString());// ✅ stores user + logged_in = true
 
         if (event.rememberMe) {
           await DI.find<ICacheManager>().saveLogin(true);
@@ -228,18 +235,5 @@ final fullNameController = TextEditingController();
   }
 
 
-  @override
-  Future<void> close() {
-    // Dispose controllers to prevent memory leaks
-  fullNameController.dispose();
-    emailRegisterController.dispose();
-    phoneController.dispose();
-    passwordRegisterController.dispose();
-    confirmPasswordController.dispose();
 
-    emailLoginController.dispose();
-    passwordLoginController.dispose();
-
-    return super.close();
-  }
 }

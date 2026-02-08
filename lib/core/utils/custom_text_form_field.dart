@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 
 class CustomTextFormField extends StatelessWidget {
@@ -84,20 +85,20 @@ class CustomTextFormField extends StatelessWidget {
         filled: fillColor,
         fillColor: fillColorValue,
         prefixIcon: leading,
-        suffixIcon:
-            enablePasswordToggle
-                ? IconButton(
-                  icon: Icon(
-                    obscureText
-                        ? Icons.visibility_off_outlined
-                        : Icons.visibility_outlined,
-                    color: AppColors.current.lightText,
-                  ),
-                  onPressed: onToggleObscureText, // 🔹 يبعث event للبلوك
-                )
-                : suffixIcon,
-        contentPadding:
-            contentPadding ??
+        prefixIconConstraints: BoxConstraints(
+          minWidth: 24.w,
+          minHeight: 24.h,
+          maxWidth: 24.w,
+          maxHeight: 24.h,
+        ),
+        suffixIconConstraints: BoxConstraints(
+          minWidth: 24.w,
+          minHeight: 24.h,
+          maxWidth: 24.w,
+          maxHeight: 24.h,
+        ),
+        suffixIcon: suffixIcon,
+        contentPadding: contentPadding ??
             const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
         border: border ?? const OutlineInputBorder(),
         focusedBorder:

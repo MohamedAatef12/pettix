@@ -11,7 +11,7 @@ class UnLikePostUseCase {
   UnLikePostUseCase(this.repository);
 
   Future<Either<Failure, void>> call(
-    int postId,
+    int postId
   ) {
     return repository.unlikePost(
       postId,

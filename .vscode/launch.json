@@ -1,0 +1,50 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Pettix Dev",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main/main_development.dart",
+            "args": [
+                "--flavor",
+                "dev"
+            ]
+        },
+        {
+            "name": "Pettix Dev (Release)",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main/main_development.dart",
+            "flutterMode": "release",
+            "args": [
+                "--flavor",
+                "dev"
+            ]
+        },
+        {
+            "name": "Pettix Prod",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main/main_production.dart",
+            "args": [
+                "--flavor",
+                "prod"
+            ]
+        },
+        {
+            "name": "Pettix Prod (Release)",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main/main_production.dart",
+            "flutterMode": "release",
+            "args": [
+                "--flavor",
+                "prod"
+            ]
+        }
+    ]
+}

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -15,6 +16,25 @@ import 'package:pettix/features/auth/presentation/blocs/auth_state.dart';
 
 class LoginForm extends StatelessWidget {
   const LoginForm({super.key});
+  bool _isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
+    return emailRegex.hasMatch(email);
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) return "Required";
+    if (value.length < 8) return "Password must be at least 8 characters";
+    if (!RegExp(r'[A-Z]').hasMatch(value)) {
+      return "Must contain at least one uppercase letter";
+    }
+    if (!RegExp(r'[a-z]').hasMatch(value)) {
+      return "Must contain at least one lowercase letter";
+    }
+    if (!RegExp(r'\d').hasMatch(value)) {
+      return "Must contain at least one number";
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,17 +45,22 @@ class LoginForm extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Email or phone number', style: AppTextStyles.smallDescription),
+          Text(AppText.email, style: AppTextStyles.smallDescription),
           SizedBox(height: 4.h),
           GestureDetector(
             onTap: () => FocusScope.of(context).unfocus(),
             child: CustomTextFormField(
               controller: bloc.emailLoginController,
-              labelText: 'Email',
-              hintText: 'Enter your email',
+              hintText: AppText.enterYourEmail,
               keyboardType: TextInputType.emailAddress,
-              validator: (value) =>
-              (value == null || value.isEmpty) ? "Required" : null,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return AppText.required;
+                } else if (!_isValidEmail(value)) {
+                  return AppText.validEmail;
+                }
+                return null;
+              },
               fillColor: true,
               fillColorValue: AppColors.current.white,
               enabledBorder: OutlineInputBorder(
@@ -46,21 +71,20 @@ class LoginForm extends StatelessWidget {
           ),
           SizedBox(height: 10.h),
 
-          Text('Password', style: AppTextStyles.smallDescription),
+          Text(AppText.password, style: AppTextStyles.smallDescription),
           SizedBox(height: 4.h),
           BlocBuilder<AuthBloc, AuthState>(
-            buildWhen: (previous, current) =>
-            current is LoginPasswordVisibilityChanged,
+            buildWhen:
+                (previous, current) =>
+                    current is LoginPasswordVisibilityChanged,
             builder: (context, state) {
               return GestureDetector(
                 onTap: () => FocusScope.of(context).unfocus(),
                 child: CustomTextFormField(
                   controller: bloc.passwordLoginController,
-                  labelText: 'Password',
-                  hintText: 'Enter your password',
-
+                  hintText: AppText.enterPassword,
                   validator: (value) =>
-                  (value == null || value.isEmpty) ? "Required" : null,
+                  (value == null || value.isEmpty) ? AppText.passwordRequired : null,
                   fillColor: true,
                   fillColorValue: AppColors.current.white,
                   enablePasswordToggle: true,
@@ -80,8 +104,7 @@ class LoginForm extends StatelessWidget {
 
           // 👇 برضه هنا BlocBuilder للـ RememberMe بس
           BlocBuilder<AuthBloc, AuthState>(
-            buildWhen: (previous, current) =>
-            current is LoginRememberMeChanged,
+            buildWhen: (previous, current) => current is LoginRememberMeChanged,
             builder: (context, state) {
               return Padding(
                 padding: PaddingConstants.horizontalSmall,
@@ -89,12 +112,11 @@ class LoginForm extends StatelessWidget {
                   children: [
                     Checkbox(
                       value: bloc.rememberMe,
-                      onChanged: (value) =>
-                          bloc.add(ToggleRememberMe(value!)),
+                      onChanged: (value) => bloc.add(ToggleRememberMe(value!)),
                       activeColor: AppColors.current.green,
                     ),
                     Text(
-                      'Remember Me',
+                      AppText.rememberMe,
                       style: AppTextStyles.smallDescription.copyWith(
                         color: AppColors.current.gray,
                       ),
@@ -103,7 +125,7 @@ class LoginForm extends StatelessWidget {
                     GestureDetector(
                       onTap: () => context.pushNamed('forgot_password'),
                       child: Text(
-                        'Forget Password?',
+                        AppText.forgetPassword,
                         style: AppTextStyles.smallDescription.copyWith(
                           color: AppColors.current.gray,
                         ),
@@ -130,8 +152,10 @@ class LoginForm extends StatelessWidget {
                 );
               }
 
+              bloc.emailLoginController.clear();
+              bloc.passwordLoginController.clear();
             },
-            text: 'Sign In',
+            text: AppText.signIn,
             backgroundColor: AppColors.current.primary,
             textColor: AppColors.current.white,
           ),
@@ -149,7 +173,7 @@ class LoginForm extends StatelessWidget {
               ),
               SizedBox(width: 5.w),
               Text(
-                'OR',
+                AppText.or,
                 style: AppTextStyles.smallDescription.copyWith(
                   color: AppColors.current.gray,
                 ),
@@ -168,11 +192,11 @@ class LoginForm extends StatelessWidget {
           SizedBox(height: 10.h),
           CustomFilledButton(
             onPressed: () {
-              context.read<AuthBloc>().add(GoogleLoginSubmitted(
-                rememberMe: bloc.rememberMe,
-              ));
+              context.read<AuthBloc>().add(
+                GoogleLoginSubmitted(rememberMe: bloc.rememberMe),
+              );
             },
-            text: 'Continue with Google',
+            text: AppText.continueWithGoogle,
             backgroundColor: AppColors.current.white,
             textColor: AppColors.current.lightText,
             hasLeading: true,
@@ -183,7 +207,7 @@ class LoginForm extends StatelessWidget {
             onPressed: () {
               // Handle login
             },
-            text: 'Continue with Apple',
+            text: AppText.continueWithApple,
             backgroundColor: AppColors.current.white,
             textColor: AppColors.current.lightText,
             hasLeading: true,
@@ -194,7 +218,7 @@ class LoginForm extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Don\'t have an account? ',
+                AppText.dontHaveAccount,
                 style: AppTextStyles.smallDescription.copyWith(
                   color: AppColors.current.gray,
                 ),
@@ -204,7 +228,7 @@ class LoginForm extends StatelessWidget {
                   context.push('/signup');
                 },
                 child: Text(
-                  'Sign Up',
+                  AppText.signUp,
                   style: AppTextStyles.smallDescription.copyWith(
                     color: AppColors.current.primary,
                     fontWeight: FontWeight.w600,
@@ -218,4 +242,3 @@ class LoginForm extends StatelessWidget {
     );
   }
 }
-

@@ -9,12 +9,12 @@ android.apply {
         create("dev") {
             dimension = "app"
             applicationId = "com.example.pettix.dev"
-            resValue(type = "string", name = "app_name", value = "MyApp Dev")
+            resValue(type = "string", name = "app_name", value = "Pettix Dev")
         }
         create("prod") {
             dimension = "app"
-            applicationId = "com.example.myapp"
-            resValue(type = "string", name = "app_name", value = "MyApp")
+            applicationId = "com.example.pettix"
+            resValue(type = "string", name = "app_name", value = "Pettix")
         }
     }
 }

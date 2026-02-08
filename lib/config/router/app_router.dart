@@ -1,3 +1,4 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/features/adoption/presentation/view/adoption_screen.dart';
 import 'package:pettix/features/adoption/presentation/view/pet_application.dart';
@@ -11,12 +12,18 @@ import 'package:pettix/features/auth/presentation/pages/register/register_page.d
 import 'package:pettix/features/auth/presentation/pages/register/set_password_page.dart';
 import 'package:pettix/features/auth/presentation/pages/register/verified_page.dart';
 import 'package:pettix/features/bottom_bar/views/pages/bottom_bar_page.dart';
+import 'package:pettix/features/chat/presentation/view/pages/chat_list_page.dart';
+import 'package:pettix/features/chat/presentation/view/pages/chat_page.dart';
+import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
+import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 import 'package:pettix/features/home/presentation/pages/add_post_page.dart';
 import 'package:pettix/features/home/presentation/pages/comments_page.dart';
 import 'package:pettix/features/home/presentation/pages/home_page.dart';
 import 'package:pettix/features/home/presentation/pages/home_search.dart';
+import 'package:pettix/features/notification/presentation/view/pages/notification_page.dart';
 import 'package:pettix/features/on_boarding/presentation/view/on_boarding_screen.dart';
 import 'package:pettix/features/select_language/presentation/view/select_language_screen.dart';
+import 'package:pettix/features/side_menu/presentation/view/pages/side_menu_page.dart';
 import 'package:pettix/features/splash/persentation/view/splash_screen.dart';
 
 import '../../features/adoption/presentation/view/application_view.dart';
@@ -25,26 +32,31 @@ import 'routes.dart';
 GoRouter appRouter() => GoRouter(
   initialLocation: AppRoutes.bottomNav,
   // redirect: (context, state) async {
+  //   await SharedPrefsHelper.init();
+  //
+  //   final isFirstOpen = SharedPrefsHelper.getBool('isFirstOpen') ?? true;
   //   final isSignedUp = await AuthService.hasSignedUp();
   //   final isLoggedIn = await AuthService.checkAuth();
   //
-  //   final goingToLogin = state.uri.toString() == AppRoutes.login;
-  //   final goingToSignUp = state.uri.toString() == AppRoutes.signUp;
+  //   final current = state.uri.toString();
   //
-  //   if (!isSignedUp && !goingToSignUp) {
-  //     return AppRoutes.signUp;
+  //   if (isFirstOpen && current != AppRoutes.selectLanguage) {
+  //     return AppRoutes.selectLanguage;
   //   }
   //
-  //   if (isSignedUp && !isLoggedIn && !goingToLogin) {
-  //     return AppRoutes.login;
+  //   if (current == AppRoutes.onBoarding) {
+  //     await SharedPrefsHelper.setBool('isFirstOpen', false);
   //   }
   //
-  //   if (isLoggedIn && (goingToLogin || goingToSignUp)) {
-  //     return AppRoutes.home;
+  //   if (!isFirstOpen) {
+  //     if (!isSignedUp && current != AppRoutes.signUp) return AppRoutes.signUp;
+  //     if (isSignedUp && !isLoggedIn && current != AppRoutes.login) return AppRoutes.login;
+  //     if (isLoggedIn && (current == AppRoutes.login || current == AppRoutes.signUp)) return AppRoutes.home;
   //   }
   //
   //   return null;
   // },
+
   routes: <RouteBase>[
     GoRoute(
       path: AppRoutes.splash,
@@ -74,6 +86,7 @@ GoRouter appRouter() => GoRouter(
     GoRoute(
       path: AppRoutes.setPassword,
       name: AppRouteNames.setPassword,
+      builder: (context, state) => const SetPasswordScreen(),
       builder: (context, state) => const SetPasswordScreen(),
     ),
     GoRoute(
@@ -117,10 +130,36 @@ GoRouter appRouter() => GoRouter(
       builder: (context, state) => const AddPostPage(),
     ),
     GoRoute(
-      path: AppRoutes.comments,
-      name: AppRouteNames.comments,
-      builder: (context, state) => const CommentsPage(),
+      path: '${AppRoutes.chat}/:index',
+      name: AppRouteNames.chat,
+      builder: (context, state) {
+        final index = int.tryParse(state.pathParameters['index'] ?? '0') ?? 0;
+        return ChatPage(index: index);
+      },
     ),
+
+    GoRoute(
+      path: AppRoutes.chatList,
+      name: AppRouteNames.chatList,
+      builder: (context, state) => const ChatListPage(),
+    ),
+    // GoRoute(
+    //   path: AppRoutes.comments,
+    //   builder: (context, state) {
+    //     final postId = state.extra as int;
+    //
+    //     // ✅ نستخدم BlocProvider مستقل من DI أو نمرر الـ bloc الموجود من صفحة Home
+    //     return BlocProvider(
+    //       create: (_) => HomeBloc.fromDI()
+    //         ..add(
+    //           FetchPostsCommentsEvent(postId),
+    //         ),
+    //       child: CommentsPage(postId: postId),
+    //     );
+    //   },
+    // ),
+
+
     GoRoute(
       path: AppRoutes.homeSearch,
       name: AppRouteNames.homeSearch,

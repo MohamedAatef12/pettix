@@ -22,11 +22,15 @@ class CacheManager implements ICacheManager {
   }
 
   @override
-  bool? logout() {
+  bool logout() {
     _prefs?.remove('user');
+    _prefs?.remove('token');
+    _prefs?.remove('remember_me');
     _prefs?.setBool('logged_in', false);
+
     return true;
   }
+
 
   @override
   bool isCrossedOnBoardingPage() {
@@ -39,11 +43,11 @@ class CacheManager implements ICacheManager {
   }
 
   @override
-  RegisterModel? getUserData() {
+  UserModel? getUserData() {
     final jsonString = _prefs?.getString('user');
     if (jsonString != null) {
       final userJson = json.decode(jsonString);
-      return RegisterModel.fromJson(userJson);
+      return UserModel.fromJson(userJson);
     }
     return null;
   }
@@ -97,6 +101,14 @@ class CacheManager implements ICacheManager {
   @override
   Future<String?> getToken() async {
     return _prefs?.getString('token');
+  }
+  @override
+  Future<void> setRefreshToken(String refreshToken) async {
+     await _prefs?.setString('refresh_token', refreshToken);
+  }
+  @override
+  Future<String?> getRefreshToken() async {
+    return _prefs?.getString('refresh_token');
   }
 
 }
