@@ -42,8 +42,8 @@ class HomeAppBar extends StatelessWidget {
             ),
           ),
           SizedBox(width: 10.w,),
-          SizedBox(
-                  width:120.w,child: Text(user!.userName, style: AppTextStyles.bold)),
+          // SizedBox(
+          //         width:120.w,child: Text(user!.userName, style: AppTextStyles.bold)),
 
           Spacer(),
           GestureDetector(

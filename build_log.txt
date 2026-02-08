@@ -1,0 +1,9 @@
+Running Gradle task 'assembleDevDebug'...                       
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+3 warnings
+Running Gradle task 'assembleDevDebug'...                         181.0s
+√ Built build\app\outputs\flutter-apk\app-dev-debug.apk
