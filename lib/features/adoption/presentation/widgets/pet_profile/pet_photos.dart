@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class PetGallery extends StatelessWidget {
   const PetGallery({super.key});
@@ -67,56 +66,56 @@ class PetGallery extends StatelessWidget {
           const SizedBox(height: 8),
 
           // 4 small images below
-          MasonryGridView.count(
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            crossAxisCount: 4,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            itemCount: 4,
-            itemBuilder: (context, index) {
-              final image = images[index + 1];
-              final isLast = index == 3 && remaining > 0;
+        //   MasonryGridView.count(
+        //     physics: const NeverScrollableScrollPhysics(),
+        //     shrinkWrap: true,
+        //     crossAxisCount: 4,
+        //     mainAxisSpacing: 8,
+        //     crossAxisSpacing: 8,
+        //     itemCount: 4,
+        //     itemBuilder: (context, index) {
+        //       final image = images[index + 1];
+        //       final isLast = index == 3 && remaining > 0;
 
-              return GestureDetector(
-                onTap:
-                    () =>
-                        isLast
-                            ? _openGallery(context, images)
-                            : _openImage(context, image),
-                child: Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        image,
-                        fit: BoxFit.cover,
-                        height: 120.h,
-                        width: double.infinity,
-                      ),
-                    ),
-                    if (isLast)
-                      Container(
-                        height: 120.h,
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.45),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          '+$remaining',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              );
-            },
-          ),
+        //       return GestureDetector(
+        //         onTap:
+        //             () =>
+        //                 isLast
+        //                     ? _openGallery(context, images)
+        //                     : _openImage(context, image),
+        //         child: Stack(
+        //           children: [
+        //             ClipRRect(
+        //               borderRadius: BorderRadius.circular(12),
+        //               child: Image.network(
+        //                 image,
+        //                 fit: BoxFit.cover,
+        //                 height: 120.h,
+        //                 width: double.infinity,
+        //               ),
+        //             ),
+        //             if (isLast)
+        //               Container(
+        //                 height: 120.h,
+        //                 decoration: BoxDecoration(
+        //                   color: Colors.black.withOpacity(0.45),
+        //                   borderRadius: BorderRadius.circular(12),
+        //                 ),
+        //                 alignment: Alignment.center,
+        //                 child: Text(
+        //                   '+$remaining',
+        //                   style: const TextStyle(
+        //                     color: Colors.white,
+        //                     fontSize: 22,
+        //                     fontWeight: FontWeight.bold,
+        //                   ),
+        //                 ),
+        //               ),
+        //           ],
+        //         ),
+        //       );
+        //     },
+        //   ),
         ],
       ),
     );

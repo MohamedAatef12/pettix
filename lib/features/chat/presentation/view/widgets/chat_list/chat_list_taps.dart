@@ -121,10 +121,11 @@ class _ChatListTapsState extends State<ChatListTaps>
                   children: [
                     GestureDetector(
                       onTap: (){
-                        context.pushNamed(
-                          AppRouteNames.chat,
-                          pathParameters: {'index': index.toString()},
-                        ); },
+                        // context.pushNamed(
+                        //   AppRouteNames.chat,
+                        //   pathParameters: {'index': index.toString()},
+                        // ); },
+                      },
                       child: Container(
                         padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 5.w),
                       decoration: BoxDecoration(

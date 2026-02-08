@@ -24,6 +24,7 @@ class AppRoutes {
   static const String settings = '/settings';
   static const String notifications = '/notifications';
   static const String chat = '/chat';
+  static const String chatList = '/chatList';
   static const String messages = '/messages';
   static const String friends = '/friends';
 }
@@ -49,4 +50,12 @@ class AppRouteNames {
   static const String petProfile = 'pet_profile';
   static const String petApplication = 'pet_application';
   static const String applications = 'applications';
+  static const String profile = 'profile';
+  static const String editProfile = 'edit_profile';
+  static const String settings = 'settings';
+  static const String notifications = 'notifications';
+  static const String chat = 'chat';
+  static const String chatList = 'chatList';
+  static const String messages = 'messages';
+  static const String friends = 'friends';
 }

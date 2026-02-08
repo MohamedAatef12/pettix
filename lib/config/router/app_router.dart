@@ -87,7 +87,6 @@ GoRouter appRouter() => GoRouter(
       path: AppRoutes.setPassword,
       name: AppRouteNames.setPassword,
       builder: (context, state) => const SetPasswordScreen(),
-      builder: (context, state) => const SetPasswordScreen(),
     ),
     GoRoute(
       path: AppRoutes.otpVerification,
