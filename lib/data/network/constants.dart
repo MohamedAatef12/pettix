@@ -1,6 +1,5 @@
 class Constants {
-  static const String baseUrl = 'https://pettix-production.up.railway.app/api/';
-  // static const String baseUrl = 'http://alefak.runasp.net';
+  static const String baseUrl = 'https://pettix-production.up.railway.app';
 
   static const String commentsEndpoint = 'Comments/post';
   static const String commentLikesEndpoint = 'CommentLikes';
@@ -19,4 +18,3 @@ class Constants {
   static const String contentTypeHeader = 'Content-Type';
   static const String applicationJson = 'application/json';
 }
-

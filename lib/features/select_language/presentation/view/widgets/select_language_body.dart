@@ -1,7 +1,9 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/config/router/routes.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -28,11 +30,11 @@ class SelectLanguageBody extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Select Your Language', style: AppTextStyles.title),
+                    Text(AppText.selectYourLanguage, style: AppTextStyles.title),
                     SizedBox(height: 20.h),
                     GestureDetector(
                       onTap: () {
-                        // Handle Arabic selection
+                        context.setLocale(const Locale('ar'));
                       },
                       child: Container(
                         width: 300.w,
@@ -46,7 +48,7 @@ class SelectLanguageBody extends StatelessWidget {
                           child: Row(
                             children: [
                               Text(
-                                'Arabic',
+                                AppText.arabic,
                                 style: AppTextStyles.bold.copyWith(
                                   color: AppColors.current.lightText,
                                 ),
@@ -67,7 +69,7 @@ class SelectLanguageBody extends StatelessWidget {
                     SizedBox(height: 20.h),
                     GestureDetector(
                       onTap: () {
-                        // Handle Arabic selection
+                        context.setLocale(const Locale('en'));
                       },
                       child: Container(
                         width: 300.w,
@@ -81,7 +83,7 @@ class SelectLanguageBody extends StatelessWidget {
                           child: Row(
                             children: [
                               Text(
-                                'English',
+                                AppText.english,
                                 style: AppTextStyles.bold.copyWith(
                                   color: AppColors.current.lightText,
                                 ),

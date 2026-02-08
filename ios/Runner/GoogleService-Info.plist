@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>774297250092-p0lj720af890k8pqhlida5cjhuvcn76m.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.774297250092-p0lj720af890k8pqhlida5cjhuvcn76m</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>774297250092-pjtorlmekp18k440eqtn33rclv3jh03c.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBFzLZap85e4ONDvWRGMbK_c-WEeHbAMcA</string>
+	<key>GCM_SENDER_ID</key>
+	<string>774297250092</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.pettix.dev</string>
+	<key>PROJECT_ID</key>
+	<string>pettix-5c3c9</string>
+	<key>STORAGE_BUCKET</key>
+	<string>pettix-5c3c9.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:774297250092:ios:f48cdea5a492f609cc2489</string>
+</dict>
+</plist>

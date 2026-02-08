@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -29,11 +30,10 @@ class RegisterForm extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Full Name',style: AppTextStyles.smallDescription,),
+            Text(AppText.fullName,style: AppTextStyles.smallDescription,),
             SizedBox(height: 4.h,),
             CustomTextFormField(
-              labelText: 'Name',
-              hintText: 'Enter your name',
+              hintText: AppText.enterName,
               controller: bloc.fullNameController,
               keyboardType: TextInputType.emailAddress,
               fillColor: true,
@@ -46,11 +46,10 @@ class RegisterForm extends StatelessWidget {
               ),
             ),
             SizedBox(height: 10.h,),
-            Text('Email',style: AppTextStyles.smallDescription,),
+            Text(AppText.email,style: AppTextStyles.smallDescription,),
             SizedBox(height: 4.h,),
             CustomTextFormField(
-              labelText: 'Email',
-              hintText: 'Enter your email',
+              hintText: AppText.enterYourEmail,
               keyboardType: TextInputType.emailAddress,
               controller: bloc.emailRegisterController,
               fillColor: true,
@@ -63,11 +62,10 @@ class RegisterForm extends StatelessWidget {
               ),
             ),
             SizedBox(height: 10.h,),
-            Text('Phone Number',style: AppTextStyles.smallDescription,),
+            Text(AppText.phoneNumber,style: AppTextStyles.smallDescription,),
             SizedBox(height: 4.h,),
             CustomTextFormField(
-              labelText: 'Phone',
-              hintText: 'Enter your phone number',
+              hintText: AppText.enterPhoneNumber,
               keyboardType: TextInputType.phone,
               controller: bloc.phoneController,
               fillColor: true,
@@ -94,7 +92,7 @@ class RegisterForm extends StatelessWidget {
                context.push('/set_password',
                extra: context.read<AuthBloc>(),);
               },
-              text: 'Continue',
+              text: AppText.continue_,
               backgroundColor: AppColors.current.primary,
               textColor: AppColors.current.white,
 
@@ -113,7 +111,7 @@ class RegisterForm extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 5.w,),
-                Text('OR',style: AppTextStyles.smallDescription.copyWith(
+                Text(AppText.or,style: AppTextStyles.smallDescription.copyWith(
                   color: AppColors.current.gray,
                 ),),
                 SizedBox(width: 5.w,),
@@ -134,7 +132,7 @@ class RegisterForm extends StatelessWidget {
                   rememberMe: bloc.rememberMe,
                 ));
               },
-              text: 'Continue with Google',
+              text: AppText.continueWithGoogle,
               backgroundColor: AppColors.current.white,
               textColor: AppColors.current.lightText,
               hasLeading: true,
@@ -149,7 +147,7 @@ class RegisterForm extends StatelessWidget {
               onPressed: () {
                 // Handle login
               },
-              text: 'Continue with Apple',
+              text: AppText.continueWithApple,
               backgroundColor: AppColors.current.white,
               textColor: AppColors.current.lightText,
               hasLeading: true,
@@ -161,14 +159,14 @@ class RegisterForm extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Already have account? ',style: AppTextStyles.smallDescription.copyWith(
+                Text(AppText.alreadyHaveAccount,style: AppTextStyles.smallDescription.copyWith(
                   color: AppColors.current.gray,
                 ),),
                 GestureDetector(
                   onTap: () {
                     context.go('/login');
                   },
-                  child: Text('Sign In',style: AppTextStyles.smallDescription.copyWith(
+                  child: Text(AppText.signIn,style: AppTextStyles.smallDescription.copyWith(
                     color: AppColors.current.primary,
                     fontWeight: FontWeight.w600,
                   ),),

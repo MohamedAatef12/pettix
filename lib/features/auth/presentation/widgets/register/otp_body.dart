@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_button.dart';
@@ -28,9 +29,9 @@ class OTPBody extends StatelessWidget {
                 fit: BoxFit.fill,
                 width: MediaQuery.sizeOf(context).width,
               ),
-              Text('OTP Verification', style: AppTextStyles.title),
+              Text(AppText.otpVerification, style: AppTextStyles.title),
               SizedBox(height: 10.h,),
-              Text('Enter the OTP we sent to +45472****', style: AppTextStyles.smallDescription),
+              Text(AppText.enterOtpSent, style: AppTextStyles.smallDescription),
               SizedBox(height: 40.h,),
               Pinput(
                 length: 6,
@@ -51,14 +52,14 @@ class OTPBody extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Didn’t receive code? ',style: AppTextStyles.smallDescription.copyWith(
+                  Text(AppText.didntReceiveCode,style: AppTextStyles.smallDescription.copyWith(
                     color: AppColors.current.gray,
                   ),),
                   GestureDetector(
                     onTap: () {
 
                     },
-                    child: Text('Resend',style: AppTextStyles.smallDescription.copyWith(
+                    child: Text(AppText.resend,style: AppTextStyles.smallDescription.copyWith(
                       color: AppColors.current.primary,
                       fontWeight: FontWeight.w600,
                     ),),
@@ -72,7 +73,7 @@ class OTPBody extends StatelessWidget {
                   context.read<AuthBloc>().add(RegisterOtpSubmitted(otp));
                   context.go('/verified');
                 },
-                text: 'Verify',
+                text: AppText.verify,
                 backgroundColor: AppColors.current.primary,
                 textColor: AppColors.current.white,
 

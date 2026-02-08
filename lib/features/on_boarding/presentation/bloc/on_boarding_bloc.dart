@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/features/on_boarding/presentation/bloc/on_boarding_events.dart';
 import 'package:pettix/features/on_boarding/presentation/bloc/on_boarding_states.dart';
 import 'package:pettix/features/on_boarding/presentation/view/widgets/on_boarding_slides.dart';
@@ -7,19 +9,18 @@ class OnBoardingBloc extends Bloc<OnBoardingEvent, OnBoardingState> {
   final List<OnBoardingSlide> slides = [
     OnBoardingSlide(
       image: "assets/images/on_boarding1.png",
-      title: "Connect with Pet Lovers",
-      desc: "Share your pet’s daily adventures, post cute pictures, and engage with a loving pet community  just like you!",
+      title: AppText.connectWithPetLovers,
+      desc: AppText.shareDailyAdventures,
     ),
     OnBoardingSlide(
       image: "assets/images/on_boarding2.png",
-      title: "Care. Safety. Second Chances.",
-      desc: "Find loving homes for pets, access trusted clinics, or get urgent help in emergencies — all in one  convenient place.",
+      title: AppText.careSafetySecondChances,
+      desc:  AppText.findLovingHomes
     ),
     OnBoardingSlide(
       image: "assets/images/on_boarding3.png",
-      title: "Everything Your Pet Needs.",
-      desc: "Discover food, toys, and grooming essentials.  Shop easily for your furry friend from  trusted pet brands.",
-    ),
+      title: AppText.everythingYourPetNeeds,
+      desc: AppText.discoverFoodToys  ),
   ];
 
   OnBoardingBloc() : super(OnBoardingInitial()) {
