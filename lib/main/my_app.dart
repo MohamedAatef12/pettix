@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/config/env/app_config.dart';
@@ -17,6 +18,19 @@ class MyApp extends StatelessWidget {
       builder:
           (cxt, child) => MaterialApp.router(
             title: 'Flutter ${appConfig.envName}',
+            locale: Locale('en'),
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: const [Locale('ar'), Locale('en')],
+            localeResolutionCallback: (locale, supportedLocales) {
+              if (locale == null) return supportedLocales.first;
+              for (var supportedLocale in supportedLocales) {
+                if (supportedLocale.languageCode == locale.languageCode &&
+                    supportedLocale.countryCode == locale.countryCode) {
+                  return supportedLocale;
+                }
+              }
+              return locale;
+            },
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
               colorScheme: ColorScheme.fromSeed(

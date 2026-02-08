@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pettix/config/router/guards.dart';
+import 'package:pettix/data/caching/shared_prefs_helper.dart';
 import 'package:pettix/features/auth/presentation/pages/forgot_password/forgot_password_page.dart';
 import 'package:pettix/features/auth/presentation/pages/login/login_page.dart';
 import 'package:pettix/features/auth/presentation/pages/register/otp_page.dart';
@@ -28,26 +30,31 @@ import 'routes.dart';
 GoRouter appRouter() => GoRouter(
   initialLocation: AppRoutes.splash,
   // redirect: (context, state) async {
+  //   await SharedPrefsHelper.init();
+  //
+  //   final isFirstOpen = SharedPrefsHelper.getBool('isFirstOpen') ?? true;
   //   final isSignedUp = await AuthService.hasSignedUp();
   //   final isLoggedIn = await AuthService.checkAuth();
   //
-  //   final goingToLogin = state.uri.toString() == AppRoutes.login;
-  //   final goingToSignUp = state.uri.toString() == AppRoutes.signUp;
+  //   final current = state.uri.toString();
   //
-  //   if (!isSignedUp && !goingToSignUp) {
-  //     return AppRoutes.signUp;
+  //   if (isFirstOpen && current != AppRoutes.selectLanguage) {
+  //     return AppRoutes.selectLanguage;
   //   }
   //
-  //   if (isSignedUp && !isLoggedIn && !goingToLogin) {
-  //     return AppRoutes.login;
+  //   if (current == AppRoutes.onBoarding) {
+  //     await SharedPrefsHelper.setBool('isFirstOpen', false);
   //   }
   //
-  //   if (isLoggedIn && (goingToLogin || goingToSignUp)) {
-  //     return AppRoutes.home;
+  //   if (!isFirstOpen) {
+  //     if (!isSignedUp && current != AppRoutes.signUp) return AppRoutes.signUp;
+  //     if (isSignedUp && !isLoggedIn && current != AppRoutes.login) return AppRoutes.login;
+  //     if (isLoggedIn && (current == AppRoutes.login || current == AppRoutes.signUp)) return AppRoutes.home;
   //   }
   //
   //   return null;
   // },
+
   routes: <RouteBase>[
     GoRoute(
       path: AppRoutes.splash,

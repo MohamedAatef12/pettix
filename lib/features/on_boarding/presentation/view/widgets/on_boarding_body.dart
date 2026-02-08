@@ -1,12 +1,15 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/config/router/routes.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/data/caching/shared_prefs_helper.dart';
 import 'package:pettix/features/on_boarding/presentation/bloc/on_boarding_bloc.dart';
 import 'package:pettix/features/on_boarding/presentation/bloc/on_boarding_events.dart';
 import 'package:pettix/features/on_boarding/presentation/bloc/on_boarding_states.dart';
@@ -95,7 +98,7 @@ class OnBoardingBody extends StatelessWidget {
                   GestureDetector(
                     onTap: () => context.go(AppRoutes.login),
                     child: Text(
-                      'Skip',
+                      AppText.skip,
                       style: AppTextStyles.bold.copyWith(
                         color: AppColors.current.lightText,
                         fontSize: 16.sp,
@@ -114,6 +117,8 @@ class OnBoardingBody extends StatelessWidget {
                     onTap: () {
                       if (state.currentPage == bloc.slides.length - 1) {
                         context.go(AppRoutes.login);
+                         SharedPrefsHelper.setBool('isFirstOpen', false);
+
                       } else {
                         _pageController.nextPage(
                           duration: const Duration(milliseconds: 300),
