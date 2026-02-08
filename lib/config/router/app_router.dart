@@ -75,7 +75,7 @@ GoRouter appRouter() => GoRouter(
     GoRoute(
       path: AppRoutes.setPassword,
       name: AppRouteNames.setPassword,
-        builder: (context, state) => const SetPasswordScreen(),
+      builder: (context, state) => const SetPasswordScreen(),
     ),
     GoRoute(
       path: AppRoutes.otpVerification,
@@ -124,15 +124,12 @@ GoRouter appRouter() => GoRouter(
 
         // ✅ نستخدم BlocProvider مستقل من DI أو نمرر الـ bloc الموجود من صفحة Home
         return BlocProvider(
-          create: (_) => HomeBloc.fromDI()
-            ..add(
-              FetchPostsCommentsEvent(postId),
-            ),
+          create:
+              (_) => HomeBloc.fromDI()..add(FetchPostsCommentsEvent(postId)),
           child: CommentsPage(postId: postId),
         );
       },
     ),
-
 
     GoRoute(
       path: AppRoutes.homeSearch,
