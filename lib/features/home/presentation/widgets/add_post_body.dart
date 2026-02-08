@@ -86,18 +86,18 @@ class AddPostBody extends StatelessWidget {
                   SizedBox(height: 20.h),
 
                   // 🔹 User Info Row
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 25.r,
-                        backgroundImage:
-                        NetworkImage(userData!.avatar.toString()),
-                      ),
-                      SizedBox(width: 10.w),
-                      Text(userData.userName, style: AppTextStyles.bold),
-                    ],
-                  ),
-                  SizedBox(height: 20.h),
+                  // Row(
+                  //   children: [
+                  //     CircleAvatar(
+                  //       radius: 25.r,
+                  //       backgroundImage:
+                  //       NetworkImage(userData!.avatar.toString()),
+                  //     ),
+                  //     SizedBox(width: 10.w),
+                  //     Text(userData.userName, style: AppTextStyles.bold),
+                  //   ],
+                  // ),
+                  // SizedBox(height: 20.h),
                   CustomTextFormField(
                     controller: bloc.postTextController,
                     hintText: 'Write a caption...',

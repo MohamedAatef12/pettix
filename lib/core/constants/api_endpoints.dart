@@ -1,5 +1,5 @@
 class ApiEndpoints {
-  static const String baseUrl = 'https://2bc7dcadd103.ngrok-free.app';
+  static const String baseUrl = 'https://pettix-production.up.railway.app/';
   static const commentsEndpoint = '/api/Comments';
   static const usersEndpoint = '/api/users';
   static const postsEndpoint = '/api/Posts';

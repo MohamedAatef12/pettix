@@ -26,7 +26,7 @@ import 'package:pettix/features/splash/persentation/view/splash_screen.dart';
 import 'routes.dart';
 
 GoRouter appRouter() => GoRouter(
-  initialLocation: AppRoutes.splash,
+  initialLocation: AppRoutes.home,
   // redirect: (context, state) async {
   //   final isSignedUp = await AuthService.hasSignedUp();
   //   final isLoggedIn = await AuthService.checkAuth();
