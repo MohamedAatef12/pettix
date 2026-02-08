@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -22,21 +23,27 @@ class HomeAppBar extends StatelessWidget {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () {
-              context.push('/side_menu');
-            },
-            child: CircleAvatar(
-              radius: 30.r,
-              backgroundColor: AppColors.current.lightGray,
-              backgroundImage: NetworkImage(user!.image.toString()),
-              onBackgroundImageError: (_, __) {
-                const AssetImage('assets/images/no_user.png');
-              },
+            onTap: () => context.push('/side_menu'),
+            child: CachedNetworkImage(
+              imageUrl: user?.avatar ?? '',
+              imageBuilder: (context, imageProvider) => CircleAvatar(
+                radius: 30.r,
+                backgroundImage: imageProvider,
+                backgroundColor: AppColors.current.lightGray,
+              ),
+              placeholder: (context, url) => CircleAvatar(
+                radius: 30.r,
+                backgroundColor: AppColors.current.lightGray,
+              ),
+              errorWidget: (context, url, error) => CircleAvatar(
+                radius: 30.r,
+                backgroundImage: const AssetImage('assets/images/no_user.png'),
+              ),
             ),
           ),
           SizedBox(width: 10.w,),
           SizedBox(
-                  width:120.w,child: Text(user.userName, style: AppTextStyles.bold)),
+                  width:120.w,child: Text(user!.userName, style: AppTextStyles.bold)),
 
           Spacer(),
           GestureDetector(

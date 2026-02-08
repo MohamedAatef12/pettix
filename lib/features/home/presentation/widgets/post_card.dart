@@ -1,3 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:ui';
+
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -5,11 +10,14 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
+import 'package:pettix/core/shimmers/report_shimmer.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/home/domain/entities/post_entity.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 import 'package:pettix/features/home/presentation/blocs/home_state.dart';
+import 'package:pettix/features/home/presentation/pages/comments_page.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class PostCard extends StatelessWidget {
   const PostCard({super.key, required this.post});
@@ -29,23 +37,30 @@ class PostCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// --- HEADER (User Info)
+
+
             Row(
               children: [
                 CircleAvatar(
-                  radius: 30.r,
-                  backgroundImage: NetworkImage(post.imageUrl),
-                  onBackgroundImageError: (_, __) {
-                    const AssetImage('assets/images/no_user.png');
-                  },
+                  radius: 30,
+                  backgroundColor: AppColors.current.blueGray,
+                  backgroundImage:
+                      (post.author.avatar != null &&
+                              post.author.avatar!.isNotEmpty)
+                          ? NetworkImage(post.author.avatar!)
+                          : const AssetImage('assets/images/no_user.png')
+                              as ImageProvider,
                 ),
                 SizedBox(width: 10.w),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(post.username, style: AppTextStyles.bold),
                     Text(
-                      post.date,
+                      post.author.nameEn.toString(),
+                      style: AppTextStyles.bold,
+                    ),
+                    Text(
+                      _formatCreationDate(post.creationDate),
                       style: AppTextStyles.description.copyWith(
                         fontSize: 12.sp,
                       ),
@@ -53,58 +68,351 @@ class PostCard extends StatelessWidget {
                   ],
                 ),
                 const Spacer(),
-                GestureDetector(
-                  onTap: () {},
-                  child: CircleAvatar(
-                    radius: 20.r,
-                    backgroundColor: AppColors.current.white,
-                    child: SvgPicture.asset('assets/icons/more.svg'),
-                  ),
-                ),
-              ],
-            ),
-
-            SizedBox(height: 10.h),
-
-            /// --- POST CONTENT
-            Text(post.text, style: AppTextStyles.description),
-            post.imageUrl.isNotEmpty
-                ? Padding(
-              padding: EdgeInsets.symmetric(vertical: 10.h),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20.r),
-                child: Image.network(
-                  post.imageUrl,
-                  width: double.infinity,
-                  height: 200.h,
-                  fit: BoxFit.cover,
-
-                ),
+        GestureDetector(
+          onTap: () {
+            final homeBloc = context.read<HomeBloc>();
+            homeBloc.add(GetReportReasonsEvent());
+            showModalBottomSheet(
+              backgroundColor: AppColors.current.lightBlue,
+              context: context,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
               ),
-            )
-                : const SizedBox.shrink(),
+              builder: (_) {
+                return BlocProvider.value(
+                  value: homeBloc,
+                  child: BlocBuilder<HomeBloc, HomeState>(
+                    buildWhen: (p, c) =>
+                    p.reportReasons != c.reportReasons ||
+                        p.isReportLoading != c.isReportLoading,
+                    builder: (context, state) {
+                      return DraggableScrollableSheet(
+                        expand: false,
+                        initialChildSize: 0.9,
+                        minChildSize: 0.5,
+                        maxChildSize: 0.9,
+                        builder: (_, controller) {
+                          if (state.isReportLoading) {
+                            return const ReportShimmer();
+                          }
 
+                          return Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 8.h),
+                                child: Container(
+                                  width: 50.w,
+                                  height: 4.h,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[300],
+                                    borderRadius: BorderRadius.circular(2.r),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 10.0.r),
+                                child: Text(
+                                  'Report Post',
+                                  style: AppTextStyles.bold.copyWith(
+                                    fontSize: 18.sp,
+                                    color: AppColors.current.red,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 10.h),
+                              Expanded(
+                                child: ListView.separated(
+                                  controller: controller,
+                                  itemCount: state.reportReasons.length,
+                                  separatorBuilder: (_, __) => SizedBox(),
+                                  itemBuilder: (context, index) {
+                                    final reason = state.reportReasons[index];
+                                    final isOther = reason.name.toLowerCase().contains('other');
+                                    final textController = TextEditingController();
+
+                                    return Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: AppColors.current.red.withOpacity(0.05),
+                                          borderRadius: BorderRadius.all(Radius.circular(10.r)),
+                                          border: Border.all(color: AppColors.current.red, width: 1.h),
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            ListTile(
+                                              title: Text(
+                                                reason.name,
+                                                style: AppTextStyles.bold.copyWith(
+                                                  color: AppColors.current.text,
+                                                ),
+                                              ),
+                                              onTap: () {
+                                                if (isOther) {
+                                                 showDialog(
+                                                    context: context,
+                                                    builder: (ctx) {
+                                                      return AlertDialog(
+                                                        backgroundColor: AppColors.current.lightBlue,
+                                                        title: const Text('Please specify the reason'),
+                                                        content: TextField(
+                                                          controller: textController,
+                                                          decoration: const InputDecoration(
+                                                            hintText: 'Type your reason here...',
+                                                          ),
+                                                        ),
+                                                        actions: [
+                                                          TextButton(
+                                                            onPressed: () => Navigator.pop(ctx),
+                                                            child:  Text('Cancel',style: TextStyle(
+                                                              color: AppColors.current.text
+                                                            ),),
+                                                          ),
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              final customReason = textController.text.trim();
+                                                              if (customReason.isNotEmpty) {
+                                                                context.read<HomeBloc>().add(
+                                                                  ReportPostEvent(
+                                                                    post.id,
+                                                                    reason.id,
+                                                                    customReason,
+                                                                  ),
+                                                                );
+                                                                Navigator.pop(ctx); // close dialog
+                                                                Navigator.pop(context); // close sheet
+                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                  const SnackBar(
+                                                                    content: Text('Report sent successfully'),
+                                                                    backgroundColor: Colors.green,
+                                                                  ),
+                                                                );
+                                                              }
+                                                            },
+                                                            child:  Text('Submit',style: TextStyle(
+                                                      color: AppColors.current.primary
+                                                      ),),
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  );
+                                                } else {
+                                                  context.read<HomeBloc>().add(
+                                                    ReportPostEvent(post.id, reason.id, reason.name),
+                                                  );
+                                                  Navigator.pop(context);
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text('Report sent successfully'),
+                                                      backgroundColor: Colors.green,
+                                                    ),
+                                                  );
+                                                }
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                );
+              },
+            );
+          },
+          child: CircleAvatar(
+            radius: 20.r,
+            backgroundColor: AppColors.current.white,
+            child: SvgPicture.asset('assets/icons/more.svg'),
+          ),
+        )
+
+
+
+
+        ],
+            ),
             SizedBox(height: 10.h),
+            Text(post.content, style: AppTextStyles.description),
+            if (post.images.isNotEmpty)
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 10.h),
+                child: Builder(
+                  builder: (context) {
+                    final validImages = post.images
+                        .where((e) =>
+                    e.isNotEmpty &&
+                        (e.startsWith('http') ||
+                            e.startsWith('data:image') ||
+                            File(e).existsSync()))
+                        .toList();
 
-            /// --- ACTION ROW (Like, Comment, Share, Save)
+                    if (validImages.isEmpty) return const SizedBox.shrink();
+
+                    final imagesToShow =
+                    validImages.length > 4 ? validImages.take(4).toList() : validImages;
+
+                    // ✅ حال صورتين فقط → أفقي جنب بعض
+                    if (imagesToShow.length == 2) {
+                      return Row(
+                        children: List.generate(2, (index) {
+                          final image = imagesToShow[index];
+                          return Expanded(
+                            child: GestureDetector(
+                              onTap: () => _openSingleImagePreview(context, image),
+                              child: Padding(
+                                padding: EdgeInsets.only(right: index == 0 ? 8.w : 0),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(15.r),
+                                  child: _buildImage(
+                                    context,
+                                    image,
+                                    height: 200.h,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
+                      );
+                    }
+
+                    // ✅ باقي الحالات (1 أو أكتر من 2)
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // الصورة الأولى كبيرة
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(15.r),
+                          child: GestureDetector(
+                            onTap: () =>
+                                _openSingleImagePreview(context, validImages[0]),
+                            child: _buildImage(context, imagesToShow[0], height: 300.h),
+                          ),
+                        ),
+                        SizedBox(height: 8.h),
+
+                        // باقي الصور
+                        if (imagesToShow.length > 1)
+                          Row(
+                            children: List.generate(
+                              imagesToShow.length == 2
+                                  ? 2
+                                  : imagesToShow.length > 3
+                                  ? 3
+                                  : imagesToShow.length - 1,
+                                  (index) {
+                                final actualIndex = index + 1;
+                                final image = imagesToShow[actualIndex];
+                                final isLastWithMore =
+                                    actualIndex == 3 && validImages.length > 4;
+
+                                return SizedBox(
+                                  width: (MediaQuery.of(context).size.width -
+                                      2 * PaddingConstants.medium.horizontal / 2 -
+                                      16.w) /
+                                      (imagesToShow.length == 2
+                                          ? 2
+                                          : imagesToShow.length > 3
+                                          ? 3
+                                          : imagesToShow.length - 1),
+                                  height: 100.h,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      if (isLastWithMore) {
+                                        _openImagesPreview(context, validImages);
+                                      } else {
+                                        _openSingleImagePreview(context, image);
+                                      }
+                                    },
+                                    child: Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(15.r),
+                                          child: _buildImage(
+                                            context,
+                                            image,
+                                            height: 100.h,
+                                          ),
+                                        ),
+                                        if (isLastWithMore)
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(15.r),
+                                            child: BackdropFilter(
+                                              filter: ImageFilter.blur(
+                                                  sigmaX: 2, sigmaY: 2),
+                                              child: Container(
+                                                color: Colors.transparent,
+                                              ),
+                                            ),
+                                          ),
+                                        if (isLastWithMore)
+                                          Center(
+                                            child: Text(
+                                              '+${validImages.length - 3}',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 24.sp,
+                                                fontWeight: FontWeight.bold,
+                                                shadows: [
+                                                  Shadow(
+                                                    blurRadius: 6,
+                                                    color: Colors.black54,
+                                                    offset: Offset(1, 1),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ).expand((w) sync* {
+                              yield w;
+                              yield SizedBox(width: 8.w);
+                            }).toList()
+                              ..removeLast(),
+                          ),
+                      ],
+                    );
+                  },
+                ),
+              )
+
+
+            else
+              const SizedBox.shrink(),
+
+
             BlocBuilder<HomeBloc, HomeState>(
-              buildWhen: (prev, curr) =>
-              prev.likedPostIds != curr.likedPostIds ||
-                  prev.postLikesCount != curr.postLikesCount,
+              buildWhen:
+                  (prev, curr) =>
+                      prev.likedPostIds != curr.likedPostIds ||
+                      prev.postLikesCount != curr.postLikesCount ||
+                      prev.postCommentsCount != curr.postCommentsCount,
               builder: (context, state) {
                 final homeBloc = context.read<HomeBloc>();
-
+                final commentsCount = state.postCommentsCount[post.id] ?? 0;
                 final isLiked = state.likedPostIds.contains(post.id);
-                final likesCount = state.postLikesCount[post.id] ?? post.likesCount;
-
-                final isThrottled = homeBloc.throttledPostIds.contains(post.id);
+                final likesCount =
+                    state.postLikesCount[post.id] ?? post.likes.length;
 
                 return Row(
                   children: [
                     GestureDetector(
-                      onTap: isThrottled
-                          ? null
-                          : () {
+                      onTap: () {
                         if (isLiked) {
                           homeBloc.add(DeleteLikeEvent(post.id));
                         } else {
@@ -131,35 +439,56 @@ class PostCard extends StatelessWidget {
 
                     SizedBox(width: 10.w),
 
-                    /// 💬 COMMENT BUTTON
+                    
+
                     GestureDetector(
                       onTap: () {
-                        context.push('/comments', extra: post.id);
+                        debugPrint(
+                          '🔵 Adding GetPostCommentsCountsEvent for post ${post.id}',
+                        );
+                        context.read<HomeBloc>().add(
+                          GetPostCommentsCountsEvent(post.id),
+                        );
+                        CommentsBottomSheet.show(
+                          context: context,
+                          postId: post.id,
+                          parentContext: context,
+                        );
                       },
-
-                      child: SvgPicture.asset('assets/icons/comment.svg'),
+                      child: SvgPicture.asset(
+                        'assets/icons/comment.svg',
+                        height: 22.h,
+                        width: 22.w,
+                      ),
                     ),
                     SizedBox(width: 4.w),
+
                     Text(
-                      post.commentsCount.toString(),
+                      commentsCount.toString(),
                       style: AppTextStyles.description,
                     ),
 
                     const Spacer(),
 
-                    /// 📤 SHARE BUTTON
+                    
+
                     GestureDetector(
                       onTap: () {
-                        // final link = 'http://alefak.runasp.net/posts/${post.id}';
-                        // Share.shareUri(Uri.parse(link));
+                        
+
+                        
+
                       },
                       child: SvgPicture.asset('assets/icons/share.svg'),
                     ),
                     SizedBox(width: 10.w),
 
-                    /// 💾 SAVE BUTTON
+                    
+
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        context.push('/chat_list');
+                      },
                       child: SvgPicture.asset('assets/icons/save_post.svg'),
                     ),
                   ],
@@ -172,3 +501,197 @@ class PostCard extends StatelessWidget {
     );
   }
 }
+
+String _formatCreationDate(String rawDate) {
+  try {
+    final dateTime = DateTime.parse(rawDate).toLocal();
+    final now = DateTime.now();
+    final diff = now.difference(dateTime);
+    if (diff.inSeconds < 60) return 'Just now';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    if (diff.inDays < 7) return '${diff.inDays}d ago';
+    return DateFormat('MMM d, yyyy').format(dateTime);
+  } catch (_) {
+    return rawDate; 
+
+  }
+}
+Widget _buildImage(BuildContext context, String image, {double? height}) {
+  if (image.startsWith('http')) {
+    return Image.network(
+      image,
+      height: height,
+      width: double.infinity,
+      fit: BoxFit.fill,
+      errorBuilder: (_, __, ___) => _errorImage(height),
+    );
+  } else if (image.startsWith('data:image')) {
+    try {
+      final base64String = image.split(',').last;
+      final bytes = base64Decode(base64String);
+      return Image.memory(
+        bytes,
+        height: height,
+        width: double.infinity,
+        fit: BoxFit.fill,
+        errorBuilder: (_, __, ___) => _errorImage(height),
+      );
+    } catch (_) {
+      return _errorImage(height);
+    }
+  } else if (File(image).existsSync()) {
+    return Image.file(
+      File(image),
+      height: height,
+      width: double.infinity,
+      fit: BoxFit.fill,
+      errorBuilder: (_, __, ___) => _errorImage(height),
+    );
+  } else {
+    return _errorImage(height);
+  }
+}
+
+Widget _errorImage([double? height]) {
+  return Container(
+    color: AppColors.current.lightGray,
+    height: height ?? 200.h,
+    child: const Icon(Icons.broken_image),
+  );
+}
+
+
+
+void _openImagesPreview(BuildContext context, List<String> images) {
+  final controller = PageController(initialPage: 0);
+
+  showGeneralDialog(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: '',
+    barrierColor: Colors.black.withOpacity(0.8),
+    pageBuilder: (_, __, ___) {
+      final imageHeight = MediaQuery.of(context).size.height * 0.5;
+
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Center(
+              child: GestureDetector(
+                onTap: () {},
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          height: imageHeight,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12.r),
+                            child: PageView.builder(
+                              controller: controller,
+                              itemCount: images.length,
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding:
+                                  const EdgeInsets.symmetric(horizontal: 10.0),
+                                  child: InteractiveViewer(
+                                    child: _buildImage(
+                                      context,
+                                      images[index],
+                                      height: imageHeight,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+
+
+                      ],
+                    ),
+                    SizedBox(height: 16.h),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(width: 10.w,),
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back_ios_rounded,
+                              color: Colors.white, size: 26),
+                          onPressed: () {
+                            if (controller.page! > 0) {
+                              controller.previousPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            }
+                          },
+                        ),
+                        SmoothPageIndicator(
+                          controller: controller,
+                          count: images.length,
+                          effect: ExpandingDotsEffect(
+                            activeDotColor: Colors.white,
+                            dotColor: Colors.white54,
+                            dotHeight: 8,
+                            dotWidth: 8,
+                            expansionFactor: 3,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.arrow_forward_ios_rounded,
+                              color: Colors.white, size: 26),
+                          onPressed: () {
+                            if (controller.page! < images.length - 1) {
+                              controller.nextPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            }
+                          },
+                        ),
+                        SizedBox(width: 10.w,),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+void _openSingleImagePreview(BuildContext context, String image) {
+  showDialog(
+    context: context,
+    barrierColor: Colors.black.withOpacity(0.8),
+    builder: (_) {
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: EdgeInsets.all(12.r),
+        child: ClipRRect(
+          child: InteractiveViewer(
+            child: _buildImage(
+              context,
+              image,
+              height: MediaQuery.of(context).size.height * 0.5, // نفس ارتفاع الصور الكاملة
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+

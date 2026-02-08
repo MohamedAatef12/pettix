@@ -22,7 +22,8 @@ class SetPasswordForm extends StatelessWidget {
       listener: (context, state) {
         if (state is RegisterStepTwoSuccess) {
           // ✅ الانتقال إلى صفحة التحقق بعد نجاح خطوة الباسورد
-          context.go('/otp_verification');
+          context.go('/otp_verification',
+          extra: context.read<AuthBloc>(),);
         } else if (state is RegisterFailure) {
           // ❌ عرض الخطأ في SnackBar
           ScaffoldMessenger.of(context).showSnackBar(

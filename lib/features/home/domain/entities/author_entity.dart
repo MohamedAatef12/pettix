@@ -2,46 +2,45 @@ import 'package:equatable/equatable.dart';
 
 class AuthorEntity extends Equatable {
   final int id;
-  final String email;
-  final String password;
-  final String phone;
-  final String? country;
-  final String? city;
-  final String userName;
-  final String? imageUrl;
+  final String? nameAr;
+  final String? nameEn;
+  final String? avatar;
+  final String? email;
+  final String? phone;
+  final int? genderId;
+  final String? genderName;
+  final int? contactTypeId;
+  final int? statusId;
   final int? age;
-  final String? gender;
-  final String? address;
-  final String? idImage;
 
   const AuthorEntity({
     required this.id,
+    required this.nameAr,
+    required this.nameEn,
+    required this.avatar,
     required this.email,
-    required this.password,
     required this.phone,
-    this.country,
-    this.city,
-    required this.userName,
-    this.imageUrl,
-    this.age,
-    this.gender,
-    this.address,
-    this.idImage,
+    required this.genderId,
+    required this.genderName,
+    required this.contactTypeId,
+
+    required this.statusId,
+
+    required this.age,
   });
 
   @override
   List<Object?> get props => [
-        id,
-        email,
-        password,
-        phone,
-        country,
-        city,
-        userName,
-        imageUrl,
-        age,
-        gender,
-        address,
-        idImage,
-      ];
+    id,
+    email,
+    phone,
+    nameAr,
+    nameEn,
+    avatar,
+    genderId,
+    genderName,
+    contactTypeId,
+    statusId,
+    age,
+  ];
 }

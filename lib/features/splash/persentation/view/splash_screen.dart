@@ -23,6 +23,9 @@ class SplashScreen extends StatelessWidget {
           } else if (state is SplashNavigateToHome) {
             context.pushReplacement(AppRoutes.bottomNav);
           }
+          else if (state is SplashNavigateToLogin) {
+            context.pushReplacement(AppRoutes.login);
+          }
         },
         child: Scaffold(
           backgroundColor: AppColors.current.lightBlue,

@@ -27,7 +27,7 @@ class ProfileCard extends StatelessWidget {
               radius: 40.r,
               backgroundImage:
 
-                       NetworkImage(user!.image.toString())
+                       NetworkImage(user!.avatar.toString())
 
             ),
             SizedBox(width: 20),

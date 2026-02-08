@@ -1,43 +1,38 @@
 import 'package:equatable/equatable.dart';
-
+import 'package:pettix/features/home/domain/entities/author_entity.dart';
+import 'package:pettix/features/home/domain/entities/comments_entity.dart';
+import 'package:pettix/features/home/domain/entities/likes_entity.dart';
 import '../../data/models/author_model.dart';
 
 class PostEntity extends Equatable {
   final int id;
-  final int authorID;
-  final String text;
-  final String username;
-  final String date;
-  final String imageUrl;
-  final AuthorModel author;
-  final int commentsCount;
-  final int likesCount;
-  final bool liked;
-
+  final String content;
+  final String creationDate;
+  final String? modifyDate;
+  final AuthorEntity author;
+  final List<CommentEntity> comments;
+  final List<LikesEntity> likes;
+  final List<String> images;
   const PostEntity({
     required this.id,
-    required this.authorID,
-    required this.username,
-    required this.text,
-    required this.date,
-    required this.imageUrl,
+    required this.content,
+    required this.creationDate,
+    this.modifyDate,
     required this.author,
-    required this.commentsCount,
-    required this.likesCount,
-    required this.liked,
+    required this.comments,
+    required this.likes,
+    required this.images,
   });
 
   @override
   List<Object?> get props => [
-        id,
-        authorID,
-        username,
-        text,
-        date,
-        imageUrl,
-        author,
-        commentsCount,
-        likesCount,
-        liked,
-      ];
+    id,
+    author,
+    content,
+    creationDate,
+    modifyDate,
+    comments,
+    likes,
+    images,
+  ];
 }

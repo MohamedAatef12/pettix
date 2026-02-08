@@ -1,22 +1,59 @@
 import 'package:equatable/equatable.dart';
+import 'package:pettix/features/home/domain/entities/author_entity.dart';
+import 'package:pettix/features/home/domain/entities/comment_like_entity.dart';
 
 class CommentEntity extends Equatable {
   final int id;
+  final int postId;
   final String text;
-  final int postID;
-  // final String userName;
-  // final String userImage;
-  final int userID;
-  final String date;
+  final String creationDate;
+  final AuthorEntity author;
+  final int? parentCommentId;
+  final List<CommentEntity> replies;
+  final List<CommentLikeEntity> likes;
+
   const CommentEntity({
     required this.id,
     required this.text,
-    required this.postID,
-    required this.userID,
-    required this.date,
-    // required this.userName,
-    // required this.userImage,
+    required this.postId,
+    required this.author,
+    required this.creationDate,
+    this.parentCommentId,
+    required this.replies,
+    required this.likes,
   });
+
+  CommentEntity copyWith({
+    int? id,
+    int? postId,
+    String? text,
+    String? creationDate,
+    AuthorEntity? author,
+    int? parentCommentId,
+    List<CommentEntity>? replies,
+    List<CommentLikeEntity>? likes,
+  }) {
+    return CommentEntity(
+      id: id ?? this.id,
+      text: text ?? this.text,
+      postId: postId ?? this.postId,
+      author: author ?? this.author,
+      creationDate: creationDate ?? this.creationDate,
+      parentCommentId: parentCommentId ?? this.parentCommentId,
+      replies: replies ?? List<CommentEntity>.from(this.replies),
+      likes: likes ?? List<CommentLikeEntity>.from(this.likes),
+    );
+  }
+
   @override
-  List<Object?> get props => [id, text, postID, userID, date];
+  List<Object?> get props => [
+    id,
+    text,
+    postId,
+    author,
+    creationDate,
+    parentCommentId,
+    replies,
+    likes,
+  ];
 }
