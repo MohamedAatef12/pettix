@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/adoption/presentation/view/application_view.dart';
+import 'routes.dart';
 import 'package:pettix/features/adoption/presentation/view/adoption_screen.dart';
 import 'package:pettix/features/adoption/presentation/view/pet_application.dart';
 import 'package:pettix/features/adoption/presentation/view/pet_profile_screen.dart';
@@ -26,11 +28,9 @@ import 'package:pettix/features/select_language/presentation/view/select_languag
 import 'package:pettix/features/side_menu/presentation/view/pages/side_menu_page.dart';
 import 'package:pettix/features/splash/persentation/view/splash_screen.dart';
 
-import '../../features/adoption/presentation/view/application_view.dart';
-import 'routes.dart';
-
 GoRouter appRouter() => GoRouter(
-  initialLocation: AppRoutes.bottomNav,
+  initialLocation: AppRoutes.splash,
+
   // redirect: (context, state) async {
   //   await SharedPrefsHelper.init();
   //
@@ -56,7 +56,6 @@ GoRouter appRouter() => GoRouter(
   //
   //   return null;
   // },
-
   routes: <RouteBase>[
     GoRoute(
       path: AppRoutes.splash,
@@ -142,6 +141,7 @@ GoRouter appRouter() => GoRouter(
       name: AppRouteNames.chatList,
       builder: (context, state) => const ChatListPage(),
     ),
+
     // GoRoute(
     //   path: AppRoutes.comments,
     //   builder: (context, state) {
@@ -157,8 +157,6 @@ GoRouter appRouter() => GoRouter(
     //     );
     //   },
     // ),
-
-
     GoRoute(
       path: AppRoutes.homeSearch,
       name: AppRouteNames.homeSearch,
@@ -167,8 +165,9 @@ GoRouter appRouter() => GoRouter(
     GoRoute(
       path: AppRoutes.adoption,
       name: AppRouteNames.adoption,
-      builder: (context, state) => AdoptionScreen(),
+      builder: (context, state) => const AdoptionScreen(),
     ),
+
     GoRoute(
       path: AppRoutes.petProfile,
       name: AppRouteNames.petProfile,

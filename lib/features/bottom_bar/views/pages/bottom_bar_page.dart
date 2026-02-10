@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/adoption/presentation/view/adoption_screen.dart';
+import 'package:pettix/features/profile/presentation/profile_screen.dart';
 import '../../../home/presentation/pages/home_page.dart';
 import '../bloc/bottom_bar_bloc.dart';
 import '../bloc/bottom_bar_events.dart';
@@ -31,7 +32,7 @@ class BottomNavigationScreen extends StatelessWidget {
             page = const AdoptionScreen();
           }
           else if (state is ClinicsState) {
-            page = const AdoptionScreen();
+            page = const ProfileScreen();
           }
             else {
             page = const HomePage();

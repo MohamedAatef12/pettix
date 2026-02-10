@@ -1,5 +1,5 @@
-// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format width=80
 
 // **************************************************************************
 // InjectableConfigGenerator
@@ -20,6 +20,17 @@ import '../../data/network/dio_factory.dart' as _i719;
 import '../../data/network/dio_interceptor.dart' as _i790;
 import '../../data/network/email_auth_service.dart' as _i1;
 import '../../data/network/twilio_service.dart' as _i718;
+import '../../features/adoption/data/datasources/adoption_remote_data_source.dart'
+    as _i956;
+import '../../features/adoption/data/repositories/adoption_repo_impl.dart'
+    as _i35;
+import '../../features/adoption/domain/repositories/adoption_repository.dart'
+    as _i133;
+import '../../features/adoption/domain/usecases/get_adoption_options_usecase.dart'
+    as _i756;
+import '../../features/adoption/domain/usecases/submit_adoption_form_usecase.dart'
+    as _i843;
+import '../../features/adoption/presentation/bloc/adoption_bloc.dart' as _i943;
 import '../../features/auth/data/repos/auth_repo_impl.dart' as _i152;
 import '../../features/auth/data/sources/remote/auth_remote_data_source.dart'
     as _i865;
@@ -74,17 +85,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i694.ICacheManager>(() => registerModule.cacheManager);
     gh.lazySingleton<_i1.EmailAuthService>(() => _i1.EmailAuthService());
     gh.lazySingleton<_i718.TwilioService>(() => _i718.TwilioService());
-    gh.factory<_i526.GetUserLocalDataSource>(
-      () => _i298.GetUserDataSourceImpl(gh<_i694.ICacheManager>()),
-    );
     gh.lazySingleton<_i361.Dio>(
       () => registerModule.dio(gh<_i719.DioFactory>(), gh<_i207.Talker>()),
     );
     gh.lazySingleton<_i655.ApiService>(
       () => _i655.ApiService(gh<_i361.Dio>(), gh<_i694.ICacheManager>()),
-    );
-    gh.lazySingleton<_i790.TokenInterceptor>(
-      () => _i790.TokenInterceptor(gh<_i361.Dio>()),
     );
     gh.factory<_i865.AuthRemoteDataSource>(
       () => _i523.AuthRemoteDataSourceImpl(
@@ -92,11 +97,29 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i1.EmailAuthService>(),
       ),
     );
-    gh.factory<_i787.AuthRepository>(
-      () => _i152.AuthRepositoryImpl(gh<_i865.AuthRemoteDataSource>()),
+    gh.factory<_i526.GetUserLocalDataSource>(
+      () => _i298.GetUserDataSourceImpl(gh<_i694.ICacheManager>()),
+    );
+    gh.lazySingleton<_i956.AdoptionRemoteDataSource>(
+      () => _i956.AdoptionRemoteDataSourceImpl(gh<_i655.ApiService>()),
+    );
+    gh.lazySingleton<_i790.TokenInterceptor>(
+      () => _i790.TokenInterceptor(gh<_i361.Dio>()),
     );
     gh.factory<_i1055.RemoteDataSource>(
       () => _i621.RemoteDataSourceImpl(gh<_i655.ApiService>()),
+    );
+    gh.factory<_i787.AuthRepository>(
+      () => _i152.AuthRepositoryImpl(gh<_i865.AuthRemoteDataSource>()),
+    );
+    gh.lazySingleton<_i133.AdoptionRepository>(
+      () => _i35.AdoptionRepositoryImpl(gh<_i956.AdoptionRemoteDataSource>()),
+    );
+    gh.factory<_i756.GetAdoptionOptionsUseCase>(
+      () => _i756.GetAdoptionOptionsUseCase(gh<_i133.AdoptionRepository>()),
+    );
+    gh.factory<_i843.SubmitAdoptionFormUseCase>(
+      () => _i843.SubmitAdoptionFormUseCase(gh<_i133.AdoptionRepository>()),
     );
     gh.factory<_i986.HomeDomainRepository>(
       () => _i1024.HomeRepositoryImpl(
@@ -119,6 +142,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i975.VerifyOtp>(
       () => _i975.VerifyOtp(gh<_i787.AuthRepository>()),
     );
+    gh.factory<_i943.AdoptionBloc>(
+      () => _i943.AdoptionBloc(
+        gh<_i756.GetAdoptionOptionsUseCase>(),
+        gh<_i843.SubmitAdoptionFormUseCase>(),
+      ),
+    );
     gh.factory<_i829.AddCommentUseCase>(
       () => _i829.AddCommentUseCase(gh<_i986.HomeDomainRepository>()),
     );
@@ -137,11 +166,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i1036.UnLikePostUseCase>(
       () => _i1036.UnLikePostUseCase(gh<_i986.HomeDomainRepository>()),
     );
+    gh.factory<_i229.GetCommentLikesUseCase>(
+      () => _i229.GetCommentLikesUseCase(gh<_i986.HomeDomainRepository>()),
+    );
     gh.factory<_i604.GetPostCommentsUseCase>(
       () => _i604.GetPostCommentsUseCase(gh<_i986.HomeDomainRepository>()),
     );
-    gh.factory<_i229.GetCommentLikesUseCase>(
-      () => _i229.GetCommentLikesUseCase(gh<_i986.HomeDomainRepository>()),
+    gh.factory<_i38.GetPostCommentsCountsUseCase>(
+      () => _i38.GetPostCommentsCountsUseCase(gh<_i986.HomeDomainRepository>()),
     );
     gh.factory<_i1026.GetPostsUseCase>(
       () => _i1026.GetPostsUseCase(gh<_i986.HomeDomainRepository>()),
@@ -149,14 +181,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i947.GetPostLikesUseCase>(
       () => _i947.GetPostLikesUseCase(gh<_i986.HomeDomainRepository>()),
     );
-    gh.factory<_i38.GetPostCommentsCountsUseCase>(
-      () => _i38.GetPostCommentsCountsUseCase(gh<_i986.HomeDomainRepository>()),
+    gh.factory<_i660.GetReportReasonsUseCase>(
+      () => _i660.GetReportReasonsUseCase(gh<_i986.HomeDomainRepository>()),
     );
     gh.factory<_i623.GetReportedPostsUseCase>(
       () => _i623.GetReportedPostsUseCase(gh<_i986.HomeDomainRepository>()),
-    );
-    gh.factory<_i660.GetReportReasonsUseCase>(
-      () => _i660.GetReportReasonsUseCase(gh<_i986.HomeDomainRepository>()),
     );
     gh.factory<_i58.LikePostUseCase>(
       () => _i58.LikePostUseCase(gh<_i986.HomeDomainRepository>()),

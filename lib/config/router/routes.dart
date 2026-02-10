@@ -27,6 +27,7 @@ class AppRoutes {
   static const String chatList = '/chatList';
   static const String messages = '/messages';
   static const String friends = '/friends';
+  static const String adoptionForm = '/adoption_form';
 }
 
 class AppRouteNames {
@@ -58,4 +59,5 @@ class AppRouteNames {
   static const String chatList = 'chatList';
   static const String messages = 'messages';
   static const String friends = 'friends';
+  static const String adoptionForm = 'adoption_form';
 }
