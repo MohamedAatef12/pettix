@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/rtl_aware_icon.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
   const ForgotPasswordPage({super.key});
@@ -27,7 +28,9 @@ class ForgotPasswordPage extends StatelessWidget {
                   onTap: () {
                    context.pop();
                   },
-                  child: SvgPicture.asset('assets/icons/backButton.svg'),
+                  child: RtlAwareIcon(
+                    child: SvgPicture.asset('assets/icons/backButton.svg'),
+                  ),
                 ),
               ),
             ]

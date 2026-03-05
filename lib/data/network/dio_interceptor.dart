@@ -18,7 +18,7 @@ class TokenInterceptor extends Interceptor {
   }
 
   @override
-  void onError(DioError err, ErrorInterceptorHandler handler) async {
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
       final refreshToken = await DI.find<ICacheManager>().getRefreshToken();
 

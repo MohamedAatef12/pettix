@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/rtl_aware_icon.dart';
 
 class SideMenuAppBar extends StatelessWidget {
   const SideMenuAppBar({super.key});
@@ -15,7 +16,9 @@ class SideMenuAppBar extends StatelessWidget {
           onTap: (){
             Navigator.pop(context);
           },
-          child: SvgPicture.asset('assets/icons/backButton.svg',),
+          child: RtlAwareIcon(
+            child: SvgPicture.asset('assets/icons/backButton.svg'),
+          ),
         ),
       ],
     );

@@ -43,7 +43,7 @@ class LoginRememberMeChanged extends AuthState {
 class GoogleLoginLoading extends AuthState {}
 
 class GoogleLoginSuccess extends AuthState {
-  final UserEntity user;
+  final UserEntity? user;
   GoogleLoginSuccess(this.user);
 }
 

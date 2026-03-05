@@ -180,7 +180,6 @@ final fullNameController = TextEditingController();
       },
     );
   }
-
   Future<void> _googleLoginSubmitted(
       GoogleLoginSubmitted event, Emitter<AuthState> emit) async {
     emit(GoogleLoginLoading());
@@ -190,14 +189,11 @@ final fullNameController = TextEditingController();
       final googleUser = await googleSignIn.signIn();
 
       if (googleUser == null) {
-        debugPrint("❌ Google sign in cancelled by user");
         emit(GoogleLoginFailure("Google login cancelled"));
         return;
       }
 
       final googleAuth = await googleUser.authentication;
-      debugPrint("✅ Google accessToken: ${googleAuth.accessToken}");
-      debugPrint("✅ Google idToken: ${googleAuth.idToken}");
 
       if (googleAuth.idToken == null) {
         emit(GoogleLoginFailure("Failed to get Google ID token"));
@@ -208,32 +204,27 @@ final fullNameController = TextEditingController();
         GoogleLoginEntity(idToken: googleAuth.idToken!),
       );
 
-     await result.fold(
+      await result.fold(
             (failure) {
-          debugPrint("❌ Backend rejected login: ${failure.message}");
           emit(GoogleLoginFailure(failure.message));
         },
             (loginResponse) async {
-              await DI.find<ICacheManager>().setUserData(UserModel.fromEntity(loginResponse.user));
-              await DI
-                  .find<ICacheManager>()
-                  .setToken(loginResponse.token); // Store token
-          debugPrint("✅ Backend login success, user: ${loginResponse.user.email}");
-              debugPrint("✅ Backend login success, user: ${loginResponse.token}");
-             if (event.rememberMe) {
-                await DI.find<ICacheManager>().saveLogin(true);
-              } else {
-                await DI.find<ICacheManager>().clearLogin();
-              }
-          emit(GoogleLoginSuccess(loginResponse.user));
+          // هنا loginResponse.result عبارة عن String
+          await DI.find<ICacheManager>().setToken(loginResponse.token);
+
+          if (event.rememberMe) {
+            await DI.find<ICacheManager>().saveLogin(true);
+          } else {
+            await DI.find<ICacheManager>().clearLogin();
+          }
+
+          emit(GoogleLoginSuccess(loginResponse.user)); // مفيش User entity جديد
         },
       );
     } catch (e, st) {
-      debugPrint("❌ Exception during Google login: $e\n$st");
       emit(GoogleLoginFailure(e.toString()));
     }
   }
-
 
 
 }
