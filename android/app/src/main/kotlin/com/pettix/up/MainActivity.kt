@@ -1,4 +1,4 @@
-package com.example.pettix.dev
+package com.pettix.up
 
 import io.flutter.embedding.android.FlutterActivity
 
