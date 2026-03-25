@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,121 +28,124 @@ class OnBoardingBody extends StatelessWidget {
       builder: (context, state) {
         final bloc = context.read<OnBoardingBloc>();
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // top content
-            Expanded(
-              child: Stack(
-                children: [
-                  SvgPicture.asset(
-                    'assets/images/on_boarding_background.svg',
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                  ),
-
-                  // ✅ PageView
-                  PageView.builder(
-                    controller: _pageController,
-                    itemCount: bloc.slides.length,
-                    onPageChanged: (index) {
-                      bloc.add(PageSwiped(index));
-                    },
-                    itemBuilder: (context, index) {
-                      final slide = bloc.slides[index];
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                            child: Image.asset(
-                              slide.image,
-                              fit: BoxFit.fill,
-                              width: double.infinity,
-                              height: 300.h,
-                            ),
-                          ),
-                          SizedBox(height: 20.h),
-                          Text(
-                            slide.title,
-                            textAlign: TextAlign.center,
-                            style: AppTextStyles.title.copyWith(
-                              color: AppColors.current.lightText,
-                              fontSize: 18.sp,
-                            ),
-                          ),
-                          SizedBox(height: 10.h),
-                          Text(
-                            slide.desc,
-                            textAlign: TextAlign.center,
-                            style: AppTextStyles.bold.copyWith(
-                              color: AppColors.current.lightText,
-                              fontSize: 14.sp,
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-
-            // bottom controls
-            Padding(
-              padding: PaddingConstants.medium,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Skip
-                  GestureDetector(
-                    onTap: () => context.go(AppRoutes.login),
-                    child: Text(
-                      AppText.skip,
-                      style: AppTextStyles.bold.copyWith(
-                        color: AppColors.current.lightText,
-                        fontSize: 16.sp,
-                      ),
+        return Directionality(
+          textDirection: ui.TextDirection.ltr,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // top content
+              Expanded(
+                child: Stack(
+                  children: [
+                    SvgPicture.asset(
+                      'assets/images/on_boarding_background.svg',
+                      fit: BoxFit.cover,
+                      width: double.infinity,
                     ),
-                  ),
 
-                  // ✅ Progress Stepper
-                  OnboardingStepper(
-                    currentPage: state.currentPage,
-                    totalPages: bloc.slides.length,
-                  ),
-
-                  // Next button
-                  GestureDetector(
-                    onTap: () {
-                      if (state.currentPage == bloc.slides.length - 1) {
-                        context.go(AppRoutes.login);
-                         SharedPrefsHelper.setBool('isFirstOpen', false);
-
-                      } else {
-                        _pageController.nextPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
+                    // ✅ PageView
+                    PageView.builder(
+                      controller: _pageController,
+                      itemCount: bloc.slides.length,
+                      onPageChanged: (index) {
+                        bloc.add(PageSwiped(index));
+                      },
+                      itemBuilder: (context, index) {
+                        final slide = bloc.slides[index];
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                              child: Image.asset(
+                                slide.image,
+                                fit: BoxFit.fill,
+                                width: double.infinity,
+                                height: 300.h,
+                              ),
+                            ),
+                            SizedBox(height: 20.h),
+                            Text(
+                              slide.title,
+                              textAlign: TextAlign.center,
+                              style: AppTextStyles.title.copyWith(
+                                color: AppColors.current.lightText,
+                                fontSize: 18.sp,
+                              ),
+                            ),
+                            SizedBox(height: 10.h),
+                            Text(
+                              slide.desc,
+                              textAlign: TextAlign.center,
+                              style: AppTextStyles.bold.copyWith(
+                                color: AppColors.current.lightText,
+                                fontSize: 14.sp,
+                              ),
+                            ),
+                          ],
                         );
-                        bloc.add(NextPage());
-                      }
-                    },
-                    child: CircleAvatar(
-                      radius: 30.r,
-                      backgroundColor: AppColors.current.white,
-                      child: SvgPicture.asset(
-                        'assets/icons/right_rounded_button.svg',
-                        width: 60.w,
-                        height: 60.h,
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              // bottom controls
+              Padding(
+                padding: PaddingConstants.medium,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Skip
+                    GestureDetector(
+                      onTap: () => context.go(AppRoutes.login),
+                      child: Text(
+                        AppText.skip,
+                        style: AppTextStyles.bold.copyWith(
+                          color: AppColors.current.lightText,
+                          fontSize: 16.sp,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            )
-          ],
+
+                    // ✅ Progress Stepper
+                    OnboardingStepper(
+                      currentPage: state.currentPage,
+                      totalPages: bloc.slides.length,
+                    ),
+
+                    // Next button
+                    GestureDetector(
+                      onTap: () {
+                        if (state.currentPage == bloc.slides.length - 1) {
+                          context.go(AppRoutes.login);
+                           SharedPrefsHelper.setBool('isFirstOpen', false);
+
+                        } else {
+                          _pageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                          bloc.add(NextPage());
+                        }
+                      },
+                      child: CircleAvatar(
+                        radius: 30.r,
+                        backgroundColor: AppColors.current.white,
+                        child: SvgPicture.asset(
+                          'assets/icons/right_rounded_button.svg',
+                          width: 60.w,
+                          height: 60.h,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
         );
       },
     );

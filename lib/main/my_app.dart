@@ -18,9 +18,9 @@ class MyApp extends StatelessWidget {
       builder:
           (cxt, child) => MaterialApp.router(
             title: 'Flutter ${appConfig.envName}',
-            locale: Locale('en'),
+            locale: context.locale, // Local'en'
             localizationsDelegates: context.localizationDelegates,
-            supportedLocales: const [Locale('ar'), Locale('en')],
+            supportedLocales: context.supportedLocales,
             localeResolutionCallback: (locale, supportedLocales) {
               if (locale == null) return supportedLocales.first;
               for (var supportedLocale in supportedLocales) {

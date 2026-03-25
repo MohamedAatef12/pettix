@@ -350,7 +350,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           content: text,
           images: imagePaths,
           creationDate: DateTime.now().add(const Duration(hours: 2)).toString(),
-
           comments: [],
           likes: [],
         );

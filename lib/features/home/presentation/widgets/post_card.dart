@@ -8,10 +8,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pettix/core/constants/api_endpoints.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/shimmers/report_shimmer.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/rtl_aware_icon.dart';
 import 'package:pettix/features/home/domain/entities/post_entity.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
@@ -112,7 +114,7 @@ class PostCard extends StatelessWidget {
                               Padding(
                                 padding: EdgeInsets.symmetric(vertical: 10.0.r),
                                 child: Text(
-                                  'Report Post',
+                                  'Report Post'.tr(),
                                   style: AppTextStyles.bold.copyWith(
                                     fontSize: 18.sp,
                                     color: AppColors.current.red,
@@ -142,7 +144,7 @@ class PostCard extends StatelessWidget {
                                           children: [
                                             ListTile(
                                               title: Text(
-                                                reason.name,
+                                                reason.name.tr(),
                                                 style: AppTextStyles.bold.copyWith(
                                                   color: AppColors.current.text,
                                                 ),
@@ -154,7 +156,7 @@ class PostCard extends StatelessWidget {
                                                     builder: (ctx) {
                                                       return AlertDialog(
                                                         backgroundColor: AppColors.current.lightBlue,
-                                                        title: const Text('Please specify the reason'),
+                                                        title:  Text('Please specify the reason'.tr()),
                                                         content: TextField(
                                                           controller: textController,
                                                           decoration: const InputDecoration(
@@ -189,7 +191,7 @@ class PostCard extends StatelessWidget {
                                                                 );
                                                               }
                                                             },
-                                                            child:  Text('Submit',style: TextStyle(
+                                                            child:  Text('Submit'.tr(),style: TextStyle(
                                                       color: AppColors.current.primary
                                                       ),),
                                                           ),
@@ -203,8 +205,8 @@ class PostCard extends StatelessWidget {
                                                   );
                                                   Navigator.pop(context);
                                                   ScaffoldMessenger.of(context).showSnackBar(
-                                                    const SnackBar(
-                                                      content: Text('Report sent successfully'),
+                                                    SnackBar(
+                                                      content: Text('Report sent successfully'.tr()),
                                                       backgroundColor: Colors.green,
                                                     ),
                                                   );
@@ -249,12 +251,24 @@ class PostCard extends StatelessWidget {
                 child: Builder(
                   builder: (context) {
                     final validImages = post.images
-                        .where((e) =>
-                    e.isNotEmpty &&
-                        (e.startsWith('http') ||
-                            e.startsWith('data:image') ||
-                            File(e).existsSync()))
+                        .where((e) {
+                      // Filter out empty strings
+                      if (e.isEmpty) return false;
+                      
+                      // Filter out backend placeholders like "data:image/png;base64,string"
+                      if (e == 'data:image/png;base64,string') {
+                        debugPrint('⚠️ Filtered out placeholder image: $e');
+                        return false;
+                      }
+                      
+                      // Accept valid image formats
+                      return e.startsWith('http') ||
+                          e.startsWith('data:image') ||
+                          File(e).existsSync();
+                    })
                         .toList();
+                    
+                    debugPrint('📸 Post ${post.id} has ${post.images.length} images, ${validImages.length} valid');
 
                     if (validImages.isEmpty) return const SizedBox.shrink();
 
@@ -518,7 +532,39 @@ String _formatCreationDate(String rawDate) {
   }
 }
 Widget _buildImage(BuildContext context, String image, {double? height}) {
-  if (image.startsWith('http')) {
+  debugPrint('🖼️ Building image: ${image.substring(0, image.length > 100 ? 100 : image.length)}...');
+  
+  // Handle malformed data URLs from backend (e.g., "data:image/png;base64,Resources/PostsUploads/file.jpg")
+  if (image.startsWith('data:image') && image.contains('Resources/')) {
+    // Extract the file path and construct proper URL
+    final filePath = image.split(',').last;
+    final properUrl = '${ApiEndpoints.baseUrl}/$filePath';
+    debugPrint('✅ Converted malformed URL to: $properUrl');
+    return Image.network(
+      properUrl,
+      height: height,
+      width: double.infinity,
+      fit: BoxFit.fill,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Container(
+          height: height,
+          color: AppColors.current.lightGray,
+          child: Center(
+            child: CircularProgressIndicator(
+              value: loadingProgress.expectedTotalBytes != null
+                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                  : null,
+            ),
+          ),
+        );
+      },
+      errorBuilder: (context, error, stackTrace) {
+        debugPrint('❌ Image load error for $properUrl: $error');
+        return _errorImage(height);
+      },
+    );
+  } else if (image.startsWith('http')) {
     return Image.network(
       image,
       height: height,
@@ -626,8 +672,10 @@ void _openImagesPreview(BuildContext context, List<String> images) {
                       children: [
                         SizedBox(width: 10.w,),
                         IconButton(
-                          icon: const Icon(Icons.arrow_back_ios_rounded,
-                              color: Colors.white, size: 26),
+                          icon: RtlAwareIcon(
+                            child: const Icon(Icons.arrow_back_ios_rounded,
+                                color: Colors.white, size: 26),
+                          ),
                           onPressed: () {
                             if (controller.page! > 0) {
                               controller.previousPage(
@@ -649,8 +697,10 @@ void _openImagesPreview(BuildContext context, List<String> images) {
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.arrow_forward_ios_rounded,
-                              color: Colors.white, size: 26),
+                          icon: RtlAwareIcon(
+                            child: const Icon(Icons.arrow_forward_ios_rounded,
+                                color: Colors.white, size: 26),
+                          ),
                           onPressed: () {
                             if (controller.page! < images.length - 1) {
                               controller.nextPage(

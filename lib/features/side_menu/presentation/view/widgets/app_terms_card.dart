@@ -1,9 +1,11 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/rtl_aware_icon.dart';
 
 class AppTermsCard extends StatelessWidget {
   const AppTermsCard({super.key});
@@ -26,19 +28,23 @@ class AppTermsCard extends StatelessWidget {
               },
               child: Row(
                 children: [
-                  SvgPicture.asset(
-                    'assets/icons/privacy.svg',
-                    width: 23.w,
-                    height: 23.h,
-                    color: AppColors.current.text,
+                  RtlAwareIcon(
+                    child: SvgPicture.asset(
+                      'assets/icons/privacy.svg',
+                      width: 23.w,
+                      height: 23.h,
+                      color: AppColors.current.text,
+                    ),
                   ),
                   SizedBox(width: 20.w),
-                  Text('privacy policy', style: AppTextStyles.description),
+                  Text('privacy policy'.tr(), style: AppTextStyles.description),
                   const Spacer(),
-                  SvgPicture.asset(
-                    'assets/icons/right_button.svg',
-                    width: 20.w,
-                    height: 20.h,
+                  RtlAwareIcon(
+                    child: SvgPicture.asset(
+                      'assets/icons/right_button.svg',
+                      width: 20.w,
+                      height: 20.h,
+                    ),
                   ),
                   SizedBox(width: 10.w),
                 ],
@@ -51,19 +57,23 @@ class AppTermsCard extends StatelessWidget {
               },
               child: Row(
                 children: [
-                  SvgPicture.asset(
-                    'assets/icons/refund.svg',
-                    width: 23.w,
-                    height: 23.h,
-                    color: AppColors.current.text,
+                  RtlAwareIcon(
+                    child: SvgPicture.asset(
+                      'assets/icons/refund.svg',
+                      width: 23.w,
+                      height: 23.h,
+                      color: AppColors.current.text,
+                    ),
                   ),
                   SizedBox(width: 20.w),
-                  Text('Refund Policy', style: AppTextStyles.description),
+                  Text('Refund Policy'.tr(), style: AppTextStyles.description),
                   const Spacer(),
-                  SvgPicture.asset(
-                    'assets/icons/right_button.svg',
-                    width: 20.w,
-                    height: 20.h,
+                  RtlAwareIcon(
+                    child: SvgPicture.asset(
+                      'assets/icons/right_button.svg',
+                      width: 20.w,
+                      height: 20.h,
+                    ),
                   ),
                   SizedBox(width: 10.w),
                 ],
@@ -76,19 +86,23 @@ class AppTermsCard extends StatelessWidget {
               },
               child: Row(
                 children: [
-                  SvgPicture.asset(
-                    'assets/icons/terms.svg',
-                    width: 23.w,
-                    height: 23.h,
-                    color: AppColors.current.text,
+                  RtlAwareIcon(
+                    child: SvgPicture.asset(
+                      'assets/icons/terms.svg',
+                      width: 23.w,
+                      height: 23.h,
+                      color: AppColors.current.text,
+                    ),
                   ),
                   SizedBox(width: 20.w),
-                  Text('Terms & Conditions', style: AppTextStyles.description),
+                  Text('Terms & Conditions'.tr(), style: AppTextStyles.description),
                   const Spacer(),
-                  SvgPicture.asset(
-                    'assets/icons/right_button.svg',
-                    width: 20.w,
-                    height: 20.h,
+                  RtlAwareIcon(
+                    child: SvgPicture.asset(
+                      'assets/icons/right_button.svg',
+                      width: 20.w,
+                      height: 20.h,
+                    ),
                   ),
                   SizedBox(width: 10.w),
                 ],

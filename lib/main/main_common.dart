@@ -32,7 +32,8 @@ Future<void> mainCommon(AppConfig config) async {
   }
   runApp( EasyLocalization(
     supportedLocales: const [Locale('en'), Locale('ar')],
-    path: 'assets/translations', // مسار ملفات الترجمات JSON
+    path: 'assets/translations',
+    fallbackLocale: const Locale('en'),
     child: MyApp(appConfig: config),
   ),);
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/auth/presentation/widgets/forgot_password/reset_password_body.dart';
+import 'package:pettix/core/widgets/rtl_aware_icon.dart';
 
 class ResetPassword extends StatelessWidget {
   const ResetPassword({super.key});
@@ -19,7 +20,9 @@ class ResetPassword extends StatelessWidget {
          onTap: (){
             Navigator.pop(context);
          },
-         child: SvgPicture.asset('assets/icons/backButton.svg')),
+         child: RtlAwareIcon(
+           child: SvgPicture.asset('assets/icons/backButton.svg'),
+         )),
         
       ),
       body: ResetPasswordBody(),

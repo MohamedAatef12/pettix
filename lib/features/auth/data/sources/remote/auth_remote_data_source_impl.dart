@@ -6,6 +6,7 @@ import 'package:pettix/data/network/constants.dart';
 import 'package:pettix/data/network/email_auth_service.dart';
 import 'package:pettix/data/network/twilio_service.dart';
 import 'package:pettix/features/auth/data/models/login/google_login_model.dart';
+import 'package:pettix/features/auth/data/models/login/google_login_response_model.dart';
 import 'package:pettix/features/auth/data/models/login/login_response_model.dart';
 import 'package:pettix/features/auth/data/models/user_model.dart';
 import 'package:pettix/features/auth/data/sources/remote/auth_remote_data_source.dart';
@@ -65,44 +66,52 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return Left(DioFailure.fromDioError(e));
     }
   }
-
   @override
-  Future<Either<Failure, LoginResponseModel>> loginWithGoogle(
-    GoogleLoginModel model,
-  ) async {
+  Future<Either<Failure, GoogleLoginResponseModel>> loginWithGoogle(
+      GoogleLoginModel model,
+      ) async {
     try {
+      print('[DEBUG] Google Login - Sending idToken');
+
       final response = await apiService.post(
         endPoint: Constants.googleLoginEndpoint,
         data: {'idToken': model.idToken},
       );
 
-      final message = response['message']?.toString() ?? '';
+      print('[DEBUG] Google Login Response: $response');
 
-      if (message.contains('Login successful')) {
-        final userJson = response['contact'];
-        final token = response['token'];
-
-        if (userJson == null || token == null) {
-          return Left(Failure("Invalid response format from server"));
-        }
-
-        final userModel = UserModel.fromJson(userJson);
-        await DI.find<ICacheManager>().setUserData(userModel);
-
-        return Right(
-          LoginResponseModel(
-            user: userModel,
-            token: token,
-            message: message,
-            refreshToken: response["refreshToken"],
-            success: response["success"],
-            role: response["role"],
-          ),
-        );
+      final result = response['result'];
+      if (result == null) {
+        return Left(Failure("Invalid response format - result is null"));
       }
 
-      return Left(Failure(response['message'] ?? 'Google login failed'));
+      final userJson = result['contact'];
+      final token = result['token'];
+
+      if (userJson == null || token == null) {
+        print('[DEBUG] Google Login - Missing contact or token. Contact: $userJson, Token: $token');
+        return Left(Failure("Invalid response format from server"));
+      }
+
+      final userModel = UserModel.fromJson(userJson);
+
+      await DI.find<ICacheManager>().setUserData(userModel);
+
+      return Right(
+        GoogleLoginResponseModel(
+          success: response['success'] ?? true,
+          message: response['message'] ?? '',
+          traceId: response['traceId'] ?? '',
+          resultSuccess: result['success'] ?? true,
+          resultMessage: result['message'] ?? '',
+          token: token,
+          refreshToken: result['refreshToken'] ?? '',
+          role: result['role'] ?? '',
+          user: userModel,
+        ),
+      );
     } catch (e) {
+      print('[ERROR] Google Login failed: $e');
       return Left(DioFailure.fromDioError(e));
     }
   }

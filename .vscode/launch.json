@@ -1,50 +1,71 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Pettix Dev",
+            "name": "development Debug",
             "request": "launch",
             "type": "dart",
-            "program": "lib/main/main_development.dart",
+            "flutterMode": "debug",
             "args": [
                 "--flavor",
-                "dev"
-            ]
+                "development"
+            ],
+            "program": "lib/main/main_development.dart"
         },
         {
-            "name": "Pettix Dev (Release)",
+            "name": "development Profile",
             "request": "launch",
             "type": "dart",
-            "program": "lib/main/main_development.dart",
+            "flutterMode": "profile",
+            "args": [
+                "--flavor",
+                "development"
+            ],
+            "program": "lib/main/main_development"
+        },
+        {
+            "name": "development Release",
+            "request": "launch",
+            "type": "dart",
             "flutterMode": "release",
             "args": [
                 "--flavor",
-                "dev"
-            ]
+                "development"
+            ],
+            "program": "lib/main/main_development"
         },
         {
-            "name": "Pettix Prod",
+            "name": "production Debug",
             "request": "launch",
             "type": "dart",
-            "program": "lib/main/main_production.dart",
+            "flutterMode": "debug",
             "args": [
                 "--flavor",
-                "prod"
-            ]
+                "production"
+            ],
+            "program": "lib/main/main_production.dart"
         },
         {
-            "name": "Pettix Prod (Release)",
+            "name": "production Profile",
             "request": "launch",
             "type": "dart",
-            "program": "lib/main/main_production.dart",
+            "flutterMode": "profile",
+            "args": [
+                "--flavor",
+                "production"
+            ],
+            "program": "lib/main/main_production.dart"
+        },
+        {
+            "name": "production Release",
+            "request": "launch",
+            "type": "dart",
             "flutterMode": "release",
             "args": [
                 "--flavor",
-                "prod"
-            ]
+                "production"
+            ],
+            "program": "lib/main/main_production.dart"
         }
     ]
 }

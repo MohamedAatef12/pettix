@@ -13,28 +13,30 @@ class LoginResponseModel extends LoginResponseEntity {
 
   /// Normal factory for fresh JSON parsing
   factory LoginResponseModel.fromJson(Map<String, dynamic> json) {
+    final result = json['result'] ?? {};
     return LoginResponseModel(
-      user: json['contact'] != null
-          ? UserModel.fromJson(json['contact'])
+      user: result['contact'] != null
+          ? UserModel.fromJson(result['contact'])
           : const UserModel(
         id: 0,
         email: '',
         userName: '',
       ),
-      token: json['token'] ?? '',
-      message: json['message'] ?? '',
-      refreshToken: json['refreshToken'] ?? '',
-      success: json['success'] ?? true,
-      role: json['role'] ?? '',
+      token: result['token'] ?? '',
+      message: result['message'] ?? json['message'] ?? '',
+      refreshToken: result['refreshToken'] ?? '',
+      success: result['success'] ?? json['success'] ?? true,
+      role: result['role'] ?? '',
     );
   }
 
-  /// NEW: merge old data with new response — keeping old values if new ones are missing
+  /// Merge old data with new response — keeping old values if new ones are missing
   factory LoginResponseModel.merge({
     required LoginResponseModel oldData,
     required Map<String, dynamic> newJson,
   }) {
-    final newUserJson = newJson['contact'] ?? {};
+    final result = newJson['result'] ?? {};
+    final newUserJson = result['contact'] ?? {};
     final mergedUser = UserModel.merge(
       oldUser: oldData.user as UserModel,
       newJson: newUserJson,
@@ -42,22 +44,24 @@ class LoginResponseModel extends LoginResponseEntity {
 
     return LoginResponseModel(
       user: mergedUser,
-      token: newJson['token'] ?? oldData.token,
-      message: newJson['message'] ?? oldData.message,
-      refreshToken: newJson['refreshToken'] ?? oldData.refreshToken,
-      success: newJson['success'] ?? oldData.success,
-      role: newJson['role'] ?? oldData.role,
+      token: result['token'] ?? oldData.token,
+      message: result['message'] ?? oldData.message,
+      refreshToken: result['refreshToken'] ?? oldData.refreshToken,
+      success: result['success'] ?? oldData.success,
+      role: result['role'] ?? oldData.role,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'contact': (user as UserModel).toJson(),
-      'token': token,
-      'refreshToken': refreshToken,
-      'message': message,
-      'success': success,
-      'role': role,
+      'result': {
+        'contact': (user as UserModel).toJson(),
+        'token': token,
+        'refreshToken': refreshToken,
+        'message': message,
+        'success': success,
+        'role': role,
+      }
     };
   }
 }
