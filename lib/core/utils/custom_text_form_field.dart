@@ -42,7 +42,7 @@ class CustomTextFormField extends StatelessWidget {
     this.suffixIcon,
     this.obscureText = false,
     this.enablePasswordToggle = false,
-    this.onToggleObscureText, // 🔹 جديد
+    this.onToggleObscureText,
     this.keyboardType = TextInputType.text,
     this.textInputAction,
     this.validator,

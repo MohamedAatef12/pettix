@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/rtl_aware_icon.dart';
@@ -16,44 +17,50 @@ class ForgotPasswordPage extends StatelessWidget {
       body: Column(
         children: [
           Stack(
-            children:[SvgPicture.asset(
-              'assets/images/reset_password.svg',
-              fit: BoxFit.fill,
-              width: MediaQuery.sizeOf(context).width,
-            ),
+            clipBehavior: Clip.none,
+            children: [
+              SvgPicture.asset(
+                'assets/images/reset_password.svg',
+                fit: BoxFit.fill,
+                width: MediaQuery.sizeOf(context).width,
+              ),
               Positioned(
                 top: 40.h,
                 left: 20.w,
                 child: GestureDetector(
-                  onTap: () {
-                   context.pop();
-                  },
+                  onTap: () => context.pop(),
                   child: RtlAwareIcon(
-                    child: SvgPicture.asset('assets/icons/backButton.svg'),
+                    child: Icon(
+                      Icons.chevron_left,
+                      size: 34.r,
+                      color: AppColors.current.text,
+                    ),
                   ),
                 ),
               ),
-            ]
+            ],
           ),
 
-          Text('Check Your Email', style: AppTextStyles.title),
-          SizedBox(height: 10.h,),
-          Text('Enter the OTP we sent to +45472****', style: AppTextStyles.smallDescription),
-         SizedBox(height: 10.h,),
+          Text(AppText.checkYourEmail, style: AppTextStyles.title),
+          SizedBox(height: 10.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Didn’t receive link? ',style: AppTextStyles.smallDescription.copyWith(
-                color: AppColors.current.gray,
-              ),),
+              Text(
+                AppText.didntReceiveCode,
+                style: AppTextStyles.description.copyWith(
+                  color: AppColors.current.gray,
+                ),
+              ),
               GestureDetector(
-                onTap: () {
-
-                },
-                child: Text('Resend',style: AppTextStyles.smallDescription.copyWith(
-                  color: AppColors.current.primary,
-                  fontWeight: FontWeight.w600,
-                ),),
+                onTap: () {},
+                child: Text(
+                  AppText.resend,
+                  style: AppTextStyles.description.copyWith(
+                    color: AppColors.current.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ],
           ),

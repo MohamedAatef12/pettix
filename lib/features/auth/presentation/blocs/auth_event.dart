@@ -61,3 +61,7 @@ class VerifyOtpEvent extends AuthEvent {
   final String smsCode;
   VerifyOtpEvent(this.smsCode);
 }
+class ResendOtpEvent extends AuthEvent {
+  final String email;
+  ResendOtpEvent(this.email);
+}

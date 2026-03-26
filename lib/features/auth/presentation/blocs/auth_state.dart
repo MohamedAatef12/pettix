@@ -65,3 +65,10 @@ class AuthError extends AuthState {
   final String message;
   AuthError(this.message);
 }
+class OtpVerificationLoading extends AuthState {}
+class OtpVerificationSuccess extends AuthState {}
+class OtpVerificationFailure extends AuthState {
+  final String message;
+  OtpVerificationFailure(this.message);
+}
+

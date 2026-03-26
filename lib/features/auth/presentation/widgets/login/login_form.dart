@@ -7,6 +7,7 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/features/auth/data/models/login/login_model.dart';
@@ -34,6 +35,99 @@ class LoginForm extends StatelessWidget {
       return "Must contain at least one number";
     }
     return null;
+  }
+
+  void _showActivateEmailDialog(BuildContext context) {
+    final emailController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    final authBloc = context.read<AuthBloc>();
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return BlocListener<AuthBloc, AuthState>(
+          bloc: authBloc,
+          listener: (context, state) {
+            if (state is OtpSent) {
+              AuthToast.showSuccess(
+                context,
+                'OTP sent! Please check your email.',
+                onDone: () {
+                   Navigator.of(ctx).pop(); // Close dialog
+                  context.push('/otp_verification', extra: authBloc);
+                }
+              );
+            } else if (state is RegisterFailure) {
+              AuthToast.showError(context, state.message);
+            }
+          },
+          child: AlertDialog(
+            backgroundColor: AppColors.current.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Text(
+              AppText.activateEmail,
+              style: AppTextStyles.bodyTitle.copyWith(
+                color: AppColors.current.primary,
+              ),
+            ),
+            content: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(AppText.email, style: AppTextStyles.smallDescription),
+                  SizedBox(height: 8.h),
+                  CustomTextFormField(
+                    controller: emailController,
+                    hintText: AppText.enterYourEmail,
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return AppText.required;
+                      } else if (!_isValidEmail(value)) {
+                        return AppText.validEmail;
+                      }
+                      return null;
+                    },
+                    fillColor: true,
+                    fillColorValue: AppColors.current.white,
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide:
+                          BorderSide(color: AppColors.current.lightGray),
+                    ),
+                  ),
+                  SizedBox(height: 20.h),
+                  BlocBuilder<AuthBloc, AuthState>(
+                    bloc: authBloc,
+                    builder: (context, state) {
+                      final isLoading = state is AuthLoading;
+                      return isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : CustomFilledButton(
+                              widthFactor: null,
+                              onPressed: () {
+                                if (formKey.currentState!.validate()) {
+                                  authBloc.add(
+                                      ResendOtpEvent(emailController.text));
+                                }
+                              },
+                              text: 'Send OTP',
+                              backgroundColor: AppColors.current.primary,
+                              textColor: AppColors.current.white,
+                            );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -87,10 +181,19 @@ class LoginForm extends StatelessWidget {
                   (value == null || value.isEmpty) ? AppText.passwordRequired : null,
                   fillColor: true,
                   fillColorValue: AppColors.current.white,
-                  enablePasswordToggle: true,
-                  onToggleObscureText: () {
-                    bloc.add(LoginTogglePasswordVisibility());
-                  },
+                  obscureText: bloc.obscurePasswordLogin,
+                  enablePasswordToggle: false,
+                  suffixIcon: GestureDetector(
+                    onTap: () {
+                      bloc.add(LoginTogglePasswordVisibility());
+                    },
+                    child: Icon(
+                      bloc.obscurePasswordLogin
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                      color: AppColors.current.gray,
+                    ),
+                  ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide(color: AppColors.current.lightGray),
@@ -102,8 +205,7 @@ class LoginForm extends StatelessWidget {
 
           SizedBox(height: 1.h),
 
-          // 👇 برضه هنا BlocBuilder للـ RememberMe بس
-          BlocBuilder<AuthBloc, AuthState>(
+        BlocBuilder<AuthBloc, AuthState>(
             buildWhen: (previous, current) => current is LoginRememberMeChanged,
             builder: (context, state) {
               return Padding(
@@ -121,13 +223,13 @@ class LoginForm extends StatelessWidget {
                         color: AppColors.current.gray,
                       ),
                     ),
-                    const Spacer(),
+                    Spacer(),
                     GestureDetector(
                       onTap: () => context.pushNamed('forgot_password'),
                       child: Text(
                         AppText.forgetPassword,
                         style: AppTextStyles.smallDescription.copyWith(
-                          color: AppColors.current.gray,
+                          color: AppColors.current.primary,
                         ),
                       ),
                     ),
@@ -136,28 +238,33 @@ class LoginForm extends StatelessWidget {
               );
             },
           ),
+          BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, state) {
+              final isLoading = state is LoginLoading;
+              return isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : CustomFilledButton(
+                      onPressed: () {
+                        if (bloc.loginFormKey.currentState!.validate()) {
+                          bloc.add(
+                            LoginSubmitted(
+                              model: LoginModel(
+                                email: bloc.emailLoginController.text,
+                                password: bloc.passwordLoginController.text,
+                              ),
+                              rememberMe: bloc.rememberMe,
+                            ),
+                          );
+                        }
 
-          SizedBox(height: 20.h),
-          CustomFilledButton(
-            onPressed: () {
-              if (bloc.loginFormKey.currentState!.validate()) {
-                bloc.add(
-                  LoginSubmitted(
-                    model: LoginModel(
-                      email: bloc.emailLoginController.text,
-                      password: bloc.passwordLoginController.text,
-                    ),
-                    rememberMe: bloc.rememberMe,
-                  ),
-                );
-              }
-
-              bloc.emailLoginController.clear();
-              bloc.passwordLoginController.clear();
+                        bloc.emailLoginController.clear();
+                        bloc.passwordLoginController.clear();
+                      },
+                      text: AppText.signIn,
+                      backgroundColor: AppColors.current.primary,
+                      textColor: AppColors.current.white,
+                    );
             },
-            text: AppText.signIn,
-            backgroundColor: AppColors.current.primary,
-            textColor: AppColors.current.white,
           ),
 
           SizedBox(height: 10.h),
@@ -183,24 +290,30 @@ class LoginForm extends StatelessWidget {
                 child: Divider(
                   color: AppColors.current.lightText,
                   thickness: 1,
-
                   height: 20.h,
                 ),
               ),
             ],
           ),
           SizedBox(height: 10.h),
-          CustomFilledButton(
-            onPressed: () {
-              context.read<AuthBloc>().add(
-                GoogleLoginSubmitted(rememberMe: bloc.rememberMe),
-              );
+          BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, state) {
+              final isLoading = state is GoogleLoginLoading;
+              return isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : CustomFilledButton(
+                      onPressed: () {
+                        context.read<AuthBloc>().add(
+                          GoogleLoginSubmitted(rememberMe: bloc.rememberMe),
+                        );
+                      },
+                      text: AppText.continueWithGoogle,
+                      backgroundColor: AppColors.current.white,
+                      textColor: AppColors.current.lightText,
+                      hasLeading: true,
+                      leading: SvgPicture.asset('assets/icons/gmail.svg'),
+                    );
             },
-            text: AppText.continueWithGoogle,
-            backgroundColor: AppColors.current.white,
-            textColor: AppColors.current.lightText,
-            hasLeading: true,
-            leading: SvgPicture.asset('assets/icons/gmail.svg'),
           ),
           SizedBox(height: 10.h),
           CustomFilledButton(
@@ -214,26 +327,54 @@ class LoginForm extends StatelessWidget {
             leading: SvgPicture.asset('assets/icons/apple.svg'),
           ),
           SizedBox(height: 20.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Column(
             children: [
-              Text(
-                AppText.dontHaveAccount,
-                style: AppTextStyles.smallDescription.copyWith(
-                  color: AppColors.current.gray,
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  context.push('/signup');
-                },
-                child: Text(
-                  AppText.signUp,
-                  style: AppTextStyles.smallDescription.copyWith(
-                    color: AppColors.current.primary,
-                    fontWeight: FontWeight.w600,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    AppText.dontHaveAccount,
+                    style: AppTextStyles.smallDescription.copyWith(
+                      color: AppColors.current.gray,
+                    ),
                   ),
-                ),
+                  GestureDetector(
+                    onTap: () {
+                      context.push('/signup');
+                    },
+                    child: Text(
+                      AppText.signUp,
+                      style: AppTextStyles.smallDescription.copyWith(
+                        color: AppColors.current.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),]),
+              SizedBox(
+                height: 10.h,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    AppText.emailNotVerified,
+                    style: AppTextStyles.smallDescription.copyWith(
+                      color: AppColors.current.gray,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      _showActivateEmailDialog(context);
+                    },
+                    child: Text(
+                      AppText.activateEmail,
+                      style: AppTextStyles.smallDescription.copyWith(
+                        color: AppColors.current.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

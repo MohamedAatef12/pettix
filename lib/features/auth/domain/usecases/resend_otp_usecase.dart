@@ -3,12 +3,10 @@ import 'package:injectable/injectable.dart';
 import 'package:pettix/data/network/failure.dart';
 import 'package:pettix/features/auth/domain/repositories/auth_repository.dart';
 @injectable
-class SendOtpUseCase {
+class ResendOtpUseCase {
   final AuthRepository repository;
-
-  SendOtpUseCase(this.repository);
-
-  Future<Either<Failure,bool>> call(String email) async {
-    return await repository.sendOtp(email);
+  ResendOtpUseCase(this.repository);
+  Future<Either<Failure, void>> call(String email) async {
+    return await repository.resendOtp(email);
   }
 }

@@ -23,7 +23,7 @@ class HomeBody extends StatelessWidget {
 
           if (state.isPostsLoading) {
             content = const Center(child: HomeShimmer());
-          } else if (state.error != null) {
+          } else if (state.error != null && state.posts.isEmpty) {
             content = Center(
            child: CircleAvatar(
              backgroundColor: AppColors.current.lightGray,
@@ -35,14 +35,7 @@ class HomeBody extends StatelessWidget {
              ),
            ),
             );
-          } else if (state.posts.isEmpty) {
-            content = Center(
-              child: SvgPicture.asset(
-                'assets/images/no_content_photo.svg',
-                fit: BoxFit.cover,
-              ),
-            );
-          } else {
+          }else {
             content = RefreshIndicator(
               onRefresh: () async {
                 context.read<HomeBloc>().add(FetchPostsEvent());

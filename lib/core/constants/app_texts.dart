@@ -125,4 +125,9 @@ abstract class AppText {
   static String get archived => 'Archived'.tr();
   static String get latestMessage => 'Latest message...'.tr();
   static String get skip => 'Skip'.tr();
+  static String get emailNotVerified => 'Your email not verified? '.tr();
+  static String get resendActivationEmail => 'Resend activation email'.tr();
+  static String get activateEmail => 'Activate your email'.tr();
+  static String get activateEmailDesc => 'Please check your email and click on the activation link to verify your account.'.tr();
+  static String get verificationEmailSent => 'Account created! Check your email for the OTP.'.tr();
 }

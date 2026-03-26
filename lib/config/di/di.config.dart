@@ -30,7 +30,7 @@ import '../../features/auth/domain/usecases/google_login_use_case.dart'
     as _i550;
 import '../../features/auth/domain/usecases/login_use_case.dart' as _i37;
 import '../../features/auth/domain/usecases/register_usecase.dart' as _i941;
-import '../../features/auth/domain/usecases/send_otp_use_case.dart' as _i643;
+import '../../features/auth/domain/usecases/resend_otp_usecase.dart' as _i613;
 import '../../features/auth/domain/usecases/verify_otp.dart' as _i975;
 import '../../features/home/data/repo/home_repo_impl.dart' as _i1024;
 import '../../features/home/data/sources/local/local_data_source.dart' as _i526;
@@ -113,11 +113,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i941.RegisterUseCase>(
       () => _i941.RegisterUseCase(gh<_i787.AuthRepository>()),
     );
-    gh.factory<_i643.SendOtpUseCase>(
-      () => _i643.SendOtpUseCase(gh<_i787.AuthRepository>()),
-    );
     gh.factory<_i975.VerifyOtp>(
       () => _i975.VerifyOtp(gh<_i787.AuthRepository>()),
+    );
+    gh.factory<_i613.ResendOtpUseCase>(
+      () => _i613.ResendOtpUseCase(gh<_i787.AuthRepository>()),
     );
     gh.factory<_i829.AddCommentUseCase>(
       () => _i829.AddCommentUseCase(gh<_i986.HomeDomainRepository>()),

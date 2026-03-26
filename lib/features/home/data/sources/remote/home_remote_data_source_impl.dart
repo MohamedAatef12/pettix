@@ -25,10 +25,15 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   Future<Either<Failure, List<PostModel>>> getPosts() async {
     final userToken = await DI.find<ICacheManager>().getToken();
     try {
-      final data = await apiService.getList(
+      final response = await apiService.getList(
         endPoint: Constants.postsEndpoint,
         headers: {'Authorization': 'Bearer $userToken'},
       );
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
+
+      final data = response.result as List? ?? [];
       final posts = data.map((e) => PostModel.fromJson(e)).toList();
       // Sort posts by date descending (latest first)
       posts.sort(
@@ -44,31 +49,12 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     }
   }
 
-  // Future<Either<Failure, List<PostModel>>> getPostsById(post.id) async {
-  //   try {
-  //     final data = await apiService.get(
-  //       endPoint: '${Constants.postsEndpoint}/${post.id}',
-  //     );
-  //
-  //     final posts = data.map((e) => PostModel.fromJson(e)).toList();
-  //
-  //     // Sort posts by date descending (latest first)
-  //     posts.sort(
-  //         (a, b) => DateTime.parse(b.date).compareTo(DateTime.parse(a.date)));
-  //
-  //     return Right(posts);
-  //   } catch (e) {
-  //     log('Error fetching posts: $e');
-  //     return Left(DioFailure.fromDioError(e));
-  //   }
-  // }
-
   @override
   Future<Either<Failure, void>> editPost(PostModel post) async {
     try {
       final jsonData = await post.toJson(); // 👈 ضروري await هنا
 
-      await apiService.put(
+      final response = await apiService.put(
         endPoint: '${Constants.postsEndpoint}/${post.id}',
         data: jsonData,
         headers: {
@@ -76,7 +62,9 @@ class RemoteDataSourceImpl implements RemoteDataSource {
           'Accept': 'application/json',
         },
       );
-
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
       return const Right(null);
     } catch (e) {
       return Left(DioFailure.fromDioError(e));
@@ -89,7 +77,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
       log('Adding post: ${post.id}');
       final jsonData = await post.toJson(); // مهم جداً await هنا
 
-      await apiService.post(
+      final response = await apiService.post(
         endPoint: Constants.postsEndpoint,
         data: jsonData,
         headers: {
@@ -97,6 +85,9 @@ class RemoteDataSourceImpl implements RemoteDataSource {
           'Accept': 'application/json',
         },
       );
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
 
       return const Right(null);
     } catch (e) {
@@ -108,7 +99,10 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   @override
   Future<Either<Failure, void>> deletePost(int id) async {
     try {
-      await apiService.delete(endPoint: '${Constants.postsEndpoint}/$id');
+      final response = await apiService.delete(endPoint: '${Constants.postsEndpoint}/$id');
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
       return const Right(null);
     } catch (e) {
       return Left(DioFailure.fromDioError(e));
@@ -122,10 +116,14 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     int postId,
   ) async {
     try {
-      final data = await apiService.getList(
+      final response = await apiService.getList(
         endPoint: '${Constants.commentsEndpoint}/$postId',
       );
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
 
+      final data = response.result as List? ?? [];
       final comments = data.map((e) => CommentModel.fromJson(e)).toList();
       // Sort comments by date descending (latest first)
       comments.sort(
@@ -152,7 +150,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   ) async {
     final userToken = await DI.find<ICacheManager>().getToken();
     try {
-      await apiService.post(
+      final response = await apiService.post(
         endPoint: '${Constants.commentsEndpoint}/$postId',
         data: comment.toJson(),
         headers: {
@@ -160,6 +158,9 @@ class RemoteDataSourceImpl implements RemoteDataSource {
           'Content-Type': 'application/json',
         },
       );
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
 
       return const Right(null);
     } catch (e) {
@@ -170,7 +171,10 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   @override
   Future<Either<Failure, void>> deleteComment(int id) async {
     try {
-      await apiService.delete(endPoint: '${Constants.commentsEndpoint}/$id');
+      final response = await apiService.delete(endPoint: '${Constants.commentsEndpoint}/$id');
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
       return const Right(null);
     } catch (e) {
       return Left(DioFailure.fromDioError(e));
@@ -180,10 +184,13 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   @override
   Future<Either<Failure, void>> editComment(CommentModel comment) async {
     try {
-      await apiService.put(
+      final response = await apiService.put(
         endPoint: '${Constants.commentsEndpoint}/${comment.id}',
         data: comment.toJson(),
       );
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
       return const Right(null);
     } catch (e) {
       return Left(DioFailure.fromDioError(e));
@@ -195,10 +202,14 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   @override
   Future<Either<Failure, List<LikesModel>>> getPostLikes(int postId) async {
     try {
-      final data = await apiService.getList(
+      final response = await apiService.getList(
         endPoint: '${Constants.getPostLikes}/$postId',
       );
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
 
+      final data = response.result as List? ?? [];
       final likes = data.map((e) => LikesModel.fromJson(e)).toList();
       // Sort likes by date descending (latest first)
       likes.sort(
@@ -231,7 +242,10 @@ class RemoteDataSourceImpl implements RemoteDataSource {
           'Content-Type': 'application/json',
         },
       );
-      return Right(LikesModel.fromJson(response));
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
+      return Right(LikesModel.fromJson(response.result as Map<String, dynamic>? ?? {}));
     } on DioException catch (dioError) {
       return Left(DioFailure.fromDioError(dioError));
     } catch (e) {
@@ -250,7 +264,10 @@ class RemoteDataSourceImpl implements RemoteDataSource {
           'Content-Type': 'application/json',
         },
       );
-      return Right(response);
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
+      return const Right(null);
     } on DioException catch (dioError) {
       return Left(DioFailure.fromDioError(dioError));
     } catch (e) {
@@ -269,8 +286,13 @@ class RemoteDataSourceImpl implements RemoteDataSource {
           'Content-Type': 'application/json',
         },
       );
+      
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
 
-      final count = response['commentsCount'] ?? 0; // ✅ استخدم المفتاح الصحيح
+      final result = response.result as Map<String, dynamic>? ?? {};
+      final count = result['commentsCount'] ?? 0; // ✅ استخدم المفتاح الصحيح
       return Right(count);
     } on DioException catch (dioError) {
       return Left(DioFailure.fromDioError(dioError));
@@ -284,10 +306,14 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     int commentId,
   ) async {
     try {
-      final data = await apiService.getList(
+      final response = await apiService.getList(
         endPoint: '${Constants.commentLikesEndpoint}/comment/$commentId',
       );
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
 
+      final data = response.result as List? ?? [];
       final commentsLikes =
           data.map((e) => CommentsLikeModel.fromJson(e)).toList();
       // Sort commentsLikes by date descending (latest first)
@@ -310,14 +336,17 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   Future<Either<Failure, void>> likeComment(int commentId) async {
     try {
       final userToken = await DI.find<ICacheManager>().getToken();
-      final data = await apiService.post(
+      final response = await apiService.post(
         endPoint: '${Constants.commentLikesEndpoint}/$commentId',
         headers: {
           'Authorization': 'Bearer $userToken',
           'Content-Type': 'application/json',
         },
       );
-      return Right(null);
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
+      return const Right(null);
     } on DioException catch (dioError) {
       return Left(DioFailure.fromDioError(dioError));
     } catch (e) {
@@ -329,14 +358,17 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   Future<Either<Failure, void>> unlikeComment(int commentId) async {
     try {
       final userToken = await DI.find<ICacheManager>().getToken();
-      final data = await apiService.delete(
+      final response = await apiService.delete(
         endPoint: '${Constants.commentLikesEndpoint}/$commentId',
         headers: {
           'Authorization': 'Bearer $userToken',
           'Content-Type': 'application/json',
         },
       );
-      return Right(null);
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
+      return const Right(null);
     } on DioException catch (dioError) {
       return Left(DioFailure.fromDioError(dioError));
     } catch (e) {
@@ -352,7 +384,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   ) async {
     try {
       final userToken = await DI.find<ICacheManager>().getToken();
-      await apiService.post(
+      final response = await apiService.post(
         endPoint: Constants.reportPostEndpoint,
         data: {'postId':postId,'reasonId': reasonId, 'customReason': reason},
         headers: {
@@ -360,6 +392,9 @@ class RemoteDataSourceImpl implements RemoteDataSource {
           'Content-Type': 'application/json',
         },
       );
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
       return const Right(null);
     } catch (e) {
       return Left(DioFailure.fromDioError(e));
@@ -369,9 +404,13 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   @override
   Future<Either<Failure, List<dynamic>>> getReportReasons() async {
     try {
-      final data = await apiService.getList(
+      final response = await apiService.getList(
         endPoint: Constants.reportReasonsEndpoint,
       );
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
+      final data = response.result as List? ?? [];
       return Right(data);
     } catch (e) {
       return Left(DioFailure.fromDioError(e));
@@ -381,12 +420,17 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   @override
   Future<Either<Failure, List<dynamic>>> reportedPosts(int postId) async {
     try {
-      final data = await apiService.getList(
+      final response = await apiService.getList(
         endPoint: '${Constants.reportedPostsEndpoint}/$postId',
       );
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
+      final data = response.result as List? ?? [];
       return Right(data);
     } catch (e) {
       return Left(DioFailure.fromDioError(e));
     }
   }
 }
+

@@ -276,42 +276,65 @@ class HomeRepositoryImpl implements HomeDomainRepository {
 
   @override
   Future<Either<Failure, List<ReportReasonEntity>>> getReportReasons() async {
-    final result = await remoteDataSource.getReportReasons();
-    return result.fold(
-          (failure) => Left(failure),
-          (success) =>
-          Right(
-            success
-                .map(
-                  (reason) =>
-                  ReportReasonEntity(id: reason['id'], name: reason['name']),
-            )
-                .toList(),
-          ),
-    );
+    try {
+      final result = await remoteDataSource.getReportReasons();
+      return result.fold(
+            (failure) => Left(failure),
+            (success) {
+          try {
+            final reasons = success
+                .map((reason) {
+              if (reason is Map<String, dynamic>) {
+                return ReportReasonEntity(
+                  id: reason['id'] as int,
+                  name: reason['name'] as String,
+                );
+              }
+              throw FormatException('Invalid reason format: $reason');
+            })
+                .toList();
+            return Right(reasons);
+          } catch (e) {
+            return Left(Failure('Failed to parse report reasons: $e'));
+          }
+        },
+      );
+    } catch (e) {
+      return Left(Failure('Error fetching report reasons: $e'));
+    }
   }
 
   @override
   Future<Either<Failure, List<ReportEntity>>> reportedPosts(int postId) async {
-    final result = await remoteDataSource.reportedPosts(postId);
-    return result.fold(
-          (failure) => Left(failure),
-          (success) =>
-          Right(
-            success
-                .map(
-                  (report) =>
-                  ReportEntity(
-                    id: report['id'],
-                    postId: report['postId'],
-                    author: report['author'],
-                    reasonName: report['reasonName'],
-                    customReason: report['customReason'],
-                    creationDate: DateTime.parse(report['creationDate']),
-                  ),
-            )
-                .toList(),
-          ),
-    );
+    try {
+      final result = await remoteDataSource.reportedPosts(postId);
+      return result.fold(
+            (failure) => Left(failure),
+            (success) {
+          try {
+            final reports = success
+                .map((report) {
+              if (report is Map<String, dynamic>) {
+                return ReportEntity(
+                  id: report['id'] as int,
+                  postId: report['postId'] as int,
+                  author: report['author'],
+                  reasonName: report['reasonName'] as String,
+                  customReason: (report['customReason'] ?? '') as String,
+                  creationDate: DateTime.parse(report['creationDate'] as String),
+                );
+              }
+              throw FormatException('Invalid report format: $report');
+            })
+                .toList();
+            return Right(reports);
+          } catch (e) {
+            return Left(Failure('Failed to parse reported posts: $e'));
+          }
+        },
+      );
+    } catch (e) {
+      return Left(Failure('Error fetching reported posts: $e'));
+    }
   }
 }

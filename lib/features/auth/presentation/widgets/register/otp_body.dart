@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_bloc.dart';
@@ -19,9 +20,24 @@ class OTPBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bloc = context.read<AuthBloc>();
     return SingleChildScrollView(
-      child: BlocBuilder<AuthBloc,AuthState>(
-        builder: (context,state) {
+      child: BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is RegisterOtpSuccess) {
+             AuthToast.showSuccess(
+              context,
+              'Verification Successful!',
+              onDone: () => context.go('/verified'),
+            );
+          } else if (state is RegisterFailure) {
+            AuthToast.showError(context, state.message);
+          } else if (state is OtpSent) {
+             AuthToast.showSuccess(context, 'OTP resent successfully!');
+          }
+        },
+        builder: (context, state) {
+          final isLoading = state is RegisterLoading || state is AuthLoading;
           return Column(
             children: [
               SvgPicture.asset(
@@ -47,19 +63,20 @@ class OTPBody extends StatelessWidget {
                   ),
                 ),
               ),
-
               SizedBox(height: 20.h,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(AppText.didntReceiveCode,style: AppTextStyles.smallDescription.copyWith(
+                  Text(AppText.didntReceiveCode, style: AppTextStyles.smallDescription.copyWith(
                     color: AppColors.current.gray,
                   ),),
                   GestureDetector(
                     onTap: () {
-
+                      context.read<AuthBloc>().add(ResendOtpEvent(
+                        bloc.emailRegisterController.text
+                      ));
                     },
-                    child: Text(AppText.resend,style: AppTextStyles.smallDescription.copyWith(
+                    child: Text(AppText.resend, style: AppTextStyles.smallDescription.copyWith(
                       color: AppColors.current.primary,
                       fontWeight: FontWeight.w600,
                     ),),
@@ -67,21 +84,21 @@ class OTPBody extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 40.h,),
-              CustomFilledButton(
-                onPressed: () {
-                  final otp =  _otpController.text;
-                  context.read<AuthBloc>().add(RegisterOtpSubmitted(otp));
-                  context.go('/verified');
-                },
-                text: AppText.verify,
-                backgroundColor: AppColors.current.primary,
-                textColor: AppColors.current.white,
-
-              ),
+              isLoading
+                  ? const CircularProgressIndicator()
+                  : CustomFilledButton(
+                      onPressed: () {
+                        final otp = _otpController.text;
+                        context.read<AuthBloc>().add(RegisterOtpSubmitted(otp));
+                      },
+                      text: AppText.verify,
+                      backgroundColor: AppColors.current.primary,
+                      textColor: AppColors.current.white,
+                    ),
               SizedBox(height: 20.h,),
             ],
           );
-        }
+        },
       ),
     );
   }

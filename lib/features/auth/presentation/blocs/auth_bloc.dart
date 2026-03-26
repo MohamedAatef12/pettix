@@ -15,6 +15,8 @@ import 'package:pettix/features/auth/domain/entities/user_entity.dart';
 import 'package:pettix/features/auth/domain/usecases/google_login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/register_usecase.dart';
+import 'package:pettix/features/auth/domain/usecases/resend_otp_usecase.dart';
+import 'package:pettix/features/auth/domain/usecases/verify_otp.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_event.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_state.dart';
 
@@ -23,9 +25,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUseCase loginUseCase;
   final GoogleLoginUseCase googleLoginUseCase;
   final EmailAuthService emailAuthService;
-
+  final VerifyOtp verifyOtp;
+  final ResendOtpUseCase resendOtpUseCase;
   // Controllers for Register
-final fullNameController = TextEditingController();
+  final fullNameController = TextEditingController();
   final emailRegisterController = TextEditingController();
   final phoneController = TextEditingController();
   final passwordRegisterController = TextEditingController();
@@ -41,11 +44,14 @@ final fullNameController = TextEditingController();
   bool rememberMe = false;
   bool obscurePasswordLogin = true;
   RegisterEntity? _tempRegisterData;
+  String? _pendingEmail;
   AuthBloc( {
     required this.registerUseCase,
     required this.loginUseCase,
     required this.googleLoginUseCase,
     required this.emailAuthService,
+    required this.verifyOtp,
+    required this.resendOtpUseCase,
   }) : super(AuthInitial()) {
     // Register events
     on<RegisterStepOneSubmitted>(_registerStepOne);
@@ -62,6 +68,7 @@ final fullNameController = TextEditingController();
 
     // Login events
     on<LoginSubmitted>(_loginSubmitted);
+    on<ResendOtpEvent>(_resendOtp);
     on<LoginTogglePasswordVisibility>((event, emit) {
       obscurePasswordLogin = !obscurePasswordLogin;
       emit(LoginPasswordVisibilityChanged());
@@ -93,14 +100,8 @@ final fullNameController = TextEditingController();
       idImage: '',
     );
 
-    // نرسل OTP عبر Twilio
-    final otpSent = await emailAuthService.sendOtp(event.email);
-
-    if (otpSent) {
-      emit(RegisterStepOneSuccess());
-    } else {
-      emit(RegisterFailure("فشل إرسال رمز التحقق"));
-    }
+    // Continue to step two locally
+    emit(RegisterStepOneSuccess());
   }
 
 
@@ -120,43 +121,46 @@ final fullNameController = TextEditingController();
     _tempRegisterData = _tempRegisterData!.copyWith(
       password: event.password,
     );
+    
+    emit(RegisterLoading());
+    
+    // Call the register endpoint to send the OTP to the user's email
+    final result = await registerUseCase(_tempRegisterData!);
 
-    emit(RegisterStepTwoSuccess());
+    result.fold(
+          (failure) => emit(RegisterFailure(failure.message)),
+          (_) => emit(RegisterStepTwoSuccess()),
+    );
   }
 
 // Step 3: OTP
   Future<void> _registerOtp(
       RegisterOtpSubmitted event, Emitter<AuthState> emit) async {
-    if (_tempRegisterData == null) {
-      emit(RegisterFailure("Previous steps not completed"));
+    // Support both the registration flow (_tempRegisterData) and the
+    // login "activate email" flow (_pendingEmail set by ResendOtpEvent).
+    final email = _tempRegisterData?.email ?? _pendingEmail;
+    if (email == null) {
+      emit(RegisterFailure("Email not found. Please start the process again."));
       return;
     }
 
     emit(RegisterLoading());
 
-    final verified = await emailAuthService.verifyOtp(
-      _tempRegisterData!.email,
-      event.otp,
-    );
+    final verified = await verifyOtp(email, event.otp);
 
-    if (!verified) {
-      emit(RegisterFailure("رمز التحقق غير صحيح"));
-      return;
-    }
-
-    // بعد التأكد من OTP → نسجل المستخدم في الباك إند
-    _tempRegisterData = _tempRegisterData!.copyWith(otp: event.otp);
-
-    final result = await registerUseCase(_tempRegisterData!);
-
-    result.fold(
+    verified.fold(
           (failure) => emit(RegisterFailure(failure.message)),
-          (_) => emit(RegisterOtpSuccess()),
+          (_) {
+            if (_tempRegisterData != null) {
+              _tempRegisterData = _tempRegisterData!.copyWith(otp: event.otp);
+            }
+            _pendingEmail = null; // clear after successful verification
+            emit(RegisterOtpSuccess());
+          },
     );
   }
 
-@override
-  Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) async {
+Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) async {
     emit(LoginLoading());
 
     final result = await loginUseCase(event.model);
@@ -166,7 +170,7 @@ final fullNameController = TextEditingController();
             emit(LoginFailure(failure.message));} ,
           (loginResponse) async {
         await DI.find<ICacheManager>()
-            .setUserData(UserModel.fromEntity(loginResponse.user));
+            .setUserData(UserModel.fromEntity(loginResponse.contact));
         await DI.find<ICacheManager>().setToken(loginResponse.token);
         await DI.find<ICacheManager>().setRefreshToken(loginResponse.refreshToken.toString());// ✅ stores user + logged_in = true
 
@@ -176,7 +180,7 @@ final fullNameController = TextEditingController();
           await DI.find<ICacheManager>().clearLogin();
         }
 
-        emit(LoginSuccess(loginResponse.user));
+        emit(LoginSuccess(loginResponse.contact));
       },
     );
   }
@@ -225,6 +229,18 @@ final fullNameController = TextEditingController();
       emit(GoogleLoginFailure(e.toString()));
     }
   }
+  Future<void> _resendOtp(ResendOtpEvent event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    _pendingEmail = event.email; // store for OTP verification step
 
+    final result = await resendOtpUseCase(event.email);
 
+    result.fold(
+          (failure) {
+            _pendingEmail = null; // clear on failure
+            emit(RegisterFailure(failure.message));
+          },
+          (_) => emit(OtpSent()),
+    );
+  }
 }
