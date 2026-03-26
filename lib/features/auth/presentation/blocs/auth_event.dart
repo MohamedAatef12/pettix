@@ -52,10 +52,6 @@ class GoogleLoginSubmitted extends AuthEvent {
   final bool rememberMe;
   GoogleLoginSubmitted({required this.rememberMe});
 }
-class SendOtpEvent extends AuthEvent {
-  final String phoneNumber;
-  SendOtpEvent(this.phoneNumber);
-}
 
 class VerifyOtpEvent extends AuthEvent {
   final String smsCode;
@@ -64,4 +60,20 @@ class VerifyOtpEvent extends AuthEvent {
 class ResendOtpEvent extends AuthEvent {
   final String email;
   ResendOtpEvent(this.email);
+}
+class ForgotPasswordEvent extends AuthEvent {
+  final String email;
+  ForgotPasswordEvent(this.email);
+}
+class ResetPasswordEvent extends AuthEvent {
+  final String email;
+  final String otp;
+  final String newPassword;
+  final String confirmPassword;
+  ResetPasswordEvent({
+    required this.email,
+    required this.otp,
+    required this.newPassword,
+    required this.confirmPassword,
+  });
 }

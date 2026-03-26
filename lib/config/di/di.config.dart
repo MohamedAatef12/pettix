@@ -26,11 +26,13 @@ import '../../features/auth/data/sources/remote/auth_remote_data_source.dart'
 import '../../features/auth/data/sources/remote/auth_remote_data_source_impl.dart'
     as _i523;
 import '../../features/auth/domain/repositories/auth_repository.dart' as _i787;
+import '../../features/auth/domain/usecases/forgot_password.dart' as _i510;
 import '../../features/auth/domain/usecases/google_login_use_case.dart'
     as _i550;
 import '../../features/auth/domain/usecases/login_use_case.dart' as _i37;
 import '../../features/auth/domain/usecases/register_usecase.dart' as _i941;
 import '../../features/auth/domain/usecases/resend_otp_usecase.dart' as _i613;
+import '../../features/auth/domain/usecases/reset_password.dart' as _i1066;
 import '../../features/auth/domain/usecases/verify_otp.dart' as _i975;
 import '../../features/home/data/repo/home_repo_impl.dart' as _i1024;
 import '../../features/home/data/sources/local/local_data_source.dart' as _i526;
@@ -104,6 +106,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i526.GetUserLocalDataSource>(),
       ),
     );
+    gh.factory<_i510.ForgotPasswordUseCase>(
+      () => _i510.ForgotPasswordUseCase(gh<_i787.AuthRepository>()),
+    );
     gh.factory<_i550.GoogleLoginUseCase>(
       () => _i550.GoogleLoginUseCase(gh<_i787.AuthRepository>()),
     );
@@ -113,11 +118,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i941.RegisterUseCase>(
       () => _i941.RegisterUseCase(gh<_i787.AuthRepository>()),
     );
-    gh.factory<_i975.VerifyOtp>(
-      () => _i975.VerifyOtp(gh<_i787.AuthRepository>()),
-    );
     gh.factory<_i613.ResendOtpUseCase>(
       () => _i613.ResendOtpUseCase(gh<_i787.AuthRepository>()),
+    );
+    gh.factory<_i1066.ResetPasswordUseCase>(
+      () => _i1066.ResetPasswordUseCase(gh<_i787.AuthRepository>()),
+    );
+    gh.factory<_i975.VerifyOtp>(
+      () => _i975.VerifyOtp(gh<_i787.AuthRepository>()),
     );
     gh.factory<_i829.AddCommentUseCase>(
       () => _i829.AddCommentUseCase(gh<_i986.HomeDomainRepository>()),

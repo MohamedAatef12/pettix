@@ -14,4 +14,6 @@ abstract class AuthRemoteDataSource {
   Future<Either<Failure, GoogleLoginResponseModel>> loginWithGoogle(GoogleLoginModel model);
   Future<Either<Failure, bool>> verifyOtp(String email, String otp);
   Future<Either<Failure, void>> resendOtp(String email);
+  Future<Either<Failure, void>> forgotPassword(String email);
+  Future<Either<Failure, void>> resetPassword(String email, String otp, String newPassword, String confirmPassword);
 }

@@ -12,10 +12,12 @@ import 'package:pettix/features/auth/data/models/user_model.dart';
 import 'package:pettix/features/auth/domain/entities/google_login_entity.dart';
 import 'package:pettix/features/auth/domain/entities/register_domain_entity.dart';
 import 'package:pettix/features/auth/domain/entities/user_entity.dart';
+import 'package:pettix/features/auth/domain/usecases/forgot_password.dart';
 import 'package:pettix/features/auth/domain/usecases/google_login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/register_usecase.dart';
 import 'package:pettix/features/auth/domain/usecases/resend_otp_usecase.dart';
+import 'package:pettix/features/auth/domain/usecases/reset_password.dart';
 import 'package:pettix/features/auth/domain/usecases/verify_otp.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_event.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_state.dart';
@@ -27,6 +29,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final EmailAuthService emailAuthService;
   final VerifyOtp verifyOtp;
   final ResendOtpUseCase resendOtpUseCase;
+  final ForgotPasswordUseCase forgotPasswordUseCase;
+  final ResetPasswordUseCase resetPasswordUseCase;
   // Controllers for Register
   final fullNameController = TextEditingController();
   final emailRegisterController = TextEditingController();
@@ -45,6 +49,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   bool obscurePasswordLogin = true;
   RegisterEntity? _tempRegisterData;
   String? _pendingEmail;
+  // Controllers for Forgot Password
+  final emailForgotController = TextEditingController();
+  final otpForgotController = TextEditingController();
+  final newPasswordForgotController = TextEditingController();
+  final confirmNewPasswordForgotController = TextEditingController();
+  final forgotFormKey = GlobalKey<FormState>();
   AuthBloc( {
     required this.registerUseCase,
     required this.loginUseCase,
@@ -52,6 +62,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.emailAuthService,
     required this.verifyOtp,
     required this.resendOtpUseCase,
+    required this.forgotPasswordUseCase,
+    required this.resetPasswordUseCase,
   }) : super(AuthInitial()) {
     // Register events
     on<RegisterStepOneSubmitted>(_registerStepOne);
@@ -78,6 +90,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(LoginRememberMeChanged(rememberMe));
     });
     on<GoogleLoginSubmitted>(_googleLoginSubmitted);
+    on<ForgotPasswordEvent>(_forgotPassword);
+    on<ResetPasswordEvent>(_resetPassword);
   }
 
   /// Handle Register
@@ -243,4 +257,43 @@ Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) asyn
           (_) => emit(OtpSent()),
     );
   }
+  Future<void> _forgotPassword(ForgotPasswordEvent event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+
+    _pendingEmail = event.email; // ensure OTP verification can use this email
+
+    final result = await forgotPasswordUseCase(event.email);
+
+    result.fold(
+          (failure) => emit(AuthError(failure.message)),
+          (_) => emit(OtpSent()),
+    );
+  }
+  Future<void> _resetPassword(ResetPasswordEvent event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+
+    final result = await resetPasswordUseCase(
+      event.email,
+      event.otp,
+      event.newPassword,
+      event.confirmPassword,
+    );
+
+    result.fold(
+          (failure) => emit(AuthError(failure.message)),
+          (_) => emit(AuthSuccess(UserEntity(
+        id: 0,
+        email: event.email,
+        userName: '',
+        phone: '',
+        country: '',
+        city: '',
+        image: '',
+        gender: '',
+        age: 0,
+        address: '',
+        idImage: '',
+      ))),
+    );
+    }
 }

@@ -152,4 +152,39 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return Left(DioFailure.fromDioError(e));
     }
   }
+  @override
+  Future<Either<Failure, void>> forgotPassword(String email) async {
+    try {
+      final response = await apiService.post(
+          endPoint: Constants.forgotPasswordEndpoint, data: {
+        'email': email,
+      });
+      if (response.success == true) {
+        return Right(response.message);
+      }
+      return Left(Failure(response.message));
+    }
+    catch (e) {
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
+  @override
+  Future<Either<Failure, void>> resetPassword(String email, String otp, String newPassword, String confirmPassword) async {
+    try {
+      final response = await apiService.post(
+          endPoint: Constants.resetPasswordEndpoint, data: {
+        'email': email,
+        'otp': otp,
+        'newPassword': newPassword,
+        'confirmPassword': confirmPassword,
+      });
+      if (response.success == true) {
+        return Right(response.message);
+      }
+      return Left(Failure(response.message));
+    }
+    catch (e) {
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
 }

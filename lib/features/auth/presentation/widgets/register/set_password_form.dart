@@ -103,11 +103,6 @@ class SetPasswordForm extends StatelessWidget {
                             confirmPassword: bloc.confirmPasswordController.text,
                           ),
                         );
-                        context.read<AuthBloc>().add(
-                          RegisterOtpSubmitted(
-                            bloc.emailRegisterController.text,
-                          )
-                        );
                       },
                       text: AppText.signUp,
                       backgroundColor: AppColors.current.primary,

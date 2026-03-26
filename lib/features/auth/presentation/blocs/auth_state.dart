@@ -71,4 +71,16 @@ class OtpVerificationFailure extends AuthState {
   final String message;
   OtpVerificationFailure(this.message);
 }
+class ResendOtpLoading extends AuthState {}
+class ResendOtpSuccess extends AuthState {}
+class ResendOtpFailure extends AuthState {
+  final String message;
+  ResendOtpFailure(this.message);
+}
+class ForgotPasswordLoading extends AuthState {}
+class ForgotPasswordSuccess extends AuthState {}
+class ForgotPasswordFailure extends AuthState {
+  final String message;
+  ForgotPasswordFailure(this.message);
+}
 

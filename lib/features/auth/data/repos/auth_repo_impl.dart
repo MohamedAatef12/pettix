@@ -44,4 +44,12 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, void>> resendOtp(String email) async {
     return await remoteDataSource.resendOtp(email);
   }
+  @override
+  Future<Either<Failure, void>> forgotPassword(String email) async {
+    return await remoteDataSource.forgotPassword(email);
+  }
+  @override
+  Future<Either<Failure, void>> resetPassword(String email, String otp, String newPassword, String confirmPassword) async {
+    return await remoteDataSource.resetPassword(email, otp, newPassword, confirmPassword);
+  }
 }
