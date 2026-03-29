@@ -42,6 +42,8 @@ class LoginSubmitted extends AuthEvent {
 class CheckRemembered extends AuthEvent {}
 
 class LoginTogglePasswordVisibility extends AuthEvent {}
+class ResetPasswordTogglePasswordVisibility extends AuthEvent {}
+class ResetPasswordToggleConfirmPasswordVisibility extends AuthEvent {}
 
 class ToggleRememberMe extends AuthEvent {
   final bool value;

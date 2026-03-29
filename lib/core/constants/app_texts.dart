@@ -131,6 +131,6 @@ abstract class AppText {
   static String get activateEmailDesc => 'Please check your email and click on the activation link to verify your account.'.tr();
   static String get verificationEmailSent => 'Account created! Check your email for the OTP.'.tr();
   static String get send => 'Send'.tr();
-  static String get sendOtp => 'Send OTP'.tr();
+  static String get sendOtp => "Send OTP".tr();
 
 }

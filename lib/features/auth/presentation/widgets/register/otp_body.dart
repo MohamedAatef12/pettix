@@ -99,9 +99,8 @@ class OTPBody extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 40.h,),
-              isLoading
-                  ? const CircularProgressIndicator()
-                  : CustomFilledButton(
+              CustomFilledButton(
+                isLoading: isLoading,
                       onPressed: () {
                         final otp = _otpController.text;
                         context.read<AuthBloc>().add(RegisterOtpSubmitted(otp));

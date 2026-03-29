@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_bloc.dart';
@@ -28,9 +29,7 @@ class ResetPasswordBody extends StatelessWidget {
             // navigate to password reset done
             context.pushNamed('password_reset_done');
           } else if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+           AuthToast.showError(context, state.message);
           }
         },
         builder: (context, state) {
@@ -50,7 +49,7 @@ class ResetPasswordBody extends StatelessWidget {
               CustomTextFormField(
                 controller: bloc.newPasswordForgotController,
                 hintText: AppText.enterPassword,
-                obscureText: true,
+                obscureText: bloc.obscurePasswordReset,
                 fillColor: true,
                 fillColorValue: AppColors.current.white,
                 enabledBorder: OutlineInputBorder(
@@ -59,7 +58,18 @@ class ResetPasswordBody extends StatelessWidget {
                     color: AppColors.current.lightGray,
                   ),
                 ),
-                enablePasswordToggle: true,
+                enablePasswordToggle: false,
+                suffixIcon: GestureDetector(
+                  onTap: () {
+                    bloc.add(ResetPasswordTogglePasswordVisibility());
+                  },
+                  child: Icon(
+                    bloc.obscurePasswordReset
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                    color: AppColors.current.gray,
+                  ),
+                ),
               ),
               SizedBox(height: 10.h,),
               Text(AppText.confirmPassword,style: AppTextStyles.smallDescription,),
@@ -67,21 +77,32 @@ class ResetPasswordBody extends StatelessWidget {
               CustomTextFormField(
                 controller: bloc.confirmNewPasswordForgotController,
                 hintText: AppText.confirmPassword,
-                obscureText: true,
                 fillColor: true,
                 fillColorValue: AppColors.current.white,
+                obscureText: bloc.obscureConfirmPasswordReset,
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide(
                     color: AppColors.current.lightGray,
                   ),
                 ),
-                enablePasswordToggle: true,
+                enablePasswordToggle: false,
+                suffixIcon: GestureDetector(
+                  onTap: () {
+                    bloc.add(ResetPasswordToggleConfirmPasswordVisibility()
+                    );
+                  },
+                  child: Icon(
+                    bloc.obscureConfirmPasswordReset
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                    color: AppColors.current.gray,
+                  ),
+                ),
               ),
               Spacer(),
-              isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : CustomFilledButton(
+            CustomFilledButton(
+          isLoading:isLoading,
                       onPressed: () {
                         final newPass = bloc.newPasswordForgotController.text;
                         final confirm = bloc.confirmNewPasswordForgotController.text;

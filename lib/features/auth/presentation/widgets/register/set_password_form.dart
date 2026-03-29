@@ -40,10 +40,10 @@ class SetPasswordForm extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Password', style: AppTextStyles.smallDescription),
+              Text(AppText.password, style: AppTextStyles.smallDescription),
               SizedBox(height: 4.h),
               CustomTextFormField(
-                hintText: AppText.enterYourEmail,
+                hintText: AppText.password,
                 obscureText: bloc.obscurePasswordRegister,
                 controller: bloc.passwordRegisterController,
                 fillColor: true,
@@ -93,9 +93,9 @@ class SetPasswordForm extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 20.h),
-              isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : CustomFilledButton(
+
+                   CustomFilledButton(
+                     isLoading: isLoading,
                       onPressed: () {
                         context.read<AuthBloc>().add(
                           RegisterStepTwoSubmitted(
@@ -137,15 +137,23 @@ class SetPasswordForm extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 10.h),
-              CustomFilledButton(
-                onPressed: () {
-                  // Handle Google login
+              BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, state) {
+                  final isLoading = state is GoogleLoginLoading;
+                  return CustomFilledButton(
+                    isLoading: isLoading,
+                    onPressed: () {
+                      context.read<AuthBloc>().add(
+                        GoogleLoginSubmitted(rememberMe: bloc.rememberMe),
+                      );
+                    },
+                    text: AppText.continueWithGoogle,
+                    backgroundColor: AppColors.current.white,
+                    textColor: AppColors.current.lightText,
+                    hasLeading: true,
+                    leading: SvgPicture.asset('assets/icons/gmail.svg'),
+                  );
                 },
-                text: AppText.continueWithGoogle,
-                backgroundColor: AppColors.current.white,
-                textColor: AppColors.current.lightText,
-                hasLeading: true,
-                leading: SvgPicture.asset('assets/icons/gmail.svg'),
               ),
               SizedBox(height: 10.h),
               CustomFilledButton(

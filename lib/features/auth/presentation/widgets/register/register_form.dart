@@ -82,9 +82,8 @@ class RegisterForm extends StatelessWidget {
               ),
             ),
             SizedBox(height: 20.h),
-            isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : CustomFilledButton(
+            CustomFilledButton(
+              isLoading: isLoading,
                     onPressed: () {
                       context.read<AuthBloc>().add(RegisterStepOneSubmitted(
                         email: bloc.emailRegisterController.text,
@@ -124,17 +123,23 @@ class RegisterForm extends StatelessWidget {
               ],
             ),
             SizedBox(height: 10.h),
-            CustomFilledButton(
-              onPressed: () {
-                context.read<AuthBloc>().add(
-                  GoogleLoginSubmitted(rememberMe: bloc.rememberMe),
+            BlocBuilder<AuthBloc, AuthState>(
+              builder: (context, state) {
+                final isLoading = state is GoogleLoginLoading;
+                return CustomFilledButton(
+                  isLoading: isLoading,
+                  onPressed: () {
+                    context.read<AuthBloc>().add(
+                      GoogleLoginSubmitted(rememberMe: bloc.rememberMe),
+                    );
+                  },
+                  text: AppText.continueWithGoogle,
+                  backgroundColor: AppColors.current.white,
+                  textColor: AppColors.current.lightText,
+                  hasLeading: true,
+                  leading: SvgPicture.asset('assets/icons/gmail.svg'),
                 );
               },
-              text: AppText.continueWithGoogle,
-              backgroundColor: AppColors.current.white,
-              textColor: AppColors.current.lightText,
-              hasLeading: true,
-              leading: SvgPicture.asset('assets/icons/gmail.svg'),
             ),
             SizedBox(height: 10.h),
             CustomFilledButton(

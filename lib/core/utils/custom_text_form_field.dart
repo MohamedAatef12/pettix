@@ -96,7 +96,12 @@ class CustomTextFormField extends StatelessWidget {
           maxWidth: 24.w,
           maxHeight: 24.h,
         ),
-        suffixIcon: suffixIcon,
+        suffixIcon: suffixIcon != null
+            ? Padding(
+          padding: const EdgeInsets.only(left: 10.0), // 👈 control distance here
+          child: suffixIcon,
+        )
+            : null,
         contentPadding: contentPadding ??
             const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
         border: border ?? const OutlineInputBorder(),

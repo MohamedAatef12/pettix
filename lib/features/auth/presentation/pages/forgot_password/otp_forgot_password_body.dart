@@ -38,7 +38,7 @@ class OTPForgotPasswordBody extends StatelessWidget {
           }
         },
         builder: (context, state) {
-          final isLoading = state is RegisterLoading || state is AuthLoading;
+          final isLoading = state is ForgotPasswordLoading;
           return Column(
             children: [
               SvgPicture.asset(
@@ -85,21 +85,22 @@ class OTPForgotPasswordBody extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 40.h,),
-              isLoading
-                  ? const CircularProgressIndicator()
-                  : CustomFilledButton(
-                      onPressed: () {
-                        final otp = bloc.otpForgotController.text;
-                        context.pushNamed('reset_password', extra: {
-                          'bloc': bloc,
-                          'email': bloc.emailForgotController.text,
-                          'otp': otp,
-                        });
-                      },
-                      text: AppText.continue_,
-                      backgroundColor: AppColors.current.primary,
-                      textColor: AppColors.current.white,
-                    ),
+              CustomFilledButton(
+                onPressed: () {
+                  final otp = bloc.otpForgotController.text;
+                  context.pushNamed(
+                    'reset_password',
+                    extra: {
+                      'bloc': bloc,
+                      'email': bloc.emailForgotController.text,
+                      'otp': otp,
+                    },
+                  );
+                },
+                text: AppText.continue_,
+                backgroundColor: AppColors.current.primary,
+                textColor: AppColors.current.white,
+              ),
               SizedBox(height: 20.h,),
             ],
           );

@@ -39,6 +39,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final confirmPasswordController = TextEditingController();
   bool obscurePasswordRegister = true;
   bool obscureConfirmPassword = true;
+  bool obscurePasswordReset = true;
+  bool obscureConfirmPasswordReset = true;
   final registerFormKey = GlobalKey<FormState>();
 
   // Controllers for Login
@@ -83,6 +85,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<ResendOtpEvent>(_resendOtp);
     on<LoginTogglePasswordVisibility>((event, emit) {
       obscurePasswordLogin = !obscurePasswordLogin;
+      emit(LoginPasswordVisibilityChanged());
+    });
+    on<ResetPasswordTogglePasswordVisibility>((event, emit) {
+      obscurePasswordReset = !obscurePasswordReset;
+      emit(LoginPasswordVisibilityChanged());
+    });
+    on<ResetPasswordToggleConfirmPasswordVisibility>((event, emit) {
+      obscureConfirmPasswordReset = !obscureConfirmPasswordReset;
       emit(LoginPasswordVisibilityChanged());
     });
     on<ToggleRememberMe>((event, emit) {
@@ -258,7 +268,7 @@ Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) asyn
     );
   }
   Future<void> _forgotPassword(ForgotPasswordEvent event, Emitter<AuthState> emit) async {
-    emit(AuthLoading());
+    emit(ForgotPasswordLoading());
 
     _pendingEmail = event.email; // ensure OTP verification can use this email
 

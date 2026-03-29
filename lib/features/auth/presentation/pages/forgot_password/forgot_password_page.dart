@@ -8,6 +8,8 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/core/widgets/rtl_aware_icon.dart';
 import 'package:pettix/data/network/email_auth_service.dart';
@@ -50,12 +52,9 @@ class ForgotPasswordPage extends StatelessWidget {
             return BlocConsumer<AuthBloc, AuthState>(
               listener: (context, state) {
                 if (state is OtpSent) {
-                  // Navigate to OTP forgot password screen and pass the existing bloc instance
-                  context.pushNamed('otp_forgot_password', extra: bloc);
+                 context.pushNamed('otp_forgot_password', extra: bloc);
                 } else if (state is AuthError) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(state.message)),
-                  );
+                  AuthToast.showError(context, state.message);
                 }
               },
               builder: (context, state) {
@@ -116,28 +115,24 @@ class ForgotPasswordPage extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 10.h),
-                          isLoading
-                              ? const CircularProgressIndicator()
-                              : ElevatedButton(
-                                  onPressed: () {
-                                    bloc.add(ForgotPasswordEvent(
+                          BlocBuilder<AuthBloc, AuthState>(
+                            builder: (context, state) {
+                              final isLoading = state is ForgotPasswordLoading;
+                              return CustomFilledButton(
+                                isLoading: isLoading,
+                                onPressed: () {
+                                  bloc.add(
+                                    ForgotPasswordEvent(
                                       bloc.emailForgotController.text,
-                                    ));
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.current.primary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
                                     ),
-                                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                                  ),
-                                  child: Text(
-                                    AppText.sendOtp,
-                                    style: AppTextStyles.button.copyWith(
-                                      color: AppColors.current.white,
-                                    ),
-                                  ),
-                                ),
+                                  );
+                                },
+                                text: AppText.sendOtp,
+                                backgroundColor: AppColors.current.primary,
+                                textColor: AppColors.current.white,
+                              );
+                            },
+                          )
                         ],
                       ),
                     ),
