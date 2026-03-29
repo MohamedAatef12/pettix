@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pettix/config/router/guards.dart';
 import 'package:pettix/data/caching/shared_prefs_helper.dart';
 import 'package:pettix/features/auth/presentation/pages/forgot_password/forgot_password_page.dart';
+import 'package:pettix/features/auth/presentation/pages/forgot_password/otp_forgot_password_page.dart';
 import 'package:pettix/features/auth/presentation/pages/login/login_page.dart';
 import 'package:pettix/features/auth/presentation/pages/register/otp_page.dart';
 import 'package:pettix/features/auth/presentation/pages/forgot_password/password_reset_done_page.dart';
@@ -102,9 +103,29 @@ GoRouter appRouter() => GoRouter(
       builder: (context, state) => const ForgotPasswordPage(),
     ),
     GoRoute(
+      path: '/otp_forgot_password',
+      name: 'otp_forgot_password',
+      builder: (context, state) => const OTPForgotPasswordScreen(),
+    ),
+    GoRoute(
       path: AppRoutes.resetPassword,
       name: AppRouteNames.resetPassword,
-      builder: (context, state) => const ResetPassword(),
+      builder: (context, state) {
+        final extra = state.extra;
+        if (extra is Map) {
+          final authBloc = extra['bloc'] as dynamic?;
+          final email = extra['email'] as String? ?? '';
+          final otp = extra['otp'] as String? ?? '';
+          if (authBloc != null) {
+            return BlocProvider.value(
+              value: authBloc,
+              child: ResetPassword(email: email, otp: otp),
+            );
+          }
+          return ResetPassword(email: email, otp: otp);
+        }
+        return const ResetPassword(email: '', otp: '');
+      },
     ),
     GoRoute(
       path: AppRoutes.passwordResetDone,

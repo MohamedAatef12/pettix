@@ -43,7 +43,7 @@ class LoginRememberMeChanged extends AuthState {
 class GoogleLoginLoading extends AuthState {}
 
 class GoogleLoginSuccess extends AuthState {
-  final UserEntity user;
+  final UserEntity? user;
   GoogleLoginSuccess(this.user);
 }
 
@@ -65,3 +65,22 @@ class AuthError extends AuthState {
   final String message;
   AuthError(this.message);
 }
+class OtpVerificationLoading extends AuthState {}
+class OtpVerificationSuccess extends AuthState {}
+class OtpVerificationFailure extends AuthState {
+  final String message;
+  OtpVerificationFailure(this.message);
+}
+class ResendOtpLoading extends AuthState {}
+class ResendOtpSuccess extends AuthState {}
+class ResendOtpFailure extends AuthState {
+  final String message;
+  ResendOtpFailure(this.message);
+}
+class ForgotPasswordLoading extends AuthState {}
+class ForgotPasswordSuccess extends AuthState {}
+class ForgotPasswordFailure extends AuthState {
+  final String message;
+  ForgotPasswordFailure(this.message);
+}
+

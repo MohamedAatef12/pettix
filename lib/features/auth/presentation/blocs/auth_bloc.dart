@@ -12,9 +12,13 @@ import 'package:pettix/features/auth/data/models/user_model.dart';
 import 'package:pettix/features/auth/domain/entities/google_login_entity.dart';
 import 'package:pettix/features/auth/domain/entities/register_domain_entity.dart';
 import 'package:pettix/features/auth/domain/entities/user_entity.dart';
+import 'package:pettix/features/auth/domain/usecases/forgot_password.dart';
 import 'package:pettix/features/auth/domain/usecases/google_login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/register_usecase.dart';
+import 'package:pettix/features/auth/domain/usecases/resend_otp_usecase.dart';
+import 'package:pettix/features/auth/domain/usecases/reset_password.dart';
+import 'package:pettix/features/auth/domain/usecases/verify_otp.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_event.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_state.dart';
 
@@ -23,15 +27,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUseCase loginUseCase;
   final GoogleLoginUseCase googleLoginUseCase;
   final EmailAuthService emailAuthService;
-
+  final VerifyOtp verifyOtp;
+  final ResendOtpUseCase resendOtpUseCase;
+  final ForgotPasswordUseCase forgotPasswordUseCase;
+  final ResetPasswordUseCase resetPasswordUseCase;
   // Controllers for Register
-final fullNameController = TextEditingController();
+  final fullNameController = TextEditingController();
   final emailRegisterController = TextEditingController();
   final phoneController = TextEditingController();
   final passwordRegisterController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   bool obscurePasswordRegister = true;
   bool obscureConfirmPassword = true;
+  bool obscurePasswordReset = true;
+  bool obscureConfirmPasswordReset = true;
   final registerFormKey = GlobalKey<FormState>();
 
   // Controllers for Login
@@ -41,11 +50,22 @@ final fullNameController = TextEditingController();
   bool rememberMe = false;
   bool obscurePasswordLogin = true;
   RegisterEntity? _tempRegisterData;
+  String? _pendingEmail;
+  // Controllers for Forgot Password
+  final emailForgotController = TextEditingController();
+  final otpForgotController = TextEditingController();
+  final newPasswordForgotController = TextEditingController();
+  final confirmNewPasswordForgotController = TextEditingController();
+  final forgotFormKey = GlobalKey<FormState>();
   AuthBloc( {
     required this.registerUseCase,
     required this.loginUseCase,
     required this.googleLoginUseCase,
     required this.emailAuthService,
+    required this.verifyOtp,
+    required this.resendOtpUseCase,
+    required this.forgotPasswordUseCase,
+    required this.resetPasswordUseCase,
   }) : super(AuthInitial()) {
     // Register events
     on<RegisterStepOneSubmitted>(_registerStepOne);
@@ -62,8 +82,17 @@ final fullNameController = TextEditingController();
 
     // Login events
     on<LoginSubmitted>(_loginSubmitted);
+    on<ResendOtpEvent>(_resendOtp);
     on<LoginTogglePasswordVisibility>((event, emit) {
       obscurePasswordLogin = !obscurePasswordLogin;
+      emit(LoginPasswordVisibilityChanged());
+    });
+    on<ResetPasswordTogglePasswordVisibility>((event, emit) {
+      obscurePasswordReset = !obscurePasswordReset;
+      emit(LoginPasswordVisibilityChanged());
+    });
+    on<ResetPasswordToggleConfirmPasswordVisibility>((event, emit) {
+      obscureConfirmPasswordReset = !obscureConfirmPasswordReset;
       emit(LoginPasswordVisibilityChanged());
     });
     on<ToggleRememberMe>((event, emit) {
@@ -71,6 +100,8 @@ final fullNameController = TextEditingController();
       emit(LoginRememberMeChanged(rememberMe));
     });
     on<GoogleLoginSubmitted>(_googleLoginSubmitted);
+    on<ForgotPasswordEvent>(_forgotPassword);
+    on<ResetPasswordEvent>(_resetPassword);
   }
 
   /// Handle Register
@@ -93,14 +124,8 @@ final fullNameController = TextEditingController();
       idImage: '',
     );
 
-    // نرسل OTP عبر Twilio
-    final otpSent = await emailAuthService.sendOtp(event.email);
-
-    if (otpSent) {
-      emit(RegisterStepOneSuccess());
-    } else {
-      emit(RegisterFailure("فشل إرسال رمز التحقق"));
-    }
+    // Continue to step two locally
+    emit(RegisterStepOneSuccess());
   }
 
 
@@ -120,43 +145,46 @@ final fullNameController = TextEditingController();
     _tempRegisterData = _tempRegisterData!.copyWith(
       password: event.password,
     );
+    
+    emit(RegisterLoading());
+    
+    // Call the register endpoint to send the OTP to the user's email
+    final result = await registerUseCase(_tempRegisterData!);
 
-    emit(RegisterStepTwoSuccess());
+    result.fold(
+          (failure) => emit(RegisterFailure(failure.message)),
+          (_) => emit(RegisterStepTwoSuccess()),
+    );
   }
 
 // Step 3: OTP
   Future<void> _registerOtp(
       RegisterOtpSubmitted event, Emitter<AuthState> emit) async {
-    if (_tempRegisterData == null) {
-      emit(RegisterFailure("Previous steps not completed"));
+    // Support both the registration flow (_tempRegisterData) and the
+    // login "activate email" flow (_pendingEmail set by ResendOtpEvent).
+    final email = _tempRegisterData?.email ?? _pendingEmail;
+    if (email == null) {
+      emit(RegisterFailure("Email not found. Please start the process again."));
       return;
     }
 
     emit(RegisterLoading());
 
-    final verified = await emailAuthService.verifyOtp(
-      _tempRegisterData!.email,
-      event.otp,
-    );
+    final verified = await verifyOtp(email, event.otp);
 
-    if (!verified) {
-      emit(RegisterFailure("رمز التحقق غير صحيح"));
-      return;
-    }
-
-    // بعد التأكد من OTP → نسجل المستخدم في الباك إند
-    _tempRegisterData = _tempRegisterData!.copyWith(otp: event.otp);
-
-    final result = await registerUseCase(_tempRegisterData!);
-
-    result.fold(
+    verified.fold(
           (failure) => emit(RegisterFailure(failure.message)),
-          (_) => emit(RegisterOtpSuccess()),
+          (_) {
+            if (_tempRegisterData != null) {
+              _tempRegisterData = _tempRegisterData!.copyWith(otp: event.otp);
+            }
+            _pendingEmail = null; // clear after successful verification
+            emit(RegisterOtpSuccess());
+          },
     );
   }
 
-@override
-  Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) async {
+Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) async {
     emit(LoginLoading());
 
     final result = await loginUseCase(event.model);
@@ -166,7 +194,7 @@ final fullNameController = TextEditingController();
             emit(LoginFailure(failure.message));} ,
           (loginResponse) async {
         await DI.find<ICacheManager>()
-            .setUserData(UserModel.fromEntity(loginResponse.user));
+            .setUserData(UserModel.fromEntity(loginResponse.contact));
         await DI.find<ICacheManager>().setToken(loginResponse.token);
         await DI.find<ICacheManager>().setRefreshToken(loginResponse.refreshToken.toString());// ✅ stores user + logged_in = true
 
@@ -176,11 +204,10 @@ final fullNameController = TextEditingController();
           await DI.find<ICacheManager>().clearLogin();
         }
 
-        emit(LoginSuccess(loginResponse.user));
+        emit(LoginSuccess(loginResponse.contact));
       },
     );
   }
-
   Future<void> _googleLoginSubmitted(
       GoogleLoginSubmitted event, Emitter<AuthState> emit) async {
     emit(GoogleLoginLoading());
@@ -190,14 +217,11 @@ final fullNameController = TextEditingController();
       final googleUser = await googleSignIn.signIn();
 
       if (googleUser == null) {
-        debugPrint("❌ Google sign in cancelled by user");
         emit(GoogleLoginFailure("Google login cancelled"));
         return;
       }
 
       final googleAuth = await googleUser.authentication;
-      debugPrint("✅ Google accessToken: ${googleAuth.accessToken}");
-      debugPrint("✅ Google idToken: ${googleAuth.idToken}");
 
       if (googleAuth.idToken == null) {
         emit(GoogleLoginFailure("Failed to get Google ID token"));
@@ -208,32 +232,78 @@ final fullNameController = TextEditingController();
         GoogleLoginEntity(idToken: googleAuth.idToken!),
       );
 
-     await result.fold(
+      await result.fold(
             (failure) {
-          debugPrint("❌ Backend rejected login: ${failure.message}");
           emit(GoogleLoginFailure(failure.message));
         },
             (loginResponse) async {
-              await DI.find<ICacheManager>().setUserData(UserModel.fromEntity(loginResponse.user));
-              await DI
-                  .find<ICacheManager>()
-                  .setToken(loginResponse.token); // Store token
-          debugPrint("✅ Backend login success, user: ${loginResponse.user.email}");
-              debugPrint("✅ Backend login success, user: ${loginResponse.token}");
-             if (event.rememberMe) {
-                await DI.find<ICacheManager>().saveLogin(true);
-              } else {
-                await DI.find<ICacheManager>().clearLogin();
-              }
-          emit(GoogleLoginSuccess(loginResponse.user));
+          // هنا loginResponse.result عبارة عن String
+          await DI.find<ICacheManager>().setToken(loginResponse.token);
+
+          if (event.rememberMe) {
+            await DI.find<ICacheManager>().saveLogin(true);
+          } else {
+            await DI.find<ICacheManager>().clearLogin();
+          }
+
+          emit(GoogleLoginSuccess(loginResponse.user)); // مفيش User entity جديد
         },
       );
     } catch (e, st) {
-      debugPrint("❌ Exception during Google login: $e\n$st");
       emit(GoogleLoginFailure(e.toString()));
     }
   }
+  Future<void> _resendOtp(ResendOtpEvent event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    _pendingEmail = event.email; // store for OTP verification step
 
+    final result = await resendOtpUseCase(event.email);
 
+    result.fold(
+          (failure) {
+            _pendingEmail = null; // clear on failure
+            emit(RegisterFailure(failure.message));
+          },
+          (_) => emit(OtpSent()),
+    );
+  }
+  Future<void> _forgotPassword(ForgotPasswordEvent event, Emitter<AuthState> emit) async {
+    emit(ForgotPasswordLoading());
 
+    _pendingEmail = event.email; // ensure OTP verification can use this email
+
+    final result = await forgotPasswordUseCase(event.email);
+
+    result.fold(
+          (failure) => emit(AuthError(failure.message)),
+          (_) => emit(OtpSent()),
+    );
+  }
+  Future<void> _resetPassword(ResetPasswordEvent event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+
+    final result = await resetPasswordUseCase(
+      event.email,
+      event.otp,
+      event.newPassword,
+      event.confirmPassword,
+    );
+
+    result.fold(
+          (failure) => emit(AuthError(failure.message)),
+          (_) => emit(AuthSuccess(UserEntity(
+        id: 0,
+        email: event.email,
+        userName: '',
+        phone: '',
+        country: '',
+        city: '',
+        image: '',
+        gender: '',
+        age: 0,
+        address: '',
+        idImage: '',
+      ))),
+    );
+    }
 }

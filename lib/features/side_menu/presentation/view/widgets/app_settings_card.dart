@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -5,18 +6,14 @@ import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 
-class AppSettingsCard extends StatefulWidget {
+class AppSettingsCard extends StatelessWidget {
   const AppSettingsCard({super.key});
 
   @override
-  State<AppSettingsCard> createState() => _AppSettingsCardState();
-}
-
-class _AppSettingsCardState extends State<AppSettingsCard> {
-  bool isArabic = false;
-
-  @override
   Widget build(BuildContext context) {
+    // Get current locale from context
+    final bool isArabic = context.locale.languageCode == 'ar';
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -37,14 +34,18 @@ class _AppSettingsCardState extends State<AppSettingsCard> {
                 ),
                 SizedBox(width: 20.w),
                 Text(
-                  'Settings',
+                  'Settings'.tr(),
                   style: AppTextStyles.description,
                 ),
                 const Spacer(),
-                SvgPicture.asset(
-                  'assets/icons/right_button.svg',
-                  width: 20.w,
-                  height: 20.h,
+                Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.identity()..scale(isArabic ? -1.0 : 1.0, 1.0),
+                  child: SvgPicture.asset(
+                    'assets/icons/right_button.svg',
+                    width: 20.w,
+                    height: 20.h,
+                  ),
                 ),
                 SizedBox(width: 10.w),
               ],
@@ -60,16 +61,17 @@ class _AppSettingsCardState extends State<AppSettingsCard> {
                 ),
                 SizedBox(width: 20.w),
                 Text(
-                  'Language',
+                  'Language'.tr(),
                   style: AppTextStyles.description,
                 ),
                 const Spacer(),
                 GestureDetector(
                   onTap: () {
-                    setState(() {
-                      isArabic = !isArabic;
-                    });
-                    // TODO: dispatch bloc event or localization change here
+                    // Toggle between English and Arabic
+                    final newLocale = isArabic 
+                        ? const Locale('en') 
+                        : const Locale('ar');
+                    context.setLocale(newLocale);
                   },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),

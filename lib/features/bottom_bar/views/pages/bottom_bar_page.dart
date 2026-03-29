@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -63,7 +64,7 @@ class BottomNavigationScreen extends StatelessWidget {
                       height: 30.r,
                       color: state.index == 0 ? AppColors.current.white : AppColors.current.lightGray,
                     ),
-                    label: 'Home',
+                    label: 'Home'.tr(),
 
                   ),
                   BottomNavigationBarItem(
@@ -72,7 +73,7 @@ class BottomNavigationScreen extends StatelessWidget {
                       height: 30.r,
                       color: state.index == 1 ? AppColors.current.white : AppColors.current.lightGray,
                     ),
-                    label: 'Adoption',
+                    label: 'Adoption'.tr(),
                   ),
                   BottomNavigationBarItem(
                     icon: SvgPicture.asset(
@@ -80,7 +81,7 @@ class BottomNavigationScreen extends StatelessWidget {
                       height: 30.r,
                       color: state.index == 2 ? AppColors.current.white : AppColors.current.lightGray,
                     ),
-                    label: 'Store',
+                    label: 'Store'.tr(),
                   ),
                   BottomNavigationBarItem(
                     icon: SvgPicture.asset(
@@ -88,7 +89,7 @@ class BottomNavigationScreen extends StatelessWidget {
                       height: 30.r,
                       color: state.index == 3 ? AppColors.current.white : AppColors.current.lightGray,
                     ),
-                    label: 'Clinics',
+                    label: 'Clinics'.tr(),
                   ),
                 ],
               )

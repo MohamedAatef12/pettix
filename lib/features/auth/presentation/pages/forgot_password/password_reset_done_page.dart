@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_button.dart';
@@ -18,13 +20,15 @@ class PasswordResetDonePage extends StatelessWidget {
             SvgPicture.asset('assets/images/verified.svg',
               fit: BoxFit.fill,
               width: MediaQuery.sizeOf(context).width,),
-            Text('Password Reset', style: AppTextStyles.title
+            Text(AppText.resetPassword, style: AppTextStyles.title
 
             ),
             SizedBox(height: 10.h,),
-            Text('Reset complete. Welcome back!', style: AppTextStyles.description),
+            Text(AppText.resetCompleteWelcomeBack, style: AppTextStyles.description),
             SizedBox(height: 30.h,),
-            CustomFilledButton(text: 'Done', onPressed: (){},backgroundColor: AppColors.current.primary,),
+            CustomFilledButton(text: AppText.done, onPressed: (){
+              context.pushReplacement('/login');
+            },backgroundColor: AppColors.current.primary,),
             SizedBox(height: 20.h,),
           ],
         ),

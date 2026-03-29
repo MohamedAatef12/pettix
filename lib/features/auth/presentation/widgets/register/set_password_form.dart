@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_bloc.dart';
@@ -18,32 +20,30 @@ class SetPasswordForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final bloc = context.read<AuthBloc>();
 
-    return BlocListener<AuthBloc, AuthState>(
+    return BlocConsumer<AuthBloc, AuthState>(
+      listenWhen: (_, current) =>
+          current is RegisterStepTwoSuccess || current is RegisterFailure,
       listener: (context, state) {
         if (state is RegisterStepTwoSuccess) {
-          // ✅ الانتقال إلى صفحة التحقق بعد نجاح خطوة الباسورد
-          context.go('/otp_verification',
-          extra: context.read<AuthBloc>(),);
-        } else if (state is RegisterFailure) {
-          // ❌ عرض الخطأ في SnackBar
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.red,
-            ),
+          AuthToast.showSuccess(
+            context,
+            AppText.verificationEmailSent,
+            onDone: () => context.push('/otp_verification',
+                extra: context.read<AuthBloc>()),
           );
+        } else if (state is RegisterFailure) {
+          AuthToast.showError(context, state.message);
         }
       },
-      child: BlocBuilder<AuthBloc, AuthState>(
-        builder: (context, state) {
+      builder: (context, state) {
+          final isLoading = state is RegisterLoading;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Password', style: AppTextStyles.smallDescription),
+              Text(AppText.password, style: AppTextStyles.smallDescription),
               SizedBox(height: 4.h),
               CustomTextFormField(
-                labelText: 'Password',
-                hintText: 'Enter your password',
+                hintText: AppText.password,
                 obscureText: bloc.obscurePasswordRegister,
                 controller: bloc.passwordRegisterController,
                 fillColor: true,
@@ -52,19 +52,25 @@ class SetPasswordForm extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide(color: AppColors.current.lightGray),
                 ),
-                enablePasswordToggle: true,
-                onToggleObscureText: () {
-                  context
-                      .read<AuthBloc>()
-                      .add(RegisterTogglePasswordVisibility());
-                },
+               enablePasswordToggle: false,
+                suffixIcon: GestureDetector(
+                  onTap: () {
+                    bloc.add(RegisterTogglePasswordVisibility());
+                  },
+                  child: Icon(
+                    bloc.obscurePasswordLogin
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                    color: AppColors.current.gray,
+                  ),
+                ),
               ),
               SizedBox(height: 10.h),
-              Text('Confirm Password', style: AppTextStyles.smallDescription),
+              Text(AppText.confirmPassword, style: AppTextStyles.smallDescription),
               SizedBox(height: 4.h),
               CustomTextFormField(
-                labelText: 'Confirm Password',
-                hintText: 'Confirm Password',
+
+                hintText: AppText.confirmPassword,
                 obscureText: bloc.obscureConfirmPassword,
                 fillColor: true,
                 controller: bloc.confirmPasswordController,
@@ -73,29 +79,35 @@ class SetPasswordForm extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide(color: AppColors.current.lightGray),
                 ),
-                enablePasswordToggle: true,
-                onToggleObscureText: () {
-                  context
-                      .read<AuthBloc>()
-                      .add(RegisterToggleConfirmPasswordVisibility());
-                },
+               enablePasswordToggle: false,
+                suffixIcon: GestureDetector(
+                  onTap: () {
+                    bloc.add(RegisterToggleConfirmPasswordVisibility());
+                  },
+                  child: Icon(
+                    bloc.obscurePasswordLogin
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                    color: AppColors.current.gray,
+                  ),
+                ),
               ),
               SizedBox(height: 20.h),
-              CustomFilledButton(
-                onPressed: () {
-                  // نرسل الحدث فقط
-                  context.read<AuthBloc>().add(
-                    RegisterStepTwoSubmitted(
-                      password: bloc.passwordRegisterController.text,
-                      confirmPassword:
-                      bloc.confirmPasswordController.text,
+
+                   CustomFilledButton(
+                     isLoading: isLoading,
+                      onPressed: () {
+                        context.read<AuthBloc>().add(
+                          RegisterStepTwoSubmitted(
+                            password: bloc.passwordRegisterController.text,
+                            confirmPassword: bloc.confirmPasswordController.text,
+                          ),
+                        );
+                      },
+                      text: AppText.signUp,
+                      backgroundColor: AppColors.current.primary,
+                      textColor: AppColors.current.white,
                     ),
-                  ); 
-                },
-                text: 'Sign Up',
-                backgroundColor: AppColors.current.primary,
-                textColor: AppColors.current.white,
-              ),
               SizedBox(height: 10.h),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -109,7 +121,7 @@ class SetPasswordForm extends StatelessWidget {
                   ),
                   SizedBox(width: 5.w),
                   Text(
-                    'OR',
+                    AppText.or,
                     style: AppTextStyles.smallDescription.copyWith(
                       color: AppColors.current.gray,
                     ),
@@ -125,22 +137,30 @@ class SetPasswordForm extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 10.h),
-              CustomFilledButton(
-                onPressed: () {
-                  // Handle Google login
+              BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, state) {
+                  final isLoading = state is GoogleLoginLoading;
+                  return CustomFilledButton(
+                    isLoading: isLoading,
+                    onPressed: () {
+                      context.read<AuthBloc>().add(
+                        GoogleLoginSubmitted(rememberMe: bloc.rememberMe),
+                      );
+                    },
+                    text: AppText.continueWithGoogle,
+                    backgroundColor: AppColors.current.white,
+                    textColor: AppColors.current.lightText,
+                    hasLeading: true,
+                    leading: SvgPicture.asset('assets/icons/gmail.svg'),
+                  );
                 },
-                text: 'Continue with Google',
-                backgroundColor: AppColors.current.white,
-                textColor: AppColors.current.lightText,
-                hasLeading: true,
-                leading: SvgPicture.asset('assets/icons/gmail.svg'),
               ),
               SizedBox(height: 10.h),
               CustomFilledButton(
                 onPressed: () {
                   // Handle Apple login
                 },
-                text: 'Continue with Apple',
+                text: AppText.continueWithApple,
                 backgroundColor: AppColors.current.white,
                 textColor: AppColors.current.lightText,
                 hasLeading: true,
@@ -149,7 +169,6 @@ class SetPasswordForm extends StatelessWidget {
             ],
           );
         },
-      ),
     );
   }
 }

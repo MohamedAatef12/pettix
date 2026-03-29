@@ -7,28 +7,12 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:774297250092:android:9b7a48ee3dbb09fccc2489",
+        "mobilesdk_app_id": "1:774297250092:android:1598c2a4a318364acc2489",
         "android_client_info": {
-          "package_name": "com.example.pettix.dev"
+          "package_name": "com.pettix.up"
         }
       },
       "oauth_client": [
-        {
-          "client_id": "774297250092-pjtorlmekp18k440eqtn33rclv3jh03c.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.pettix.dev",
-            "certificate_hash": "9fc492721fd3945a7a34ab2bba4ff0051859e84d"
-          }
-        },
-        {
-          "client_id": "774297250092-vpp3dbd8k4i4hc05o5tl7ktfiqs6a0i8.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.pettix.dev",
-            "certificate_hash": "6678d62b78027d0abafaeccd5a1d39ec45f58922"
-          }
-        },
         {
           "client_id": "774297250092-fn7ffva50ev5onfcbvhprkcgn3of01ct.apps.googleusercontent.com",
           "client_type": 3
@@ -45,6 +29,13 @@
             {
               "client_id": "774297250092-fn7ffva50ev5onfcbvhprkcgn3of01ct.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "774297250092-p0lj720af890k8pqhlida5cjhuvcn76m.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pettix.dev"
+              }
             }
           ]
         }

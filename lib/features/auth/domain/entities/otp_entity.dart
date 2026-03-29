@@ -1,21 +1,16 @@
 import 'package:equatable/equatable.dart';
 
 class OTPEntity extends Equatable {
-  final String serviceSid;
-  final String authToken;
-  final String accountSid;
+  final String email;
+  final String otp;
+
 
   const OTPEntity({
-    required this.serviceSid,
-    required this.authToken,
-    required this.accountSid,
-  });
+    required this.email, required this.otp});
 
   @override
   // TODO: implement props
   List<Object?> get props => [
-    serviceSid,
-    authToken,
-    accountSid,
+    email,otp
   ];
 }

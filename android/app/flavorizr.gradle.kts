@@ -6,14 +6,14 @@ android.apply {
     flavorDimensions("app")
 
     productFlavors {
-        create("dev") {
+        create("development") {
             dimension = "app"
-            applicationId = "com.example.pettix.dev"
+            applicationId = "com.pettix.up"
             resValue(type = "string", name = "app_name", value = "Pettix Dev")
         }
-        create("prod") {
+        create("production") {
             dimension = "app"
-            applicationId = "com.example.pettix"
+            applicationId = "com.pettix.up"
             resValue(type = "string", name = "app_name", value = "Pettix")
         }
     }

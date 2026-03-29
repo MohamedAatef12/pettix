@@ -45,7 +45,9 @@ class CustomFilledButton extends StatelessWidget {
 
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor ?? AppColors.current.lightBlue,
+          backgroundColor: backgroundColor?? AppColors.current.primary,
+          disabledBackgroundColor:
+          backgroundColor ??  AppColors.current.primary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
           ),

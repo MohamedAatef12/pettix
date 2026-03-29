@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'dart:io';
 
 import '../../domain/entities/post_entity.dart';
@@ -54,7 +55,8 @@ class PostModel extends PostEntity {
     );
   }
 
-  @override
+
+
   Future<Map<String, dynamic>> toJson() async {
     List<String> encodedImages = [];
 
@@ -65,8 +67,27 @@ class PostModel extends PostEntity {
       } else {
         final file = File(image);
         if (await file.exists()) {
-          final bytes = await file.readAsBytes();
-          encodedImages.add(base64Encode(bytes));
+          try {
+            // Compress the image
+            final result = await FlutterImageCompress.compressWithFile(
+              file.absolute.path,
+              minWidth: 1024,
+              minHeight: 1024,
+              quality: 70, // 70% quality reduces size significantly
+            );
+
+            if (result != null) {
+              encodedImages.add('data:image/jpeg;base64,${base64Encode(result)}');
+            } else {
+              // Fallback if compression returns null
+              final bytes = await file.readAsBytes();
+              encodedImages.add('data:image/jpeg;base64,${base64Encode(bytes)}');
+            }
+          } catch (e) {
+             // Fallback if compression throws error
+            final bytes = await file.readAsBytes();
+            encodedImages.add('data:image/jpeg;base64,${base64Encode(bytes)}');
+          }
         }
       }
     }

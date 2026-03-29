@@ -3,7 +3,7 @@ description: "Pet Care App"
 
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: ">=3.7.2 <4.0.0"
@@ -68,6 +68,7 @@ dependencies:
   connectivity_plus: ^6.1.4
   pinput: ^5.0.2
   flutter_localization: ^0.3.3
+  flutter_image_compress: ^2.4.0
 
 
 dev_dependencies:
@@ -85,20 +86,37 @@ dev_dependencies:
 
 
 flavorizr:
+  ide: "vscode"
   app:
     android:
       flavorDimensions: "app"
   flavors:
-    dev:
+    development:
       app:
-        name: "MyApp Dev"
+        name: "Pettix Dev"
       android:
-        applicationId: "com.example.myapp.dev"
-    prod:
+        applicationId: "com.pettix.up"
+        icon: "assets/images/logo.png"
+        firebase:
+          config: "config/development/android/google-services.json"
+      ios:
+        bundleId: "com.pettix.up"
+        icon: "assets/images/logo.png"
+        # firebase:
+        #   config: "config/development/ios/GoogleService-Info.plist"
+    production:
       app:
-        name: "MyApp"
+        name: "Pettix"
       android:
-        applicationId: "com.example.myapp"
+        applicationId: "com.pettix.up"
+        icon: "assets/images/logo.png"
+        firebase:
+          config: "config/production/android/google-services.json"
+      ios:
+        bundleId: "com.pettix.up"
+        icon: "assets/images/logo.png"
+        # firebase:
+        #   config: "config/production/ios/GoogleService-Info.plist"
 
 flutter:
   uses-material-design: true

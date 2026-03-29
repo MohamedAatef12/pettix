@@ -246,6 +246,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             postCommentsCount: postCommentsMap,
             likedPostIds: likedPostIds,
             isPostsLoading: false,
+            error: null,
           ),
         );
       },
@@ -350,7 +351,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           content: text,
           images: imagePaths,
           creationDate: DateTime.now().add(const Duration(hours: 2)).toString(),
-
           comments: [],
           likes: [],
         );
@@ -926,24 +926,42 @@ Future<void> _onReportPost(
       GetReportReasonsEvent event,
       Emitter<HomeState> emit,
       ) async {
-    emit(state.copyWith(isReportLoading: true));
 
-    final result = await getReportReasonsUseCase();
 
-    result.fold(
-          (failure) {
-        emit(state.copyWith(
-          isReportLoading: false,
-          error: failure.message,
-        ));
-      },
-          (reasons) {
-        emit(state.copyWith(
-          isReportLoading: false,
-          reportReasons: reasons,
-        ));
-      },
-    );
+    // Start loading
+    emit(state.copyWith(isReportLoading: true, error: null));
+
+    try {
+      final result = await getReportReasonsUseCase();
+
+      result.fold(
+            (failure) {
+          // Log and emit failure
+          debugPrint('[HomeBloc] getReportReasons failed: ${failure.message}');
+          emit(state.copyWith(
+            isReportLoading: false,
+            error: failure.message,
+          ));
+        },
+            (reasons) {
+          // Log success details for debugging
+          debugPrint('[HomeBloc] getReportReasons success. count=${reasons.length}');
+          if (reasons.isNotEmpty) {
+            debugPrint('[HomeBloc] first reason type=${reasons.first.runtimeType}');
+          }
+
+          // Ensure we clear any previous error and stop the loading indicator
+          emit(state.copyWith(
+            isReportLoading: false,
+            reportReasons: reasons,
+            error: null,
+          ));
+        },
+      );
+    } catch (e, st) {
+      debugPrint('[HomeBloc] getReportReasons exception: $e\n$st');
+      emit(state.copyWith(isReportLoading: false, error: e.toString()));
+    }
   }
 
 
@@ -959,7 +977,9 @@ Future<void> _onReportPost(
           (failure) {
         emit(state.copyWith(error: failure.message));
       },
-          (_) {
+          (reports) {
+        // Populate reports and clear errors so UI reflects the successful load
+        emit(state.copyWith(reports: reports, error: null));
       },
     );
   }

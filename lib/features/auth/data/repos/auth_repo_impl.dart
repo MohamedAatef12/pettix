@@ -5,6 +5,7 @@ import 'package:pettix/features/auth/data/models/login/login_model.dart';
 import 'package:pettix/features/auth/data/models/register/register_model.dart';
 import 'package:pettix/features/auth/data/sources/remote/auth_remote_data_source.dart';
 import 'package:pettix/features/auth/domain/entities/google_login_entity.dart';
+import 'package:pettix/features/auth/domain/entities/google_login_response_entity.dart';
 import 'package:pettix/features/auth/domain/entities/login_entity.dart';
 import 'package:pettix/features/auth/domain/entities/login_response_entity.dart';
 import 'package:pettix/features/auth/domain/entities/register_domain_entity.dart';
@@ -29,16 +30,26 @@ class AuthRepositoryImpl implements AuthRepository {
     return await remoteDataSource.register(registerModel);
   }
   @override
-  Future<Either<Failure, LoginResponseEntity>> loginWithGoogle(GoogleLoginEntity model) async {
+  Future<Either<Failure, GoogleLoginResponseEntity>> loginWithGoogle(GoogleLoginEntity model) async {
     final googleLoginModel = GoogleLoginModel.fromEntity(model);
     return await remoteDataSource.loginWithGoogle(googleLoginModel);
   }
+
   @override
-  Future<Either<Failure, bool>> sendOtp(String email) async {
-    return await remoteDataSource.sendOtp(email);
+  Future<Either<Failure, bool>> verifyOtp(String email, String otp) async {
+    return await remoteDataSource.verifyOtp(email, otp);
+  }
+
+  @override
+  Future<Either<Failure, void>> resendOtp(String email) async {
+    return await remoteDataSource.resendOtp(email);
   }
   @override
-  Future<Either<Failure, bool>> verifyOtp(String email, String code) async {
-    return await remoteDataSource.verifyOtp(email, code);
+  Future<Either<Failure, void>> forgotPassword(String email) async {
+    return await remoteDataSource.forgotPassword(email);
+  }
+  @override
+  Future<Either<Failure, void>> resetPassword(String email, String otp, String newPassword, String confirmPassword) async {
+    return await remoteDataSource.resetPassword(email, otp, newPassword, confirmPassword);
   }
 }
