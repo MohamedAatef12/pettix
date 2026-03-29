@@ -26,7 +26,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     final userToken = await DI.find<ICacheManager>().getToken();
     try {
       final data = await apiService.getList(
-        endPoint: Constants.postsEndpoint,
+        endPoint: ApiEndpoints.postsEndpoint,
         headers: {'Authorization': 'Bearer $userToken'},
       );
       final posts = data.map((e) => PostModel.fromJson(e)).toList();
@@ -69,7 +69,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
       final jsonData = await post.toJson(); // 👈 ضروري await هنا
 
       await apiService.put(
-        endPoint: '${Constants.postsEndpoint}/${post.id}',
+        endPoint: '${ApiEndpoints.postsEndpoint}/${post.id}',
         data: jsonData,
         headers: {
           'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
       final jsonData = await post.toJson(); // مهم جداً await هنا
 
       await apiService.post(
-        endPoint: Constants.postsEndpoint,
+        endPoint: ApiEndpoints.postsEndpoint,
         data: jsonData,
         headers: {
           'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   @override
   Future<Either<Failure, void>> deletePost(int id) async {
     try {
-      await apiService.delete(endPoint: '${Constants.postsEndpoint}/$id');
+      await apiService.delete(endPoint: '${ApiEndpoints.postsEndpoint}/$id');
       return const Right(null);
     } catch (e) {
       return Left(DioFailure.fromDioError(e));
@@ -123,7 +123,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   ) async {
     try {
       final data = await apiService.getList(
-        endPoint: '${Constants.commentsEndpoint}/$postId',
+        endPoint: '${ApiEndpoints.commentsEndpoint}/$postId',
       );
 
       final comments = data.map((e) => CommentModel.fromJson(e)).toList();
@@ -153,7 +153,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     final userToken = await DI.find<ICacheManager>().getToken();
     try {
       await apiService.post(
-        endPoint: '${Constants.commentsEndpoint}/$postId',
+        endPoint: '${ApiEndpoints.commentsEndpoint}/$postId',
         data: comment.toJson(),
         headers: {
           'Authorization': 'Bearer $userToken',
@@ -170,7 +170,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   @override
   Future<Either<Failure, void>> deleteComment(int id) async {
     try {
-      await apiService.delete(endPoint: '${Constants.commentsEndpoint}/$id');
+      await apiService.delete(endPoint: '${ApiEndpoints.commentsEndpoint}/$id');
       return const Right(null);
     } catch (e) {
       return Left(DioFailure.fromDioError(e));
@@ -181,7 +181,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   Future<Either<Failure, void>> editComment(CommentModel comment) async {
     try {
       await apiService.put(
-        endPoint: '${Constants.commentsEndpoint}/${comment.id}',
+        endPoint: '${ApiEndpoints.commentsEndpoint}/${comment.id}',
         data: comment.toJson(),
       );
       return const Right(null);
@@ -196,7 +196,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   Future<Either<Failure, List<LikesModel>>> getPostLikes(int postId) async {
     try {
       final data = await apiService.getList(
-        endPoint: '${Constants.getPostLikes}/$postId',
+        endPoint: '${ApiEndpoints.getPostLikes}/$postId',
       );
 
       final likes = data.map((e) => LikesModel.fromJson(e)).toList();
@@ -224,7 +224,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
 
       // ✅ Send token in headers, not body
       final response = await apiService.post(
-        endPoint: '${Constants.postLikesEndpoint}/$postId',
+        endPoint: '${ApiEndpoints.postLikesEndpoint}/$postId',
         data: {'userId': userId, 'date': DateTime.now().toIso8601String()},
         headers: {
           'Authorization': 'Bearer $userToken',
@@ -244,7 +244,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     try {
       final userToken = await DI.find<ICacheManager>().getToken();
       final response = await apiService.delete(
-        endPoint: '${Constants.postLikesEndpoint}/$postId',
+        endPoint: '${ApiEndpoints.postLikesEndpoint}/$postId',
         headers: {
           'Authorization': 'Bearer $userToken',
           'Content-Type': 'application/json',
@@ -263,7 +263,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     try {
       final userToken = await DI.find<ICacheManager>().getToken();
       final response = await apiService.get(
-        endPoint: '${Constants.commentsEndpoint}/$postId/count',
+        endPoint: '${ApiEndpoints.commentsEndpoint}/$postId/count',
         headers: {
           'Authorization': 'Bearer $userToken',
           'Content-Type': 'application/json',
@@ -285,7 +285,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   ) async {
     try {
       final data = await apiService.getList(
-        endPoint: '${Constants.commentLikesEndpoint}/comment/$commentId',
+        endPoint: '${ApiEndpoints.commentLikesEndpoint}/comment/$commentId',
       );
 
       final commentsLikes =
@@ -311,7 +311,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     try {
       final userToken = await DI.find<ICacheManager>().getToken();
       final data = await apiService.post(
-        endPoint: '${Constants.commentLikesEndpoint}/$commentId',
+        endPoint: '${ApiEndpoints.commentLikesEndpoint}/$commentId',
         headers: {
           'Authorization': 'Bearer $userToken',
           'Content-Type': 'application/json',
@@ -330,7 +330,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     try {
       final userToken = await DI.find<ICacheManager>().getToken();
       final data = await apiService.delete(
-        endPoint: '${Constants.commentLikesEndpoint}/$commentId',
+        endPoint: '${ApiEndpoints.commentLikesEndpoint}/$commentId',
         headers: {
           'Authorization': 'Bearer $userToken',
           'Content-Type': 'application/json',
@@ -353,7 +353,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     try {
       final userToken = await DI.find<ICacheManager>().getToken();
       await apiService.post(
-        endPoint: Constants.reportPostEndpoint,
+        endPoint: ApiEndpoints.reportPostEndpoint,
         data: {'postId':postId,'reasonId': reasonId, 'customReason': reason},
         headers: {
           'Authorization': 'Bearer $userToken',
@@ -370,7 +370,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   Future<Either<Failure, List<dynamic>>> getReportReasons() async {
     try {
       final data = await apiService.getList(
-        endPoint: Constants.reportReasonsEndpoint,
+        endPoint: ApiEndpoints.reportReasonsEndpoint,
       );
       return Right(data);
     } catch (e) {
@@ -382,7 +382,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   Future<Either<Failure, List<dynamic>>> reportedPosts(int postId) async {
     try {
       final data = await apiService.getList(
-        endPoint: '${Constants.reportedPostsEndpoint}/$postId',
+        endPoint: '${ApiEndpoints.reportedPostsEndpoint}/$postId',
       );
       return Right(data);
     } catch (e) {

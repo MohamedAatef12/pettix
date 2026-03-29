@@ -1,4 +1,4 @@
-class Constants {
+class ApiEndpoints {
   static const String baseUrl = 'https://pettix-production.up.railway.app';
 
   static const String commentsEndpoint = 'Comments/post';
