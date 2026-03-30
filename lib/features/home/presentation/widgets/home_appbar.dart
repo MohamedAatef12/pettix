@@ -23,7 +23,7 @@ class HomeAppBar extends StatelessWidget {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => context.push('/side_menu'),
+            onTap: () => Scaffold.of(context).openDrawer(),
             child: CachedNetworkImage(
               imageUrl: user?.avatar ?? '',
               imageBuilder: (context, imageProvider) => CircleAvatar(

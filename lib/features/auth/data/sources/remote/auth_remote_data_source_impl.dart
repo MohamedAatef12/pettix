@@ -70,14 +70,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<Either<Failure, GoogleLoginResponseModel>> loginWithGoogle(
       GoogleLoginModel model,) async {
     try {
-      print('[DEBUG] Google Login - Sending idToken');
+      debugPrint('[DEBUG] Google Login - Sending idToken');
 
       final response = await apiService.post(
         endPoint: Constants.googleLoginEndpoint,
         data: {'idToken': model.idToken},
       );
 
-      print('[DEBUG] Google Login Response: $response');
+      debugPrint('[DEBUG] Google Login Response: $response');
 
       final result = response.result as Map<String, dynamic>?;
       if (result == null || response.success != true) {
@@ -160,7 +160,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'email': email,
       });
       if (response.success == true) {
-        return Right(response.message);
+        return Right(null);
       }
       return Left(Failure(response.message));
     }
