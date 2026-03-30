@@ -8,14 +8,13 @@ import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
-import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_event.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_state.dart';
 import 'package:pinput/pinput.dart';
 
 class OTPBody extends StatelessWidget {
-   OTPBody({super.key});
+   const OTPBody({super.key});
   // Use the bloc's OTP controller so the same controller is used across flows
   // (registration and forgot-password).
 

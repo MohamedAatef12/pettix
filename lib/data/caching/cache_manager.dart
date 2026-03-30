@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:pettix/features/auth/data/models/register/register_model.dart';
 import 'package:pettix/features/auth/data/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'i_cache_manager.dart';

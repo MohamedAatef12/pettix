@@ -22,20 +22,20 @@ class LoginForm extends StatelessWidget {
     return emailRegex.hasMatch(email);
   }
 
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) return "Required";
-    if (value.length < 8) return "Password must be at least 8 characters";
-    if (!RegExp(r'[A-Z]').hasMatch(value)) {
-      return "Must contain at least one uppercase letter";
-    }
-    if (!RegExp(r'[a-z]').hasMatch(value)) {
-      return "Must contain at least one lowercase letter";
-    }
-    if (!RegExp(r'\d').hasMatch(value)) {
-      return "Must contain at least one number";
-    }
-    return null;
-  }
+  // String? _validatePassword(String? value) {
+  //   if (value == null || value.isEmpty) return "Required";
+  //   if (value.length < 8) return "Password must be at least 8 characters";
+  //   if (!RegExp(r'[A-Z]').hasMatch(value)) {
+  //     return "Must contain at least one uppercase letter";
+  //   }
+  //   if (!RegExp(r'[a-z]').hasMatch(value)) {
+  //     return "Must contain at least one lowercase letter";
+  //   }
+  //   if (!RegExp(r'\d').hasMatch(value)) {
+  //     return "Must contain at least one number";
+  //   }
+  //   return null;
+  // }
 
   void _showActivateEmailDialog(BuildContext context) {
     final emailController = TextEditingController();

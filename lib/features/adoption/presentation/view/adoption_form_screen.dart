@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import '../../../../config/di/di.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/utils/custom_text_form_field.dart';
-import '../../data/models/adoption_form_request_model.dart';
 import '../../domain/entities/adoption_options_entity.dart';
 import '../bloc/adoption_bloc.dart';
 import '../bloc/adoption_event.dart';
@@ -94,18 +93,6 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
         return;
       }
 
-      final request = AdoptionFormRequestModel(
-        fullName: _fullNameController.text,
-        email: _emailController.text,
-        phoneNumber: _phoneNumberController.text,
-        dateOfBirth: _selectedDate!.toIso8601String(),
-        livingSituationId: _selectedLivingSituationId!,
-        typeOfResidenceId: _selectedResidenceTypeId!,
-        hasOwnedOrCaredForPetBefore: _hasOwnedPetBefore,
-        petType: _petTypeController.text,
-        hasReadAndUnderstood: _hasReadAndUnderstood,
-        agreesToTerms: _agreesToTerms,
-      );
 
       context.read<AdoptionBloc>().add(SubmitAdoptionForm());
     }
