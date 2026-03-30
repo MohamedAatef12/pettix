@@ -40,7 +40,7 @@ class AppSettingsCard extends StatelessWidget {
                 const Spacer(),
                 Transform(
                   alignment: Alignment.center,
-                  transform: Matrix4.identity()..scale(isArabic ? -1.0 : 1.0, 1.0),
+                  transform: Matrix4.identity()..scaleByVector3,
                   child: SvgPicture.asset(
                     'assets/icons/right_button.svg',
                     width: 20.w,
@@ -57,7 +57,10 @@ class AppSettingsCard extends StatelessWidget {
                   'assets/icons/languages.svg',
                   width: 23.w,
                   height: 23.h,
-                  color: AppColors.current.text,
+                  colorFilter: ColorFilter.mode(
+                    AppColors.current.text,
+                    BlendMode.srcIn,
+                  ),
                 ),
                 SizedBox(width: 20.w),
                 Text(

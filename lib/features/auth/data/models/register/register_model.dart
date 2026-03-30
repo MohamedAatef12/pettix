@@ -88,6 +88,7 @@ class RegisterModel extends RegisterEntity {
     );
   }
 
+@override
   RegisterModel copyWith({
     int? id,
     String? email,

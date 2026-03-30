@@ -63,7 +63,10 @@ class BottomNavigationScreen extends StatelessWidget {
                     icon: SvgPicture.asset(
                       'assets/icons/home.svg',
                       height: 30.r,
-                      color: state.index == 0 ? AppColors.current.white : AppColors.current.lightGray,
+                      colorFilter: ColorFilter.mode(
+                        state.index == 0 ? AppColors.current.white : AppColors.current.lightGray,
+                        BlendMode.srcIn,
+                      ),
                     ),
                     label: 'Home'.tr(),
 
@@ -72,7 +75,10 @@ class BottomNavigationScreen extends StatelessWidget {
                     icon: SvgPicture.asset(
                       'assets/icons/adoption.svg',
                       height: 30.r,
-                      color: state.index == 1 ? AppColors.current.white : AppColors.current.lightGray,
+                      colorFilter: ColorFilter.mode(
+                        state.index == 1 ? AppColors.current.white : AppColors.current.lightGray,
+                        BlendMode.srcIn,
+                      ),
                     ),
                     label: 'Adoption'.tr(),
                   ),
@@ -80,7 +86,10 @@ class BottomNavigationScreen extends StatelessWidget {
                     icon: SvgPicture.asset(
                       'assets/icons/store.svg',
                       height: 30.r,
-                      color: state.index == 2 ? AppColors.current.white : AppColors.current.lightGray,
+                      colorFilter: ColorFilter.mode(
+                        state.index == 2 ? AppColors.current.white : AppColors.current.lightGray,
+                        BlendMode.srcIn,
+                      ),
                     ),
                     label: 'Store'.tr(),
                   ),
@@ -88,7 +97,10 @@ class BottomNavigationScreen extends StatelessWidget {
                     icon: SvgPicture.asset(
                       'assets/icons/clinics.svg',
                       height: 30.r,
-                      color: state.index == 3 ? AppColors.current.white : AppColors.current.lightGray,
+                      colorFilter: ColorFilter.mode(
+                        state.index == 3 ? AppColors.current.white : AppColors.current.lightGray,
+                        BlendMode.srcIn,
+                      ),
                     ),
                     label: 'Clinics'.tr(),
                   ),

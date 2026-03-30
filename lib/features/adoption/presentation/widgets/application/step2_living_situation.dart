@@ -92,7 +92,7 @@ class CustomChoiceChip extends StatelessWidget {
         decoration: BoxDecoration(
           color:
               selected
-                  ? const Color(0xff5379B2).withOpacity(0.1)
+                  ? const Color(0xff5379B2).withValues(alpha: 0.1)
                   : Colors.white,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(

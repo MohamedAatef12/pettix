@@ -186,7 +186,7 @@ Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) asyn
     final result = await loginUseCase(event.model);
     await result.fold(
           (failure) async {
-            print('failure message: ${failure.message}');
+            debugPrint('failure message: ${failure.message}');
             emit(LoginFailure(failure.message));} ,
           (loginResponse) async {
         await DI.find<ICacheManager>()

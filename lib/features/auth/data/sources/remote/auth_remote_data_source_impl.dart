@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
@@ -89,7 +90,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final token = result['token'];
 
       if (userJson == null || token == null) {
-        print(
+        debugPrint(
             '[DEBUG] Google Login - Missing contact or token. Contact: $userJson, Token: $token');
         return Left(Failure("Invalid response format from server"));
       }
@@ -112,7 +113,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         ),
       );
     } catch (e) {
-      print('[ERROR] Google Login failed: $e');
+      debugPrint('[ERROR] Google Login failed: $e');
       return Left(DioFailure.fromDioError(e));
     }
   }
@@ -143,7 +144,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'email': email,
       });
       if (response.success == true) {
-        return Right(response.message);
+        return Right(null);
       }
       return Left(Failure(response.message));
     }
@@ -178,7 +179,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'confirmPassword': confirmPassword,
       });
       if (response.success == true) {
-        return Right(response.message);
+        return Right(null);
       }
       return Left(Failure(response.message));
     }

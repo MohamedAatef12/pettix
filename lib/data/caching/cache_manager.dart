@@ -68,7 +68,7 @@ class CacheManager implements ICacheManager {
 
   @override
   getSavedLogin() async {
-    final rememberMe = await _prefs?.getBool('remember_me');
+    final rememberMe =  _prefs?.getBool('remember_me');
     if (rememberMe != null) {
       return {'remember_me': rememberMe};
     }

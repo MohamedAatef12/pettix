@@ -136,7 +136,7 @@ class PostCard extends StatelessWidget {
                                       padding: const EdgeInsets.all(8.0),
                                       child: Container(
                                         decoration: BoxDecoration(
-                                          color: AppColors.current.red.withOpacity(0.05),
+                                          color: AppColors.current.red.withValues(alpha: 0.05),
                                           borderRadius: BorderRadius.all(Radius.circular(10.r)),
                                           border: Border.all(color: AppColors.current.red, width: 1.h),
                                         ),
@@ -438,7 +438,7 @@ class PostCard extends StatelessWidget {
                         colorFilter: ColorFilter.mode(
                           isLiked
                               ? AppColors.current.red
-                              : AppColors.current.text.withOpacity(0.7),
+                              : AppColors.current.text.withValues(alpha: 0.7),
                           BlendMode.srcIn,
                         ),
                         height: 24.h,
@@ -616,7 +616,7 @@ void _openImagesPreview(BuildContext context, List<String> images) {
     context: context,
     barrierDismissible: true,
     barrierLabel: '',
-    barrierColor: Colors.black.withOpacity(0.8),
+    barrierColor: Colors.black.withValues(alpha: 0.8),
     pageBuilder: (_, __, ___) {
       final imageHeight = MediaQuery.of(context).size.height * 0.5;
 
@@ -726,7 +726,7 @@ void _openImagesPreview(BuildContext context, List<String> images) {
 void _openSingleImagePreview(BuildContext context, String image) {
   showDialog(
     context: context,
-    barrierColor: Colors.black.withOpacity(0.8),
+    barrierColor: Colors.black.withValues(alpha: 0.8),
     builder: (_) {
       return Dialog(
         backgroundColor: Colors.transparent,
