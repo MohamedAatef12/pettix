@@ -30,7 +30,10 @@ class AdoptionTextField extends StatelessWidget {
         leading: SvgPicture.asset(
           'assets/icons/search.svg',
           fit: BoxFit.scaleDown,
-          color: AppColors.current.lightText,
+          colorFilter: ColorFilter.mode(
+            AppColors.current.lightText,
+            BlendMode.srcIn,
+          ),
         ),
         suffixIcon: Icon(
           Icons.filter_alt_rounded,

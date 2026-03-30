@@ -196,7 +196,7 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
             ),
             SizedBox(height: 10.h),
             DropdownButtonFormField<int>(
-              value: _selectedLivingSituationId,
+              initialValue: _selectedLivingSituationId,
               hint: const Text('Living Situation'),
               items:
                   options.livingSituations.map((e) {
@@ -214,7 +214,7 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
             ),
             SizedBox(height: 10.h),
             DropdownButtonFormField<int>(
-              value: _selectedResidenceTypeId,
+              initialValue: _selectedResidenceTypeId,
               hint: const Text('Residence Type'),
               items:
                   options.residenceTypes.map((e) {

@@ -25,7 +25,7 @@ class Step1PersonalInfo extends StatelessWidget {
               "Full Name",
               style: TextStyle(
                 fontSize: 12.sp,
-                color: AppColors.current.gray.withOpacity(0.5),
+                color: AppColors.current.gray.withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(height: 5),
@@ -63,7 +63,7 @@ class Step1PersonalInfo extends StatelessWidget {
               "Email",
               style: TextStyle(
                 fontSize: 12.sp,
-                color: AppColors.current.gray.withOpacity(0.5),
+                color: AppColors.current.gray.withValues(alpha: 0.5),
               ),
             ),
 
@@ -138,7 +138,7 @@ class Step1PersonalInfo extends StatelessWidget {
               "Date of Birth ",
               style: TextStyle(
                 fontSize: 12.sp,
-                color: AppColors.current.gray.withOpacity(0.5),
+                color: AppColors.current.gray.withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(height: 5),

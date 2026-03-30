@@ -19,7 +19,6 @@ import '../../data/network/api_services.dart' as _i655;
 import '../../data/network/dio_factory.dart' as _i719;
 import '../../data/network/dio_interceptor.dart' as _i790;
 import '../../data/network/email_auth_service.dart' as _i1;
-import '../../data/network/twilio_service.dart' as _i718;
 import '../../features/adoption/data/datasources/adoption_remote_data_source.dart'
     as _i956;
 import '../../features/adoption/data/repositories/adoption_repo_impl.dart'
@@ -86,7 +85,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i719.DioFactory>(() => registerModule.dioFactory);
     gh.lazySingleton<_i694.ICacheManager>(() => registerModule.cacheManager);
     gh.lazySingleton<_i1.EmailAuthService>(() => _i1.EmailAuthService());
-    gh.lazySingleton<_i718.TwilioService>(() => _i718.TwilioService());
     gh.lazySingleton<_i361.Dio>(
       () => registerModule.dio(gh<_i719.DioFactory>(), gh<_i207.Talker>()),
     );
