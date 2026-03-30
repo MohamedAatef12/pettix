@@ -538,7 +538,7 @@ Widget _buildImage(BuildContext context, String image, {double? height}) {
   if (image.startsWith('data:image') && image.contains('Resources/')) {
     // Extract the file path and construct proper URL
     final filePath = image.split(',').last;
-    final properUrl = '${ApiEndpoints.baseUrl}/$filePath';
+    final properUrl = '${Constants.baseUrl}/$filePath';
     debugPrint('✅ Converted malformed URL to: $properUrl');
     return Image.network(
       properUrl,

@@ -1,6 +1,6 @@
 class Constants {
   // static const String baseUrl = 'https://pettix-production.up.railway.app';
-  static const String baseUrl = 'https://c1b2-81-10-3-82.ngrok-free.app';
+  static const String baseUrl = 'https://bb24-81-10-3-82.ngrok-free.app';
 
   static const commentsEndpoint = '/api/Comments/post';
   static const commentLikesEndpoint = '/api/CommentLikes';

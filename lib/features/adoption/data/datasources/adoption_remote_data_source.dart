@@ -19,7 +19,7 @@ class AdoptionRemoteDataSourceImpl implements AdoptionRemoteDataSource {
     final response = await _apiService.get(
       endPoint: 'AdoptionForms/options',
     );
-    return AdoptionOptionsModel.fromJson(response);
+    return AdoptionOptionsModel.fromJson(response.result);
   }
 
   @override
