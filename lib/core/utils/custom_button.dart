@@ -40,57 +40,49 @@ class CustomFilledButton extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.current.primary,
-        minimumSize: Size(
-          screenWidth * (widthFactor ?? 0.4),
-          screenHeight * (heightFactor ?? 0.05),
-        ),
-        maximumSize: Size(
-          screenWidth * (widthFactor ?? 0.4),
-          screenHeight * (heightFactor ?? 0.05),
-        ),
+    return SizedBox(
+      width: widthFactor != null ? screenWidth * widthFactor! : null,
+      height: heightFactor != null ? screenHeight * heightFactor! : null,
+      child: ElevatedButton(
 
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      ),
-
-      onPressed: isLoading ? null : onPressed,
-      child:
-          isLoading
-              ? SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  color: textColor ?? AppColors.current.white,
-                  strokeWidth: 2.5,
-                ),
-              )
-              : Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (hasLeading && leading != null) ...[
-                    leading ?? SizedBox.shrink(),
-                    SizedBox(width: spacing),
-                  ],
-                  Text(
-                    text,
-                    style:
-                        textStyle ??
-                        TextStyle(
-                          color: textColor ?? AppColors.current.white,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w600,
-                        ),
+        onPressed: isLoading ? null : onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor?? AppColors.current.primary,
+          disabledBackgroundColor:
+          backgroundColor ??  AppColors.current.primary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+          ),
+        ),
+        child: isLoading
+            ? SizedBox(
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(
+            color: textColor ?? AppColors.current.white,
+            strokeWidth: 2.5,
+          ),
+        )
+            : Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (hasLeading && leading != null) ...[
+              leading!,
+              SizedBox(width: spacing),
+            ],
+            Text(
+              text,
+              style: textStyle ??
+                  TextStyle(
+                    color: textColor ?? AppColors.current.white,
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w600,
                   ),
-                  if (hasTrailing) ...[
-                    SizedBox(width: spacing),
-
-                    trailing ?? SizedBox.shrink(),
-                  ],
-                ],
-              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

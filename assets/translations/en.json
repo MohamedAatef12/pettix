@@ -107,5 +107,13 @@
   "Available": "Available",
   "Archived": "Archived",
   "Latest message...": "Latest message...",
-  "Skip": "Skip"
+  "Skip": "Skip",
+  "Activate your email": "Activate your email",
+    "Your email not verified?": "Your email not verified? ",
+        "Resend verification email": "Resend verification email",
+  "Please check your email and click on the activation link to verify your account.": "Please check your email and click on the activation link to verify your account.",
+  "Account created! Check your email for the OTP.": "Account created! Check your email for the OTP.",
+  "Send OTP": "Send OTP",
+  "Send": "Send"
+
 }

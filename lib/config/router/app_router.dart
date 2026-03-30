@@ -1,13 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/adoption/presentation/view/application_view.dart';
+import '../../features/auth/presentation/pages/forgot_password/password_reset_done_page.dart';
+import '../../features/auth/presentation/pages/forgot_password/reset_password_page.dart';
 import 'routes.dart';
 import 'package:pettix/features/adoption/presentation/view/adoption_screen.dart';
 import 'package:pettix/features/adoption/presentation/view/pet_application.dart';
 import 'package:pettix/features/adoption/presentation/view/pet_profile_screen.dart';
 import 'package:pettix/features/auth/presentation/pages/forgot_password/forgot_password_page.dart';
-import 'package:pettix/features/auth/presentation/pages/forgot_password/password_reset_done_page.dart';
-import 'package:pettix/features/auth/presentation/pages/forgot_password/reset_password_page.dart';
+import 'package:pettix/features/auth/presentation/pages/forgot_password/otp_forgot_password_page.dart';
 import 'package:pettix/features/auth/presentation/pages/login/login_page.dart';
 import 'package:pettix/features/auth/presentation/pages/register/otp_page.dart';
 import 'package:pettix/features/auth/presentation/pages/register/register_page.dart';
@@ -16,16 +17,11 @@ import 'package:pettix/features/auth/presentation/pages/register/verified_page.d
 import 'package:pettix/features/bottom_bar/views/pages/bottom_bar_page.dart';
 import 'package:pettix/features/chat/presentation/view/pages/chat_list_page.dart';
 import 'package:pettix/features/chat/presentation/view/pages/chat_page.dart';
-import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
-import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 import 'package:pettix/features/home/presentation/pages/add_post_page.dart';
-import 'package:pettix/features/home/presentation/pages/comments_page.dart';
 import 'package:pettix/features/home/presentation/pages/home_page.dart';
 import 'package:pettix/features/home/presentation/pages/home_search.dart';
-import 'package:pettix/features/notification/presentation/view/pages/notification_page.dart';
 import 'package:pettix/features/on_boarding/presentation/view/on_boarding_screen.dart';
 import 'package:pettix/features/select_language/presentation/view/select_language_screen.dart';
-import 'package:pettix/features/side_menu/presentation/view/pages/side_menu_page.dart';
 import 'package:pettix/features/splash/persentation/view/splash_screen.dart';
 
 GoRouter appRouter() => GoRouter(
@@ -103,9 +99,29 @@ GoRouter appRouter() => GoRouter(
       builder: (context, state) => const ForgotPasswordPage(),
     ),
     GoRoute(
+      path: '/otp_forgot_password',
+      name: 'otp_forgot_password',
+      builder: (context, state) => const OTPForgotPasswordScreen(),
+    ),
+    GoRoute(
       path: AppRoutes.resetPassword,
       name: AppRouteNames.resetPassword,
-      builder: (context, state) => const ResetPassword(),
+      builder: (context, state) {
+        final extra = state.extra;
+        if (extra is Map) {
+          final authBloc = extra['bloc'] as dynamic;
+          final email = extra['email'] as String? ?? '';
+          final otp = extra['otp'] as String? ?? '';
+          if (authBloc != null) {
+            return BlocProvider.value(
+              value: authBloc,
+              child: ResetPassword(email: email, otp: otp),
+            );
+          }
+          return ResetPassword(email: email, otp: otp);
+        }
+        return const ResetPassword(email: '', otp: '');
+      },
     ),
     GoRoute(
       path: AppRoutes.passwordResetDone,

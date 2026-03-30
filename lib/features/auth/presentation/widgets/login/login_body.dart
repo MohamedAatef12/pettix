@@ -7,6 +7,7 @@ import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
+import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_state.dart';
@@ -38,10 +39,21 @@ class LoginBody extends StatelessWidget {
             SizedBox(height: 50.h,),
             BlocListener<AuthBloc, AuthState>(
               listenWhen: (previous, current) =>
-              current is GoogleLoginSuccess || current is LoginSuccess, // ✅ include both
+                  current is GoogleLoginSuccess ||
+                  current is LoginSuccess ||
+                  current is LoginFailure ||
+                  current is GoogleLoginFailure,
               listener: (context, state) {
                 if (state is GoogleLoginSuccess || state is LoginSuccess) {
-                  context.push(AppRoutes.bottomNav);
+                  AuthToast.showSuccess(
+                    context,
+                    'Login Successful!',
+                    onDone: () => context.push(AppRoutes.bottomNav),
+                  );
+                } else if (state is LoginFailure) {
+                  AuthToast.showError(context, state.error);
+                } else if (state is GoogleLoginFailure) {
+                  AuthToast.showError(context, state.error);
                 }
               },
               child: const LoginForm(),

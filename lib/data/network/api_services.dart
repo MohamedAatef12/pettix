@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
+import 'package:pettix/core/models/response_model.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'constants.dart';
 
@@ -21,7 +23,31 @@ class ApiService {
     ));
   }
 
-  Future<Map<String, dynamic>> get({
+  ResponseModel _normalizeResponse(dynamic data) {
+    // If the backend returns a wrapped response object, use the existing factory
+    if (data is Map<String, dynamic>) return ResponseModel.fromJson(data);
+
+    // If the backend directly returns a list (e.g. ['reason1', ...]) treat it as success
+    if (data is List) {
+      return ResponseModel(success: true, message: '', traceId: '', result: data);
+    }
+
+    // If Dio returned a raw JSON string, try to decode it
+    if (data is String) {
+      try {
+        final decoded = json.decode(data);
+        if (decoded is Map<String, dynamic>) return ResponseModel.fromJson(decoded);
+        if (decoded is List) return ResponseModel(success: true, message: '', traceId: '', result: decoded);
+      } catch (_) {
+        // fallthrough to return a generic failure-shaped ResponseModel
+      }
+    }
+
+    // Fallback: return a ResponseModel marking failure with the raw body in result
+    return ResponseModel(success: false, message: 'Unexpected response format', traceId: '', result: data);
+  }
+
+  Future<ResponseModel> get({
     required String endPoint,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? queryParameters,
@@ -31,10 +57,10 @@ class ApiService {
       options: Options(headers: headers),
       queryParameters: queryParameters,
     );
-    return response.data;
+    return _normalizeResponse(response.data);
   }
 
-  Future<List<dynamic>> getList({
+  Future<ResponseModel> getList({
     required String endPoint,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? queryParameters,
@@ -44,10 +70,11 @@ class ApiService {
       options: Options(headers: headers),
       queryParameters: queryParameters,
     );
-    return response.data as List<dynamic>;
+
+    return _normalizeResponse(response.data);
   }
 
-  Future<Map<String, dynamic>> post({
+  Future<ResponseModel> post({
     required String endPoint,
     Map<String, dynamic>? data,
     FormData? formData,
@@ -63,7 +90,7 @@ class ApiService {
       ),
       queryParameters: queryParameters,
     );
-    return response.data;
+    return _normalizeResponse(response.data);
   }
 
   Future<Response<dynamic>> postWithFullResponse({
@@ -85,7 +112,7 @@ class ApiService {
     return response;
   }
 
-  Future<Map<String, dynamic>> put({
+  Future<ResponseModel> put({
     required String endPoint,
     Map<String, dynamic>? data,
     Map<String, dynamic>? headers,
@@ -97,10 +124,10 @@ class ApiService {
       options: Options(headers: headers),
       queryParameters: queryParameters,
     );
-    return response.data;
+    return _normalizeResponse(response.data);
   }
 
-  Future<dynamic> delete({
+  Future<ResponseModel> delete({
     required String endPoint,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? queryParameters,
@@ -113,6 +140,6 @@ class ApiService {
       data: data,
     );
 
-    return response.data;
+    return _normalizeResponse(response.data);
   }
 }

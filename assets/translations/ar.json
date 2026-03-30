@@ -108,5 +108,12 @@
 "Available": "متاح",
 "Archived": "أرشيف",
 "Latest message...": "أحدث رسالة...",
-"Skip": "تخطي"
+"Skip": "تخطي",
+"Activate your email": "قم بتفعيل بريدك الإلكتروني",
+"Your email not verified? ": "بريدك الإلكتروني غير مفعل؟ ",
+"Resend verification email": "إعادة إرسال بريد التحقق",
+"Please check your email and click on the activation link to verify your account.": "يرجى التحقق من بريدك الإلكتروني والنقر على رابط التفعيل للتحقق من حسابك.",
+"Account created! Check your email for the OTP.": "تم إنشاء الحساب! تحقق من بريدك الإلكتروني للحصول على رمز التحقق.",
+"Send": "إرسال",
+"Send OTP": "إرسال رمز التحقق"
 }
