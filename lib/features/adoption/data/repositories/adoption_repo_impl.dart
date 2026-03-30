@@ -14,29 +14,13 @@ class AdoptionRepositoryImpl implements AdoptionRepository {
 
   @override
   Future<Either<Failure, AdoptionOptionsEntity>> getAdoptionOptions() async {
-    try {
-      final result = await _remoteDataSource.getAdoptionOptions();
-      return Right(result);
-    } catch (e) {
-      if (e is Failure) {
-        return Left(e);
-      }
-      return Left(Failure(e.toString()));
-    }
+    return await _remoteDataSource.getAdoptionOptions();
   }
 
   @override
   Future<Either<Failure, void>> submitAdoptionForm(
     AdoptionFormRequestModel request,
   ) async {
-    try {
-      await _remoteDataSource.submitAdoptionForm(request);
-      return const Right(null);
-    } catch (e) {
-      if (e is Failure) {
-        return Left(e);
-      }
-      return Left(Failure(e.toString()));
-    }
+    return await _remoteDataSource.submitAdoptionForm(request);
   }
 }

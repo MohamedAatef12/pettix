@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pettix/config/di/di.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/data/network/email_auth_service.dart';
-import 'package:pettix/data/network/twilio_service.dart';
 import 'package:pettix/features/auth/domain/usecases/forgot_password.dart';
 import 'package:pettix/features/auth/domain/usecases/google_login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/login_use_case.dart';

@@ -18,7 +18,6 @@ class PetGallery extends StatelessWidget {
     ];
 
     final total = images.length;
-    final remaining = total > 5 ? total - 5 : 0;
 
     // Case 1: Only 1–4 images (grid)
     if (total <= 4) {
@@ -130,12 +129,12 @@ class PetGallery extends StatelessWidget {
   }
 
   // 🗂 Open full gallery view
-  void _openGallery(BuildContext context, List<String> images) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => _FullGalleryView(images: images)),
-    );
-  }
+  // void _openGallery(BuildContext context, List<String> images) {
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(builder: (_) => _FullGalleryView(images: images)),
+  //   );
+  // }
 }
 
 // -------------------------------
@@ -158,37 +157,37 @@ class _FullImageView extends StatelessWidget {
 // -------------------------------
 // 🗂 Full gallery grid view
 // -------------------------------
-class _FullGalleryView extends StatelessWidget {
-  final List<String> images;
-  const _FullGalleryView({required this.images});
+// class _FullGalleryView extends StatelessWidget {
+//   final List<String> images;
+//   const _FullGalleryView({required this.images});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Gallery')),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(8),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
-        ),
-        itemCount: images.length,
-        itemBuilder:
-            (context, index) => GestureDetector(
-              onTap:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => _FullImageView(imageUrl: images[index]),
-                    ),
-                  ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.network(images[index], fit: BoxFit.cover),
-              ),
-            ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: const Text('Gallery')),
+//       body: GridView.builder(
+//         padding: const EdgeInsets.all(8),
+//         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+//           crossAxisCount: 3,
+//           mainAxisSpacing: 8,
+//           crossAxisSpacing: 8,
+//         ),
+//         itemCount: images.length,
+//         itemBuilder:
+//             (context, index) => GestureDetector(
+//               onTap:
+//                   () => Navigator.push(
+//                     context,
+//                     MaterialPageRoute(
+//                       builder: (_) => _FullImageView(imageUrl: images[index]),
+//                     ),
+//                   ),
+//               child: ClipRRect(
+//                 borderRadius: BorderRadius.circular(8),
+//                 child: Image.network(images[index], fit: BoxFit.cover),
+//               ),
+//             ),
+//       ),
+//     );
+//   }
+// }

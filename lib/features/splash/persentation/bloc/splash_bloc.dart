@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';

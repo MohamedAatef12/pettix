@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:pettix/config/di/di.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
-import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
@@ -58,7 +57,6 @@ class ForgotPasswordPage extends StatelessWidget {
                 }
               },
               builder: (context, state) {
-                final isLoading = state is AuthLoading;
                 return Column(
                   children: [
                     Stack(

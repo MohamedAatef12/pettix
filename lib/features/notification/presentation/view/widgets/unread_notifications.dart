@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/features/notification/presentation/view/widgets/empty_notifications.dart';
 import 'package:pettix/features/notification/presentation/view/widgets/notification_card.dart';
 
 class UnreadNotifications extends StatelessWidget {

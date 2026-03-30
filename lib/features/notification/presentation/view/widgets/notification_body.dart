@@ -4,7 +4,6 @@ import 'package:pettix/features/notification/presentation/bloc/notification_bloc
 import 'package:pettix/features/notification/presentation/bloc/notification_states.dart';
 import 'package:pettix/features/notification/presentation/view/widgets/adoption_notifications.dart';
 import 'package:pettix/features/notification/presentation/view/widgets/all_notifications.dart';
-import 'package:pettix/features/notification/presentation/view/widgets/empty_notifications.dart';
 import 'package:pettix/features/notification/presentation/view/widgets/notifications_tab_bar.dart';
 import 'package:pettix/features/notification/presentation/view/widgets/unread_notifications.dart';
 

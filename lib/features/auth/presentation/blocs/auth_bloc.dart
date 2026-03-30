@@ -1,13 +1,9 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/data/network/email_auth_service.dart';
-import 'package:pettix/data/network/twilio_service.dart';
-import 'package:pettix/features/auth/data/models/login/google_login_model.dart';
 import 'package:pettix/features/auth/data/models/user_model.dart';
 import 'package:pettix/features/auth/domain/entities/google_login_entity.dart';
 import 'package:pettix/features/auth/domain/entities/register_domain_entity.dart';
@@ -249,7 +245,7 @@ Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) asyn
           emit(GoogleLoginSuccess(loginResponse.user)); // مفيش User entity جديد
         },
       );
-    } catch (e, st) {
+    } catch (e) {
       emit(GoogleLoginFailure(e.toString()));
     }
   }

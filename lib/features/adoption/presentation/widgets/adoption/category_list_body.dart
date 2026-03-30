@@ -10,7 +10,6 @@ class CategoryListBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<String> images = ['assets/images/buddy.svg', 'assets/images/caty.svg'];
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: GridView.builder(

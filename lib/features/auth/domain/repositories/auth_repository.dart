@@ -1,5 +1,4 @@
 import 'package:dartz/dartz.dart';
-import 'package:pettix/features/auth/data/models/login/google_login_model.dart';
 import 'package:pettix/features/auth/domain/entities/google_login_entity.dart';
 import 'package:pettix/features/auth/domain/entities/google_login_response_entity.dart';
 import 'package:pettix/features/auth/domain/entities/login_entity.dart';
