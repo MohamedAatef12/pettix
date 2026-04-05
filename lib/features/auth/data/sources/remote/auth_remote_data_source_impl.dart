@@ -5,6 +5,7 @@ import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/data/network/api_services.dart';
 import 'package:pettix/data/network/constants.dart';
 import 'package:pettix/data/network/email_auth_service.dart';
+import 'package:pettix/features/auth/data/models/login/apple_login_model.dart';
 import 'package:pettix/features/auth/data/models/login/google_login_model.dart';
 import 'package:pettix/features/auth/data/models/login/google_login_response_model.dart';
 import 'package:pettix/features/auth/data/models/login/login_response_model.dart';
@@ -118,6 +119,49 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
+
+  @override
+  Future<Either<Failure, GoogleLoginResponseModel>> loginWithApple(AppleLoginModel model) async {
+    try {
+      final response = await apiService.post(
+        endPoint: Constants.appleLoginEndpoint,
+        data: {'idToken': model.idToken},
+      );
+
+      final result = response.result as Map<String, dynamic>?;
+      if (result == null || response.success != true) {
+        return Left(Failure(response.message.isNotEmpty
+            ? response.message
+            : 'Invalid response from server'));
+      }
+
+      final userJson = result['contact'];
+      final token = result['token'];
+
+      if (userJson == null || token == null) {
+        return Left(Failure('Invalid response format from server'));
+      }
+
+      final userModel = UserModel.fromJson(userJson);
+      await DI.find<ICacheManager>().setUserData(userModel);
+
+      return Right(
+        GoogleLoginResponseModel(
+          success: response.success,
+          message: response.message,
+          traceId: response.traceId,
+          resultSuccess: result['success'] ?? true,
+          resultMessage: result['message'] ?? '',
+          token: token,
+          refreshToken: result['refreshToken'] ?? '',
+          role: result['role'] ?? '',
+          user: userModel,
+        ),
+      );
+    } catch (e) {
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
 
   @override
   Future<Either<Failure, bool>> verifyOtp(String email, String otp) async {

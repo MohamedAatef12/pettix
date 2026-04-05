@@ -15,8 +15,9 @@ dependencies:
   firebase_core: ^3.9.0
   firebase_auth: ^5.3.1
 
-  # Google Sign-In
+  # Auth providers
   google_sign_in: ^6.2.2
+  sign_in_with_apple: ^6.1.0
   email_auth: ^2.0.0
   mailer: ^6.1.0
 
@@ -34,7 +35,7 @@ dependencies:
   flutter_staggered_grid_view: ^0.7.0
   image_picker: ^1.2.0
   smooth_page_indicator: ^1.2.0
-  
+
   # State Management & Architectures
   flutter_bloc: ^9.1.1
   equatable: ^2.0.7

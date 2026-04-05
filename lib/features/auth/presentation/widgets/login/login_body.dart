@@ -38,11 +38,15 @@ class LoginBody extends StatelessWidget {
             BlocListener<AuthBloc, AuthState>(
               listenWhen: (previous, current) =>
                   current is GoogleLoginSuccess ||
+                  current is AppleLoginSuccess ||
                   current is LoginSuccess ||
                   current is LoginFailure ||
-                  current is GoogleLoginFailure,
+                  current is GoogleLoginFailure ||
+                  current is AppleLoginFailure,
               listener: (context, state) {
-                if (state is GoogleLoginSuccess || state is LoginSuccess) {
+                if (state is GoogleLoginSuccess ||
+                    state is AppleLoginSuccess ||
+                    state is LoginSuccess) {
                   AuthToast.showSuccess(
                     context,
                     'Login Successful!',
@@ -51,6 +55,8 @@ class LoginBody extends StatelessWidget {
                 } else if (state is LoginFailure) {
                   AuthToast.showError(context, state.error);
                 } else if (state is GoogleLoginFailure) {
+                  AuthToast.showError(context, state.error);
+                } else if (state is AppleLoginFailure) {
                   AuthToast.showError(context, state.error);
                 }
               },

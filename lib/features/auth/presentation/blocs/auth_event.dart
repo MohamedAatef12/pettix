@@ -54,6 +54,11 @@ class GoogleLoginSubmitted extends AuthEvent {
   GoogleLoginSubmitted({required this.rememberMe});
 }
 
+class AppleLoginSubmitted extends AuthEvent {
+  final bool rememberMe;
+  AppleLoginSubmitted({required this.rememberMe});
+}
+
 class VerifyOtpEvent extends AuthEvent {
   final String smsCode;
   VerifyOtpEvent(this.smsCode);

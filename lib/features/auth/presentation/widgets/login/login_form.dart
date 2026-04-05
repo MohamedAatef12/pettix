@@ -329,15 +329,23 @@ class LoginForm extends StatelessWidget {
             },
           ),
           SizedBox(height: 10.h),
-          CustomFilledButton(
-            onPressed: () {
-              // Handle login
+          BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, state) {
+              final isLoading = state is AppleLoginLoading;
+              return CustomFilledButton(
+                isLoading: isLoading,
+                onPressed: () {
+                  context.read<AuthBloc>().add(
+                    AppleLoginSubmitted(rememberMe: bloc.rememberMe),
+                  );
+                },
+                text: AppText.continueWithApple,
+                backgroundColor: AppColors.current.white,
+                textColor: AppColors.current.lightText,
+                hasLeading: true,
+                leading: SvgPicture.asset('assets/icons/apple.svg'),
+              );
             },
-            text: AppText.continueWithApple,
-            backgroundColor: AppColors.current.white,
-            textColor: AppColors.current.lightText,
-            hasLeading: true,
-            leading: SvgPicture.asset('assets/icons/apple.svg'),
           ),
           SizedBox(height: 20.h),
           Column(

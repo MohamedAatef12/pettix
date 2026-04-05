@@ -12,6 +12,7 @@ class Constants {
   static const String loginEndpoint = '/api/Security/Authentication/login';
   static const String registerEndpoint = '/api/Security/Authentication/register';
   static const String googleLoginEndpoint = '/api/Security/Authentication/google-login';
+  static const String appleLoginEndpoint = '/api/Security/Authentication/apple-login';
   static const String reportPostEndpoint = '/api/PostReport';
   static const String reportReasonsEndpoint = '/api/PostReport/reasons';
   static const String reportedPostsEndpoint = '/api/PostReport/post';

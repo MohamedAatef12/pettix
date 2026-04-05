@@ -12,6 +12,7 @@ import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/core/widgets/rtl_aware_icon.dart';
 import 'package:pettix/data/network/email_auth_service.dart';
+import 'package:pettix/features/auth/domain/usecases/apple_login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/forgot_password.dart';
 import 'package:pettix/features/auth/domain/usecases/google_login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/login_use_case.dart';
@@ -37,6 +38,7 @@ class ForgotPasswordPage extends StatelessWidget {
       body: BlocProvider(
         create: (context) => AuthBloc(
           googleLoginUseCase: getIt<GoogleLoginUseCase>(),
+          appleLoginUseCase: getIt<AppleLoginUseCase>(),
           loginUseCase: getIt<LoginUseCase>(),
           registerUseCase: getIt<RegisterUseCase>(),
           emailAuthService: getIt<EmailAuthService>(),

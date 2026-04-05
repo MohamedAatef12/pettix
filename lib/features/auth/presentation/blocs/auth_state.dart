@@ -51,6 +51,18 @@ class GoogleLoginFailure extends AuthState {
   GoogleLoginFailure(this.error);
 }
 
+class AppleLoginLoading extends AuthState {}
+
+class AppleLoginSuccess extends AuthState {
+  final UserEntity? user;
+  AppleLoginSuccess(this.user);
+}
+
+class AppleLoginFailure extends AuthState {
+  final String error;
+  AppleLoginFailure(this.error);
+}
+
 
 class AuthLoading extends AuthState {}
 
