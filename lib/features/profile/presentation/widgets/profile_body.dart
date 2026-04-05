@@ -9,8 +9,8 @@ import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/auth/domain/entities/user_entity.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_state.dart';
-import 'package:pettix/features/profile/presentation/view/widgets/profile_header.dart';
-import 'package:pettix/features/profile/presentation/view/widgets/profile_info_card.dart';
+import 'package:pettix/features/profile/presentation/widgets/profile_header.dart';
+import 'package:pettix/features/profile/presentation/widgets/profile_info_card.dart';
 
 class ProfileBody extends StatelessWidget {
   const ProfileBody({super.key});

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_event.dart';
-import 'package:pettix/features/profile/presentation/view/widgets/edit_profile_body.dart';
+import 'package:pettix/features/profile/presentation/widgets/edit_profile_body.dart';
 
 class EditProfileScreen extends StatelessWidget {
   const EditProfileScreen({super.key});

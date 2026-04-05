@@ -9,8 +9,8 @@ import 'package:pettix/features/profile/domain/entities/update_profile_entity.da
 import 'package:pettix/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_event.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_state.dart';
-import 'package:pettix/features/profile/presentation/view/widgets/avatar_picker.dart';
-import 'package:pettix/features/profile/presentation/view/widgets/gender_dropdown.dart';
+import 'package:pettix/features/profile/presentation/widgets/avatar_picker.dart';
+import 'package:pettix/features/profile/presentation/widgets/gender_dropdown.dart';
 
 class EditProfileBody extends StatelessWidget {
   const EditProfileBody({super.key});

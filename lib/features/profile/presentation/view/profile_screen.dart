@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_event.dart';
-import 'package:pettix/features/profile/presentation/view/widgets/profile_body.dart';
+import 'package:pettix/features/profile/presentation/widgets/profile_body.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
