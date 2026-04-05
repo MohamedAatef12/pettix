@@ -1,13 +1,13 @@
 class Constants {
   // static const String baseUrl = 'https://pettix-production.up.railway.app';
-  static const String baseUrl = 'https://2b14-81-10-3-82.ngrok-free.app';
+  static const String baseUrl = 'https://23db-81-10-3-82.ngrok-free.app';
 
-  static const commentsEndpoint = '/api/Comments/post';
-  static const commentLikesEndpoint = '/api/CommentLikes';
-  static const usersEndpoint = '/api/Users';
-  static const postsEndpoint = '/api/Posts';
-  static const likesEndpoint = '/api/Likes';
-  static const postLikesEndpoint = '/api/PostLikes';
+  static const String commentsEndpoint = '/api/Comments/post';
+  static const String commentLikesEndpoint = '/api/CommentLikes';
+  static const String usersEndpoint = '/api/Users';
+  static const String postsEndpoint = '/api/Posts';
+  static const String likesEndpoint = '/api/Likes';
+  static const String postLikesEndpoint = '/api/PostLikes';
   static const String getPostLikes = '/api/PostLikes/post';
   static const String loginEndpoint = '/api/Security/Authentication/login';
   static const String registerEndpoint = '/api/Security/Authentication/register';
@@ -21,6 +21,7 @@ class Constants {
   static const String resetPasswordEndpoint = '/api/Security/Authentication/reset-password-otp';
   static const String adoptionOptionsEndpoint = '/api/Adoption/AdoptionForms/options';
   static const String adoptionFormsEndpoint = '/api/Adoption/AdoptionForms';
+  static const String contactEndpoint = '/api/Security/Contact';
   // Headers
   static const String contentTypeHeader = 'Content-Type';
   static const String applicationJson = 'application/json';

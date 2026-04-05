@@ -133,4 +133,40 @@ abstract class AppText {
   static String get send => 'Send'.tr();
   static String get sendOtp => "Send OTP".tr();
 
+  // ── Drawer ──────────────────────────────────────────────────────────────────
+  static String get myProfile => 'My Profile'.tr();
+  static String get editProfile => 'Edit Profile'.tr();
+  static String get activity => 'Activity'.tr();
+  static String get myPosts => 'My Posts'.tr();
+  static String get savedPosts => 'Saved Posts'.tr();
+  static String get adoptionPets => 'Adoption & Pets'.tr();
+  static String get adoptionHistory => 'Adoption History'.tr();
+  static String get storeOrders => 'Store & Orders'.tr();
+  static String get myOrders => 'My Orders'.tr();
+  static String get myAddresses => 'My Addresses'.tr();
+  static String get paymentMethods => 'Payment Methods'.tr();
+  static String get refundsReturns => 'Refunds & Returns'.tr();
+  static String get emergency => 'Emergency'.tr();
+  static String get emergencyReports => 'My Emergency Reports'.tr();
+  static String get helpSupport => 'Help & Support'.tr();
+  static String get legal => 'Legal'.tr();
+  static String get logout => 'Logout'.tr();
+  static String get switchRole => 'Switch Role'.tr();
+  static String get petLover => 'Pet Lover'.tr();
+  static String get userName => 'User Name'.tr();
+
+  // ── Profile ─────────────────────────────────────────────────────────────────
+  static String get personalInfo => 'Personal Info'.tr();
+  static String get details => 'Details'.tr();
+  static String get nameAr => 'Name (Arabic)'.tr();
+  static String get age => 'Age'.tr();
+  static String get gender => 'Gender'.tr();
+  static String get address => 'Address'.tr();
+  static String get phone => 'Phone'.tr();
+  static String get male => 'Male'.tr();
+  static String get female => 'Female'.tr();
+  static String get error => 'Something went wrong'.tr();
+  static String get profileUpdated => 'Profile updated successfully'.tr();
+  static String get saveChanges => 'Save Changes'.tr();
+  static String get save => 'Save'.tr();
 }

@@ -1,6 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/adoption/presentation/view/application_view.dart';
+import '../../features/profile/presentation/bloc/profile_bloc.dart';
+import '../../features/profile/presentation/view/edit_profile_screen.dart';
+import '../../features/profile/presentation/view/profile_screen.dart';
+import 'package:pettix/config/di/di_wrapper.dart';
 import '../../features/auth/presentation/pages/forgot_password/password_reset_done_page.dart';
 import '../../features/auth/presentation/pages/forgot_password/reset_password_page.dart';
 import 'routes.dart';
@@ -198,6 +202,22 @@ GoRouter appRouter() => GoRouter(
       path: AppRoutes.applications,
       name: AppRouteNames.applications,
       builder: (context, state) => const ApplicationScreens(),
+    ),
+    GoRoute(
+      path: AppRoutes.profile,
+      name: AppRouteNames.profile,
+      builder: (context, state) => BlocProvider(
+        create: (_) => DI.find<ProfileBloc>(),
+        child: const ProfileScreen(),
+      ),
+    ),
+    GoRoute(
+      path: AppRoutes.editProfile,
+      name: AppRouteNames.editProfile,
+      builder: (context, state) => BlocProvider.value(
+        value: state.extra as ProfileBloc,
+        child: const EditProfileScreen(),
+      ),
     ),
     // GoRoute(
     //   path: AppRoutes.signUp,

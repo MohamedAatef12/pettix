@@ -71,6 +71,17 @@ import '../../features/home/domain/usecases/get_user_cached%20_data.dart'
     as _i118;
 import '../../features/home/domain/usecases/like_post.dart' as _i58;
 import '../../features/home/domain/usecases/unlike_comment.dart' as _i975;
+import '../../features/profile/data/datasources/profile_remote_data_source.dart'
+    as _i847;
+import '../../features/profile/data/repositories/profile_repo_impl.dart'
+    as _i988;
+import '../../features/profile/domain/repositories/profile_repository.dart'
+    as _i894;
+import '../../features/profile/domain/usecases/get_profile_usecase.dart'
+    as _i965;
+import '../../features/profile/domain/usecases/update_profile_usecase.dart'
+    as _i478;
+import '../../features/profile/presentation/bloc/profile_bloc.dart' as _i469;
 import 'di.dart' as _i913;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -112,6 +123,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i787.AuthRepository>(
       () => _i152.AuthRepositoryImpl(gh<_i865.AuthRemoteDataSource>()),
     );
+    gh.lazySingleton<_i847.ProfileRemoteDataSource>(
+      () => _i847.ProfileRemoteDataSourceImpl(gh<_i655.ApiService>()),
+    );
+    gh.lazySingleton<_i894.ProfileRepository>(
+      () => _i988.ProfileRepositoryImpl(gh<_i847.ProfileRemoteDataSource>()),
+    );
     gh.lazySingleton<_i133.AdoptionRepository>(
       () => _i35.AdoptionRepositoryImpl(gh<_i956.AdoptionRemoteDataSource>()),
     );
@@ -120,6 +137,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i843.SubmitAdoptionFormUseCase>(
       () => _i843.SubmitAdoptionFormUseCase(gh<_i133.AdoptionRepository>()),
+    );
+    gh.factory<_i965.GetProfileUseCase>(
+      () => _i965.GetProfileUseCase(gh<_i894.ProfileRepository>()),
+    );
+    gh.factory<_i478.UpdateProfileUseCase>(
+      () => _i478.UpdateProfileUseCase(gh<_i894.ProfileRepository>()),
     );
     gh.factory<_i986.HomeDomainRepository>(
       () => _i1024.HomeRepositoryImpl(
@@ -147,6 +170,13 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i975.VerifyOtp>(
       () => _i975.VerifyOtp(gh<_i787.AuthRepository>()),
+    );
+    gh.factory<_i469.ProfileBloc>(
+      () => _i469.ProfileBloc(
+        gh<_i965.GetProfileUseCase>(),
+        gh<_i478.UpdateProfileUseCase>(),
+        gh<_i694.ICacheManager>(),
+      ),
     );
     gh.factory<_i943.AdoptionBloc>(
       () => _i943.AdoptionBloc(
