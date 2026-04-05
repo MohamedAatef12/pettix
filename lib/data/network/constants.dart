@@ -23,6 +23,12 @@ class Constants {
   static const String adoptionOptionsEndpoint = '/api/Adoption/AdoptionForms/options';
   static const String adoptionFormsEndpoint = '/api/Adoption/AdoptionForms';
   static const String contactEndpoint = '/api/Security/Contact';
+  // Pets
+  static const String petCategoryEndpoint = '/api/Adoption/PetCategory';
+  static const String petColorsEndpoint = '/api/Adoption/PetColors';
+  static const String petMedicalsEndpoint = '/api/Adoption/PetMedicals';
+  static const String petsEndpoint = '/api/Adoption/Pets';
+  static const String userPetsEndpoint = '/api/Adoption/Pets/admin/user';
   // Headers
   static const String contentTypeHeader = 'Content-Type';
   static const String applicationJson = 'application/json';

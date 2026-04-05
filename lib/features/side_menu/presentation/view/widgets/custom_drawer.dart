@@ -125,13 +125,19 @@ class CustomDrawer extends StatelessWidget {
                     icon: Icons.help_outline_rounded,
                     label: AppText.helpSupport,
                     color: AppColors.current.primary,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      context.push(AppRoutes.helpSupport);
+                    },
                   ),
                   _TileSvg(
                     path: 'assets/icons/terms.svg',
                     label: AppText.legal,
                     color: AppColors.current.gray,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      context.push(AppRoutes.legal);
+                    },
                   ),
                   Padding(
                     padding: EdgeInsets.fromLTRB(20.w, 4.h, 20.w, 4.h),

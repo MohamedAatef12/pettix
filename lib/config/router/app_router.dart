@@ -5,6 +5,14 @@ import '../../features/profile/presentation/bloc/profile_bloc.dart';
 import '../../features/profile/presentation/bloc/profile_event.dart';
 import '../../features/profile/presentation/view/edit_profile_screen.dart';
 import '../../features/profile/presentation/view/profile_screen.dart';
+import '../../features/help_support/presentation/view/help_support_page.dart';
+import '../../features/help_support/presentation/view/faq_page.dart';
+import '../../features/help_support/presentation/view/contact_support_page.dart';
+import '../../features/help_support/presentation/view/report_problem_page.dart';
+import '../../features/help_support/presentation/view/send_feedback_page.dart';
+import '../../features/legal/presentation/view/legal_page.dart';
+import '../../features/legal/presentation/view/about_pettix_page.dart';
+import '../../features/legal/presentation/view/legal_content_page.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 import '../../features/auth/presentation/pages/forgot_password/password_reset_done_page.dart';
 import '../../features/auth/presentation/pages/forgot_password/reset_password_page.dart';
@@ -228,6 +236,58 @@ GoRouter appRouter() => GoRouter(
           child: const EditProfileScreen(),
         );
       },
+    ),
+    // ── Help & Support ────────────────────────────────────────────────────────
+    GoRoute(
+      path: AppRoutes.helpSupport,
+      name: AppRouteNames.helpSupport,
+      builder: (_, __) => const HelpSupportPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.faq,
+      name: AppRouteNames.faq,
+      builder: (_, __) => const FaqPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.contactSupport,
+      name: AppRouteNames.contactSupport,
+      builder: (_, __) => const ContactSupportPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.reportProblem,
+      name: AppRouteNames.reportProblem,
+      builder: (_, __) => const ReportProblemPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.sendFeedback,
+      name: AppRouteNames.sendFeedback,
+      builder: (_, __) => const SendFeedbackPage(),
+    ),
+    // ── Legal ─────────────────────────────────────────────────────────────────
+    GoRoute(
+      path: AppRoutes.legal,
+      name: AppRouteNames.legal,
+      builder: (_, __) => const LegalPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.aboutPettix,
+      name: AppRouteNames.aboutPettix,
+      builder: (_, __) => const AboutPettixPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.privacyPolicy,
+      name: AppRouteNames.privacyPolicy,
+      builder: (_, __) => const PrivacyPolicyPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.termsConditions,
+      name: AppRouteNames.termsConditions,
+      builder: (_, __) => const TermsConditionsPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.refundPolicy,
+      name: AppRouteNames.refundPolicy,
+      builder: (_, __) => const RefundPolicyPage(),
     ),
     // GoRoute(
     //   path: AppRoutes.signUp,

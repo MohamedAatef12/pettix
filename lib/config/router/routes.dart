@@ -28,6 +28,20 @@ class AppRoutes {
   static const String messages = '/messages';
   static const String friends = '/friends';
   static const String adoptionForm = '/adoption_form';
+  // Help & Support
+  static const String helpSupport = '/help_support';
+  static const String faq = '/faq';
+  static const String contactSupport = '/contact_support';
+  static const String reportProblem = '/report_problem';
+  static const String sendFeedback = '/send_feedback';
+  // Legal
+  static const String legal = '/legal';
+  static const String aboutPettix = '/about_pettix';
+  static const String privacyPolicy = '/privacy_policy';
+  static const String termsConditions = '/terms_conditions';
+  static const String refundPolicy = '/refund_policy';
+  // My Pets
+  static const String addPet = '/add_pet';
 }
 
 class AppRouteNames {
@@ -60,4 +74,18 @@ class AppRouteNames {
   static const String messages = 'messages';
   static const String friends = 'friends';
   static const String adoptionForm = 'adoption_form';
+  // Help & Support
+  static const String helpSupport = 'help_support';
+  static const String faq = 'faq';
+  static const String contactSupport = 'contact_support';
+  static const String reportProblem = 'report_problem';
+  static const String sendFeedback = 'send_feedback';
+  // Legal
+  static const String legal = 'legal';
+  static const String aboutPettix = 'about_pettix';
+  static const String privacyPolicy = 'privacy_policy';
+  static const String termsConditions = 'terms_conditions';
+  static const String refundPolicy = 'refund_policy';
+  // My Pets
+  static const String addPet = 'add_pet';
 }
