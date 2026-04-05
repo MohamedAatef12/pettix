@@ -20,12 +20,14 @@ class EditProfileBody extends StatelessWidget {
     final profile = state.profile;
     if (profile == null) return;
 
+    final phone = bloc.phoneController.text.trim();
     bloc.add(
       UpdateProfileEvent(
         UpdateProfileEntity(
           id: profile.id,
           nameEn: bloc.nameEnController.text.trim(),
           nameAr: bloc.nameArController.text.trim(),
+          phone: phone.isEmpty ? null : phone,
           age: int.tryParse(bloc.ageController.text.trim()),
           address: bloc.addressController.text.trim(),
           genderId: state.selectedGenderId,
@@ -149,6 +151,14 @@ class EditProfileBody extends StatelessWidget {
                       label: AppText.nameAr,
                       icon: Icons.translate_rounded,
                       iconColor: const Color(0xFF7A6FD8),
+                    ),
+                    SizedBox(height: 12.h),
+                    _FilledField(
+                      controller: bloc.phoneController,
+                      label: AppText.phone,
+                      icon: Icons.phone_outlined,
+                      iconColor: const Color(0xFF56C590),
+                      keyboardType: TextInputType.phone,
                     ),
                     SizedBox(height: 24.h),
 

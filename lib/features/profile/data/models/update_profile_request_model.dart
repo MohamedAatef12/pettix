@@ -10,8 +10,14 @@ class AvatarModel extends AvatarEntity {
   Map<String, dynamic> toJson() => {
     'filename': filename,
     'base64': base64,
-    'state': state,
+    'state': state.value,
   };
+
+  factory AvatarModel.fromEntity(AvatarEntity entity) => AvatarModel(
+    filename: entity.filename,
+    base64: entity.base64,
+    state: entity.state,
+  );
 }
 
 class UpdateProfileRequestModel extends UpdateProfileEntity {
@@ -25,6 +31,7 @@ class UpdateProfileRequestModel extends UpdateProfileEntity {
     super.statusId,
     super.age,
     super.address,
+    super.phone,
   });
 
   Map<String, dynamic> toJson() {
@@ -37,6 +44,7 @@ class UpdateProfileRequestModel extends UpdateProfileEntity {
       'statusId': statusId,
       'age': age,
       'address': address,
+      'phone': phone,
     };
     if (avatar != null) {
       map['avatar'] = (avatar as AvatarModel).toJson();
@@ -61,6 +69,7 @@ class UpdateProfileRequestModel extends UpdateProfileEntity {
       statusId: entity.statusId,
       age: entity.age,
       address: entity.address,
+      phone: entity.phone,
     );
   }
 }

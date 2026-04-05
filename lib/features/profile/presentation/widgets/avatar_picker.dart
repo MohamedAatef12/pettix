@@ -13,10 +13,10 @@ class AvatarPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ProfileBloc, ProfileState>(
-      buildWhen: (prev, curr) => prev.pickedAvatar != curr.pickedAvatar,
+      buildWhen: (prev, curr) => prev.pickedAvatarBytes != curr.pickedAvatarBytes,
       builder: (context, state) {
-        final ImageProvider image = state.pickedAvatar != null
-            ? FileImage(state.pickedAvatar!)
+        final ImageProvider image = state.pickedAvatarBytes != null
+            ? MemoryImage(state.pickedAvatarBytes!)
             : currentAvatarUrl != null
                 ? NetworkImage(currentAvatarUrl!) as ImageProvider
                 : const AssetImage('assets/images/no_user.png');

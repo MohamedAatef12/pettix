@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/adoption/presentation/view/application_view.dart';
 import '../../features/profile/presentation/bloc/profile_bloc.dart';
+import '../../features/profile/presentation/bloc/profile_event.dart';
 import '../../features/profile/presentation/view/edit_profile_screen.dart';
 import '../../features/profile/presentation/view/profile_screen.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
@@ -214,10 +215,19 @@ GoRouter appRouter() => GoRouter(
     GoRoute(
       path: AppRoutes.editProfile,
       name: AppRouteNames.editProfile,
-      builder: (context, state) => BlocProvider.value(
-        value: state.extra as ProfileBloc,
-        child: const EditProfileScreen(),
-      ),
+      builder: (context, state) {
+        final existingBloc = state.extra is ProfileBloc ? state.extra as ProfileBloc : null;
+        if (existingBloc != null) {
+          return BlocProvider.value(
+            value: existingBloc,
+            child: const EditProfileScreen(),
+          );
+        }
+        return BlocProvider(
+          create: (_) => DI.find<ProfileBloc>()..add(FetchProfileEvent()),
+          child: const EditProfileScreen(),
+        );
+      },
     ),
     // GoRoute(
     //   path: AppRoutes.signUp,

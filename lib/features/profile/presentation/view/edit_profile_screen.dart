@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_event.dart';
+import 'package:pettix/features/profile/presentation/bloc/profile_state.dart';
 import 'package:pettix/features/profile/presentation/widgets/edit_profile_body.dart';
 
 class EditProfileScreen extends StatelessWidget {
@@ -9,10 +10,19 @@ class EditProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Re-use the same ProfileBloc from parent; init controllers with current data
-    context.read<ProfileBloc>().add(InitEditFormEvent());
-    return const Scaffold(
-      body: SafeArea(child: EditProfileBody()),
+    final bloc = context.read<ProfileBloc>();
+    // If profile is already in state (navigated from profile screen), init form now.
+    // Otherwise the BlocListener below will fire once the fresh fetch completes.
+    if (bloc.state.profile != null) {
+      bloc.add(InitEditFormEvent());
+    }
+    return BlocListener<ProfileBloc, ProfileState>(
+      listenWhen: (prev, curr) =>
+          prev.status != curr.status && curr.status == ProfileStatus.loaded,
+      listener: (context, state) {
+        context.read<ProfileBloc>().add(InitEditFormEvent());
+      },
+      child: const Scaffold(body: SafeArea(child: EditProfileBody())),
     );
   }
 }

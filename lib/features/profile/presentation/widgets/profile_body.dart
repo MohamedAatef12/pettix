@@ -53,7 +53,13 @@ class _ProfileContent extends StatelessWidget {
         SingleChildScrollView(
           child: Column(
             children: [
-              ProfileHeader(profile: profile),
+              ProfileHeader(
+                profile: profile,
+                onEditTap: () => context.push(
+                  AppRoutes.editProfile,
+                  extra: context.read<ProfileBloc>(),
+                ),
+              ),
               ProfileNameSection(profile: profile),
               SizedBox(height: 24.h),
               Padding(
@@ -115,18 +121,12 @@ class _ProfileContent extends StatelessWidget {
                         ),
                       ],
                     ),
-                    SizedBox(height: 100.h),
+                    SizedBox(height: 32.h),
                   ],
                 ),
               ),
             ],
           ),
-        ),
-        Positioned(
-          bottom: 24.h,
-          left: 20.w,
-          right: 20.w,
-          child: _EditButton(profile: profile),
         ),
       ],
     );
@@ -151,45 +151,4 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-class _EditButton extends StatelessWidget {
-  final UserEntity profile;
-  const _EditButton({required this.profile});
 
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => context.push(
-        AppRoutes.editProfile,
-        extra: context.read<ProfileBloc>(),
-      ),
-      child: Container(
-        height: 52.h,
-        decoration: BoxDecoration(
-          color: AppColors.current.primary,
-          borderRadius: BorderRadius.circular(16.r),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.current.primary.withAlpha(80),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.edit_rounded, color: Colors.white, size: 18.w),
-            SizedBox(width: 8.w),
-            Text(
-              AppText.editProfile,
-              style: AppTextStyles.bold.copyWith(
-                color: Colors.white,
-                fontSize: 15.sp,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

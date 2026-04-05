@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/auth/domain/entities/user_entity.dart';
 
 class ProfileHeader extends StatelessWidget {
   final UserEntity profile;
-  const ProfileHeader({super.key, required this.profile});
+  final VoidCallback? onEditTap;
+  const ProfileHeader({super.key, required this.profile, this.onEditTap});
 
   @override
   Widget build(BuildContext context) {
@@ -30,10 +32,25 @@ class ProfileHeader extends StatelessWidget {
           ),
         ),
 
+        // Back button
+        if (context.canPop())
+          Positioned(
+            top: 12.h,
+            left: 8.w,
+            child: IconButton(
+              onPressed: () => context.pop(),
+              icon: Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: Colors.white,
+                size: 20.w,
+              ),
+            ),
+          ),
+
         // Avatar — floats at the bottom edge of the band
         Positioned(
           bottom: -46.h,
-          child: Column(
+          child: Stack(
             children: [
               Container(
                 padding: EdgeInsets.all(3.w),
@@ -67,6 +84,35 @@ class ProfileHeader extends StatelessWidget {
                   ),
                 ),
               ),
+              if (onEditTap != null)
+                Positioned(
+                  bottom: 2.h,
+                  right: 2.w,
+                  child: GestureDetector(
+                    onTap: onEditTap,
+                    child: Container(
+                      width: 26.w,
+                      height: 26.w,
+                      decoration: BoxDecoration(
+                        color: AppColors.current.primary,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2.w),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.current.primary.withAlpha(80),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.edit_rounded,
+                        color: Colors.white,
+                        size: 13.w,
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

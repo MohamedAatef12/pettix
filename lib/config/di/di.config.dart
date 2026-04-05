@@ -36,6 +36,7 @@ import '../../features/auth/data/sources/remote/auth_remote_data_source.dart'
 import '../../features/auth/data/sources/remote/auth_remote_data_source_impl.dart'
     as _i523;
 import '../../features/auth/domain/repositories/auth_repository.dart' as _i787;
+import '../../features/auth/domain/usecases/apple_login_use_case.dart' as _i700;
 import '../../features/auth/domain/usecases/forgot_password.dart' as _i510;
 import '../../features/auth/domain/usecases/google_login_use_case.dart'
     as _i550;
@@ -128,6 +129,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i894.ProfileRepository>(
       () => _i988.ProfileRepositoryImpl(gh<_i847.ProfileRemoteDataSource>()),
+    );
+    gh.factory<_i700.AppleLoginUseCase>(
+      () => _i700.AppleLoginUseCase(gh<_i787.AuthRepository>()),
     );
     gh.lazySingleton<_i133.AdoptionRepository>(
       () => _i35.AdoptionRepositoryImpl(gh<_i956.AdoptionRemoteDataSource>()),

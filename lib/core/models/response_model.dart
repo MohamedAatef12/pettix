@@ -25,9 +25,9 @@ class ResponseModel extends ResponseEntity{
 
   factory ResponseModel.fromJson(Map<String, dynamic> json) {
     return ResponseModel(
-      success: json['success'] as bool,
-      message: json['message'] as String,
-      traceId: json['traceId'] as String,
+      success: json['success'] as bool? ?? false,
+      message: json['message'] as String? ?? '',
+      traceId: json['traceId'] as String? ?? '',
       result: json['result'],
     );
   }

@@ -1,9 +1,10 @@
 import 'package:equatable/equatable.dart';
+import 'package:pettix/core/enums/app_enums.dart';
 
 class AvatarEntity extends Equatable {
   final String filename;
   final String base64;
-  final int state; // 0=unchanged, 1=new, 2=deleted
+  final ImageFileState state;
 
   const AvatarEntity({
     required this.filename,
@@ -25,6 +26,7 @@ class UpdateProfileEntity extends Equatable {
   final int? statusId;
   final int? age;
   final String? address;
+  final String? phone;
 
   const UpdateProfileEntity({
     required this.id,
@@ -36,6 +38,7 @@ class UpdateProfileEntity extends Equatable {
     this.statusId,
     this.age,
     this.address,
+    this.phone,
   });
 
   @override
@@ -49,5 +52,6 @@ class UpdateProfileEntity extends Equatable {
     statusId,
     age,
     address,
+    phone,
   ];
 }

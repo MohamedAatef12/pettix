@@ -1,10 +1,10 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:injectable/injectable.dart';
+import 'package:pettix/core/enums/app_enums.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/features/auth/data/models/user_model.dart';
 import 'package:pettix/features/profile/domain/entities/update_profile_entity.dart';
@@ -26,6 +26,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final nameArController = TextEditingController();
   final ageController = TextEditingController();
   final addressController = TextEditingController();
+  final phoneController = TextEditingController();
 
   ProfileBloc(
     this._getProfileUseCase,
@@ -75,6 +76,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     nameArController.text = profile.nameAr ?? '';
     ageController.text = profile.age?.toString() ?? '';
     addressController.text = profile.address ?? '';
+    phoneController.text = profile.phone ?? '';
     emit(state.copyWith(selectedGenderId: profile.genderId, clearAvatar: true));
   }
 
@@ -86,14 +88,14 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
     UpdateProfileEntity request = event.request;
 
-    if (state.pickedAvatar != null) {
-      final bytes = await state.pickedAvatar!.readAsBytes();
-      final base64Str = base64Encode(bytes);
-      final filename = state.pickedAvatar!.path.split('/').last;
+    if (state.pickedAvatarBytes != null) {
+      final base64Str = base64Encode(state.pickedAvatarBytes!);
+      final filename = state.pickedAvatarFilename ?? 'avatar.jpg';
       request = UpdateProfileEntity(
         id: event.request.id,
         nameAr: event.request.nameAr,
         nameEn: event.request.nameEn,
+        phone: event.request.phone,
         genderId: event.request.genderId,
         contactTypeId: event.request.contactTypeId,
         statusId: event.request.statusId,
@@ -102,33 +104,37 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         avatar: AvatarEntity(
           filename: filename,
           base64: base64Str,
-          state: 1,
+          state: (state.profile?.avatar == null)
+              ? ImageFileState.newFile
+              : ImageFileState.modified,
         ),
       );
     }
 
     final result = await _updateProfileUseCase(request);
-    result.fold(
-      (failure) => emit(
-        state.copyWith(
+
+    if (result.isLeft()) {
+      result.fold(
+        (failure) => emit(state.copyWith(
           status: ProfileStatus.error,
           errorMessage: failure.message,
-        ),
-      ),
-      (_) async {
-        final userId = _cacheManager.getUserData()?.id ?? event.request.id;
-        final fetchResult = await _getProfileUseCase(userId);
-        fetchResult.fold(
-          (_) => emit(state.copyWith(status: ProfileStatus.success, clearAvatar: true)),
-          (updated) {
-            _cacheManager.setUserData(UserModel.fromEntity(updated));
-            emit(state.copyWith(
-              status: ProfileStatus.success,
-              profile: updated,
-              clearAvatar: true,
-            ));
-          },
-        );
+        )),
+        (_) {},
+      );
+      return;
+    }
+
+    final userId = _cacheManager.getUserData()?.id ?? event.request.id;
+    final fetchResult = await _getProfileUseCase(userId);
+    fetchResult.fold(
+      (_) => emit(state.copyWith(status: ProfileStatus.success, clearAvatar: true)),
+      (updated) {
+        _cacheManager.setUserData(UserModel.fromEntity(updated));
+        emit(state.copyWith(
+          status: ProfileStatus.success,
+          profile: updated,
+          clearAvatar: true,
+        ));
       },
     );
   }
@@ -142,7 +148,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       imageQuality: 70,
     );
     if (picked != null) {
-      emit(state.copyWith(pickedAvatar: File(picked.path)));
+      // Read bytes immediately — avoids stale temp-cache path issues on Android
+      final bytes = await picked.readAsBytes();
+      emit(state.copyWith(
+        pickedAvatarBytes: bytes,
+        pickedAvatarFilename: picked.name,
+      ));
     }
   }
 
@@ -152,6 +163,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     nameArController.dispose();
     ageController.dispose();
     addressController.dispose();
+    phoneController.dispose();
     return super.close();
   }
 }

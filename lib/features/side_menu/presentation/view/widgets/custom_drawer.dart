@@ -9,6 +9,7 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
+import 'package:pettix/data/network/constants.dart';
 import 'package:pettix/features/auth/data/models/user_model.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -50,7 +51,10 @@ class CustomDrawer extends StatelessWidget {
                     icon: Icons.edit_rounded,
                     label: AppText.editProfile,
                     color: const Color(0xFF7A6FD8),
-                    onTap: () => context.push(AppRoutes.profile),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      context.push(AppRoutes.editProfile);
+                    },
                   ),
                   _Section(AppText.activity),
                   _Tile(
@@ -179,7 +183,11 @@ class _DrawerHeader extends StatelessWidget {
               Expanded(child: _UserInfo(user: user)),
               IconButton(
                 onPressed: () => Navigator.of(context).pop(),
-                icon: Icon(Icons.close_rounded, color: Colors.white60, size: 20.w),
+                icon: Icon(
+                  Icons.close_rounded,
+                  color: Colors.white60,
+                  size: 20.w,
+                ),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
               ),
@@ -202,7 +210,11 @@ class _DrawerHeader extends StatelessWidget {
                       ),
                     ),
                     SizedBox(width: 4.w),
-                    Icon(Icons.swap_horiz_rounded, color: Colors.white70, size: 14.w),
+                    Icon(
+                      Icons.swap_horiz_rounded,
+                      color: Colors.white70,
+                      size: 14.w,
+                    ),
                   ],
                 ),
               ),
@@ -225,15 +237,21 @@ class _Avatar extends StatelessWidget {
         shape: BoxShape.circle,
         border: Border.all(color: Colors.white, width: 2.w),
         boxShadow: [
-          BoxShadow(color: Colors.black.withAlpha(50), blurRadius: 8, offset: const Offset(0, 2)),
+          BoxShadow(
+            color: Colors.black.withAlpha(50),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: CircleAvatar(
         radius: 28.r,
         backgroundColor: AppColors.current.lightGray,
-        backgroundImage: url != null
-            ? NetworkImage(url!)
-            : const AssetImage('assets/images/no_user.png') as ImageProvider,
+        backgroundImage:
+            url != null
+                ? NetworkImage("${Constants.baseUrl}/${url!}")
+                : const AssetImage('assets/images/no_user.png')
+                    as ImageProvider,
       ),
     );
   }
@@ -253,7 +271,10 @@ class _UserInfo extends StatelessWidget {
             Flexible(
               child: Text(
                 user?.userName ?? AppText.userName,
-                style: AppTextStyles.bold.copyWith(color: Colors.white, fontSize: 15.sp),
+                style: AppTextStyles.bold.copyWith(
+                  color: Colors.white,
+                  fontSize: 15.sp,
+                ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -264,14 +285,20 @@ class _UserInfo extends StatelessWidget {
         SizedBox(height: 3.h),
         Text(
           user?.email ?? '',
-          style: AppTextStyles.smallDescription.copyWith(color: Colors.white60, fontSize: 11.sp),
+          style: AppTextStyles.smallDescription.copyWith(
+            color: Colors.white60,
+            fontSize: 11.sp,
+          ),
           overflow: TextOverflow.ellipsis,
         ),
         if (user?.phone != null) ...[
           SizedBox(height: 1.h),
           Text(
             user!.phone!,
-            style: AppTextStyles.smallDescription.copyWith(color: Colors.white60, fontSize: 11.sp),
+            style: AppTextStyles.smallDescription.copyWith(
+              color: Colors.white60,
+              fontSize: 11.sp,
+            ),
           ),
         ],
       ],
@@ -339,15 +366,20 @@ class _Tile extends StatelessWidget {
   final Color color;
   final VoidCallback onTap;
 
-  const _Tile({required this.icon, required this.label, required this.color, required this.onTap});
+  const _Tile({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) => _TileBase(
-        iconWidget: Icon(icon, color: color, size: 18.w),
-        iconBg: color.withAlpha(26),
-        label: label,
-        onTap: onTap,
-      );
+    iconWidget: Icon(icon, color: color, size: 18.w),
+    iconBg: color.withAlpha(26),
+    label: label,
+    onTap: onTap,
+  );
 }
 
 class _TileSvg extends StatelessWidget {
@@ -356,20 +388,25 @@ class _TileSvg extends StatelessWidget {
   final Color color;
   final VoidCallback onTap;
 
-  const _TileSvg({required this.path, required this.label, required this.color, required this.onTap});
+  const _TileSvg({
+    required this.path,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) => _TileBase(
-        iconWidget: SvgPicture.asset(
-          path,
-          width: 18.w,
-          height: 18.w,
-          colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-        ),
-        iconBg: color.withAlpha(26),
-        label: label,
-        onTap: onTap,
-      );
+    iconWidget: SvgPicture.asset(
+      path,
+      width: 40.w,
+      height: 40.w,
+      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+    ),
+    iconBg: color.withAlpha(26),
+    label: label,
+    onTap: onTap,
+  );
 }
 
 class _TilePng extends StatelessWidget {
@@ -378,15 +415,20 @@ class _TilePng extends StatelessWidget {
   final Color color;
   final VoidCallback onTap;
 
-  const _TilePng({required this.path, required this.label, required this.color, required this.onTap});
+  const _TilePng({
+    required this.path,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) => _TileBase(
-        iconWidget: Image.asset(path, width: 18.w, height: 18.w, color: color),
-        iconBg: color.withAlpha(26),
-        label: label,
-        onTap: onTap,
-      );
+    iconWidget: Image.asset(path, width: 18.w, height: 18.w, color: color),
+    iconBg: color.withAlpha(26),
+    label: label,
+    onTap: onTap,
+  );
 }
 
 class _TileBase extends StatelessWidget {
@@ -395,7 +437,12 @@ class _TileBase extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _TileBase({required this.iconWidget, required this.iconBg, required this.label, required this.onTap});
+  const _TileBase({
+    required this.iconWidget,
+    required this.iconBg,
+    required this.label,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -409,7 +456,10 @@ class _TileBase extends StatelessWidget {
             Container(
               width: 36.w,
               height: 36.w,
-              decoration: BoxDecoration(color: iconBg, borderRadius: BorderRadius.circular(10.r)),
+              decoration: BoxDecoration(
+                color: iconBg,
+                borderRadius: BorderRadius.circular(10.r),
+              ),
               child: Center(child: iconWidget),
             ),
             SizedBox(width: 12.w),
@@ -423,7 +473,11 @@ class _TileBase extends StatelessWidget {
                 ),
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: AppColors.current.midGray, size: 18.w),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: AppColors.current.midGray,
+              size: 18.w,
+            ),
           ],
         ),
       ),
@@ -460,7 +514,10 @@ class _LogoutTile extends StatelessWidget {
                   'assets/icons/logout_right.svg',
                   width: 18.w,
                   height: 18.w,
-                  colorFilter: ColorFilter.mode(AppColors.current.red, BlendMode.srcIn),
+                  colorFilter: ColorFilter.mode(
+                    AppColors.current.red,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),
