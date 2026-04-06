@@ -10,21 +10,40 @@ class CommentModel extends CommentEntity {
     required super.creationDate,
     required super.author,
     required super.parentCommentId,
+    required super.status,
     required super.replies,
     required super.postId,
-    required super.likes
+    required super.likes,
   });
 
   factory CommentModel.fromJson(Map<String, dynamic> json) {
     return CommentModel(
-      id: json['id'] as int,
-      postId: json['postId'] as int,
-      text: json['text'] ?? '',
-      creationDate: json['creationDate'] ?? '',
-      author: AuthorModel.fromJson(json['author']),
-      parentCommentId: json['parentCommentId'] as int?,
+      id: (json['id'] ?? 0) is int ? json['id'] ?? 0 : int.tryParse(json['id'].toString()) ?? 0,
+      postId: (json['postId'] ?? 0) is int ? json['postId'] ?? 0 : int.tryParse(json['postId'].toString()) ?? 0,
+      text: json['text']?.toString() ?? '',
+      creationDate: json['creationDate']?.toString() ?? '',
+      status: json['status'] as int? ?? 1,
+      author: json['author'] != null
+          ? AuthorModel.fromJson(json['author'] as Map<String, dynamic>)
+          : const AuthorModel(
+        id: 0,
+        nameAr: '',
+        nameEn: '',
+        avatar: '',
+        email: null,
+        phone: null,
+        genderId: null,
+        genderName: null,
+        contactTypeId: 4,
+        statusId: 1,
+        age: null,
+      ),
+      parentCommentId: json['parentCommentId'] is int
+          ? json['parentCommentId']
+          : int.tryParse(json['parentCommentId']?.toString() ?? ''),
       replies: (json['replies'] as List<dynamic>?)
-          ?.map((e) => CommentModel.fromJson(e as Map<String, dynamic>))
+          ?.where((e) => e is Map<String, dynamic>)
+          .map((e) => CommentModel.fromJson(e as Map<String, dynamic>))
           .toList() ??
           [],
       likes: (json['likes'] as List<dynamic>?)
@@ -34,40 +53,42 @@ class CommentModel extends CommentEntity {
     );
   }
 
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'text': text,
-      'author': author,
+      'author': (author as AuthorModel).toJson(),
       'creationDate': creationDate,
       'parentCommentId': parentCommentId,
-      'replies': replies,
+      'status': status,
+      'replies': replies.map((e) => (e as CommentModel).toJson()).toList(),
       'postId': postId,
-      'likes':likes
+      'likes': likes.map((e) => (e as CommentsLikeModel).toJson()).toList(),
     };
   }
 
-  CommentModel.fromEntity(CommentEntity commentEntity)
-    : super(
-        id: commentEntity.id,
-        text: commentEntity.text,
-        author: commentEntity.author,
-        creationDate: commentEntity.creationDate,
-        parentCommentId: commentEntity.parentCommentId,
-        replies: commentEntity.replies,
-        postId: commentEntity.postId,
-      likes: commentEntity.likes
-      );
+  CommentModel.fromEntity(CommentEntity entity)
+      : super(
+    id: entity.id,
+    text: entity.text,
+    author: entity.author,
+    creationDate: entity.creationDate,
+    parentCommentId: entity.parentCommentId,
+    status: entity.status,
+    replies: entity.replies,
+    postId: entity.postId,
+    likes: entity.likes,
+  );
 
-  CommentEntity toEntity(CommentModel commentModel) => CommentEntity(
-    id: commentModel.id,
-    text: commentModel.text,
-    postId: commentModel.postId,
-    author: commentModel.author,
-    creationDate: commentModel.creationDate,
-    parentCommentId: commentModel.parentCommentId,
-    replies: commentModel.replies,
-    likes: commentModel.likes
+  CommentEntity toEntity() => CommentEntity(
+    id: id,
+    text: text,
+    postId: postId,
+    author: author,
+    creationDate: creationDate,
+    parentCommentId: parentCommentId,
+    status: status,
+    replies: replies,
+    likes: likes,
   );
 }

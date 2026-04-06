@@ -16,7 +16,8 @@ class DioFailure extends Failure {
 
       if (responseData is Map && responseData['message'] != null) {
         serverMessage = responseData['message'].toString();
-      } else if (responseData is String) {
+        if (serverMessage.isEmpty) serverMessage = null;
+      } else if (responseData is String && responseData.trim().isNotEmpty) {
         serverMessage = responseData;
       }
 

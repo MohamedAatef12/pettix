@@ -9,6 +9,7 @@ class CommentEntity extends Equatable {
   final String creationDate;
   final AuthorEntity author;
   final int? parentCommentId;
+  final int status;
   final List<CommentEntity> replies;
   final List<CommentLikeEntity> likes;
 
@@ -19,6 +20,7 @@ class CommentEntity extends Equatable {
     required this.author,
     required this.creationDate,
     this.parentCommentId,
+    required this.status,
     required this.replies,
     required this.likes,
   });
@@ -30,6 +32,7 @@ class CommentEntity extends Equatable {
     String? creationDate,
     AuthorEntity? author,
     int? parentCommentId,
+    int? status,
     List<CommentEntity>? replies,
     List<CommentLikeEntity>? likes,
   }) {
@@ -40,6 +43,7 @@ class CommentEntity extends Equatable {
       author: author ?? this.author,
       creationDate: creationDate ?? this.creationDate,
       parentCommentId: parentCommentId ?? this.parentCommentId,
+      status: status ?? this.status,
       replies: replies ?? List<CommentEntity>.from(this.replies),
       likes: likes ?? List<CommentLikeEntity>.from(this.likes),
     );
@@ -53,6 +57,7 @@ class CommentEntity extends Equatable {
     author,
     creationDate,
     parentCommentId,
+    status,
     replies,
     likes,
   ];

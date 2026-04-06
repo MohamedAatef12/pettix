@@ -5,15 +5,17 @@ class LikesEntity extends Equatable {
   final int id;
   final AuthorEntity author;
   final String creationDate;
-  final int? postId ;
+  final int? postId;
+  final String? postContent;
 
   const LikesEntity({
     required this.id,
-   required this.author,
+    required this.author,
     required this.creationDate,
-     this.postId,
+    this.postId,
+    this.postContent,
   });
 
   @override
-  List<Object?> get props => [id, author, creationDate, postId];
+  List<Object?> get props => [id, author, creationDate, postId, postContent];
 }

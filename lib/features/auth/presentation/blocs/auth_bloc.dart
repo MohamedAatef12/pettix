@@ -196,8 +196,12 @@ Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) asyn
         await DI.find<ICacheManager>()
             .setUserData(UserModel.fromEntity(loginResponse.contact));
         await DI.find<ICacheManager>().setToken(loginResponse.token);
-        await DI.find<ICacheManager>().setRefreshToken(loginResponse.refreshToken.toString());// ✅ stores user + logged_in = true
-
+        await DI.find<ICacheManager>().setRefreshToken(loginResponse.refreshToken.toString());
+        await DI.find<ICacheManager>().setSavedCredentials(
+          event.model.email,
+          event.model.password,
+        );
+        
         if (event.rememberMe) {
           await DI.find<ICacheManager>().saveLogin(true);
         } else {

@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:pettix/data/network/failure.dart';
 import 'package:pettix/features/home/data/models/comments_like_model.dart';
+import '../../models/paginated_posts_model.dart';
 
 import '../../models/comments_model.dart';
 import '../../models/likes_model.dart';
@@ -8,7 +9,7 @@ import '../../models/post_model.dart';
 
 abstract class RemoteDataSource {
   // Posts
-  Future<Either<Failure, List<PostModel>>> getPosts();
+  Future<Either<Failure, PaginatedPostsModel>> getPosts({int pageIndex = 1, int pageSize = 10});
   Future<Either<Failure, void>> addPost(PostModel post);
   Future<Either<Failure, void>> deletePost(int id);
   Future<Either<Failure, void>> editPost(PostModel post);
@@ -34,4 +35,7 @@ abstract class RemoteDataSource {
   Future<Either<Failure, void>> reportPost(int postId, int reasonId, String reason);
   Future<Either<Failure, List<dynamic>>> getReportReasons();
   Future<Either<Failure, List<dynamic>>> reportedPosts(int postId);
+// saved posts
+  Future<Either<Failure, void>> savePost(int postId);
+  Future<Either<Failure, void>> unSavePost(int postId);
 }

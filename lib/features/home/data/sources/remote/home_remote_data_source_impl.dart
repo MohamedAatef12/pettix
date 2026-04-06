@@ -10,10 +10,11 @@ import 'package:pettix/data/network/failure.dart';
 import 'package:pettix/features/home/data/models/comments_like_model.dart';
 import 'package:pettix/features/home/data/models/comments_model.dart';
 import 'package:pettix/features/home/data/models/likes_model.dart';
+import 'package:pettix/features/home/data/models/paginated_posts_model.dart';
 import 'package:pettix/features/home/data/models/post_model.dart';
 import 'home_remote_data_source.dart';
 
-@Injectable(as: RemoteDataSource)
+@LazySingleton(as: RemoteDataSource)
 class RemoteDataSourceImpl implements RemoteDataSource {
   final ApiService apiService;
 
@@ -22,27 +23,24 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   // Posts
 
   @override
-  Future<Either<Failure, List<PostModel>>> getPosts() async {
+  Future<Either<Failure, PaginatedPostsModel>> getPosts({int pageIndex = 1, int pageSize = 10}) async {
     final userToken = await DI.find<ICacheManager>().getToken();
+    if (userToken == null) return Left(Failure("User is not authenticated"));
     try {
       final response = await apiService.getList(
         endPoint: Constants.postsEndpoint,
         headers: {'Authorization': 'Bearer $userToken'},
+        queryParameters: {
+          'pageIndex': pageIndex,
+          'pageSize': pageSize,
+        },
       );
       if (!response.success) {
         return Left(Failure(response.message));
       }
 
-      final data = response.result as List? ?? [];
-      final posts = data.map((e) => PostModel.fromJson(e)).toList();
-      // Sort posts by date descending (latest first)
-      posts.sort(
-        (a, b) => DateTime.parse(
-          b.creationDate,
-        ).compareTo(DateTime.parse(a.creationDate)),
-      );
-
-      return Right(posts);
+      final resultData = response.result as Map<String, dynamic>? ?? {};
+      return Right(PaginatedPostsModel.fromJson(resultData));
     } catch (e) {
       log('Error fetching posts: $e');
       return Left(DioFailure.fromDioError(e));
@@ -51,6 +49,8 @@ class RemoteDataSourceImpl implements RemoteDataSource {
 
   @override
   Future<Either<Failure, void>> editPost(PostModel post) async {
+    final userToken = await DI.find<ICacheManager>().getToken();
+    if (userToken == null) return Left(Failure("User is not authenticated"));
     try {
       final jsonData = await post.toJson(); // 👈 ضروري await هنا
 
@@ -58,6 +58,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
         endPoint: '${Constants.postsEndpoint}/${post.id}',
         data: jsonData,
         headers: {
+          'Authorization': 'Bearer $userToken',
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
@@ -73,14 +74,17 @@ class RemoteDataSourceImpl implements RemoteDataSource {
 
   @override
   Future<Either<Failure, void>> addPost(PostModel post) async {
+    final userToken = await DI.find<ICacheManager>().getToken();
+    if (userToken == null) return Left(Failure("User is not authenticated"));
     try {
       log('Adding post: ${post.id}');
-      final jsonData = await post.toJson(); // مهم جداً await هنا
-
+      final jsonData = await post.toJson();
+      log("TOKEN: $userToken");
       final response = await apiService.post(
-        endPoint: Constants.postsEndpoint,
+        endPoint: Constants.addPostsEndpoint,
         data: jsonData,
         headers: {
+          'Authorization': 'Bearer $userToken',
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
@@ -98,8 +102,13 @@ class RemoteDataSourceImpl implements RemoteDataSource {
 
   @override
   Future<Either<Failure, void>> deletePost(int id) async {
+    final userToken = await DI.find<ICacheManager>().getToken();
+    if (userToken == null) return Left(Failure("User is not authenticated"));
     try {
-      final response = await apiService.delete(endPoint: '${Constants.postsEndpoint}/$id');
+      final response = await apiService.delete(
+        endPoint: '${Constants.postsEndpoint}/$id',
+        headers: {'Authorization': 'Bearer $userToken'},
+      );
       if (!response.success) {
         return Left(Failure(response.message));
       }
@@ -149,9 +158,10 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     int? parentCommentId,
   ) async {
     final userToken = await DI.find<ICacheManager>().getToken();
+    if (userToken == null) return Left(Failure("User is not authenticated"));
     try {
       final response = await apiService.post(
-        endPoint: '${Constants.commentsEndpoint}/$postId',
+        endPoint: '${Constants.addCommentEndpoint}/$postId',
         data: comment.toJson(),
         headers: {
           'Authorization': 'Bearer $userToken',
@@ -170,8 +180,13 @@ class RemoteDataSourceImpl implements RemoteDataSource {
 
   @override
   Future<Either<Failure, void>> deleteComment(int id) async {
+    final userToken = await DI.find<ICacheManager>().getToken();
+    if (userToken == null) return Left(Failure("User is not authenticated"));
     try {
-      final response = await apiService.delete(endPoint: '${Constants.commentsEndpoint}/$id');
+      final response = await apiService.delete(
+        endPoint: '${Constants.commentsEndpoint}/$id',
+        headers: {'Authorization': 'Bearer $userToken'},
+      );
       if (!response.success) {
         return Left(Failure(response.message));
       }
@@ -183,10 +198,13 @@ class RemoteDataSourceImpl implements RemoteDataSource {
 
   @override
   Future<Either<Failure, void>> editComment(CommentModel comment) async {
+    final userToken = await DI.find<ICacheManager>().getToken();
+    if (userToken == null) return Left(Failure("User is not authenticated"));
     try {
       final response = await apiService.put(
         endPoint: '${Constants.commentsEndpoint}/${comment.id}',
         data: comment.toJson(),
+        headers: {'Authorization': 'Bearer $userToken'},
       );
       if (!response.success) {
         return Left(Failure(response.message));
@@ -245,7 +263,9 @@ class RemoteDataSourceImpl implements RemoteDataSource {
       if (!response.success) {
         return Left(Failure(response.message));
       }
-      return Right(LikesModel.fromJson(response.result as Map<String, dynamic>? ?? {}));
+      return Right(
+        LikesModel.fromJson(response.result as Map<String, dynamic>? ?? {}),
+      );
     } on DioException catch (dioError) {
       return Left(DioFailure.fromDioError(dioError));
     } catch (e) {
@@ -257,15 +277,18 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   Future<Either<Failure, void>> unlikePost(int postId) async {
     try {
       final userToken = await DI.find<ICacheManager>().getToken();
-      final response = await apiService.delete(
-        endPoint: '${Constants.postLikesEndpoint}/$postId',
+      final rawResponse = await apiService.delete(
+        endPoint: '${Constants.postUnLikesEndpoint}/$postId',
         headers: {
           'Authorization': 'Bearer $userToken',
           'Content-Type': 'application/json',
         },
       );
-      if (!response.success) {
-        return Left(Failure(response.message));
+      print(
+        '🚀 [API RESPONSE FOR UNLIKE] success=${rawResponse.success}, message="${rawResponse.message}", result=${rawResponse.result}',
+      );
+      if (!rawResponse.success) {
+        return Left(Failure(rawResponse.message));
       }
       return const Right(null);
     } on DioException catch (dioError) {
@@ -280,13 +303,13 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     try {
       final userToken = await DI.find<ICacheManager>().getToken();
       final response = await apiService.get(
-        endPoint: '${Constants.commentsEndpoint}/$postId/count',
+        endPoint: '${Constants.postCommentsCount}/$postId/count',
         headers: {
           'Authorization': 'Bearer $userToken',
           'Content-Type': 'application/json',
         },
       );
-      
+
       if (!response.success) {
         return Left(Failure(response.message));
       }
@@ -307,7 +330,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   ) async {
     try {
       final response = await apiService.getList(
-        endPoint: '${Constants.commentLikesEndpoint}/comment/$commentId',
+        endPoint: '${Constants.commentLikesCountEndpoint}/$commentId/count',
       );
       if (!response.success) {
         return Left(Failure(response.message));
@@ -337,7 +360,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     try {
       final userToken = await DI.find<ICacheManager>().getToken();
       final response = await apiService.post(
-        endPoint: '${Constants.commentLikesEndpoint}/$commentId',
+        endPoint: '${Constants.likeCommentEndpoint}/$commentId',
         headers: {
           'Authorization': 'Bearer $userToken',
           'Content-Type': 'application/json',
@@ -359,7 +382,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     try {
       final userToken = await DI.find<ICacheManager>().getToken();
       final response = await apiService.delete(
-        endPoint: '${Constants.commentLikesEndpoint}/$commentId',
+        endPoint: '${Constants.unlikeCommentEndpoint}/$commentId',
         headers: {
           'Authorization': 'Bearer $userToken',
           'Content-Type': 'application/json',
@@ -385,8 +408,8 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     try {
       final userToken = await DI.find<ICacheManager>().getToken();
       final response = await apiService.post(
-        endPoint: Constants.reportPostEndpoint,
-        data: {'postId':postId,'reasonId': reasonId, 'customReason': reason},
+        endPoint: Constants.addReportPostEndpoint,
+        data: {'postId': postId, 'reasonId': reasonId, 'customReason': reason},
         headers: {
           'Authorization': 'Bearer $userToken',
           'Content-Type': 'application/json',
@@ -432,5 +455,42 @@ class RemoteDataSourceImpl implements RemoteDataSource {
       return Left(DioFailure.fromDioError(e));
     }
   }
+  @override
+  Future<Either<Failure, void>> savePost(int postId) async {
+    try {
+      final userToken = await DI.find<ICacheManager>().getToken();
+      final response = await apiService.post(
+        endPoint: '${Constants.savePostEndpoint}/$postId/save',
+        headers: {
+          'Authorization': 'Bearer $userToken',
+          'Content-Type': 'application/json',
+        },
+      );
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
+      return const Right(null);
+    } catch (e) {
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
+  @override
+  Future<Either<Failure, void>> unSavePost(int postId) async {
+    try {
+      final userToken = await DI.find<ICacheManager>().getToken();
+      final response = await apiService.delete(
+        endPoint: '${Constants.unSavePostEndpoint}/$postId/unsave',
+        headers: {
+          'Authorization': 'Bearer $userToken',
+          'Content-Type': 'application/json',
+        },
+      );
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
+      return const Right(null);
+    } catch (e) {
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
 }
-

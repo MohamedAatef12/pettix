@@ -1,136 +1,130 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/padding.dart';
-import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/features/home/domain/entities/post_entity.dart';
-import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
-import 'package:pettix/features/home/presentation/blocs/home_event.dart';
-import 'package:pettix/features/home/presentation/blocs/home_state.dart';
+class HomeShimmer extends StatefulWidget {
+  const HomeShimmer({super.key,});
+  @override
+  State<HomeShimmer> createState() => _HomeShimmerState();
+}
 
-class HomeShimmer extends StatelessWidget {
-  const HomeShimmer({super.key});
+class _HomeShimmerState extends State<HomeShimmer>
+  with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: PaddingConstants.verticalSmall,
-      child: ListView.builder(
-        itemCount: 3,
-        itemBuilder:
-            (context, index) => Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: AppColors.current.white,
-                borderRadius: BorderRadius.circular(20.r),
-              ),
-              child: Padding(
-                padding: PaddingConstants.medium,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    /// --- HEADER (User Info)
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 30.r,
-                          backgroundImage: AssetImage(
-                            'assets/images/no_user.png',
-                          ),
-                          onBackgroundImageError: (_, __) {
-                            const AssetImage('assets/images/no_user.png');
-                          },
-                        ),
-                        SizedBox(width: 10.w),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 200.w,
-                              height: 10.h,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.r),
-                                color: AppColors.current.lightGray,
-                              ),
-                            ),
-                            SizedBox(height: 5.h),
-                            Container(
-                              width: 120.w,
-                              height: 10.h,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.r),
-                                color: AppColors.current.lightGray,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Spacer(),
-                        CircleAvatar(
-                          radius: 20.r,
-                          backgroundColor: AppColors.current.white,
-                          child: SvgPicture.asset('assets/icons/more.svg'),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10.h),
-                    /// --- POST CONTENT
-                    Container(
-                      width: 250.w,
-                      height: 10.h,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.r),
-                        color: AppColors.current.lightGray,
-                      ),
-                    ),
-                    SizedBox(height: 5.h),
-                    Container(
-                      width: 270.w,
-                      height: 10.h,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.r),
-                        color: AppColors.current.lightGray,
-                      ),
-                    ),
-                    SizedBox(height: 5.h),
-                    Container(
-                      width: 240.w,
-                      height: 10.h,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.r),
-                        color: AppColors.current.lightGray,
-                      ),
-                    ),
-                    SizedBox(height: 10.h),
-                    SvgPicture.asset(
-                      'assets/images/no_content_photo.svg',
-                      width: double.infinity,
-                      height: 200.h,
-                      fit: BoxFit.fill,
-                    ),
-                    SizedBox(height: 10.h),
-                    Row(
-                      children: [
-                        SvgPicture.asset(
-                          'assets/icons/like.svg',
-                          height: 24.h,
-                          width: 24.w,
-                        ),
-                        SizedBox(width: 14.w),
-                        SvgPicture.asset('assets/icons/comment.svg'),
-                        const Spacer(),
-                        SvgPicture.asset('assets/icons/share.svg'),
-                        SizedBox(width: 10.w),
-                        SvgPicture.asset('assets/icons/save_post.svg'),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+  void initState() {
+  super.initState();
+  _controller = AnimationController(
+  vsync: this,
+  duration: const Duration(milliseconds: 1200),
+  )..repeat(reverse: true);
+  _animation = Tween<double>(begin: 0.4, end: 0.7).animate(
+  CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+  );
+  }
+
+  @override
+  void dispose() {
+  _controller.dispose();
+  super.dispose();
+  }
+Widget _shimmerBox({
+  required double width,
+  required double height,
+  double? borderRadius,
+  BoxShape shape = BoxShape.rectangle,
+}) {
+  return AnimatedBuilder(
+    animation: _animation,
+    builder: (context, child) {
+      return Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: AppColors.current.lightGray,
+          borderRadius: shape == BoxShape.rectangle
+              ? BorderRadius.circular(borderRadius ?? 8.r)
+              : null,
+          shape: shape,
+        ),
+      );
+    },
+  );
+}
+Widget _buildPostCardShimmer() {
+  return Container(
+    width: double.infinity,
+    padding: PaddingConstants.medium,
+    decoration: BoxDecoration(
+      color: AppColors.current.white,
+      borderRadius: BorderRadius.circular(20.r),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Author row
+        Row(
+          children: [
+            _shimmerBox(width: 54.r, height: 54.r, shape: BoxShape.circle),
+            SizedBox(width: 10.w),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _shimmerBox(width: 120.w, height: 12.h, borderRadius: 6.r),
+                SizedBox(height: 6.h),
+                _shimmerBox(width: 80.w, height: 10.h, borderRadius: 6.r),
+              ],
             ),
-      ),
+          ],
+        ),
+        SizedBox(height: 14.h),
+        _shimmerBox(width: 260.w, height: 10.h, borderRadius: 6.r),
+        SizedBox(height: 6.h),
+        _shimmerBox(width: 200.w, height: 10.h, borderRadius: 6.r),
+        SizedBox(height: 6.h),
+        _shimmerBox(width: 240.w, height: 10.h, borderRadius: 6.r),
+        SizedBox(height: 14.h),
+
+        // Image placeholder
+        _shimmerBox(
+          width: double.infinity,
+          height: 200.h,
+          borderRadius: 15.r,
+        ),
+        SizedBox(height: 14.h),
+
+        // Action row
+        Row(
+          children: [
+            _shimmerBox(width: 24.w, height: 24.h, borderRadius: 4.r),
+            SizedBox(width: 6.w),
+            _shimmerBox(width: 20.w, height: 10.h, borderRadius: 4.r),
+            SizedBox(width: 16.w),
+            _shimmerBox(width: 24.w, height: 24.h, borderRadius: 4.r),
+            SizedBox(width: 6.w),
+            _shimmerBox(width: 20.w, height: 10.h, borderRadius: 4.r),
+            const Spacer(),
+            // _shimmerBox(width: 24.w, height: 24.h, borderRadius: 4.r),
+            // SizedBox(width: 10.w),
+            _shimmerBox(width: 24.w, height: 24.h, borderRadius: 4.r),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      physics: const NeverScrollableScrollPhysics(),
+      padding: PaddingConstants.horizontalSmall,
+      children: [
+          _buildPostCardShimmer(),
+          SizedBox(height: 16.h),
+          _buildPostCardShimmer(),
+      ],
     );
   }
 }

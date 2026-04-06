@@ -7,6 +7,7 @@ class LikesModel extends LikesEntity {
     required super.author,
     required super.creationDate,
     super.postId,
+    super.postContent,
   });
 
   factory LikesModel.fromJson(Map<String, dynamic> json) {
@@ -17,24 +18,25 @@ class LikesModel extends LikesEntity {
       author: json['author'] != null
           ? AuthorModel.fromJson(json['author'] as Map<String, dynamic>)
           : const AuthorModel(
-        id: 0,
-        nameAr: '',
-        nameEn: '',
-        avatar: '',
-        email: null,
-        phone: null,
-        genderId: null,
-        genderName: null,
-        contactTypeId: 4,
-        statusId: 1,
-        age: null,
-      ),
+              id: 0,
+              nameAr: '',
+              nameEn: '',
+              avatar: '',
+              email: null,
+              phone: null,
+              genderId: null,
+              genderName: null,
+              contactTypeId: 4,
+              statusId: 1,
+              age: null,
+            ),
       creationDate: json['creationDate']?.toString() ?? '',
       postId: (json['postId'] == null)
           ? null
           : (json['postId'] is int
-          ? json['postId']
-          : int.tryParse(json['postId'].toString())),
+              ? json['postId']
+              : int.tryParse(json['postId'].toString())),
+      postContent: json['postContent']?.toString(),
     );
   }
 
@@ -44,21 +46,24 @@ class LikesModel extends LikesEntity {
       'author': (author as AuthorModel).toJson(),
       'creationDate': creationDate,
       'postId': postId,
+      'postContent': postContent,
     };
   }
 
   LikesModel.fromEntity(LikesEntity entity)
       : super(
-    id: entity.id,
-    author: entity.author,
-    creationDate: entity.creationDate,
-    postId: entity.postId,
-  );
+          id: entity.id,
+          author: entity.author,
+          creationDate: entity.creationDate,
+          postId: entity.postId,
+          postContent: entity.postContent,
+        );
 
-  LikesEntity toEntity(LikesModel model) => LikesEntity(
-    id: model.id,
-    author: model.author,
-    creationDate: model.creationDate,
-    postId: model.postId,
+  LikesEntity toEntity() => LikesEntity(
+    id: id,
+    author: author,
+    creationDate: creationDate,
+    postId: postId,
+    postContent: postContent,
   );
 }

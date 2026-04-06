@@ -60,7 +60,9 @@ import '../../features/home/domain/usecases/get_reported_posts.dart' as _i623;
 import '../../features/home/domain/usecases/get_user_cached%20_data.dart'
     as _i118;
 import '../../features/home/domain/usecases/like_post.dart' as _i58;
+import '../../features/home/domain/usecases/save_post_usecase.dart' as _i989;
 import '../../features/home/domain/usecases/unlike_comment.dart' as _i975;
+import '../../features/home/domain/usecases/unsave_post_usecase.dart' as _i86;
 import 'di.dart' as _i913;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -169,8 +171,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i58.LikePostUseCase>(
       () => _i58.LikePostUseCase(gh<_i986.HomeDomainRepository>()),
     );
+    gh.factory<_i989.SavePostUseCase>(
+      () => _i989.SavePostUseCase(gh<_i986.HomeDomainRepository>()),
+    );
     gh.factory<_i975.UnLikeCommentUseCase>(
       () => _i975.UnLikeCommentUseCase(gh<_i986.HomeDomainRepository>()),
+    );
+    gh.factory<_i86.UnSavePostUseCase>(
+      () => _i86.UnSavePostUseCase(gh<_i986.HomeDomainRepository>()),
     );
     gh.factory<_i118.GetUserDataUseCase>(
       () => _i118.GetUserDataUseCase(gh<_i986.HomeDomainRepository>()),
