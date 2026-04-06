@@ -7,13 +7,14 @@ import 'package:pettix/features/my_pets/presentation/widgets/pet_passport.dart';
 /// National-ID-style card displayed in the horizontal pet list on the profile.
 class PetIdCard extends StatelessWidget {
   final PetEntity pet;
+  final VoidCallback? onToggleStatus;
 
-  const PetIdCard({super.key, required this.pet});
+  const PetIdCard({super.key, required this.pet, this.onToggleStatus});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => showPetPassport(context, pet),
+      onTap: () => showPetPassport(context, pet, onToggleStatus: onToggleStatus),
       child: Container(
         width: 220.w,
         height: 125.h,

@@ -16,6 +16,11 @@ import '../../features/legal/presentation/view/legal_content_page.dart';
 import '../../features/my_pets/presentation/bloc/my_pets_bloc.dart';
 import '../../features/my_pets/presentation/bloc/my_pets_event.dart';
 import '../../features/my_pets/presentation/view/add_pet_screen.dart';
+import '../../features/adoption_history/presentation/bloc/adoption_history_bloc.dart';
+import '../../features/adoption_history/presentation/bloc/adoption_history_event.dart';
+import '../../features/adoption_history/presentation/view/adoption_history_screen.dart';
+import '../../features/adoption_history/presentation/view/adoption_form_detail_screen.dart';
+import '../../features/adoption_history/domain/entities/adoption_form_entity.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 import '../../features/auth/presentation/pages/forgot_password/password_reset_done_page.dart';
 import '../../features/auth/presentation/pages/forgot_password/reset_password_page.dart';
@@ -257,6 +262,27 @@ GoRouter appRouter() => GoRouter(
           create: (_) => DI.find<MyPetsBloc>()
             ..add(const FetchPetOptionsEvent()),
           child: const AddPetScreen(),
+        );
+      },
+    ),
+    // ── Adoption History ──────────────────────────────────────────────────────
+    GoRoute(
+      path: AppRoutes.adoptionHistory,
+      name: AppRouteNames.adoptionHistory,
+      builder: (context, state) => BlocProvider(
+        create: (_) => DI.find<AdoptionHistoryBloc>()
+          ..add(const FetchClientFormsEvent()),
+        child: const AdoptionHistoryScreen(),
+      ),
+    ),
+    GoRoute(
+      path: AppRoutes.adoptionFormDetail,
+      name: AppRouteNames.adoptionFormDetail,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        return AdoptionFormDetailScreen(
+          form: extra['form'] as AdoptionFormEntity,
+          isOwnerView: extra['isOwnerView'] as bool,
         );
       },
     ),

@@ -17,6 +17,7 @@ abstract class MyPetsRemoteDataSource {
   Future<Either<Failure, List<LookupEntity>>> getPetMedicals();
   Future<Either<Failure, void>> addPet(PetRequestModel request);
   Future<Either<Failure, void>> deletePet(int petId);
+  Future<Either<Failure, void>> updatePetStatus(int petId, int status);
 }
 
 @LazySingleton(as: MyPetsRemoteDataSource)
@@ -77,6 +78,20 @@ class MyPetsRemoteDataSourceImpl implements MyPetsRemoteDataSource {
     try {
       final response = await _apiService.delete(
         endPoint: '${Constants.petsEndpoint}/$petId',
+      );
+      if (response.success == true) return const Right(null);
+      return Left(Failure(response.message));
+    } catch (e) {
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updatePetStatus(int petId, int status) async {
+    try {
+      final response = await _apiService.patch(
+        endPoint: '${Constants.petsEndpoint}/$petId/status',
+        data: {'status': status},
       );
       if (response.success == true) return const Right(null);
       return Left(Failure(response.message));

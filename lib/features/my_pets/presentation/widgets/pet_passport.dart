@@ -3,18 +3,28 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/text_styles.dart';
+import 'package:pettix/core/enums/app_enums.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 
-/// Opens the pet passport overlay as a full-screen dialog.
-void showPetPassport(BuildContext context, PetEntity pet) {
+/// Opens the pet passport overlay.
+/// [onToggleStatus] is called when the owner taps the availability toggle.
+/// Pass null to hide the toggle (e.g., when viewing someone else's pet).
+void showPetPassport(
+  BuildContext context,
+  PetEntity pet, {
+  VoidCallback? onToggleStatus,
+}) {
   showGeneralDialog(
     context: context,
     barrierDismissible: true,
     barrierLabel: 'Pet Passport',
     barrierColor: Colors.black.withAlpha(160),
     transitionDuration: const Duration(milliseconds: 300),
-    pageBuilder: (_, __, ___) => _PetPassportDialog(pet: pet),
+    pageBuilder: (_, __, ___) => _PetPassportDialog(
+      pet: pet,
+      onToggleStatus: onToggleStatus,
+    ),
     transitionBuilder: (_, animation, __, child) {
       final curved = CurvedAnimation(
         parent: animation,
@@ -29,8 +39,9 @@ void showPetPassport(BuildContext context, PetEntity pet) {
 
 class _PetPassportDialog extends StatefulWidget {
   final PetEntity pet;
+  final VoidCallback? onToggleStatus;
 
-  const _PetPassportDialog({required this.pet});
+  const _PetPassportDialog({required this.pet, this.onToggleStatus});
 
   @override
   State<_PetPassportDialog> createState() => _PetPassportDialogState();
@@ -99,6 +110,7 @@ class _PetPassportDialogState extends State<_PetPassportDialog>
                             child: _PassportBack(
                               pet: widget.pet,
                               onFlip: _flip,
+                              onToggleStatus: widget.onToggleStatus,
                             ),
                           ),
                   );
@@ -327,8 +339,13 @@ class _PassportFrontFooter extends StatelessWidget {
 class _PassportBack extends StatelessWidget {
   final PetEntity pet;
   final VoidCallback onFlip;
+  final VoidCallback? onToggleStatus;
 
-  const _PassportBack({required this.pet, required this.onFlip});
+  const _PassportBack({
+    required this.pet,
+    required this.onFlip,
+    this.onToggleStatus,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -371,6 +388,13 @@ class _PassportBack extends StatelessWidget {
                       _BackSectionTitle('Medical Records'),
                       ...pet.vaccinations.map(
                         (v) => _VaccinationTile(vaccination: v),
+                      ),
+                    ],
+                    if (onToggleStatus != null) ...[
+                      SizedBox(height: 12.h),
+                      _StatusToggleButton(
+                        adoptionStatus: pet.adoptionStatus,
+                        onToggle: onToggleStatus!,
                       ),
                     ],
                     SizedBox(height: 8.h),
@@ -604,6 +628,53 @@ class _VaccinationTile extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ─── Status toggle button ─────────────────────────────────────────────────────
+
+class _StatusToggleButton extends StatelessWidget {
+  final int? adoptionStatus;
+  final VoidCallback onToggle;
+
+  const _StatusToggleButton({required this.adoptionStatus, required this.onToggle});
+
+  @override
+  Widget build(BuildContext context) {
+    final isAvailable = PetAdoptionStatus.fromValue(adoptionStatus) ==
+        PetAdoptionStatus.available;
+
+    final color = isAvailable ? AppColors.current.midGray : AppColors.current.green;
+    final icon = isAvailable ? Icons.visibility_off_rounded : Icons.pets_rounded;
+    final label = isAvailable ? 'Make Private' : 'Make Available for Adoption';
+
+    return GestureDetector(
+      onTap: onToggle,
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: 12.h),
+        decoration: BoxDecoration(
+          color: color.withAlpha(20),
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: color.withAlpha(80), width: 1),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: color, size: 16.w),
+            SizedBox(width: 8.w),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

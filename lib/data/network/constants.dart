@@ -29,6 +29,9 @@ class Constants {
   static const String petMedicalsEndpoint = '/api/Adoption/PetMedicals';
   static const String petsEndpoint = '/api/Adoption/Pets';
   static const String userPetsEndpoint = '/api/Adoption/Pets/admin/user';
+  static const String clientFormsEndpoint = '/api/Adoption/AdoptionForms/clients-forms';
+  static const String ownerFormsEndpoint = '/api/Adoption/AdoptionForms/owner-forms';
+  static const String pagedPetsEndpoint = '/api/Adoption/Pets/paged';
   // Headers
   static const String contentTypeHeader = 'Content-Type';
   static const String applicationJson = 'application/json';

@@ -127,6 +127,21 @@ class ApiService {
     return _normalizeResponse(response.data);
   }
 
+  Future<ResponseModel> patch({
+    required String endPoint,
+    Map<String, dynamic>? data,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    var response = await _dio.patch(
+      '${Constants.baseUrl}$endPoint',
+      data: data,
+      options: Options(headers: headers),
+      queryParameters: queryParameters,
+    );
+    return _normalizeResponse(response.data);
+  }
+
   Future<ResponseModel> delete({
     required String endPoint,
     Map<String, dynamic>? headers,

@@ -74,7 +74,10 @@ class CustomDrawer extends StatelessWidget {
                     icon: Icons.pets_rounded,
                     label: AppText.adoptionHistory,
                     color: AppColors.current.gold,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      context.push(AppRoutes.adoptionHistory);
+                    },
                   ),
                   _Section(AppText.storeOrders),
                   _Tile(

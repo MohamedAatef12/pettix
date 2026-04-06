@@ -42,6 +42,9 @@ class AppRoutes {
   static const String refundPolicy = '/refund_policy';
   // My Pets
   static const String addPet = '/add_pet';
+  // Adoption History
+  static const String adoptionHistory = '/adoption_history';
+  static const String adoptionFormDetail = '/adoption_form_detail';
 }
 
 class AppRouteNames {
@@ -88,4 +91,7 @@ class AppRouteNames {
   static const String refundPolicy = 'refund_policy';
   // My Pets
   static const String addPet = 'add_pet';
+  // Adoption History
+  static const String adoptionHistory = 'adoption_history';
+  static const String adoptionFormDetail = 'adoption_form_detail';
 }

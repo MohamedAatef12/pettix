@@ -6,11 +6,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
+import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_request_entity.dart';
 import 'package:pettix/features/my_pets/domain/usecases/add_pet_usecase.dart';
 import 'package:pettix/features/my_pets/domain/usecases/delete_pet_usecase.dart';
 import 'package:pettix/features/my_pets/domain/usecases/get_pet_options_usecase.dart';
 import 'package:pettix/features/my_pets/domain/usecases/get_user_pets_usecase.dart';
+import 'package:pettix/features/my_pets/domain/usecases/update_pet_status_usecase.dart';
 
 import 'my_pets_event.dart';
 import 'my_pets_state.dart';
@@ -21,6 +23,7 @@ class MyPetsBloc extends Bloc<MyPetsEvent, MyPetsState> {
   final GetPetOptionsUseCase _getPetOptions;
   final AddPetUseCase _addPet;
   final DeletePetUseCase _deletePet;
+  final UpdatePetStatusUseCase _updatePetStatus;
   final ICacheManager _cacheManager;
   final ImagePicker _imagePicker = ImagePicker();
 
@@ -35,6 +38,7 @@ class MyPetsBloc extends Bloc<MyPetsEvent, MyPetsState> {
     this._getPetOptions,
     this._addPet,
     this._deletePet,
+    this._updatePetStatus,
     this._cacheManager,
   ) : super(const MyPetsState()) {
     on<FetchUserPetsEvent>(_onFetchUserPets);
@@ -62,6 +66,7 @@ class MyPetsBloc extends Bloc<MyPetsEvent, MyPetsState> {
       (e, emit) => emit(state.copyWith(selectedGenderId: e.genderId)),
     );
     on<ResetPetFormEvent>(_onResetForm);
+    on<UpdatePetStatusEvent>(_onUpdatePetStatus);
   }
 
   Future<void> _onFetchUserPets(
@@ -206,6 +211,45 @@ class MyPetsBloc extends Bloc<MyPetsEvent, MyPetsState> {
       pickedImageBytes: bytes,
       pickedImageFilenames: names,
     ));
+  }
+
+  Future<void> _onUpdatePetStatus(
+    UpdatePetStatusEvent event,
+    Emitter<MyPetsState> emit,
+  ) async {
+    final result = await _updatePetStatus(
+      (petId: event.petId, status: event.status),
+    );
+    result.fold(
+      (failure) => emit(state.copyWith(
+        status: MyPetsStatus.error,
+        errorMessage: failure.message,
+      )),
+      (_) {
+        // Optimistically update the pet in the local list.
+        final updated = state.pets.map((p) {
+          if (p.id == event.petId) {
+            return PetEntity(
+              id: p.id,
+              code: p.code,
+              name: p.name,
+              description: p.description,
+              details: p.details,
+              age: p.age,
+              adoptionStatus: event.status,
+              categoryName: p.categoryName,
+              genderName: p.genderName,
+              colorName: p.colorName,
+              imageUrls: p.imageUrls,
+              isBlocked: p.isBlocked,
+              vaccinations: p.vaccinations,
+            );
+          }
+          return p;
+        }).toList();
+        emit(state.copyWith(status: MyPetsStatus.loaded, pets: updated));
+      },
+    );
   }
 
   void _onResetForm(ResetPetFormEvent event, Emitter<MyPetsState> emit) {

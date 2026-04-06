@@ -17,4 +17,7 @@ abstract class MyPetsRepository {
 
   /// Permanently removes the pet identified by [petId].
   Future<Either<Failure, void>> deletePet(int petId);
+
+  /// Updates the adoption status of the pet (private=0, available=1).
+  Future<Either<Failure, void>> updatePetStatus(int petId, int status);
 }

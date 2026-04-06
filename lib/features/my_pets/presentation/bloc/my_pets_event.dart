@@ -100,3 +100,15 @@ class SelectGenderEvent extends MyPetsEvent {
 class ResetPetFormEvent extends MyPetsEvent {
   const ResetPetFormEvent();
 }
+
+/// Toggles the adoption availability of a pet.
+/// [status]: 0 = private, 1 = available.
+class UpdatePetStatusEvent extends MyPetsEvent {
+  final int petId;
+  final int status;
+
+  const UpdatePetStatusEvent({required this.petId, required this.status});
+
+  @override
+  List<Object?> get props => [petId, status];
+}
