@@ -37,6 +37,7 @@ class HomeState extends Equatable {
   final List<ReportEntity> reports;
   final bool isReportLoading;
   final int postId;
+  final bool isSaved;
   const HomeState({
     this.posts = const [],
     this.comments = const [],
@@ -63,7 +64,8 @@ class HomeState extends Equatable {
     this.reportReasons = const [],
     this.reports = const [],
     this.isReportLoading = false,
-    this.postId = 0
+    this.postId = 0,
+    this.isSaved = false
   });
 
   HomeState copyWith({
@@ -93,7 +95,8 @@ class HomeState extends Equatable {
     List<ReportReasonEntity>? reportReasons,
     List<ReportEntity>? reports,
     bool? isReportLoading,
-    int? postId
+    int? postId,
+    bool? isSaved
   }) {
     return HomeState(
       posts: posts ?? this.posts,
@@ -122,7 +125,8 @@ class HomeState extends Equatable {
       reportReasons: reportReasons ?? this.reportReasons,
       reports: reports ?? this.reports,
       isReportLoading: isReportLoading ?? this.isReportLoading,
-        postId: postId ?? this.postId
+        postId: postId ?? this.postId,
+        isSaved: isSaved ?? this.isSaved
     );
   }
 
@@ -153,6 +157,7 @@ class HomeState extends Equatable {
     reportReasons,
     reports,
     isReportLoading,
-    postId
+    postId,
+    isSaved
   ];
 }

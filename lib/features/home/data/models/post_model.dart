@@ -18,6 +18,7 @@ class PostModel extends PostEntity {
     super.modifyDate,
     required super.images,
     required super.statusId,
+    required super.isSaved
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) {
@@ -54,6 +55,7 @@ class PostModel extends PostEntity {
           .toList() ??
           [],
       statusId: json['statusId'],
+      isSaved: json['isSaved'] ?? false,
     );
   }
 
@@ -116,6 +118,7 @@ class PostModel extends PostEntity {
     modifyDate: postEntity.modifyDate,
     images: postEntity.images,
     statusId: postEntity.statusId,
+    isSaved:  postEntity.isSaved
   );
 
   PostEntity toEntity() => PostEntity(
@@ -128,5 +131,6 @@ class PostModel extends PostEntity {
     modifyDate: modifyDate,
     images: images,
     statusId: statusId,
+    isSaved: isSaved
   );
 }

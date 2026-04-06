@@ -79,13 +79,7 @@ class _HomeBodyState extends State<HomeBody> {
                       : state.posts.length,
                   itemBuilder: (context, index) {
                     if (index >= state.posts.length) {
-                      return SizedBox(
-                        key: const ValueKey('footer_shimmer'),
-                        height: 100.h,
-                        child: const Center(
-                          child: Center(child: HomeShimmer()),
-                        ),
-                      );
+                      return HomeShimmer();
                     }
                     return Padding(
                       padding: PaddingConstants.verticalSmall,

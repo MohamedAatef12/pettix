@@ -24,9 +24,10 @@ class _CommentsShimmerState extends State<CommentsShimmer>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     )..repeat(reverse: true);
-    _animation = Tween<double>(begin: 0.3, end: 0.8).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _animation = Tween<double>(
+      begin: 0.3,
+      end: 0.8,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -49,9 +50,10 @@ class _CommentsShimmerState extends State<CommentsShimmer>
           height: height,
           decoration: BoxDecoration(
             color: AppColors.current.lightGray.withOpacity(_animation.value),
-            borderRadius: shape == BoxShape.rectangle
-                ? BorderRadius.circular(borderRadius ?? 8.r)
-                : null,
+            borderRadius:
+                shape == BoxShape.rectangle
+                    ? BorderRadius.circular(borderRadius ?? 8.r)
+                    : null,
             shape: shape,
           ),
         );
@@ -128,10 +130,7 @@ class _CommentsShimmerState extends State<CommentsShimmer>
   Widget _buildCommentShimmer({bool isReply = false}) {
     final avatarRadius = isReply ? 18.r : 26.r;
     return Padding(
-      padding: EdgeInsets.only(
-        left: isReply ? 50.w : 0,
-        bottom: 16.h,
-      ),
+      padding: EdgeInsets.only(left: isReply ? 50.w : 0, bottom: 16.h),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

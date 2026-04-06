@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -425,92 +426,82 @@ class PostCard extends StatelessWidget {
                                             actualIndex == 3 &&
                                             validImages.length > 4;
 
-                                        return SizedBox(
-                                          width:
-                                              (MediaQuery.of(
+                                        return Expanded(
+                                          child: SizedBox(
+                                            height: 100.h,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                if (isLastWithMore) {
+                                                  _openImagesPreview(
                                                     context,
-                                                  ).size.width -
-                                                  2 *
-                                                      PaddingConstants
-                                                          .medium
-                                                          .horizontal /
-                                                      2 -
-                                                  16.w) /
-                                              (imagesToShow.length == 2
-                                                  ? 2
-                                                  : imagesToShow.length > 3
-                                                  ? 3
-                                                  : imagesToShow.length - 1),
-                                          height: 100.h,
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              if (isLastWithMore) {
-                                                _openImagesPreview(
-                                                  context,
-                                                  validImages,
-                                                );
-                                              } else {
-                                                _openSingleImagePreview(
-                                                  context,
-                                                  image,
-                                                );
-                                              }
-                                            },
-                                            child: Stack(
-                                              alignment: Alignment.center,
-                                              children: [
-                                                ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                        15.r,
-                                                      ),
-                                                  child: _buildImage(
+                                                    validImages,
+                                                  );
+                                                } else {
+                                                  _openSingleImagePreview(
                                                     context,
                                                     image,
-                                                    height: 100.h,
-                                                  ),
-                                                ),
-                                                if (isLastWithMore)
+                                                  );
+                                                }
+                                              },
+                                              child: Stack(
+                                                alignment: Alignment.center,
+                                                children: [
                                                   ClipRRect(
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                           15.r,
                                                         ),
-                                                    child: BackdropFilter(
-                                                      filter: ImageFilter.blur(
-                                                        sigmaX: 2,
-                                                        sigmaY: 2,
-                                                      ),
-                                                      child: Container(
-                                                        color:
-                                                            Colors.transparent,
-                                                      ),
+                                                    child: _buildImage(
+                                                      context,
+                                                      image,
+                                                      height: 100.h,
                                                     ),
                                                   ),
-                                                if (isLastWithMore)
-                                                  Center(
-                                                    child: Text(
-                                                      '+${validImages.length - 3}',
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 24.sp,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        shadows: [
-                                                          Shadow(
-                                                            blurRadius: 6,
-                                                            color:
-                                                                Colors.black54,
-                                                            offset: Offset(
-                                                              1,
-                                                              1,
-                                                            ),
+                                                  if (isLastWithMore)
+                                                    ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            15.r,
                                                           ),
-                                                        ],
+                                                      child: BackdropFilter(
+                                                        filter:
+                                                            ImageFilter.blur(
+                                                              sigmaX: 2,
+                                                              sigmaY: 2,
+                                                            ),
+                                                        child: Container(
+                                                          color:
+                                                              Colors
+                                                                  .transparent,
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                              ],
+                                                  if (isLastWithMore)
+                                                    Center(
+                                                      child: Text(
+                                                        '+${validImages.length - 3}',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 24.sp,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          shadows: [
+                                                            Shadow(
+                                                              blurRadius: 6,
+                                                              color:
+                                                                  Colors
+                                                                      .black54,
+                                                              offset: Offset(
+                                                                1,
+                                                                1,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         );
@@ -596,7 +587,7 @@ class PostCard extends StatelessWidget {
 
                       GestureDetector(
                         onTap: () {
-                          if (isSaved) {
+                          if (state.isSaved == true) {
                             homeBloc.add(UnSavePostEvent(post.id));
                           } else {
                             homeBloc.add(SavePostEvent(post.id));
@@ -605,7 +596,7 @@ class PostCard extends StatelessWidget {
                         child: SvgPicture.asset(
                           'assets/icons/save_post.svg',
                           colorFilter: ColorFilter.mode(
-                            isSaved
+                            isSaved == true
                                 ? AppColors
                                     .current
                                     .yellow // Gold color
@@ -654,39 +645,24 @@ Widget _buildImage(BuildContext context, String image, {double? height}) {
     final filePath = image.split(',').last;
     final properUrl = '${Constants.baseUrl}/$filePath';
     debugPrint('✅ Converted malformed URL to: $properUrl');
-    return Image.network(
+    return CachedNetworkImage(
+      imageUrl:
       properUrl,
       height: height,
       width: double.infinity,
       fit: BoxFit.fill,
-      loadingBuilder: (context, child, loadingProgress) {
-        if (loadingProgress == null) return child;
-        return Container(
-          height: height,
-          color: AppColors.current.lightGray,
-          child: Center(
-            child: CircularProgressIndicator(
-              value:
-                  loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
-                      : null,
-            ),
-          ),
-        );
-      },
-      errorBuilder: (context, error, stackTrace) {
+      errorWidget: (context, error, stackTrace) {
         debugPrint('❌ Image load error for $properUrl: $error');
         return _errorImage(height);
       },
     );
   } else if (image.startsWith('http')) {
-    return Image.network(
-      image,
+    return CachedNetworkImage(
+     imageUrl:  image,
       height: height,
       width: double.infinity,
       fit: BoxFit.fill,
-      errorBuilder: (_, __, ___) => _errorImage(height),
+      errorWidget: (_, __, ___) => _errorImage(height),
     );
   } else if (image.startsWith('data:image')) {
     try {

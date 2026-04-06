@@ -434,6 +434,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           comments: [],
           likes: [],
           statusId: 3,
+          isSaved: false,
         );
 
         final result = await addPostUseCase.call(post);
