@@ -95,6 +95,7 @@ import '../../features/home/domain/usecases/get_user_cached%20_data.dart'
 import '../../features/home/domain/usecases/like_post.dart' as _i58;
 import '../../features/home/domain/usecases/save_post_usecase.dart' as _i989;
 import '../../features/home/domain/usecases/unlike_comment.dart' as _i975;
+import '../../features/home/domain/usecases/unsave_post_usecase.dart' as _i86;
 import '../../features/my_pets/data/datasources/my_pets_remote_data_source.dart'
     as _i1050;
 import '../../features/my_pets/data/repositories/my_pets_repo_impl.dart'
@@ -191,7 +192,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i790.TokenInterceptor>(
       () => _i790.TokenInterceptor(gh<_i361.Dio>()),
     );
-    gh.factory<_i1055.RemoteDataSource>(
+    gh.lazySingleton<_i1055.RemoteDataSource>(
       () => _i621.RemoteDataSourceImpl(gh<_i655.ApiService>()),
     );
     gh.factory<_i787.AuthRepository>(
