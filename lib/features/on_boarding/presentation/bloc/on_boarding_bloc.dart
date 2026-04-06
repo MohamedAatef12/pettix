@@ -7,17 +7,17 @@ import 'package:pettix/features/on_boarding/presentation/view/widgets/on_boardin
 class OnBoardingBloc extends Bloc<OnBoardingEvent, OnBoardingState> {
   final List<OnBoardingSlide> slides = [
     OnBoardingSlide(
-      image: "assets/images/on_boarding1.png",
+      image: "assets/images/on_boarding1.svg",
       title: AppText.connectWithPetLovers,
       desc: AppText.shareDailyAdventures,
     ),
     OnBoardingSlide(
-      image: "assets/images/on_boarding2.png",
+      image: "assets/images/on_boarding2.svg",
       title: AppText.careSafetySecondChances,
       desc:  AppText.findLovingHomes
     ),
     OnBoardingSlide(
-      image: "assets/images/on_boarding3.png",
+      image: "assets/images/on_boarding3.svg",
       title: AppText.everythingYourPetNeeds,
       desc: AppText.discoverFoodToys  ),
   ];

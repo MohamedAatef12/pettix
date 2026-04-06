@@ -11,8 +11,36 @@ import 'package:pettix/features/home/presentation/blocs/home_state.dart';
 import 'package:pettix/features/home/presentation/widgets/post_card.dart';
 
 import '../blocs/home_event.dart';
-class HomeBody extends StatelessWidget {
+class HomeBody extends StatefulWidget {
   const HomeBody({super.key});
+
+  @override
+  State<HomeBody> createState() => _HomeBodyState();
+}
+
+class _HomeBodyState extends State<HomeBody> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  bool _onScrollNotification(ScrollNotification notification) {
+    if (notification is ScrollEndNotification) {
+      final metrics = notification.metrics;
+      if (metrics.pixels >= metrics.maxScrollExtent * 0.9) {
+        context.read<HomeBloc>().add(LoadMorePostsEvent());
+      }
+    }
+    return false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,30 +53,40 @@ class HomeBody extends StatelessWidget {
             content = const Center(child: HomeShimmer());
           } else if (state.error != null && state.posts.isEmpty) {
             content = Center(
-           child: CircleAvatar(
-             backgroundColor: AppColors.current.lightGray,
-             radius: 100.r,
-             child: Icon(
-                Icons.cloud_off_outlined,
-                color: AppColors.current.primary,
-                size: 50.w,
-             ),
-           ),
+              child: CircleAvatar(
+                backgroundColor: AppColors.current.lightGray,
+                radius: 100.r,
+                child: Icon(
+                  Icons.cloud_off_outlined,
+                  color: AppColors.current.primary,
+                  size: 50.w,
+                ),
+              ),
             );
-          }else {
+          } else {
             content = RefreshIndicator(
               onRefresh: () async {
                 context.read<HomeBloc>().add(FetchPostsEvent());
               },
-              child: ListView.builder(
-                physics: const AlwaysScrollableScrollPhysics(), // لازم للـ RefreshIndicator
-                itemCount: state.posts.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: PaddingConstants.verticalSmall,
-                    child: PostCard(post: state.posts[index]),
-                  );
-                },
+              child: NotificationListener<ScrollNotification>(
+                onNotification: _onScrollNotification,
+                child: ListView.builder(
+                  key: const PageStorageKey('posts_list'),
+                  controller: _scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: state.isMorePostsLoading
+                      ? state.posts.length + 1
+                      : state.posts.length,
+                  itemBuilder: (context, index) {
+                    if (index >= state.posts.length) {
+                      return HomeShimmer();
+                    }
+                    return Padding(
+                      padding: PaddingConstants.verticalSmall,
+                      child: PostCard(post: state.posts[index]),
+                    );
+                  },
+                ),
               ),
             );
           }

@@ -17,7 +17,9 @@ import 'package:pettix/features/home/domain/usecases/get_report_reasons.dart';
 import 'package:pettix/features/home/domain/usecases/get_reported_posts.dart';
 import 'package:pettix/features/home/domain/usecases/get_user_cached%20_data.dart';
 import 'package:pettix/features/home/domain/usecases/like_post.dart';
+import 'package:pettix/features/home/domain/usecases/save_post_usecase.dart';
 import 'package:pettix/features/home/domain/usecases/unlike_comment.dart';
+import 'package:pettix/features/home/domain/usecases/unsave_post_usecase.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/widgets/add_post_body.dart';
 
@@ -48,6 +50,8 @@ class AddPostPage extends StatelessWidget {
                 getReportedPostsUseCase: getIt<GetReportedPostsUseCase>(),
                 getReportReasonsUseCase: getIt<GetReportReasonsUseCase>(),
                 addReportUseCase: getIt<AddReportUseCase>(),
+                savePostUseCase: getIt<SavePostUseCase>(),
+                unSavePostUseCase: getIt<UnSavePostUseCase>()
               ),
           child: AddPostBody(),
         ),

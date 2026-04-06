@@ -19,6 +19,8 @@ import 'package:pettix/features/home/domain/entities/report_entity.dart';
 import 'package:pettix/features/home/domain/entities/report_reason_entity.dart';
 import 'package:pettix/features/home/domain/repositories/home_domain_repo.dart';
 
+import 'package:pettix/features/home/domain/entities/paginated_posts.dart';
+
 @Injectable(as: HomeDomainRepository)
 class HomeRepositoryImpl implements HomeDomainRepository {
   final RemoteDataSource remoteDataSource;
@@ -29,31 +31,21 @@ class HomeRepositoryImpl implements HomeDomainRepository {
   /// Posts
 
   @override
-  Future<Either<Failure, List<PostEntity>>> getPosts() async {
-    final result = await remoteDataSource.getPosts();
+  Future<Either<Failure, PaginatedPosts>> getPosts(
+      {int pageIndex = 1, int pageSize = 10}) async {
+    final result =
+        await remoteDataSource.getPosts(pageIndex: pageIndex, pageSize: pageSize);
 
     return result.fold(
-          (failure) => Left(failure),
-          (models) =>
-          Right(
-            models
-                .map(
-                  (model) =>
-                  model.toEntity(
-                    PostModel(
-                      id: model.id,
-                      author: model.author,
-                      comments: model.comments,
-                      likes: model.likes,
-                      content: model.content,
-                      creationDate: model.creationDate,
-                      modifyDate: model.modifyDate,
-                      images: model.images,
-                    ),
-                  ),
-            )
-                .toList(),
-          ),
+      (failure) => Left(failure),
+      (model) => Right(
+        PaginatedPosts(
+          posts: model.postsModels.map((m) => m.toEntity()).toList(),
+          pageIndex: model.pageIndex,
+          pageSize: model.pageSize,
+          totalCount: model.totalCount,
+        ),
+      ),
     );
   }
 
@@ -88,18 +80,7 @@ class HomeRepositoryImpl implements HomeDomainRepository {
             models
                 .map(
                   (model) =>
-                  model.toEntity(
-                    CommentModel(
-                      id: model.id,
-                      text: model.text,
-                      author: model.author,
-                      creationDate: model.creationDate,
-                      postId: model.postId,
-                      parentCommentId: model.parentCommentId,
-                      replies: model.replies,
-                      likes: model.likes,
-                    ),
-                  ),
+                  model.toEntity(),
             )
                 .toList(),
           ),
@@ -138,14 +119,7 @@ class HomeRepositoryImpl implements HomeDomainRepository {
             likes
                 .map(
                   (like) =>
-                  like.toEntity(
-                    LikesModel(
-                      id: like.id,
-                      author: like.author,
-                      creationDate: like.creationDate,
-                      postId: like.postId,
-                    ),
-                  ),
+                  like.toEntity(),
             )
                 .toList(),
           ),
@@ -219,14 +193,7 @@ class HomeRepositoryImpl implements HomeDomainRepository {
             models
                 .map(
                   (model) =>
-                  model.toEntity(
-                    CommentsLikeModel(
-                      id: model.id,
-                      commentId: model.commentId,
-                      author: model.author,
-                      creationDate: model.creationDate,
-                    ),
-                  ),
+                  model.toEntity(),
             )
                 .toList(),
           ),
@@ -336,5 +303,15 @@ class HomeRepositoryImpl implements HomeDomainRepository {
     } catch (e) {
       return Left(Failure('Error fetching reported posts: $e'));
     }
+  }
+  @override
+  Future<Either<Failure, void>> savePost(int postId) async {
+    final result = await remoteDataSource.savePost(postId);
+    return result.fold((failure) => Left(failure), (success) => Right(null));
+  }
+  @override
+  Future<Either<Failure, void>> unSavePost(int postId) async {
+    final result = await remoteDataSource.unSavePost(postId);
+    return result.fold((failure) => Left(failure), (success) => Right(null));
   }
 }

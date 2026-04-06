@@ -58,7 +58,7 @@ class OnBoardingBody extends StatelessWidget {
                           children: [
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                              child: Image.asset(
+                              child:  SvgPicture.asset(
                                 slide.image,
                                 fit: BoxFit.fill,
                                 width: double.infinity,

@@ -15,6 +15,9 @@ abstract class ICacheManager {
   Future<void> saveLogin(bool rememberMe);
   Future<void> setRefreshToken(String refreshToken);
   Future<String?> getRefreshToken();
+  Future<void> setSavedCredentials(String email, String password);
+  Future<String?> getSavedEmail();
+  Future<String?> getSavedPassword();
   Future<bool> isRemembered();
   Future<Map<String, dynamic>?> getSavedLogin();
   Future<void> clearLogin();

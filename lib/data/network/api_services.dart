@@ -12,7 +12,7 @@ class ApiService {
 
   ApiService(this._dio, this._cache) {
     // Add interceptor to attach Bearer token automatically
-    _dio.interceptors.add(InterceptorsWrapper(
+    _dio.interceptors.add(QueuedInterceptorsWrapper(
       onRequest: (options, handler) async {
         final token = await _cache.getToken();
         if (token != null && token.isNotEmpty) {
@@ -20,10 +20,53 @@ class ApiService {
         }
         return handler.next(options);
       },
+      onError: (DioException e, handler) async {
+        if (e.response?.statusCode == 401) {
+          final email = await _cache.getSavedEmail();
+          final password = await _cache.getSavedPassword();
+
+          if (email != null && password != null) {
+            try {
+              // Create a temporary Dio to avoid recursion in interceptors
+              final refreshDio = Dio();
+              final response = await refreshDio.post(
+                '${Constants.baseUrl}${Constants.loginEndpoint}',
+                data: {
+                  'email': email,
+                  'password': password,
+                },
+              );
+
+              final data = response.data;
+              if (data != null && data['success'] == true) {
+                final newToken = data['result']['token'];
+                await _cache.setToken(newToken);
+
+                // Update original request headers and retry
+                final options = e.requestOptions;
+                options.headers['Authorization'] = 'Bearer $newToken';
+                
+                final retryResponse = await _dio.fetch(options);
+                return handler.resolve(retryResponse);
+              }
+            } catch (_) {
+              // Refresh failed, logout
+              _cache.logout();
+            }
+          } else {
+            _cache.logout();
+          }
+        }
+        return handler.next(e);
+      },
     ));
   }
 
   ResponseModel _normalizeResponse(dynamic data) {
+    if (data == null || (data is String && data.isEmpty)) {
+      return const ResponseModel(success: true, message: '', traceId: '', result: null);
+    }
+
     // If the backend returns a wrapped response object, use the existing factory
     if (data is Map<String, dynamic>) return ResponseModel.fromJson(data);
 

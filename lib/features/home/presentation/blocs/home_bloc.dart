@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -23,7 +22,9 @@ import 'package:pettix/features/home/domain/usecases/get_report_reasons.dart';
 import 'package:pettix/features/home/domain/usecases/get_reported_posts.dart';
 import 'package:pettix/features/home/domain/usecases/get_user_cached%20_data.dart';
 import 'package:pettix/features/home/domain/usecases/like_post.dart';
+import 'package:pettix/features/home/domain/usecases/save_post_usecase.dart';
 import 'package:pettix/features/home/domain/usecases/unlike_comment.dart';
+import 'package:pettix/features/home/domain/usecases/unsave_post_usecase.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 import 'package:pettix/features/home/presentation/blocs/home_state.dart';
 
@@ -44,6 +45,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final GetReportReasonsUseCase getReportReasonsUseCase;
   final GetReportedPostsUseCase getReportedPostsUseCase;
   final AddReportUseCase addReportUseCase;
+  final SavePostUseCase savePostUseCase;
+  final UnSavePostUseCase unSavePostUseCase;
   final Set<int> throttledPostIds = {};
   final Set<int> loadedBottomSheetPostIds = {};
   final TextEditingController commentTextController = TextEditingController();
@@ -70,6 +73,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       getReportReasonsUseCase: getIt<GetReportReasonsUseCase>(),
       getReportedPostsUseCase: getIt<GetReportedPostsUseCase>(),
       addReportUseCase: getIt<AddReportUseCase>(),
+      savePostUseCase: getIt<SavePostUseCase>(),
+      unSavePostUseCase: getIt<UnSavePostUseCase>(),
     );
   }
 
@@ -90,6 +95,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required this.getReportReasonsUseCase,
     required this.getReportedPostsUseCase,
     required this.addReportUseCase,
+    required this.savePostUseCase,
+    required this.unSavePostUseCase,
   }) : super(const HomeState()) {
     on<FetchPostsEvent>(_onFetchPosts);
     on<AddPostEvent>(_onAddPost);
@@ -106,6 +113,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<SubmitPostEvent>(_onSubmitPost);
     on<AddReplyEvent>(_onAddReply);
     on<SetReplyingToEvent>(_onSetReplyingTo);
+    on<SavePostEvent>(_savePost);
+    on<UnSavePostEvent>(_unSavePost);
     on<ToggleCommentRepliesEvent>((event, emit) {
       final newExpanded = Map<int, bool>.from(state.expandedComments);
       final current = newExpanded[event.commentId] ?? false;
@@ -147,6 +156,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<ReportPostEvent>(_onReportPost);
     on<GetReportReasonsEvent>(_onGetReportReasons);
     on<GetReportedPostsEvent>(_onGetReportedPosts);
+    on<LoadMorePostsEvent>(_onLoadMorePosts);
   }
 
   Future<void> _getPostCommentsCount(
@@ -155,13 +165,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ) async {
     final result = await getPostCommentsCountUseCase(event.postId);
 
-    result.fold((failure) => emit(state.copyWith(error: failure.message)), (
-      count,
-    ) {
-      final updatedMap = Map<int, int>.from(state.postCommentsCount);
-      updatedMap[event.postId] = count;
-      emit(state.copyWith(postCommentsCount: updatedMap));
-    });
+    result.fold(
+      (failure) {
+        debugPrint('⚠️ Failed to get comment count for post ${event.postId}: ${failure.message}');
+      },
+      (count) {
+        final updatedMap = Map<int, int>.from(state.postCommentsCount);
+        updatedMap[event.postId] = count;
+        emit(state.copyWith(postCommentsCount: updatedMap));
+      },
+    );
   }
 
   Future<void> _onUpdatePostCommentsCount(
@@ -169,13 +182,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     Emitter<HomeState> emit,
   ) async {
     final result = await getPostCommentsCountUseCase.call(event.postId);
-    result.fold((failure) => emit(state.copyWith(error: failure.message)), (
-      count,
-    ) {
-      final updatedMap = Map<int, int>.from(state.postCommentsCount)
-        ..[event.postId] = count;
-      emit(state.copyWith(postCommentsCount: updatedMap));
-    });
+    result.fold(
+      (failure) {
+        debugPrint('⚠️ Failed to update comment count for post ${event.postId}: ${failure.message}');
+      },
+      (count) {
+        final updatedMap = Map<int, int>.from(state.postCommentsCount)
+          ..[event.postId] = count;
+        emit(state.copyWith(postCommentsCount: updatedMap));
+      },
+    );
   }
 
   Future<void> _onRefreshCommentsSilently(
@@ -184,20 +200,28 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ) async {
     final result = await getCommentsIdUseCase.call(event.postId);
 
-    result.fold((failure) => emit(state.copyWith(error: failure.message)), (
-      comments,
-    ) {
-      emit(state.copyWith(comments: comments, error: null));
-    });
+    result.fold(
+      (failure) {
+        // Silently fail - keep existing comments visible
+        debugPrint('⚠️ Silent comments refresh failed: ${failure.message}');
+      },
+      (comments) {
+        emit(state.copyWith(comments: comments, error: null));
+      },
+    );
   }
 
   Future<void> _onFetchPosts(
     FetchPostsEvent event,
     Emitter<HomeState> emit,
   ) async {
-    emit(state.copyWith(isPostsLoading: true, error: null));
+    emit(state.copyWith(
+      isPostsLoading: true,
+      error: null,
+      pageIndex: 1, // Reset page index on fresh fetch
+    ));
 
-    final result = await getPostsUseCase.call();
+    final result = await getPostsUseCase.call(pageIndex: 1);
     final userResult = await getUserDataUseCase.call();
 
     int? currentUserId;
@@ -207,7 +231,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       (failure) async {
         emit(state.copyWith(isPostsLoading: false, error: failure.message));
       },
-      (posts) async {
+      (paginatedPosts) async {
+        final posts = paginatedPosts.posts;
         final postLikesMap = <int, int>{};
         final postCommentsMap = <int, int>{};
         final likedPostIds = <int>[];
@@ -215,27 +240,17 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         await Future.wait(
           posts.map((post) async {
             postLikesMap[post.id] = post.likes.length;
-            postCommentsMap[post.id] = post.comments.length;
+
+            final countResult = await getPostCommentsCountUseCase(post.id);
+            countResult.fold(
+              (_) => postCommentsMap[post.id] = post.comments.length,
+              (count) => postCommentsMap[post.id] = count,
+            );
 
             if (currentUserId != null &&
                 post.likes.any((like) => like.author.id == currentUserId)) {
               likedPostIds.add(post.id);
             }
-
-            final countResult = await getPostCommentsCountUseCase.call(post.id);
-
-            countResult.fold(
-              (failure) {
-                print(
-                  "❌ Failed to fetch count for post ${post.id}: ${failure.message}",
-                );
-              },
-              (count) {
-                print("✅ Comments count for post ${post.id}: $count");
-                postCommentsMap[post.id] =
-                    count;
-              },
-            );
           }),
         );
 
@@ -246,6 +261,69 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             postCommentsCount: postCommentsMap,
             likedPostIds: likedPostIds,
             isPostsLoading: false,
+            pageIndex: paginatedPosts.pageIndex,
+            totalCount: paginatedPosts.totalCount,
+            error: null,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onLoadMorePosts(
+    LoadMorePostsEvent event,
+    Emitter<HomeState> emit,
+  ) async {
+    // Don't load if already loading more or if reached the end
+    if (state.isMorePostsLoading || state.posts.length >= state.totalCount) {
+      return;
+    }
+
+    emit(state.copyWith(isMorePostsLoading: true));
+
+    final nextPage = state.pageIndex + 1;
+    final result = await getPostsUseCase.call(pageIndex: nextPage);
+    final userResult = await getUserDataUseCase.call();
+
+    int? currentUserId;
+    userResult.fold((_) {}, (user) => currentUserId = user.id);
+
+    await result.fold(
+      (failure) async {
+        emit(state.copyWith(isMorePostsLoading: false, error: failure.message));
+      },
+      (paginatedPosts) async {
+        final newPosts = paginatedPosts.posts;
+        final postLikesMap = Map<int, int>.from(state.postLikesCount);
+        final postCommentsMap = Map<int, int>.from(state.postCommentsCount);
+        final likedPostIds = List<int>.from(state.likedPostIds);
+
+        await Future.wait(
+          newPosts.map((post) async {
+            postLikesMap[post.id] = post.likes.length;
+
+            final countResult = await getPostCommentsCountUseCase(post.id);
+            countResult.fold(
+              (_) => postCommentsMap[post.id] = post.comments.length,
+              (count) => postCommentsMap[post.id] = count,
+            );
+
+            if (currentUserId != null &&
+                post.likes.any((like) => like.author.id == currentUserId)) {
+              likedPostIds.add(post.id);
+            }
+          }),
+        );
+
+        emit(
+          state.copyWith(
+            posts: [...state.posts, ...newPosts],
+            postLikesCount: postLikesMap,
+            postCommentsCount: postCommentsMap,
+            likedPostIds: likedPostIds,
+            isMorePostsLoading: false,
+            pageIndex: paginatedPosts.pageIndex,
+            totalCount: paginatedPosts.totalCount,
             error: null,
           ),
         );
@@ -262,7 +340,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         emit(state.copyWith(isAddPostLoading: false, error: failure.message));
       },
       (_) async {
-        final postsResult = await getPostsUseCase.call();
+        final postsResult = await getPostsUseCase.call(pageIndex: 1);
         postsResult.fold(
           (failure) => emit(
             state.copyWith(
@@ -271,9 +349,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
               error: failure.message,
             ),
           ),
-          (posts) => emit(
+          (paginated) => emit(
             state.copyWith(
-              posts: posts,
+              posts: paginated.posts,
+              pageIndex: paginated.pageIndex,
+              totalCount: paginated.totalCount,
               isAddPostLoading: false,
               isPostAdded: true,
               error: null,
@@ -353,6 +433,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           creationDate: DateTime.now().add(const Duration(hours: 2)).toString(),
           comments: [],
           likes: [],
+          statusId: 3,
+          isSaved: false,
         );
 
         final result = await addPostUseCase.call(post);
@@ -388,13 +470,19 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       (failure) =>
           emit(state.copyWith(isPostsLoading: false, error: failure.message)),
       (_) async {
-        final postsResult = await getPostsUseCase.call();
+        final postsResult = await getPostsUseCase.call(pageIndex: 1);
         postsResult.fold(
           (failure) => emit(
             state.copyWith(isPostsLoading: false, error: failure.message),
           ),
-          (posts) => emit(
-            state.copyWith(posts: posts, isPostsLoading: false, error: null),
+          (paginated) => emit(
+            state.copyWith(
+              posts: paginated.posts,
+              pageIndex: paginated.pageIndex,
+              totalCount: paginated.totalCount,
+              isPostsLoading: false,
+              error: null,
+            ),
           ),
         );
       },
@@ -410,29 +498,46 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final result = await getCommentsIdUseCase.call(event.postId);
 
     await result.fold(
-          (failure) {
+      (failure) {
         emit(
           state.copyWith(isCommentsLoading: false, error: failure.message),
         );
       },
-          (comments) async {
+      (comments) async {
         final updatedLikedCommentIds = <int>{};
-
         final userResult = await getUserDataUseCase.call();
         int? currentUserId;
         userResult.fold((_) {}, (user) => currentUserId = user.id);
 
-        await Future.wait(comments.map((comment) async {
-          final likesResult = await getCommentsLike.call(comment.id);
-          likesResult.fold(
-                (_) {},
-                (likes) {
-              if (currentUserId != null &&
-                  likes.any((like) => like.author.id == currentUserId)) {
-                updatedLikedCommentIds.add(comment.id);
-              }
-            },
-          );
+        // 1. Flatten the comment tree (comments + recursive replies)
+        final allComments = <CommentEntity>[];
+        void flatten(List<CommentEntity> list) {
+          for (final c in list) {
+            allComments.add(c);
+            if (c.replies.isNotEmpty) flatten(c.replies);
+          }
+        }
+        flatten(comments);
+
+        // 2. Process liked status (Checking local data + optional API fallback)
+        await Future.wait(allComments.map((comment) async {
+          // If likes are already in the object (from main fetch), use them
+          if (currentUserId != null &&
+              comment.likes.any((like) => like.author.id == currentUserId)) {
+            updatedLikedCommentIds.add(comment.id);
+          } else {
+            // Fallback: Fetch latest likes from API for this specific comment/reply
+            final likesResult = await getCommentsLike.call(comment.id);
+            likesResult.fold(
+              (_) {},
+              (likes) {
+                if (currentUserId != null &&
+                    likes.any((like) => like.author.id == currentUserId)) {
+                  updatedLikedCommentIds.add(comment.id);
+                }
+              },
+            );
+          }
         }));
 
         emit(
@@ -469,8 +574,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       author: event.comment.author,
       text: 'Posting…',
       creationDate: DateTime.now().add(const Duration(hours: 2)).toString(),
-      likes: [],
+      status: 1,
       replies: [],
+      likes: [],
     );
 
     final updatedComments = List<CommentEntity>.from(state.comments)
@@ -509,9 +615,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           state.copyWith(
             comments: revertedComments,
             postCommentsCount: revertedCount,
-            error: failure.message,
           ),
         );
+        debugPrint('⚠️ Failed to add comment: ${failure.message}');
       },
       (_) {
         final finalComments =
@@ -538,13 +644,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final controller = commentTextController;
 
     if (replyingTo != null) {
+      // Store the mention prefix for use when submitting, but don't show it in the input field
       final mentionPrefix = '@${replyingTo.author.nameEn}: ';
-      controller.text = '$mentionPrefix ';
-      controller.selection = TextSelection.fromPosition(
-        TextPosition(offset: controller.text.length),
-      );
-
       _mentionPrefix = mentionPrefix;
+      // Don't populate the controller - user types their message without seeing the mention
     } else {
       controller.clear();
       _mentionPrefix = '';
@@ -702,12 +805,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     try {
       final cached = await getUserDataUseCase.call();
-      await cached.fold((failure) async => _revertUnlike(event.postId, emit), (
+      await cached.fold((failure) async => _revertUnlike(event.postId, emit, error: failure.message), (
         user,
       ) async {
         final result = await unlikePostUseCase.call(event.postId);
         await result.fold(
-          (failure) async => _revertUnlike(event.postId, emit),
+          (failure) async => _revertUnlike(event.postId, emit, error: failure.message),
           (_) async => add(FetchPostsLikesEvent(event.postId)),
         );
       });
@@ -730,7 +833,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
   }
 
-  void _revertUnlike(int postId, Emitter<HomeState> emit) {
+  void _revertUnlike(int postId, Emitter<HomeState> emit, {String? error}) {
+    if (error != null) {
+      print('❌ [HomeBloc] _revertUnlike triggered for post $postId due to error: $error');
+    }
     final updatedLiked = List<int>.from(state.likedPostIds)..add(postId);
     final currentCount = state.postLikesCount[postId] ?? 0;
     emit(
@@ -983,5 +1089,72 @@ Future<void> _onReportPost(
       },
     );
   }
+  Future<void> _savePost(
+      SavePostEvent event,
+      Emitter<HomeState> emit,
+      ) async {
+    final previous = List<int>.from(state.savedPostIds);
 
+    // Optimistic update
+    final updatedSaved = List<int>.from(previous)
+      ..add(event.postId);
+    emit(state.copyWith(savedPostIds: updatedSaved));
+
+    final result = await savePostUseCase.call(event.postId);
+
+    result.fold(
+          (failure) {
+        // ✅ HANDLE this special case
+        if (failure.message.contains("already saved")) {
+          // DO NOTHING → keep it saved
+          emit(state.copyWith(
+            savedPostIds: List.from(state.savedPostIds),
+          ));
+          return;
+        }
+
+        // ❌ real failure → rollback
+        emit(state.copyWith(
+          savedPostIds: previous,
+          error: failure.message,
+        ));
+      },
+          (_) {
+        emit(state.copyWith(
+          savedPostIds: List.from(state.savedPostIds),
+        ));
+      },
+    );
+  }
+
+  Future<void> _unSavePost(
+      UnSavePostEvent event,
+      Emitter<HomeState> emit,
+      ) async {
+    final previous = List<int>.from(state.savedPostIds);
+
+    // Optimistic update
+    final updatedSaved = List<int>.from(previous)
+      ..remove(event.postId);
+
+    emit(state.copyWith(savedPostIds: updatedSaved));
+
+    final result = await unSavePostUseCase.call(event.postId);
+
+    result.fold(
+          (failure) {
+        // rollback to previous
+        emit(state.copyWith(
+          savedPostIds: previous,
+          error: failure.message,
+        ));
+      },
+          (_) {
+        // ✅ force rebuild
+        emit(state.copyWith(
+          savedPostIds: List.from(state.savedPostIds),
+        ));
+      },
+    );
+  }
 }

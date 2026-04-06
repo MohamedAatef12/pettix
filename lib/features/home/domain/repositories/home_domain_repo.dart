@@ -11,9 +11,11 @@ import 'package:pettix/features/home/domain/entities/report_reason_entity.dart';
 
 
 
+import 'package:pettix/features/home/domain/entities/paginated_posts.dart';
+
 abstract class HomeDomainRepository {
   // Posts
-  Future<Either<Failure, List<PostEntity>>> getPosts();
+  Future<Either<Failure, PaginatedPosts>> getPosts({int pageIndex = 1, int pageSize = 10});
   Future<Either<Failure, void>> addPost(PostEntity post);
   Future<Either<Failure, void>> deletePost(int id);
   Future<Either<Failure, void>> editPost(PostEntity post);
@@ -37,5 +39,8 @@ abstract class HomeDomainRepository {
 Future<Either<Failure, void>> reportPost(int postId,int reasonId, String reason);
 Future<Either<Failure,List<ReportReasonEntity>>> getReportReasons();
 Future<Either<Failure, List<ReportEntity>>> reportedPosts(int postId);
+// saved posts
+Future<Either<Failure, void>> savePost(int postId);
+Future<Either<Failure, void>> unSavePost(int postId);
 
 }
