@@ -13,52 +13,101 @@ import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 import 'package:pettix/features/home/presentation/blocs/home_state.dart';
 
-
 class CommentsBody extends StatelessWidget {
   final int postId;
-  final ScrollController scrollController;
-  const CommentsBody({super.key, required this.postId, required this.scrollController});
+  final ScrollController? scrollController;
+  final Widget? headerWidget;
+
+  const CommentsBody({
+    super.key,
+    required this.postId,
+    this.scrollController,
+    this.headerWidget,
+  });
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<HomeBloc>();
     return BlocBuilder<HomeBloc, HomeState>(
-      buildWhen: (prev, curr) =>
-      prev.comments != curr.comments ||
-          prev.isCommentsLoading != curr.isCommentsLoading ||
-          prev.error != curr.error ||
-          prev.expandedComments != curr.expandedComments ||
-          prev.likedCommentId != curr.likedCommentId
-      ,
+      buildWhen:
+          (prev, curr) =>
+              prev.comments != curr.comments ||
+              prev.isCommentsLoading != curr.isCommentsLoading ||
+              prev.error != curr.error ||
+              prev.expandedComments != curr.expandedComments ||
+              prev.likedCommentId != curr.likedCommentId,
       builder: (context, state) {
-        if (state.isCommentsLoading) return Center(child: CommentsShimmer());
-        if (state.error != null) {
-          return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.error_outline_outlined,
-                color: AppColors.current.red,
-                size: 50.w,
-              ),
-              Text(
-                  'Something went wrong ..!\n   Please try again later.',
-                  style: TextStyle(fontSize: 16.sp, color: AppColors.current.red )
-              )
-            ],
-          ),
-        );
+        if (state.isCommentsLoading) {
+          return CommentsShimmer(hasHeader: headerWidget != null);
         }
-        if (state.comments.isEmpty) return const Center(child: Text('No comments yet.'));
+
+        if (state.error != null && state.comments.isEmpty) {
+          return CustomScrollView(
+            controller: scrollController,
+            slivers: [
+              if (headerWidget != null)
+                SliverToBoxAdapter(child: headerWidget!),
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline_outlined,
+                        color: AppColors.current.red,
+                        size: 50.w,
+                      ),
+                      SizedBox(height: 10.h),
+                      Text(
+                        'Something went wrong ..!\n   Please try again later.',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          color: AppColors.current.red,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+
+        if (state.comments.isEmpty) {
+          return CustomScrollView(
+            controller: scrollController,
+            slivers: [
+              if (headerWidget != null)
+                SliverToBoxAdapter(child: headerWidget!),
+              const SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(child: Text('No comments yet.')),
+              ),
+            ],
+          );
+        }
+
+        // Total items = header (if any) + comments
+        final headerCount = headerWidget != null ? 1 : 0;
 
         return ListView.separated(
           controller: scrollController,
           padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-          separatorBuilder: (_, __) => SizedBox(height: 10.h),
-          itemCount: state.comments.length,
+          separatorBuilder: (_, index) {
+            // No separator after header
+            if (headerWidget != null && index == 0) {
+              return SizedBox(height: 4.h);
+            }
+            return SizedBox(height: 10.h);
+          },
+          itemCount: state.comments.length + headerCount,
           itemBuilder: (context, index) {
-            final comment = state.comments[index];
+            if (headerWidget != null && index == 0) {
+              return headerWidget!;
+            }
+            final commentIndex = index - headerCount;
+            final comment = state.comments[commentIndex];
             return _buildCommentItem(comment, bloc, state);
           },
         );
@@ -66,8 +115,12 @@ class CommentsBody extends StatelessWidget {
     );
   }
 
-  Widget _buildCommentItem(CommentEntity comment, HomeBloc bloc, HomeState state,
-      {bool isReply = false}) {
+  Widget _buildCommentItem(
+    CommentEntity comment,
+    HomeBloc bloc,
+    HomeState state, {
+    bool isReply = false,
+  }) {
     final expanded = state.expandedComments[comment.id] ?? false;
     final isLiked = state.likedCommentId.contains(comment.id);
     return Column(
@@ -78,19 +131,24 @@ class CommentsBody extends StatelessWidget {
           children: [
             CachedNetworkImage(
               imageUrl: comment.author.avatar ?? '',
-              imageBuilder: (context, imageProvider) => CircleAvatar(
-                radius: isReply ? 18.r : 30.r,
-                backgroundImage: imageProvider,
-                backgroundColor: AppColors.current.lightGray,
-              ),
-              placeholder: (context, url) => CircleAvatar(
-                radius: isReply ? 18.r : 30.r,
-                backgroundColor: AppColors.current.lightGray,
-              ),
-              errorWidget: (context, url, error) => CircleAvatar(
-                radius: isReply ? 18.r : 30.r,
-                backgroundImage: const AssetImage('assets/images/no_user.png'),
-              ),
+              imageBuilder:
+                  (context, imageProvider) => CircleAvatar(
+                    radius: isReply ? 18.r : 30.r,
+                    backgroundImage: imageProvider,
+                    backgroundColor: AppColors.current.lightGray,
+                  ),
+              placeholder:
+                  (context, url) => CircleAvatar(
+                    radius: isReply ? 18.r : 30.r,
+                    backgroundColor: AppColors.current.lightGray,
+                  ),
+              errorWidget:
+                  (context, url, error) => CircleAvatar(
+                    radius: isReply ? 18.r : 30.r,
+                    backgroundImage: const AssetImage(
+                      'assets/images/no_user.png',
+                    ),
+                  ),
             ),
             SizedBox(width: isReply ? 6.w : 10.w),
             Expanded(
@@ -99,9 +157,12 @@ class CommentsBody extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(comment.author.nameEn.toString(),
-                          style: AppTextStyles.bold.copyWith(
-                              fontSize: isReply ? 12.sp : 14.sp)),
+                      Text(
+                        comment.author.nameEn.toString(),
+                        style: AppTextStyles.bold.copyWith(
+                          fontSize: isReply ? 12.sp : 14.sp,
+                        ),
+                      ),
                       SizedBox(height: isReply ? 2.h : 4.h),
                       SizedBox(
                         width: 150.w,
@@ -111,7 +172,7 @@ class CommentsBody extends StatelessWidget {
                               if (comment.parentCommentId != null) ...[
                                 TextSpan(
                                   text:
-                                  '@${_findParentAuthorName(comment.parentCommentId, bloc.state.comments)}: ',
+                                      '@${_findParentAuthorName(comment.parentCommentId, bloc.state.comments)}: ',
                                   style: AppTextStyles.description.copyWith(
                                     color: Colors.blue,
                                     fontWeight: FontWeight.w600,
@@ -129,46 +190,46 @@ class CommentsBody extends StatelessWidget {
                             ],
                           ),
                         ),
-
                       ),
-
                       SizedBox(height: isReply ? 2.h : 4.h),
                       Row(
                         children: [
                           Text(
-                              _formatCreationDate(comment.creationDate),
-                              style: AppTextStyles.smallDescription.copyWith(
-                                fontSize: isReply ? 12.sp : 12.sp,
-                                color: AppColors.current.gray,
-                              )),
+                            _formatCreationDate(comment.creationDate),
+                            style: AppTextStyles.smallDescription.copyWith(
+                              fontSize: isReply ? 12.sp : 12.sp,
+                              color: AppColors.current.gray,
+                            ),
+                          ),
                           SizedBox(width: 20.w),
                           GestureDetector(
                             onTap: () {
                               bloc.add(SetReplyingToEvent(comment));
-                              bloc.commentTextController.text =
-                              '@${comment.author.nameEn}: ';
                             },
-                            child: Text('Reply (${_getTotalRepliesCount(comment)})',
-                                style: AppTextStyles.smallDescription.copyWith(
-                                  color: AppColors.current.primary,
-                                  fontSize: isReply ? 10.sp : 12.sp,
-                                )),
-                          ),
-                          SizedBox(width: 20.w,),
-                          Text('Likes ${state.commentLikesCount[comment.id] ?? comment.likes.length}',
+                            child: Text(
+                              'Reply (${_getTotalRepliesCount(comment)})',
                               style: AppTextStyles.smallDescription.copyWith(
                                 color: AppColors.current.primary,
                                 fontSize: isReply ? 10.sp : 12.sp,
-                              )),
-
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 20.w),
+                          Text(
+                            'Likes ${state.commentLikesCount[comment.id] ?? comment.likes.length}',
+                            style: AppTextStyles.smallDescription.copyWith(
+                              color: AppColors.current.primary,
+                              fontSize: isReply ? 10.sp : 12.sp,
+                            ),
+                          ),
                         ],
                       ),
                     ],
                   ),
-                  Spacer(),
+                  const Spacer(),
                   GestureDetector(
                     onTap: () {
-                     if (isLiked) {
+                      if (isLiked) {
                         bloc.add(UnLikeCommentEvent(comment.id));
                       } else {
                         bloc.add(AddCommentLikeEvent(comment.id));
@@ -186,7 +247,7 @@ class CommentsBody extends StatelessWidget {
                       width: 30.w,
                     ),
                   ),
-                  SizedBox(width: 10.w,)
+                  SizedBox(width: 10.w),
                 ],
               ),
             ),
@@ -214,14 +275,17 @@ class CommentsBody extends StatelessWidget {
             padding: EdgeInsets.only(left: isReply ? 0 : 50.w, top: 6.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: comment.replies
-                  .map((reply) => _buildCommentItem(
-                reply,
-                bloc,
-                state,
-                isReply: true,
-              ))
-                  .toList(),
+              children:
+                  comment.replies
+                      .map(
+                        (reply) => _buildCommentItem(
+                          reply,
+                          bloc,
+                          state,
+                          isReply: true,
+                        ),
+                      )
+                      .toList(),
             ),
           ),
       ],
@@ -235,10 +299,12 @@ class CommentsBody extends StatelessWidget {
     }
     return count;
   }
+
   String _formatCreationDate(String rawDate) {
     try {
-      final dateTime =
-      DateTime.parse(rawDate).toUtc().add(const Duration(hours: 3));
+      final dateTime = DateTime.parse(
+        rawDate,
+      ).toUtc().add(const Duration(hours: 3));
       final now = DateTime.now().toUtc().add(const Duration(hours: 3));
       final diff = now.difference(dateTime);
       if (diff.inSeconds < 60) return 'Just now';
@@ -250,6 +316,7 @@ class CommentsBody extends StatelessWidget {
       return rawDate;
     }
   }
+
   String _findParentAuthorName(int? parentId, List<CommentEntity> comments) {
     if (parentId == null) return '';
     for (final comment in comments) {
@@ -261,6 +328,4 @@ class CommentsBody extends StatelessWidget {
     }
     return '';
   }
-
 }
-

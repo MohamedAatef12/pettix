@@ -22,10 +22,28 @@ class CacheManager implements ICacheManager {
   }
 
   @override
+  Future<void> setSavedCredentials(String email, String password) async {
+    await _prefs?.setString('saved_email', email);
+    await _prefs?.setString('saved_password', password);
+  }
+
+  @override
+  Future<String?> getSavedEmail() async {
+    return _prefs?.getString('saved_email');
+  }
+
+  @override
+  Future<String?> getSavedPassword() async {
+    return _prefs?.getString('saved_password');
+  }
+
+  @override
   bool logout() {
     _prefs?.remove('user');
     _prefs?.remove('token');
     _prefs?.remove('remember_me');
+    _prefs?.remove('saved_email');
+    _prefs?.remove('saved_password');
     _prefs?.setBool('logged_in', false);
 
     return true;

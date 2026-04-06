@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'dart:io';
-
+import 'package:path/path.dart' as p;
 import '../../domain/entities/post_entity.dart';
 import 'author_model.dart';
 import 'comments_model.dart';
@@ -17,6 +17,8 @@ class PostModel extends PostEntity {
     required super.creationDate,
     super.modifyDate,
     required super.images,
+    required super.statusId,
+    required super.isSaved
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) {
@@ -34,7 +36,7 @@ class PostModel extends PostEntity {
         genderId: null,
         genderName: null,
         contactTypeId: 4,
-        statusId: 1,
+        statusId: 3,
         age: null,
       ),
       content: json['content']?.toString() ?? '',
@@ -52,53 +54,57 @@ class PostModel extends PostEntity {
           ?.map((e) => e.toString())
           .toList() ??
           [],
+      statusId: json['statusId'],
+      isSaved: json['isSaved'] ?? false,
     );
   }
 
 
-
   Future<Map<String, dynamic>> toJson() async {
-    List<String> encodedImages = [];
+    List<Map<String, dynamic>> encodedImages = [];
 
     for (final image in images) {
-      // لو الصورة عبارة عن Base64 بالفعل (مثلاً جاية من API)، سيبها زي ما هي
+      String base64Image = '';
+
       if (image.startsWith('data:image') || image.length > 50000) {
-        encodedImages.add(image);
+        base64Image = image;
       } else {
         final file = File(image);
         if (await file.exists()) {
           try {
-            // Compress the image
             final result = await FlutterImageCompress.compressWithFile(
               file.absolute.path,
               minWidth: 1024,
               minHeight: 1024,
-              quality: 70, // 70% quality reduces size significantly
+              quality: 70,
             );
 
             if (result != null) {
-              encodedImages.add('data:image/jpeg;base64,${base64Encode(result)}');
+              base64Image = base64Encode(result);
             } else {
-              // Fallback if compression returns null
               final bytes = await file.readAsBytes();
-              encodedImages.add('data:image/jpeg;base64,${base64Encode(bytes)}');
+              base64Image = base64Encode(bytes);
             }
           } catch (e) {
-             // Fallback if compression throws error
             final bytes = await file.readAsBytes();
-            encodedImages.add('data:image/jpeg;base64,${base64Encode(bytes)}');
+            base64Image = base64Encode(bytes);
           }
         }
       }
+
+      final String extension = p.extension(image).replaceFirst('.', '') ?? 'jpg';
+
+      encodedImages.add({
+        "filename": "image_${DateTime.now().millisecondsSinceEpoch}.$extension",
+        "base64": base64Image,
+        "state": 1,
+      });
     }
 
     return {
-      'id': id,
-      'authorId': author.id,
-      'content': content,
-      'creationDate': creationDate,
-      'modifyDate': modifyDate,
-      'images': encodedImages,
+      "content": content,
+      "images": encodedImages,
+      "statusId":statusId, // أو حسب الحالة عندك
     };
   }
   PostModel.fromEntity(PostEntity postEntity)
@@ -111,16 +117,20 @@ class PostModel extends PostEntity {
     creationDate: postEntity.creationDate,
     modifyDate: postEntity.modifyDate,
     images: postEntity.images,
+    statusId: postEntity.statusId,
+    isSaved:  postEntity.isSaved
   );
 
-  PostEntity toEntity(PostModel postModel) => PostEntity(
-    id: postModel.id,
-    author: postModel.author,
-    comments: postModel.comments,
-    likes: postModel.likes,
-    content: postModel.content,
-    creationDate: postModel.creationDate,
-    modifyDate: postModel.modifyDate,
-    images: postModel.images,
+  PostEntity toEntity() => PostEntity(
+    id: id,
+    author: author,
+    comments: comments,
+    likes: likes,
+    content: content,
+    creationDate: creationDate,
+    modifyDate: modifyDate,
+    images: images,
+    statusId: statusId,
+    isSaved: isSaved
   );
 }

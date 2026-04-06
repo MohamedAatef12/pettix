@@ -145,4 +145,17 @@ class GetReportedPostsEvent extends HomeEvent{
   @override
   List<Object?> get props => [postId];
 }
+class SavePostEvent extends HomeEvent{
+  final int postId;
+  SavePostEvent(this.postId);
+  @override
+  List<Object?> get props => [postId];
+}
+class UnSavePostEvent extends HomeEvent{
+  final int postId;
+  UnSavePostEvent(this.postId);
+  @override
+  List<Object?> get props => [postId];
+}
 
+class LoadMorePostsEvent extends HomeEvent {}

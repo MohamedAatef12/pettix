@@ -29,7 +29,7 @@ import 'package:pettix/features/splash/persentation/view/splash_screen.dart';
 import 'routes.dart';
 
 GoRouter appRouter() => GoRouter(
-  initialLocation: AppRoutes.home,
+  initialLocation: AppRoutes.splash,
   // redirect: (context, state) async {
   //   await SharedPrefsHelper.init();
   //
