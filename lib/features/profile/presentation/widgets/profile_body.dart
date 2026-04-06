@@ -7,6 +7,7 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/auth/domain/entities/user_entity.dart';
+import 'package:pettix/features/my_pets/presentation/widgets/pets_section.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_state.dart';
 import 'package:pettix/features/profile/presentation/widgets/profile_header.dart';
@@ -121,6 +122,10 @@ class _ProfileContent extends StatelessWidget {
                         ),
                       ],
                     ),
+                    SizedBox(height: 24.h),
+                    _SectionLabel('My Pets'),
+                    SizedBox(height: 8.h),
+                    const PetsSection(),
                     SizedBox(height: 32.h),
                   ],
                 ),

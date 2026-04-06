@@ -72,6 +72,20 @@ import '../../features/home/domain/usecases/get_user_cached%20_data.dart'
     as _i118;
 import '../../features/home/domain/usecases/like_post.dart' as _i58;
 import '../../features/home/domain/usecases/unlike_comment.dart' as _i975;
+import '../../features/my_pets/data/datasources/my_pets_remote_data_source.dart'
+    as _i1050;
+import '../../features/my_pets/data/repositories/my_pets_repo_impl.dart'
+    as _i601;
+import '../../features/my_pets/domain/repositories/my_pets_repository.dart'
+    as _i835;
+import '../../features/my_pets/domain/usecases/add_pet_usecase.dart' as _i578;
+import '../../features/my_pets/domain/usecases/delete_pet_usecase.dart'
+    as _i649;
+import '../../features/my_pets/domain/usecases/get_pet_options_usecase.dart'
+    as _i982;
+import '../../features/my_pets/domain/usecases/get_user_pets_usecase.dart'
+    as _i19;
+import '../../features/my_pets/presentation/bloc/my_pets_bloc.dart' as _i496;
 import '../../features/profile/data/datasources/profile_remote_data_source.dart'
     as _i847;
 import '../../features/profile/data/repositories/profile_repo_impl.dart'
@@ -109,11 +123,38 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i1.EmailAuthService>(),
       ),
     );
+    gh.lazySingleton<_i1050.MyPetsRemoteDataSource>(
+      () => _i1050.MyPetsRemoteDataSourceImpl(gh<_i655.ApiService>()),
+    );
     gh.factory<_i526.GetUserLocalDataSource>(
       () => _i298.GetUserDataSourceImpl(gh<_i694.ICacheManager>()),
     );
+    gh.lazySingleton<_i835.MyPetsRepository>(
+      () => _i601.MyPetsRepositoryImpl(gh<_i1050.MyPetsRemoteDataSource>()),
+    );
     gh.lazySingleton<_i956.AdoptionRemoteDataSource>(
       () => _i956.AdoptionRemoteDataSourceImpl(gh<_i655.ApiService>()),
+    );
+    gh.factory<_i578.AddPetUseCase>(
+      () => _i578.AddPetUseCase(gh<_i835.MyPetsRepository>()),
+    );
+    gh.factory<_i649.DeletePetUseCase>(
+      () => _i649.DeletePetUseCase(gh<_i835.MyPetsRepository>()),
+    );
+    gh.factory<_i982.GetPetOptionsUseCase>(
+      () => _i982.GetPetOptionsUseCase(gh<_i835.MyPetsRepository>()),
+    );
+    gh.factory<_i19.GetUserPetsUseCase>(
+      () => _i19.GetUserPetsUseCase(gh<_i835.MyPetsRepository>()),
+    );
+    gh.factory<_i496.MyPetsBloc>(
+      () => _i496.MyPetsBloc(
+        gh<_i19.GetUserPetsUseCase>(),
+        gh<_i982.GetPetOptionsUseCase>(),
+        gh<_i578.AddPetUseCase>(),
+        gh<_i649.DeletePetUseCase>(),
+        gh<_i694.ICacheManager>(),
+      ),
     );
     gh.lazySingleton<_i790.TokenInterceptor>(
       () => _i790.TokenInterceptor(gh<_i361.Dio>()),

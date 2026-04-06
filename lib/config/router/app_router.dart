@@ -13,6 +13,9 @@ import '../../features/help_support/presentation/view/send_feedback_page.dart';
 import '../../features/legal/presentation/view/legal_page.dart';
 import '../../features/legal/presentation/view/about_pettix_page.dart';
 import '../../features/legal/presentation/view/legal_content_page.dart';
+import '../../features/my_pets/presentation/bloc/my_pets_bloc.dart';
+import '../../features/my_pets/presentation/bloc/my_pets_event.dart';
+import '../../features/my_pets/presentation/view/add_pet_screen.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 import '../../features/auth/presentation/pages/forgot_password/password_reset_done_page.dart';
 import '../../features/auth/presentation/pages/forgot_password/reset_password_page.dart';
@@ -234,6 +237,26 @@ GoRouter appRouter() => GoRouter(
         return BlocProvider(
           create: (_) => DI.find<ProfileBloc>()..add(FetchProfileEvent()),
           child: const EditProfileScreen(),
+        );
+      },
+    ),
+    // ── My Pets ───────────────────────────────────────────────────────────────
+    GoRoute(
+      path: AppRoutes.addPet,
+      name: AppRouteNames.addPet,
+      builder: (context, state) {
+        final existingBloc =
+            state.extra is MyPetsBloc ? state.extra as MyPetsBloc : null;
+        if (existingBloc != null) {
+          return BlocProvider.value(
+            value: existingBloc,
+            child: const AddPetScreen(),
+          );
+        }
+        return BlocProvider(
+          create: (_) => DI.find<MyPetsBloc>()
+            ..add(const FetchPetOptionsEvent()),
+          child: const AddPetScreen(),
         );
       },
     ),
