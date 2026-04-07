@@ -17,7 +17,6 @@ import 'package:talker_flutter/talker_flutter.dart' as _i207;
 import '../../data/caching/i_cache_manager.dart' as _i694;
 import '../../data/network/api_services.dart' as _i655;
 import '../../data/network/dio_factory.dart' as _i719;
-import '../../data/network/dio_interceptor.dart' as _i790;
 import '../../data/network/email_auth_service.dart' as _i1;
 import '../../data/network/twilio_service.dart' as _i718;
 import '../../features/auth/data/repos/auth_repo_impl.dart' as _i152;
@@ -63,6 +62,20 @@ import '../../features/home/domain/usecases/like_post.dart' as _i58;
 import '../../features/home/domain/usecases/save_post_usecase.dart' as _i989;
 import '../../features/home/domain/usecases/unlike_comment.dart' as _i975;
 import '../../features/home/domain/usecases/unsave_post_usecase.dart' as _i86;
+import '../../features/notification/data/data_sources/notification_remote_data_source.dart'
+    as _i934;
+import '../../features/notification/data/repo/notification_repo_impl.dart'
+    as _i933;
+import '../../features/notification/domain/repo/notification_repo.dart'
+    as _i588;
+import '../../features/notification/domain/use_cases/get_notifications_use_case.dart'
+    as _i571;
+import '../../features/notification/domain/use_cases/mark_all_notifications_as_read_use_case.dart'
+    as _i475;
+import '../../features/notification/domain/use_cases/mark_notification_as_read_use_case.dart'
+    as _i46;
+import '../../features/notification/presentation/bloc/notification_bloc.dart'
+    as _i29;
 import 'di.dart' as _i913;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -87,8 +100,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i655.ApiService>(
       () => _i655.ApiService(gh<_i361.Dio>(), gh<_i694.ICacheManager>()),
     );
-    gh.lazySingleton<_i790.TokenInterceptor>(
-      () => _i790.TokenInterceptor(gh<_i361.Dio>()),
+    gh.lazySingleton<_i934.NotificationRemoteDataSource>(
+      () => _i934.NotificationRemoteDataSourceImpl(gh<_i655.ApiService>()),
     );
     gh.factory<_i865.AuthRemoteDataSource>(
       () => _i523.AuthRemoteDataSourceImpl(
@@ -96,16 +109,31 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i1.EmailAuthService>(),
       ),
     );
+    gh.lazySingleton<_i588.NotificationRepo>(
+      () =>
+          _i933.NotificationRepoImpl(gh<_i934.NotificationRemoteDataSource>()),
+    );
     gh.factory<_i787.AuthRepository>(
       () => _i152.AuthRepositoryImpl(gh<_i865.AuthRemoteDataSource>()),
     );
-    gh.factory<_i1055.RemoteDataSource>(
+    gh.lazySingleton<_i1055.RemoteDataSource>(
       () => _i621.RemoteDataSourceImpl(gh<_i655.ApiService>()),
     );
-    gh.factory<_i986.HomeDomainRepository>(
-      () => _i1024.HomeRepositoryImpl(
-        gh<_i1055.RemoteDataSource>(),
-        gh<_i526.GetUserLocalDataSource>(),
+    gh.lazySingleton<_i571.GetNotificationsUseCase>(
+      () => _i571.GetNotificationsUseCase(gh<_i588.NotificationRepo>()),
+    );
+    gh.lazySingleton<_i475.MarkAllNotificationsAsReadUseCase>(
+      () =>
+          _i475.MarkAllNotificationsAsReadUseCase(gh<_i588.NotificationRepo>()),
+    );
+    gh.lazySingleton<_i46.MarkNotificationAsReadUseCase>(
+      () => _i46.MarkNotificationAsReadUseCase(gh<_i588.NotificationRepo>()),
+    );
+    gh.factory<_i29.NotificationBloc>(
+      () => _i29.NotificationBloc(
+        gh<_i571.GetNotificationsUseCase>(),
+        gh<_i475.MarkAllNotificationsAsReadUseCase>(),
+        gh<_i46.MarkNotificationAsReadUseCase>(),
       ),
     );
     gh.factory<_i510.ForgotPasswordUseCase>(
@@ -128,6 +156,13 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i975.VerifyOtp>(
       () => _i975.VerifyOtp(gh<_i787.AuthRepository>()),
+    );
+    gh.factory<_i986.HomeDomainRepository>(
+      () => _i1024.HomeRepositoryImpl(
+        gh<_i1055.RemoteDataSource>(),
+        gh<_i526.GetUserLocalDataSource>(),
+        gh<_i934.NotificationRemoteDataSource>(),
+      ),
     );
     gh.factory<_i829.AddCommentUseCase>(
       () => _i829.AddCommentUseCase(gh<_i986.HomeDomainRepository>()),

@@ -1,7 +1,6 @@
 class Constants {
   // static const String baseUrl = 'https://pettix-production.up.railway.app';
-  static const String baseUrl = 'https://3834-81-10-3-82.ngrok-free.app';
-
+  static const String baseUrl = 'https://8fa9-81-10-3-82.ngrok-free.app';
   static const commentsEndpoint = '/api/Timeline/Comments/param';
   static const addCommentEndpoint = '/api/Timeline/Comments/post';
   static const commentLikesEndpoint = '/api/Timeline/CommentLikes/comment';
@@ -27,6 +26,10 @@ class Constants {
   static const String resendOtpEndpoint = '/api/Security/Authentication/resend-otp';
   static const String forgotPasswordEndpoint = '/api/Security/Authentication/forgot-password';
   static const String resetPasswordEndpoint = '/api/Security/Authentication/reset-password-otp';
+  static const String notificationSearchEndpoint = '/api/Notifications/Search';
+  static const String readAllNotificationsEndpoint = '/api/Notifications/ReadAll';
+  static const String readSingleNotificationEndpoint = '/api/Notifications/Read/param';
+  static const String sendNotificationEndpoint = '/api/Notifications/Send';
   // Headers
   static const String contentTypeHeader = 'Content-Type';
   static const String applicationJson = 'application/json';

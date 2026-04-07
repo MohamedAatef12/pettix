@@ -236,6 +236,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         final postLikesMap = <int, int>{};
         final postCommentsMap = <int, int>{};
         final likedPostIds = <int>[];
+        final savedPostIds = <int>[];
 
         await Future.wait(
           posts.map((post) async {
@@ -251,6 +252,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
                 post.likes.any((like) => like.author.id == currentUserId)) {
               likedPostIds.add(post.id);
             }
+            if (post.isSaved) {
+              savedPostIds.add(post.id);
+            }
           }),
         );
 
@@ -260,6 +264,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             postLikesCount: postLikesMap,
             postCommentsCount: postCommentsMap,
             likedPostIds: likedPostIds,
+            savedPostIds: savedPostIds,
             isPostsLoading: false,
             pageIndex: paginatedPosts.pageIndex,
             totalCount: paginatedPosts.totalCount,
@@ -297,6 +302,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         final postLikesMap = Map<int, int>.from(state.postLikesCount);
         final postCommentsMap = Map<int, int>.from(state.postCommentsCount);
         final likedPostIds = List<int>.from(state.likedPostIds);
+        final savedPostIds = List<int>.from(state.savedPostIds);
 
         await Future.wait(
           newPosts.map((post) async {
@@ -312,6 +318,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
                 post.likes.any((like) => like.author.id == currentUserId)) {
               likedPostIds.add(post.id);
             }
+            if (post.isSaved) {
+              savedPostIds.add(post.id);
+            }
           }),
         );
 
@@ -321,6 +330,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             postLikesCount: postLikesMap,
             postCommentsCount: postCommentsMap,
             likedPostIds: likedPostIds,
+            savedPostIds: savedPostIds,
             isMorePostsLoading: false,
             pageIndex: paginatedPosts.pageIndex,
             totalCount: paginatedPosts.totalCount,
@@ -598,6 +608,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       event.comment,
       event.comment.postId,
       null,
+      creatorId: event.creatorId,
     );
 
     result.fold(
@@ -688,6 +699,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       replyForUpload,
       event.reply.postId,
       event.parentCommentId,
+      creatorId: event.creatorId,
     );
     await result.fold(
           (failure) async {
@@ -770,7 +782,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       await cached.fold((failure) async => _revertLike(event.postId, emit), (
         user,
       ) async {
-        final result = await likePostUseCase.call(event.postId, user.id);
+        final result = await likePostUseCase.call(event.postId, user.id, creatorId: event.creatorId);
         await result.fold((failure) async => _revertLike(event.postId, emit), (
           _,
         ) async {
@@ -890,7 +902,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       await cachedUser.fold(
             (failure) async => _revertCommentLike(commentId, emit),
             (user) async {
-          final result = await likeCommentUseCase.call(commentId);
+          final result = await likeCommentUseCase.call(commentId, creatorId: event.creatorId);
           await result.fold(
                 (failure) async => _revertCommentLike(commentId, emit),
                 (_) async => add(GetCommentsLikeEvent(commentId)),

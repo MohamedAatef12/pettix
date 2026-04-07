@@ -10,7 +10,17 @@ class AddCommentUseCase {
 
   AddCommentUseCase(this.repository);
 
-  Future<Either<Failure, void>> call(CommentEntity comment,int postId, int? parentCommentId,) {
-    return repository.addComment(comment,postId,parentCommentId);
+  Future<Either<Failure, void>> call(
+    CommentEntity comment,
+    int postId,
+    int? parentCommentId, {
+    int? creatorId,
+  }) {
+    return repository.addComment(
+      comment,
+      postId,
+      parentCommentId,
+      creatorId: creatorId,
+    );
   }
 }

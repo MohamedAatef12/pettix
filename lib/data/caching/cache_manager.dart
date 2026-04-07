@@ -18,7 +18,7 @@ class CacheManager implements ICacheManager {
   Future<void> setUserData(UserModel value) async {
     final jsonString = json.encode(value.toJson());
     await _prefs?.setString('user', jsonString);
-    await _prefs?.setBool('logged_in', true); // ✅ mark user as logged in
+    await _prefs?.setBool('logged_in', true);
   }
 
   @override
@@ -41,6 +41,7 @@ class CacheManager implements ICacheManager {
   bool logout() {
     _prefs?.remove('user');
     _prefs?.remove('token');
+    _prefs?.remove('refresh_token');
     _prefs?.remove('remember_me');
     _prefs?.remove('saved_email');
     _prefs?.remove('saved_password');
@@ -48,7 +49,6 @@ class CacheManager implements ICacheManager {
 
     return true;
   }
-
 
   @override
   bool isCrossedOnBoardingPage() {
@@ -120,13 +120,24 @@ class CacheManager implements ICacheManager {
   Future<String?> getToken() async {
     return _prefs?.getString('token');
   }
+
   @override
   Future<void> setRefreshToken(String refreshToken) async {
-     await _prefs?.setString('refresh_token', refreshToken);
+    await _prefs?.setString('refresh_token', refreshToken);
   }
+
   @override
   Future<String?> getRefreshToken() async {
     return _prefs?.getString('refresh_token');
   }
 
+  @override
+  Future<void> setFcmToken(String fcmToken) async {
+    await _prefs?.setString('fcm_token', fcmToken);
+  }
+
+  @override
+  Future<String?> getFcmToken() async {
+    return _prefs?.getString('fcm_token');
+  }
 }

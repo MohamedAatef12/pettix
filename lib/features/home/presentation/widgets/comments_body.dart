@@ -232,7 +232,7 @@ class CommentsBody extends StatelessWidget {
                       if (isLiked) {
                         bloc.add(UnLikeCommentEvent(comment.id));
                       } else {
-                        bloc.add(AddCommentLikeEvent(comment.id));
+                        bloc.add(AddCommentLikeEvent(comment.id, creatorId: comment.author.id));
                       }
                     },
                     child: SvgPicture.asset(
