@@ -22,16 +22,21 @@ abstract class HomeDomainRepository {
   Future<Either<Failure,int>> getPostCommentsCount(int postId);
   // Comments
   Future<Either<Failure, List<CommentEntity>>> getPostComments(int id);
-  Future<Either<Failure, void>> addComment(CommentEntity comment,int postId, int? parentCommentId,);
+  Future<Either<Failure, void>> addComment(
+    CommentEntity comment,
+    int postId,
+    int? parentCommentId, {
+    int? creatorId,
+  });
   Future<Either<Failure, void>> deleteComment(int id);
   Future<Either<Failure, void>> editComment(CommentEntity comment);
 
   // Likes
   Future<Either<Failure, List<LikesEntity>>> getPostLikes(int postId);
-  Future<Either<Failure, LikesEntity>> likePost(int postId, int id);
+  Future<Either<Failure, LikesEntity>> likePost(int postId, int id, {int? creatorId});
   Future<Either<Failure, void>> unlikePost(int postId);
   Future<Either<Failure, List<CommentLikeEntity>>> getCommentLikesCount(int postId);
-  Future<Either<Failure, CommentLikeEntity>> likeComment(int commentId,);
+  Future<Either<Failure, CommentLikeEntity>> likeComment(int commentId, {int? creatorId});
   Future<Either<Failure, void>> unlikeComment(int commentId);
   // Cached Data
   Future<Either<Failure, UserEntity>> getCachedUserData();

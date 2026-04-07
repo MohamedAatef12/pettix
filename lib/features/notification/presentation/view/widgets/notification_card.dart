@@ -1,78 +1,91 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/utils/date_formatter.dart';
+import 'package:pettix/features/notification/presentation/bloc/notification_bloc.dart';
+import 'package:pettix/features/notification/presentation/bloc/notification_event.dart';
+import '../../../domain/entities/notification_entity.dart';
 
 class NotificationCard extends StatelessWidget {
   final Color color;
-  const NotificationCard({super.key, required this.color});
+  final NotificationEntity notification;
+
+  const NotificationCard({
+    super.key,
+    required this.color,
+    required this.notification,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 3), // changes position of shadow
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CircleAvatar(
-            radius: 24,
-            backgroundImage: AssetImage('assets/images/notification_icon.png'),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Notification Title',
-                  style: AppTextStyles.bodyTitle
-                ),
-                 SizedBox(height: 4.h),
-                Text(
-                  'This is a brief description of the notification. It provides more details about the notification content.',
-                  style: AppTextStyles.description
-                ),
-                 SizedBox(height: 8.h),
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        // Handle mark as read action
-                      },
-                      child: Text(
-                        'Mark as read',
-                        style: AppTextStyles.smallDescription.copyWith(
-                          color: AppColors.current.green,
-                        )
-                      ),
-                    ),
-                    Spacer(),
-                    Text(
-                      '2 hours ago',
-                      style: AppTextStyles.smallDescription.copyWith(
-                        color:AppColors.current.lightText
-                      )
-                    ),
-                  ],
-                ),
-              ],
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: notification.isRead ? color : AppColors.current.primary.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(12.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              spreadRadius: 1,
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-          ),
-        ],
-      )
-    );
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              radius: 20.r,
+              backgroundColor: AppColors.current.primary.withOpacity(0.1),
+              child: Icon(Icons.notifications_rounded, size: 20.sp, color: AppColors.current.primary),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    notification.title,
+                    style: AppTextStyles.bold.copyWith(fontSize: 14.sp),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    notification.body,
+                    style: AppTextStyles.description.copyWith(fontSize: 13.sp),
+                  ),
+                  SizedBox(height: 12.h),
+                  Row(
+                    children: [
+                      if (!notification.isRead)
+                        GestureDetector(
+                          onTap: () {
+                            context.read<NotificationBloc>().add(MarkAsReadEvent(notification.id));
+                          },
+                          child: Text(
+                            'Mark as read',
+                            style: AppTextStyles.smallDescription.copyWith(
+                              color: AppColors.current.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      const Spacer(),
+                      Text(
+                        DateFormatter.formatTimeAgo(notification.date),
+                        style: AppTextStyles.smallDescription.copyWith(
+                          color: AppColors.current.lightText,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ));
   }
 }

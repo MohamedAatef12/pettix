@@ -245,6 +245,8 @@ Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) asyn
             (loginResponse) async {
           // هنا loginResponse.result عبارة عن String
           await DI.find<ICacheManager>().setToken(loginResponse.token);
+          await DI.find<ICacheManager>().setRefreshToken(loginResponse.refreshToken);
+          await DI.find<ICacheManager>().setUserData(UserModel.fromEntity(loginResponse.user));
 
           if (event.rememberMe) {
             await DI.find<ICacheManager>().saveLogin(true);

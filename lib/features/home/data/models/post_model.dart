@@ -55,7 +55,7 @@ class PostModel extends PostEntity {
           .toList() ??
           [],
       statusId: json['statusId'],
-      isSaved: json['isSaved'] ?? false,
+      isSaved: json['isSaved'] ,
     );
   }
 
@@ -104,7 +104,8 @@ class PostModel extends PostEntity {
     return {
       "content": content,
       "images": encodedImages,
-      "statusId":statusId, // أو حسب الحالة عندك
+      "statusId":statusId,
+    "isSaved": isSaved
     };
   }
   PostModel.fromEntity(PostEntity postEntity)

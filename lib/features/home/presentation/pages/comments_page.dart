@@ -257,7 +257,7 @@ class CommentsPage extends StatelessWidget {
           status: 1,
         );
 
-        bloc.add(AddCommentEvent(comment));
+        bloc.add(AddCommentEvent(comment, creatorId: replyingTo?.author.id ?? post.author.id));
         bloc.commentTextController.clear();
         bloc.add(SetReplyingToEvent(null));
       },

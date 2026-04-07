@@ -99,6 +99,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final userModel = UserModel.fromJson(userJson);
 
       await DI.find<ICacheManager>().setUserData(userModel);
+      await DI.find<ICacheManager>().setToken(token);
+      await DI.find<ICacheManager>().setRefreshToken(result['refreshToken'] ?? '');
 
       return Right(
         GoogleLoginResponseModel(

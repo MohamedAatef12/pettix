@@ -542,7 +542,7 @@ class PostCard extends StatelessWidget {
                           if (isLiked) {
                             homeBloc.add(DeleteLikeEvent(post.id));
                           } else {
-                            homeBloc.add(AddLikeEvent(post.id));
+                            homeBloc.add(AddLikeEvent(post.id, creatorId: post.author.id));
                           }
                         },
                         child: SvgPicture.asset(
@@ -587,7 +587,7 @@ class PostCard extends StatelessWidget {
 
                       GestureDetector(
                         onTap: () {
-                          if (state.isSaved == true) {
+                          if (isSaved) {
                             homeBloc.add(UnSavePostEvent(post.id));
                           } else {
                             homeBloc.add(SavePostEvent(post.id));
@@ -596,15 +596,15 @@ class PostCard extends StatelessWidget {
                         child: SvgPicture.asset(
                           'assets/icons/save_post.svg',
                           colorFilter: ColorFilter.mode(
-                            isSaved == true
+                            isSaved
                                 ? AppColors
                                     .current
                                     .yellow // Gold color
                                 : AppColors.current.text.withOpacity(0.7),
                             BlendMode.srcIn,
                           ),
-                          height: 24.h,
-                          width: 24.w,
+                          height: 26.h,
+                          width: 26.w,
                         ),
                       ),
                     ],

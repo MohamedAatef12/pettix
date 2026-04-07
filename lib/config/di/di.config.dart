@@ -17,7 +17,6 @@ import 'package:talker_flutter/talker_flutter.dart' as _i207;
 import '../../data/caching/i_cache_manager.dart' as _i694;
 import '../../data/network/api_services.dart' as _i655;
 import '../../data/network/dio_factory.dart' as _i719;
-import '../../data/network/dio_interceptor.dart' as _i790;
 import '../../data/network/email_auth_service.dart' as _i1;
 import '../../features/adoption/data/datasources/adoption_browse_data_source.dart'
     as _i714;
@@ -96,35 +95,20 @@ import '../../features/home/domain/usecases/like_post.dart' as _i58;
 import '../../features/home/domain/usecases/save_post_usecase.dart' as _i989;
 import '../../features/home/domain/usecases/unlike_comment.dart' as _i975;
 import '../../features/home/domain/usecases/unsave_post_usecase.dart' as _i86;
-import '../../features/my_pets/data/datasources/my_pets_remote_data_source.dart'
-    as _i1050;
-import '../../features/my_pets/data/repositories/my_pets_repo_impl.dart'
-    as _i601;
-import '../../features/my_pets/domain/repositories/my_pets_repository.dart'
-    as _i835;
-import '../../features/my_pets/domain/usecases/add_pet_usecase.dart' as _i578;
-import '../../features/my_pets/domain/usecases/delete_pet_usecase.dart'
-    as _i649;
-import '../../features/my_pets/domain/usecases/get_pet_options_usecase.dart'
-    as _i982;
-import '../../features/my_pets/domain/usecases/get_user_pets_usecase.dart'
-    as _i19;
-import '../../features/my_pets/domain/usecases/update_pet_status_usecase.dart'
-    as _i152;
-import '../../features/my_pets/domain/usecases/update_pet_usecase.dart'
-    as _i931;
-import '../../features/my_pets/presentation/bloc/my_pets_bloc.dart' as _i496;
-import '../../features/profile/data/datasources/profile_remote_data_source.dart'
-    as _i847;
-import '../../features/profile/data/repositories/profile_repo_impl.dart'
-    as _i988;
-import '../../features/profile/domain/repositories/profile_repository.dart'
-    as _i894;
-import '../../features/profile/domain/usecases/get_profile_usecase.dart'
-    as _i965;
-import '../../features/profile/domain/usecases/update_profile_usecase.dart'
-    as _i478;
-import '../../features/profile/presentation/bloc/profile_bloc.dart' as _i469;
+import '../../features/notification/data/data_sources/notification_remote_data_source.dart'
+    as _i934;
+import '../../features/notification/data/repo/notification_repo_impl.dart'
+    as _i933;
+import '../../features/notification/domain/repo/notification_repo.dart'
+    as _i588;
+import '../../features/notification/domain/use_cases/get_notifications_use_case.dart'
+    as _i571;
+import '../../features/notification/domain/use_cases/mark_all_notifications_as_read_use_case.dart'
+    as _i475;
+import '../../features/notification/domain/use_cases/mark_notification_as_read_use_case.dart'
+    as _i46;
+import '../../features/notification/presentation/bloc/notification_bloc.dart'
+    as _i29;
 import 'di.dart' as _i913;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -145,119 +129,40 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i655.ApiService>(
       () => _i655.ApiService(gh<_i361.Dio>(), gh<_i694.ICacheManager>()),
     );
+    gh.lazySingleton<_i934.NotificationRemoteDataSource>(
+      () => _i934.NotificationRemoteDataSourceImpl(gh<_i655.ApiService>()),
+    );
     gh.factory<_i865.AuthRemoteDataSource>(
       () => _i523.AuthRemoteDataSourceImpl(
         gh<_i655.ApiService>(),
         gh<_i1.EmailAuthService>(),
       ),
     );
-    gh.lazySingleton<_i1050.MyPetsRemoteDataSource>(
-      () => _i1050.MyPetsRemoteDataSourceImpl(gh<_i655.ApiService>()),
-    );
-    gh.factory<_i526.GetUserLocalDataSource>(
-      () => _i298.GetUserDataSourceImpl(gh<_i694.ICacheManager>()),
-    );
-    gh.lazySingleton<_i835.MyPetsRepository>(
-      () => _i601.MyPetsRepositoryImpl(gh<_i1050.MyPetsRemoteDataSource>()),
-    );
-    gh.lazySingleton<_i221.AdoptionHistoryRemoteDataSource>(
-      () => _i221.AdoptionHistoryRemoteDataSourceImpl(gh<_i655.ApiService>()),
-    );
-    gh.lazySingleton<_i956.AdoptionRemoteDataSource>(
-      () => _i956.AdoptionRemoteDataSourceImpl(gh<_i655.ApiService>()),
-    );
-    gh.factory<_i578.AddPetUseCase>(
-      () => _i578.AddPetUseCase(gh<_i835.MyPetsRepository>()),
-    );
-    gh.factory<_i649.DeletePetUseCase>(
-      () => _i649.DeletePetUseCase(gh<_i835.MyPetsRepository>()),
-    );
-    gh.factory<_i982.GetPetOptionsUseCase>(
-      () => _i982.GetPetOptionsUseCase(gh<_i835.MyPetsRepository>()),
-    );
-    gh.factory<_i19.GetUserPetsUseCase>(
-      () => _i19.GetUserPetsUseCase(gh<_i835.MyPetsRepository>()),
-    );
-    gh.factory<_i152.UpdatePetStatusUseCase>(
-      () => _i152.UpdatePetStatusUseCase(gh<_i835.MyPetsRepository>()),
-    );
-    gh.factory<_i931.UpdatePetUseCase>(
-      () => _i931.UpdatePetUseCase(gh<_i835.MyPetsRepository>()),
-    );
-    gh.factory<_i496.MyPetsBloc>(
-      () => _i496.MyPetsBloc(
-        gh<_i19.GetUserPetsUseCase>(),
-        gh<_i982.GetPetOptionsUseCase>(),
-        gh<_i578.AddPetUseCase>(),
-        gh<_i649.DeletePetUseCase>(),
-        gh<_i152.UpdatePetStatusUseCase>(),
-        gh<_i931.UpdatePetUseCase>(),
-        gh<_i694.ICacheManager>(),
-      ),
-    );
-    gh.lazySingleton<_i790.TokenInterceptor>(
-      () => _i790.TokenInterceptor(gh<_i361.Dio>()),
-    );
-    gh.lazySingleton<_i1055.RemoteDataSource>(
-      () => _i621.RemoteDataSourceImpl(gh<_i655.ApiService>()),
+    gh.lazySingleton<_i588.NotificationRepo>(
+      () =>
+          _i933.NotificationRepoImpl(gh<_i934.NotificationRemoteDataSource>()),
     );
     gh.factory<_i787.AuthRepository>(
       () => _i152.AuthRepositoryImpl(gh<_i865.AuthRemoteDataSource>()),
     );
-    gh.lazySingleton<_i947.AdoptionHistoryRepository>(
-      () => _i81.AdoptionHistoryRepositoryImpl(
-        gh<_i221.AdoptionHistoryRemoteDataSource>(),
-      ),
+    gh.lazySingleton<_i1055.RemoteDataSource>(
+      () => _i621.RemoteDataSourceImpl(gh<_i655.ApiService>()),
     );
-    gh.lazySingleton<_i714.AdoptionBrowseDataSource>(
-      () => _i714.AdoptionBrowseDataSourceImpl(gh<_i655.ApiService>()),
+    gh.lazySingleton<_i571.GetNotificationsUseCase>(
+      () => _i571.GetNotificationsUseCase(gh<_i588.NotificationRepo>()),
     );
-    gh.lazySingleton<_i847.ProfileRemoteDataSource>(
-      () => _i847.ProfileRemoteDataSourceImpl(gh<_i655.ApiService>()),
+    gh.lazySingleton<_i475.MarkAllNotificationsAsReadUseCase>(
+      () =>
+          _i475.MarkAllNotificationsAsReadUseCase(gh<_i588.NotificationRepo>()),
     );
-    gh.lazySingleton<_i894.ProfileRepository>(
-      () => _i988.ProfileRepositoryImpl(gh<_i847.ProfileRemoteDataSource>()),
+    gh.lazySingleton<_i46.MarkNotificationAsReadUseCase>(
+      () => _i46.MarkNotificationAsReadUseCase(gh<_i588.NotificationRepo>()),
     );
-    gh.lazySingleton<_i838.AdoptionBrowseRepository>(
-      () => _i557.AdoptionBrowseRepoImpl(gh<_i714.AdoptionBrowseDataSource>()),
-    );
-    gh.factory<_i700.AppleLoginUseCase>(
-      () => _i700.AppleLoginUseCase(gh<_i787.AuthRepository>()),
-    );
-    gh.factory<_i1025.GetPagedPetsUseCase>(
-      () => _i1025.GetPagedPetsUseCase(gh<_i838.AdoptionBrowseRepository>()),
-    );
-    gh.lazySingleton<_i133.AdoptionRepository>(
-      () => _i35.AdoptionRepositoryImpl(gh<_i956.AdoptionRemoteDataSource>()),
-    );
-    gh.factory<_i823.GetClientFormsUseCase>(
-      () => _i823.GetClientFormsUseCase(gh<_i947.AdoptionHistoryRepository>()),
-    );
-    gh.factory<_i139.GetOwnerFormsUseCase>(
-      () => _i139.GetOwnerFormsUseCase(gh<_i947.AdoptionHistoryRepository>()),
-    );
-    gh.factory<_i109.AdoptionHistoryBloc>(
-      () => _i109.AdoptionHistoryBloc(
-        gh<_i823.GetClientFormsUseCase>(),
-        gh<_i139.GetOwnerFormsUseCase>(),
-      ),
-    );
-    gh.factory<_i756.GetAdoptionOptionsUseCase>(
-      () => _i756.GetAdoptionOptionsUseCase(gh<_i133.AdoptionRepository>()),
-    );
-    gh.factory<_i843.SubmitAdoptionFormUseCase>(
-      () => _i843.SubmitAdoptionFormUseCase(gh<_i133.AdoptionRepository>()),
-    );
-    gh.factory<_i965.GetProfileUseCase>(
-      () => _i965.GetProfileUseCase(gh<_i894.ProfileRepository>()),
-    );
-    gh.factory<_i478.UpdateProfileUseCase>(
-      () => _i478.UpdateProfileUseCase(gh<_i894.ProfileRepository>()),
-    );
-    gh.factory<_i986.HomeDomainRepository>(
-      () => _i1024.HomeRepositoryImpl(
-        gh<_i1055.RemoteDataSource>(),
-        gh<_i526.GetUserLocalDataSource>(),
+    gh.factory<_i29.NotificationBloc>(
+      () => _i29.NotificationBloc(
+        gh<_i571.GetNotificationsUseCase>(),
+        gh<_i475.MarkAllNotificationsAsReadUseCase>(),
+        gh<_i46.MarkNotificationAsReadUseCase>(),
       ),
     );
     gh.factory<_i510.ForgotPasswordUseCase>(
@@ -281,23 +186,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i975.VerifyOtp>(
       () => _i975.VerifyOtp(gh<_i787.AuthRepository>()),
     );
-    gh.factory<_i1029.AdoptionBrowseBloc>(
-      () => _i1029.AdoptionBrowseBloc(
-        gh<_i1025.GetPagedPetsUseCase>(),
-        gh<_i982.GetPetOptionsUseCase>(),
-      ),
-    );
-    gh.factory<_i469.ProfileBloc>(
-      () => _i469.ProfileBloc(
-        gh<_i965.GetProfileUseCase>(),
-        gh<_i478.UpdateProfileUseCase>(),
-        gh<_i694.ICacheManager>(),
-      ),
-    );
-    gh.factory<_i943.AdoptionBloc>(
-      () => _i943.AdoptionBloc(
-        gh<_i756.GetAdoptionOptionsUseCase>(),
-        gh<_i843.SubmitAdoptionFormUseCase>(),
+    gh.factory<_i986.HomeDomainRepository>(
+      () => _i1024.HomeRepositoryImpl(
+        gh<_i1055.RemoteDataSource>(),
+        gh<_i526.GetUserLocalDataSource>(),
+        gh<_i934.NotificationRemoteDataSource>(),
       ),
     );
     gh.factory<_i829.AddCommentUseCase>(
