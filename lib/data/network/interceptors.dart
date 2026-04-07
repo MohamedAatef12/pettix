@@ -7,7 +7,7 @@ class DioInterceptors {
   static List<Interceptor> getInterceptors(Talker talker, Dio dio) {
     return List.unmodifiable([
       // Token interceptor must come first to add auth headers
-      TokenInterceptor(dio),
+      TokenInterceptor(dio, talker),
       
       // Logger comes after to log the complete request with headers
       TalkerDioLogger(

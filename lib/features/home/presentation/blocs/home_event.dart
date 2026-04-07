@@ -34,9 +34,10 @@ class FetchPostsCommentsEvent extends HomeEvent {
 
 class AddCommentEvent extends HomeEvent {
   final CommentEntity comment;
-  AddCommentEvent(this.comment);
+  final int? creatorId;
+  AddCommentEvent(this.comment, {this.creatorId});
   @override
-  List<Object?> get props => [comment];
+  List<Object?> get props => [comment, creatorId];
 }
 
 class FetchPostsLikesEvent extends HomeEvent {
@@ -48,9 +49,10 @@ class FetchPostsLikesEvent extends HomeEvent {
 
 class AddLikeEvent extends HomeEvent {
   final int postId;
-  AddLikeEvent(this.postId);
+  final int? creatorId;
+  AddLikeEvent(this.postId, {this.creatorId});
   @override
-  List<Object?> get props => [postId];
+  List<Object?> get props => [postId, creatorId];
 }
 class GetPostCommentsCountsEvent extends HomeEvent {
   final int postId;
@@ -84,9 +86,10 @@ class RemoveSelectedImageEvent extends HomeEvent {
 class AddReplyEvent extends HomeEvent {
   final CommentEntity reply;
   final int parentCommentId;
-  AddReplyEvent(this.reply, this.parentCommentId);
+  final int? creatorId;
+  AddReplyEvent(this.reply, this.parentCommentId, {this.creatorId});
   @override
-  List<Object?> get props => [reply, parentCommentId];
+  List<Object?> get props => [reply, parentCommentId, creatorId];
 }
 class SetReplyingToEvent extends HomeEvent {
   final CommentEntity? comment;
@@ -114,9 +117,10 @@ class UpdatePostCommentsCountEvent extends HomeEvent {
 }
 class AddCommentLikeEvent extends HomeEvent{
   final int commentId;
-  AddCommentLikeEvent(this.commentId);
+  final int? creatorId;
+  AddCommentLikeEvent(this.commentId, {this.creatorId});
   @override
-  List<Object?> get props => [commentId];
+  List<Object?> get props => [commentId, creatorId];
 }
 class GetCommentsLikeEvent extends HomeEvent{
   final int commentId;

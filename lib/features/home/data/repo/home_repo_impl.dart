@@ -1,7 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pettix/data/network/failure.dart';
-import 'package:pettix/features/auth/domain/entities/register_domain_entity.dart';
 import 'package:pettix/features/auth/domain/entities/user_entity.dart';
 import 'package:pettix/features/home/data/models/author_model.dart';
 import 'package:pettix/features/home/data/models/comments_like_model.dart';
@@ -10,7 +9,6 @@ import 'package:pettix/features/home/data/models/likes_model.dart';
 import 'package:pettix/features/home/data/models/post_model.dart';
 import 'package:pettix/features/home/data/sources/local/local_data_source.dart';
 import 'package:pettix/features/home/data/sources/remote/home_remote_data_source.dart';
-import 'package:pettix/features/home/domain/entities/author_entity.dart';
 import 'package:pettix/features/home/domain/entities/comment_like_entity.dart';
 import 'package:pettix/features/home/domain/entities/comments_entity.dart';
 import 'package:pettix/features/home/domain/entities/likes_entity.dart';
@@ -18,6 +16,7 @@ import 'package:pettix/features/home/domain/entities/post_entity.dart';
 import 'package:pettix/features/home/domain/entities/report_entity.dart';
 import 'package:pettix/features/home/domain/entities/report_reason_entity.dart';
 import 'package:pettix/features/home/domain/repositories/home_domain_repo.dart';
+import 'package:pettix/features/notification/data/data_sources/notification_remote_data_source.dart';
 
 import 'package:pettix/features/home/domain/entities/paginated_posts.dart';
 
@@ -25,8 +24,13 @@ import 'package:pettix/features/home/domain/entities/paginated_posts.dart';
 class HomeRepositoryImpl implements HomeDomainRepository {
   final RemoteDataSource remoteDataSource;
   final GetUserLocalDataSource homeLocalDataSource;
+  final NotificationRemoteDataSource notificationRemoteDataSource;
 
-  HomeRepositoryImpl(this.remoteDataSource, this.homeLocalDataSource);
+  HomeRepositoryImpl(
+    this.remoteDataSource,
+    this.homeLocalDataSource,
+    this.notificationRemoteDataSource,
+  );
 
   /// Posts
 
@@ -88,11 +92,37 @@ class HomeRepositoryImpl implements HomeDomainRepository {
   }
 
   @override
-  Future<Either<Failure, void>> addComment(CommentEntity comment,
-      int postId,
-      int? parentCommentId,) async {
+  Future<Either<Failure, void>> addComment(
+    CommentEntity comment,
+    int postId,
+    int? parentCommentId, {
+    int? creatorId,
+  }) async {
     final commentModel = CommentModel.fromEntity(comment);
-    return remoteDataSource.addComment(commentModel, postId, parentCommentId);
+    final result = await remoteDataSource.addComment(
+      commentModel,
+      postId,
+      parentCommentId,
+    );
+
+    return result.fold(
+      (failure) => Left(failure),
+      (success) {
+        if (creatorId != null) {
+          final currentUser = homeLocalDataSource.getUserData();
+          final isReply = parentCommentId != null;
+          
+          notificationRemoteDataSource.sendNotification(
+            userId: creatorId,
+            sentBy: currentUser.id,
+            notificationTypeId: isReply ? 3 : 2, // 2 for comment, 3 for reply
+            title: isReply ? "New Reply! 💬" : "New Comment! 💬",
+            body: "${currentUser.userName} ${isReply ? 'replied to your comment' : 'commented on your post'}.",
+          );
+        }
+        return const Right(null);
+      },
+    );
   }
 
   @override
@@ -127,31 +157,49 @@ class HomeRepositoryImpl implements HomeDomainRepository {
   }
 
   @override
-  Future<Either<Failure, LikesEntity>> likePost(int postId, int userId) async {
+  Future<Either<Failure, LikesEntity>> likePost(
+    int postId,
+    int userId, {
+    int? creatorId,
+  }) async {
     final result = await remoteDataSource.likePost(postId, userId);
 
-    return result.fold((failure) => Left(failure), (success) {
-      return Right(
-        LikesModel(
-          id: 0,
-          author: AuthorModel(
-            id: userId,
-            nameAr: '',
-            nameEn: '',
-            avatar: '',
-            email: null,
-            phone: null,
-            genderId: null,
-            genderName: null,
-            contactTypeId: 4,
-            statusId: 1,
-            age: null,
+    return result.fold(
+      (failure) => Left(failure),
+      (success) {
+        if (creatorId != null) {
+          final currentUser = homeLocalDataSource.getUserData();
+          notificationRemoteDataSource.sendNotification(
+            userId: creatorId,
+            sentBy: currentUser.id,
+            notificationTypeId: 1, // 1 for Like
+            title: "New Like! ❤️",
+            body: "${currentUser.userName} liked your post.",
+          );
+        }
+        
+        return Right(
+          LikesModel(
+            id: 0,
+            author: AuthorModel(
+              id: userId,
+              nameAr: '',
+              nameEn: '',
+              avatar: '',
+              email: null,
+              phone: null,
+              genderId: null,
+              genderName: null,
+              contactTypeId: 4,
+              statusId: 1,
+              age: null,
+            ),
+            postId: 0,
+            creationDate: DateTime.now().toIso8601String(),
           ),
-          postId: 0,
-          creationDate: DateTime.now().toIso8601String(),
-        ),
-      );
-    });
+        );
+      },
+    );
   }
 
   @override
@@ -201,30 +249,47 @@ class HomeRepositoryImpl implements HomeDomainRepository {
   }
 
   @override
-  Future<Either<Failure, CommentLikeEntity>> likeComment(int commentId) async {
+  Future<Either<Failure, CommentLikeEntity>> likeComment(
+    int commentId, {
+    int? creatorId,
+  }) async {
     final result = await remoteDataSource.likeComment(commentId);
-    return result.fold((failure) => Left(failure), (success) {
-      return Right(
-        CommentsLikeModel(
-          id: 0,
-          commentId: 0,
-          author: AuthorModel(
+    return result.fold(
+      (failure) => Left(failure),
+      (success) {
+        if (creatorId != null) {
+          final currentUser = homeLocalDataSource.getUserData();
+          notificationRemoteDataSource.sendNotification(
+            userId: creatorId,
+            sentBy: currentUser.id,
+            notificationTypeId: 1, // 1 for Like
+            title: "Comment Liked! ❤️",
+            body: "${currentUser.userName} liked your comment.",
+          );
+        }
+        
+        return Right(
+          CommentsLikeModel(
             id: 0,
-            nameAr: '',
-            nameEn: '',
-            avatar: '',
-            email: null,
-            phone: null,
-            genderId: null,
-            genderName: null,
-            contactTypeId: 4,
-            statusId: 1,
-            age: null,
+            commentId: 0,
+            author: AuthorModel(
+              id: 0,
+              nameAr: '',
+              nameEn: '',
+              avatar: '',
+              email: null,
+              phone: null,
+              genderId: null,
+              genderName: null,
+              contactTypeId: 4,
+              statusId: 1,
+              age: null,
+            ),
+            creationDate: DateTime.now().toIso8601String(),
           ),
-          creationDate: DateTime.now().toIso8601String(),
-        ),
-      );
-    });
+        );
+      },
+    );
   }
 
   @override
