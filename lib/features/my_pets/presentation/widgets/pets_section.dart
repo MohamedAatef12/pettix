@@ -7,7 +7,7 @@ import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_bloc.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_event.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_state.dart';
-import 'package:pettix/core/enums/app_enums.dart';
+
 import 'package:pettix/features/my_pets/presentation/widgets/pet_id_card.dart';
 
 /// Horizontal scroll section shown inside the profile screen.
@@ -43,15 +43,18 @@ class PetsSection extends StatelessWidget {
                 ),
               ),
               ...state.pets.map((pet) {
-                final current = PetAdoptionStatus.fromValue(pet.adoptionStatus);
-                final newStatus = current == PetAdoptionStatus.available
-                    ? PetAdoptionStatus.private.value
-                    : PetAdoptionStatus.available.value;
                 return PetIdCard(
                   pet: pet,
-                  onToggleStatus: () => context
+                  onToggleStatus: (newStatus) => context
                       .read<MyPetsBloc>()
                       .add(UpdatePetStatusEvent(petId: pet.id, status: newStatus)),
+                  onDeletePet: () => context
+                      .read<MyPetsBloc>()
+                      .add(DeletePetEvent(pet.id)),
+                  onEditPet: () {
+                    // For now, edit pet doesn't have a specific route or accepts arguments
+                    // Can push to AddPet with args if implemented
+                  },
                 );
               }),
             ],

@@ -17,6 +17,7 @@ abstract class MyPetsRemoteDataSource {
   Future<Either<Failure, List<LookupEntity>>> getPetMedicals();
   Future<Either<Failure, void>> addPet(PetRequestModel request);
   Future<Either<Failure, void>> deletePet(int petId);
+  Future<Either<Failure, void>> updatePet(int petId, PetRequestModel request);
   Future<Either<Failure, void>> updatePetStatus(int petId, int status);
 }
 
@@ -87,11 +88,25 @@ class MyPetsRemoteDataSourceImpl implements MyPetsRemoteDataSource {
   }
 
   @override
+  Future<Either<Failure, void>> updatePet(int petId, PetRequestModel request) async {
+    try {
+      final response = await _apiService.put(
+        endPoint: '${Constants.petsEndpoint}/$petId',
+        data: request.toJson(),
+      );
+      if (response.success == true) return const Right(null);
+      return Left(Failure(response.message));
+    } catch (e) {
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
+
+  @override
   Future<Either<Failure, void>> updatePetStatus(int petId, int status) async {
     try {
       final response = await _apiService.patch(
         endPoint: '${Constants.petsEndpoint}/$petId/status',
-        data: {'status': status},
+        queryParameters: {'status': status},
       );
       if (response.success == true) return const Right(null);
       return Left(Failure(response.message));

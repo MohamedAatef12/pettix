@@ -4,8 +4,8 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 
 import 'package:pettix/core/constants/padding.dart';
@@ -66,7 +66,7 @@ class HomeAppBar extends StatelessWidget {
             child: CircleAvatar(
               radius: 20.r,
               backgroundColor: AppColors.current.white,
-              child: SvgPicture.asset('assets/icons/search.svg'),
+              child: Icon(Iconsax.search_normal_1, size: 20.r, color: AppColors.current.text),
             ),
           ),
           SizedBox(width: 10.w),
@@ -77,7 +77,7 @@ class HomeAppBar extends StatelessWidget {
             child: CircleAvatar(
               radius: 20.r,
               backgroundColor: AppColors.current.white,
-              child: Image.asset('assets/icons/notification.png'),
+              child: Icon(Iconsax.notification_bing, size: 20.r, color: AppColors.current.text),
             ),
           ),
         ],

@@ -17,7 +17,9 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.current.lightBlue,
       drawer: const CustomDrawer(),
-      body: SafeArea(child: BlocProvider(
+      body: SafeArea
+      (bottom: false,
+        child: BlocProvider(
           create: (context) => HomeBloc.fromDI()
             ..add(
               FetchPostsEvent(),

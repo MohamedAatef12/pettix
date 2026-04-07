@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -1 /e/Flutter_Dart/APPS/pettix/assets/icons/*.svg)",
+      "Bash(grep -E \"^\\(health|home|hospital|search_normal\\)[0-9]?$\")"
+    ]
+  }
+}

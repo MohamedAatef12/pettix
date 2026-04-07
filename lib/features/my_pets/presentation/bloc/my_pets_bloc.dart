@@ -13,6 +13,7 @@ import 'package:pettix/features/my_pets/domain/usecases/delete_pet_usecase.dart'
 import 'package:pettix/features/my_pets/domain/usecases/get_pet_options_usecase.dart';
 import 'package:pettix/features/my_pets/domain/usecases/get_user_pets_usecase.dart';
 import 'package:pettix/features/my_pets/domain/usecases/update_pet_status_usecase.dart';
+import 'package:pettix/features/my_pets/domain/usecases/update_pet_usecase.dart';
 
 import 'my_pets_event.dart';
 import 'my_pets_state.dart';
@@ -24,6 +25,7 @@ class MyPetsBloc extends Bloc<MyPetsEvent, MyPetsState> {
   final AddPetUseCase _addPet;
   final DeletePetUseCase _deletePet;
   final UpdatePetStatusUseCase _updatePetStatus;
+  final UpdatePetUseCase _updatePet;
   final ICacheManager _cacheManager;
   final ImagePicker _imagePicker = ImagePicker();
 
@@ -39,6 +41,7 @@ class MyPetsBloc extends Bloc<MyPetsEvent, MyPetsState> {
     this._addPet,
     this._deletePet,
     this._updatePetStatus,
+    this._updatePet,
     this._cacheManager,
   ) : super(const MyPetsState()) {
     on<FetchUserPetsEvent>(_onFetchUserPets);
@@ -67,6 +70,7 @@ class MyPetsBloc extends Bloc<MyPetsEvent, MyPetsState> {
     );
     on<ResetPetFormEvent>(_onResetForm);
     on<UpdatePetStatusEvent>(_onUpdatePetStatus);
+    on<UpdatePetEvent>(_onUpdatePet);
   }
 
   Future<void> _onFetchUserPets(
@@ -154,6 +158,30 @@ class MyPetsBloc extends Bloc<MyPetsEvent, MyPetsState> {
     }
 
     // Re-fetch pets and clear the form on success.
+    add(const ResetPetFormEvent());
+    add(const FetchUserPetsEvent());
+    emit(state.copyWith(status: MyPetsStatus.success));
+  }
+
+  Future<void> _onUpdatePet(
+    UpdatePetEvent event,
+    Emitter<MyPetsState> emit,
+  ) async {
+    emit(state.copyWith(status: MyPetsStatus.submitting));
+
+    final result = await _updatePet(UpdatePetParams(event.petId, event.request));
+
+    if (result.isLeft()) {
+      result.fold(
+        (failure) => emit(state.copyWith(
+          status: MyPetsStatus.error,
+          errorMessage: failure.message,
+        )),
+        (_) {},
+      );
+      return;
+    }
+
     add(const ResetPetFormEvent());
     add(const FetchUserPetsEvent());
     emit(state.copyWith(status: MyPetsStatus.success));

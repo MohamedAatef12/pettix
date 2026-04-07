@@ -67,4 +67,8 @@ class MyPetsRepositoryImpl implements MyPetsRepository {
   @override
   Future<Either<Failure, void>> updatePetStatus(int petId, int status) =>
       _remoteDataSource.updatePetStatus(petId, status);
+
+  @override
+  Future<Either<Failure, void>> updatePet(int petId, PetRequestEntity request) =>
+      _remoteDataSource.updatePet(petId, PetRequestModel.fromEntity(request));
 }

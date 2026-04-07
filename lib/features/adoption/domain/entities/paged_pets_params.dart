@@ -20,7 +20,7 @@ class PagedPetsParams {
     this.sortBy,
     this.sortDescending = false,
     this.showAll = false,
-    this.pageIndex = 0,
+    this.pageIndex = 1,
     this.pageSize = 10,
   });
 
@@ -31,7 +31,7 @@ class PagedPetsParams {
         if (location != null && location!.isNotEmpty) 'Location': location,
         if (sortBy != null && sortBy!.isNotEmpty) 'SortBy': sortBy,
         'SortDescending': sortDescending,
-        'ShowAll': true,
+        'ShowAll': false,
         'PageIndex': pageIndex,
         'PageSize': pageSize,
       };

@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/text_styles.dart';
-import 'package:pettix/core/enums/app_enums.dart';
+
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 
@@ -13,7 +13,9 @@ import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 void showPetPassport(
   BuildContext context,
   PetEntity pet, {
-  VoidCallback? onToggleStatus,
+  ValueChanged<int>? onToggleStatus,
+  VoidCallback? onEditPet,
+  VoidCallback? onDeletePet,
 }) {
   showGeneralDialog(
     context: context,
@@ -24,6 +26,8 @@ void showPetPassport(
     pageBuilder: (_, __, ___) => _PetPassportDialog(
       pet: pet,
       onToggleStatus: onToggleStatus,
+      onEditPet: onEditPet,
+      onDeletePet: onDeletePet,
     ),
     transitionBuilder: (_, animation, __, child) {
       final curved = CurvedAnimation(
@@ -39,9 +43,16 @@ void showPetPassport(
 
 class _PetPassportDialog extends StatefulWidget {
   final PetEntity pet;
-  final VoidCallback? onToggleStatus;
+  final ValueChanged<int>? onToggleStatus;
+  final VoidCallback? onEditPet;
+  final VoidCallback? onDeletePet;
 
-  const _PetPassportDialog({required this.pet, this.onToggleStatus});
+  const _PetPassportDialog({
+    required this.pet,
+    this.onToggleStatus,
+    this.onEditPet,
+    this.onDeletePet,
+  });
 
   @override
   State<_PetPassportDialog> createState() => _PetPassportDialogState();
@@ -111,6 +122,8 @@ class _PetPassportDialogState extends State<_PetPassportDialog>
                               pet: widget.pet,
                               onFlip: _flip,
                               onToggleStatus: widget.onToggleStatus,
+                              onEditPet: widget.onEditPet,
+                              onDeletePet: widget.onDeletePet,
                             ),
                           ),
                   );
@@ -339,12 +352,16 @@ class _PassportFrontFooter extends StatelessWidget {
 class _PassportBack extends StatelessWidget {
   final PetEntity pet;
   final VoidCallback onFlip;
-  final VoidCallback? onToggleStatus;
+  final ValueChanged<int>? onToggleStatus;
+  final VoidCallback? onEditPet;
+  final VoidCallback? onDeletePet;
 
   const _PassportBack({
     required this.pet,
     required this.onFlip,
     this.onToggleStatus,
+    this.onEditPet,
+    this.onDeletePet,
   });
 
   @override
@@ -395,6 +412,48 @@ class _PassportBack extends StatelessWidget {
                       _StatusToggleButton(
                         adoptionStatus: pet.adoptionStatus,
                         onToggle: onToggleStatus!,
+                      ),
+                    ],
+                    if (onEditPet != null || onDeletePet != null) ...[
+                      SizedBox(height: 12.h),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          if (onEditPet != null)
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: onEditPet,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(vertical: 12.h),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.current.primary.withAlpha(20),
+                                    borderRadius: BorderRadius.circular(12.r),
+                                    border: Border.all(color: AppColors.current.primary.withAlpha(80), width: 1),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Icon(Icons.edit_rounded, color: AppColors.current.primary, size: 20.w),
+                                ),
+                              ),
+                            ),
+                          if (onEditPet != null && onDeletePet != null)
+                            SizedBox(width: 12.w),
+                          if (onDeletePet != null)
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: onDeletePet,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(vertical: 12.h),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.current.red.withAlpha(20),
+                                    borderRadius: BorderRadius.circular(12.r),
+                                    border: Border.all(color: AppColors.current.red.withAlpha(80), width: 1),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Icon(Icons.delete_rounded, color: AppColors.current.red, size: 20.w),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ],
                     SizedBox(height: 8.h),
@@ -635,23 +694,43 @@ class _VaccinationTile extends StatelessWidget {
 
 // ─── Status toggle button ─────────────────────────────────────────────────────
 
-class _StatusToggleButton extends StatelessWidget {
+class _StatusToggleButton extends StatefulWidget {
   final int? adoptionStatus;
-  final VoidCallback onToggle;
+  final ValueChanged<int> onToggle;
 
   const _StatusToggleButton({required this.adoptionStatus, required this.onToggle});
 
   @override
-  Widget build(BuildContext context) {
-    final isAvailable = PetAdoptionStatus.fromValue(adoptionStatus) ==
-        PetAdoptionStatus.available;
+  State<_StatusToggleButton> createState() => _StatusToggleButtonState();
+}
 
-    final color = isAvailable ? AppColors.current.midGray : AppColors.current.green;
+class _StatusToggleButtonState extends State<_StatusToggleButton> {
+  late int currentStatus;
+
+  @override
+  void initState() {
+    super.initState();
+    currentStatus = widget.adoptionStatus ?? 0;
+  }
+
+  void _handleToggle() {
+    final newStatus = currentStatus == 1 ? 0 : 1;
+    setState(() {
+      currentStatus = newStatus;
+    });
+    widget.onToggle(newStatus);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isAvailable = currentStatus == 1;
+
+    final color = isAvailable ? AppColors.current.red : AppColors.current.green;
     final icon = isAvailable ? Icons.visibility_off_rounded : Icons.pets_rounded;
     final label = isAvailable ? 'Make Private' : 'Make Available for Adoption';
 
     return GestureDetector(
-      onTap: onToggle,
+      onTap: _handleToggle,
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(vertical: 12.h),
@@ -666,12 +745,12 @@ class _StatusToggleButton extends StatelessWidget {
             Icon(icon, color: color, size: 16.w),
             SizedBox(width: 8.w),
             Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w700,
-              ),
+               label,
+               style: TextStyle(
+                 color: color,
+                 fontSize: 12.sp,
+                 fontWeight: FontWeight.w700,
+               ),
             ),
           ],
         ),

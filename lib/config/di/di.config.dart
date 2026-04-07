@@ -111,6 +111,8 @@ import '../../features/my_pets/domain/usecases/get_user_pets_usecase.dart'
     as _i19;
 import '../../features/my_pets/domain/usecases/update_pet_status_usecase.dart'
     as _i152;
+import '../../features/my_pets/domain/usecases/update_pet_usecase.dart'
+    as _i931;
 import '../../features/my_pets/presentation/bloc/my_pets_bloc.dart' as _i496;
 import '../../features/profile/data/datasources/profile_remote_data_source.dart'
     as _i847;
@@ -179,6 +181,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i152.UpdatePetStatusUseCase>(
       () => _i152.UpdatePetStatusUseCase(gh<_i835.MyPetsRepository>()),
     );
+    gh.factory<_i931.UpdatePetUseCase>(
+      () => _i931.UpdatePetUseCase(gh<_i835.MyPetsRepository>()),
+    );
     gh.factory<_i496.MyPetsBloc>(
       () => _i496.MyPetsBloc(
         gh<_i19.GetUserPetsUseCase>(),
@@ -186,6 +191,7 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i578.AddPetUseCase>(),
         gh<_i649.DeletePetUseCase>(),
         gh<_i152.UpdatePetStatusUseCase>(),
+        gh<_i931.UpdatePetUseCase>(),
         gh<_i694.ICacheManager>(),
       ),
     );

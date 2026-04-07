@@ -29,7 +29,7 @@ class AdoptionBrowseBloc
 
   // ─── Helpers ────────────────────────────────────────────────────────────────
 
-  PagedPetsParams _buildParams(AdoptionBrowseState s, {int pageIndex = 0}) =>
+  PagedPetsParams _buildParams(AdoptionBrowseState s, {int pageIndex = 1}) =>
       PagedPetsParams(
         name: s.searchQuery,
         categoryId: s.selectedCategoryId,

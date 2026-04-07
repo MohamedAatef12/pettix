@@ -31,9 +31,10 @@ class AdoptionBrowseDataSourceImpl implements AdoptionBrowseDataSource {
 
         if (raw is Map<String, dynamic>) {
           // Wrapped paged response: { items: [...], totalCount: N }
-          final items = raw['items'] ?? raw['result'] ?? [];
+          final items = raw['items'] ?? raw['data'] ?? raw['result'] ?? [];
           itemsList = items is List ? items : [];
           total = (raw['totalCount'] as int?) ??
+              (raw['count'] as int?) ??
               (raw['total'] as int?) ??
               itemsList.length;
         } else if (raw is List) {

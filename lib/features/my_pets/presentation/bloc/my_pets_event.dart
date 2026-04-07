@@ -112,3 +112,14 @@ class UpdatePetStatusEvent extends MyPetsEvent {
   @override
   List<Object?> get props => [petId, status];
 }
+
+/// Updates an existing pet.
+class UpdatePetEvent extends MyPetsEvent {
+  final int petId;
+  final PetRequestEntity request;
+
+  const UpdatePetEvent(this.petId, this.request);
+
+  @override
+  List<Object?> get props => [petId, request];
+}

@@ -20,4 +20,7 @@ abstract class MyPetsRepository {
 
   /// Updates the adoption status of the pet (private=0, available=1).
   Future<Either<Failure, void>> updatePetStatus(int petId, int status);
+
+  /// Updates pet info
+  Future<Either<Failure, void>> updatePet(int petId, PetRequestEntity request);
 }
