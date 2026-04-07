@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/adoption/presentation/view/application_view.dart';
+import '../../features/notification/presentation/view/pages/notification_page.dart';
 import '../../features/profile/presentation/bloc/profile_bloc.dart';
 import '../../features/profile/presentation/bloc/profile_event.dart';
 import '../../features/profile/presentation/view/edit_profile_screen.dart';
@@ -179,21 +180,6 @@ GoRouter appRouter() => GoRouter(
       builder: (context, state) => const ChatListPage(),
     ),
 
-    // GoRoute(
-    //   path: AppRoutes.comments,
-    //   builder: (context, state) {
-    //     final postId = state.extra as int;
-    //
-    //     // ✅ نستخدم BlocProvider مستقل من DI أو نمرر الـ bloc الموجود من صفحة Home
-    //     return BlocProvider(
-    //       create: (_) => HomeBloc.fromDI()
-    //         ..add(
-    //           FetchPostsCommentsEvent(postId),
-    //         ),
-    //       child: CommentsPage(postId: postId),
-    //     );
-    //   },
-    // ),
     GoRoute(
       path: AppRoutes.homeSearch,
       name: AppRouteNames.homeSearch,
@@ -338,20 +324,13 @@ GoRouter appRouter() => GoRouter(
       name: AppRouteNames.refundPolicy,
       builder: (_, __) => const RefundPolicyPage(),
     ),
-    // GoRoute(
-    //   path: AppRoutes.signUp,
-    //   name: AppRouteNames.signUp,
-    //   builder:
-    //       (context, state) => BlocProvider(
-    //     create:
-    //         (context) =>
-    //         AuthBloc(getIt<LoginUseCase>(), getIt<SignUpUseCase>()),
-    //     child: const SignUpPage(),
-    //   ),
-    // GoRoute(
-    //   path: AppRoutes.home,
-    //   name: AppRouteNames.home,
-    //   // builder: (context, state) => const HomePage(),
-    // ),
+    // ── Notifications ────────────────────────────────────────────────────────
+    GoRoute(
+      path: AppRoutes.notifications,
+      name: AppRouteNames.notifications,
+      builder: (_, __) => const NotificationPage(),
+    ),
+    
+
   ],
 );
