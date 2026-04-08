@@ -45,10 +45,10 @@ class LoginBody extends StatelessWidget {
                   current is GoogleLoginFailure,
               listener: (context, state) {
                 if (state is GoogleLoginSuccess || state is LoginSuccess) {
+                  context.pushReplacement(AppRoutes.bottomNav);
                   AuthToast.showSuccess(
                     context,
                     'Login Successful!',
-                    onDone: () => context.push(AppRoutes.bottomNav),
                   );
                 } else if (state is LoginFailure) {
                   AuthToast.showError(context, state.error);

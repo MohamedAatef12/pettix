@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 
 class EmptyNotifications extends StatelessWidget {
@@ -13,12 +14,12 @@ class EmptyNotifications extends StatelessWidget {
       children: [
         Image.asset('assets/images/no_notification.png'),
         SizedBox(height: 10.h),
-        Text('No Notifications', style: AppTextStyles.title),
+        Text(AppText.noNotifications, style: AppTextStyles.title),
         SizedBox(height: 5.h),
         Text(
-          'You have no notifications yet,\n please Come back later.',
+          AppText.noNotificationsYet,
           style: AppTextStyles.description.copyWith(color: Colors.grey),
-        textAlign: TextAlign.center,
+          textAlign: TextAlign.center,
         ),
       ],
     );

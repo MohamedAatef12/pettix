@@ -23,7 +23,6 @@ class NotificationPage extends StatelessWidget {
           child: Column(
             children: [
               const NotificationAppBar(),
-              SizedBox(height: 10.h),
               const Expanded(child: NotificationBody()),
             ],
           ),

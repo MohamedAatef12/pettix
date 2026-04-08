@@ -257,10 +257,10 @@ class LoginForm extends StatelessWidget {
           },
           child: BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
-              final isLoading = state is LoginLoading;
+              final isAnyLoading = state is LoginLoading || state is GoogleLoginLoading || state is AuthLoading;
               return CustomFilledButton(
-                isLoading: isLoading,
-                onPressed: () {
+                isLoading: state is LoginLoading,
+                onPressed: isAnyLoading ? null : () {
                   if (bloc.loginFormKey.currentState!.validate()) {
                     bloc.add(
                       LoginSubmitted(
@@ -312,32 +312,38 @@ class LoginForm extends StatelessWidget {
           SizedBox(height: 10.h),
           BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
-              final isLoading = state is GoogleLoginLoading;
+              final isAnyLoading = state is LoginLoading || state is GoogleLoginLoading || state is AuthLoading;
               return CustomFilledButton(
-                isLoading: isLoading,
-                      onPressed: () {
-                        context.read<AuthBloc>().add(
-                          GoogleLoginSubmitted(rememberMe: bloc.rememberMe),
-                        );
-                      },
-                      text: AppText.continueWithGoogle,
-                      backgroundColor: AppColors.current.white,
-                      textColor: AppColors.current.lightText,
-                      hasLeading: true,
-                      leading: SvgPicture.asset('assets/icons/gmail.svg'),
-                    );
+                isLoading: state is GoogleLoginLoading,
+                onPressed: isAnyLoading ? null : () {
+                  context.read<AuthBloc>().add(
+                    GoogleLoginSubmitted(rememberMe: bloc.rememberMe),
+                  );
+                },
+                text: AppText.continueWithGoogle,
+                backgroundColor: AppColors.current.white,
+                textColor: AppColors.current.lightText,
+                hasLeading: true,
+                leading: SvgPicture.asset('assets/icons/gmail.svg'),
+              );
             },
           ),
           SizedBox(height: 10.h),
-          CustomFilledButton(
-            onPressed: () {
-              // Handle login
+          BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, state) {
+              final isAnyLoading = state is LoginLoading || state is GoogleLoginLoading || state is AuthLoading;
+              return CustomFilledButton(
+                onPressed: isAnyLoading ? null : () {
+                  // Handle login
+                },
+                text: AppText.continueWithApple,
+                backgroundColor: AppColors.current.white,
+                textColor: AppColors.current.lightText,
+                hasLeading: true,
+                leading: SvgPicture.asset('assets/icons/apple.svg'),
+                isLoading: false, // Could add AppleLoginLoading if available
+              );
             },
-            text: AppText.continueWithApple,
-            backgroundColor: AppColors.current.white,
-            textColor: AppColors.current.lightText,
-            hasLeading: true,
-            leading: SvgPicture.asset('assets/icons/apple.svg'),
           ),
           SizedBox(height: 20.h),
           Column(
