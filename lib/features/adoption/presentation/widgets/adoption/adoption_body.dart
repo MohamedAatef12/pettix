@@ -1,10 +1,9 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/config/router/routes.dart';
+import 'package:pettix/core/constants/sized_box.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_bloc.dart';
 import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_event.dart';
@@ -12,82 +11,54 @@ import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_state
 import 'package:pettix/features/adoption/presentation/widgets/adoption/filter_sheet.dart';
 import 'package:pettix/features/adoption/presentation/widgets/adoption/pet_browse_card.dart';
 
-class AdoptionBody extends StatefulWidget {
+class AdoptionBody extends StatelessWidget {
   const AdoptionBody({super.key});
 
-  @override
-  State<AdoptionBody> createState() => _AdoptionBodyState();
-}
-
-class _AdoptionBodyState extends State<AdoptionBody> {
-  final _searchController = TextEditingController();
-  final _scrollController = ScrollController();
-  Timer? _debounce;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    _scrollController.dispose();
-    _debounce?.cancel();
-    super.dispose();
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 300) {
-      final bloc = context.read<AdoptionBrowseBloc>();
-      if (bloc.state.hasMore &&
-          bloc.state.status == AdoptionBrowseStatus.loaded) {
-        bloc.add(const LoadMorePetsEvent());
-      }
+  void _onScrollNotification(
+    BuildContext context,
+    ScrollNotification notification,
+  ) {
+    if (notification is! ScrollUpdateNotification) return;
+    final metrics = notification.metrics;
+    if (metrics.pixels < metrics.maxScrollExtent - 300) return;
+    final bloc = context.read<AdoptionBrowseBloc>();
+    if (bloc.state.hasMore && bloc.state.status == AdoptionBrowseStatus.loaded) {
+      bloc.add(const LoadMorePetsEvent());
     }
-  }
-
-  void _onSearch(String query) {
-    _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 400), () {
-      context.read<AdoptionBrowseBloc>().add(SearchPetsEvent(query));
-    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final bloc = context.read<AdoptionBrowseBloc>();
     return Column(
       children: [
-        _AdoptionHeader(
-          searchController: _searchController,
-          onSearch: _onSearch,
-        ),
+        _AdoptionHeader(searchController: bloc.searchController),
         Expanded(
           child: RefreshIndicator(
             color: AppColors.current.primary,
             onRefresh: () async {
-              context
-                  .read<AdoptionBrowseBloc>()
-                  .add(const RefreshPetsEvent());
-              await context
-                  .read<AdoptionBrowseBloc>()
-                  .stream
-                  .firstWhere((s) =>
-                      s.status == AdoptionBrowseStatus.loaded ||
-                      s.status == AdoptionBrowseStatus.error);
+              bloc.add(const RefreshPetsEvent());
+              await bloc.stream.firstWhere(
+                (s) =>
+                    s.status == AdoptionBrowseStatus.loaded ||
+                    s.status == AdoptionBrowseStatus.error,
+              );
             },
-            child: CustomScrollView(
-              controller: _scrollController,
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                _CategoryFilterSliver(),
-                _ResultsCountSliver(),
-                _PetGridSliver(),
-                _LoadMoreSliver(),
-                const SliverToBoxAdapter(child: SizedBox(height: 80)),
-              ],
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (n) {
+                _onScrollNotification(context, n);
+                return false;
+              },
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: const [
+                  _CategoryFilterSliver(),
+                  _ResultsCountSliver(),
+                  _PetGridSliver(),
+                  _LoadMoreSliver(),
+                  SliverToBoxAdapter(child: SizedBox(height: 80)),
+                ],
+              ),
             ),
           ),
         ),
@@ -100,143 +71,158 @@ class _AdoptionBodyState extends State<AdoptionBody> {
 
 class _AdoptionHeader extends StatelessWidget {
   final TextEditingController searchController;
-  final ValueChanged<String> onSearch;
 
-  const _AdoptionHeader({
-    required this.searchController,
-    required this.onSearch,
-  });
+  const _AdoptionHeader({required this.searchController});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 20.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.pets_rounded, color: AppColors.current.gold, size: 20.w),
+                SizedBoxConstants.horizontalSmall,
+                Text(
+                  'PETTIX ADOPTION',
+                  style: TextStyle(
+                    color: AppColors.current.gold,
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 2,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 6.h),
+            Text(
+              'Find Your Fur-ever\nFriend',
+              style: TextStyle(
+                color: AppColors.current.text,
+                fontSize: 22.sp,
+                fontWeight: FontWeight.w800,
+                height: 1.2,
+              ),
+            ),
+            SizedBox(height: 16.h),
+            Row(
+              children: [
+                Expanded(child: _SearchField(controller: searchController)),
+                SizedBox(width: 10.w),
+                const _FilterButton(),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SearchField extends StatelessWidget {
+  final TextEditingController controller;
+
+  const _SearchField({required this.controller});
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 44.h,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.current.primary, const Color(0xFF2A4E8F)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 20.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.pets_rounded,
-                      color: AppColors.current.gold, size: 20.w),
-                  SizedBox(width: 8.w),
-                  Text(
-                    'PETTIX ADOPTION',
-                    style: TextStyle(
-                      color: AppColors.current.gold,
-                      fontSize: 11.sp,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 2,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 6.h),
-              Text(
-                'Find Your Fur-ever\nFriend',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22.sp,
-                  fontWeight: FontWeight.w800,
-                  height: 1.2,
-                ),
-              ),
-              SizedBox(height: 16.h),
-              // Search + Filter row
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 44.h,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withAlpha(20),
-                        borderRadius: BorderRadius.circular(14.r),
-                        border: Border.all(
-                            color: Colors.white.withAlpha(40), width: 1),
-                      ),
-                      child: TextField(
-                        controller: searchController,
-                        onChanged: onSearch,
-                        style: TextStyle(
-                            color: Colors.white, fontSize: 13.sp),
-                        decoration: InputDecoration(
-                          hintText: 'Search by name...',
-                          hintStyle: TextStyle(
-                              color: Colors.white60, fontSize: 13.sp),
-                          prefixIcon: Icon(Icons.search_rounded,
-                              color: Colors.white60, size: 18.w),
-                          suffixIcon: BlocBuilder<AdoptionBrowseBloc,
-                              AdoptionBrowseState>(
-                            buildWhen: (p, c) =>
-                                (p.searchQuery != null) !=
-                                (c.searchQuery != null),
-                            builder: (context, state) {
-                              if (state.searchQuery == null ||
-                                  state.searchQuery!.isEmpty) {
-                                return const SizedBox.shrink();
-                              }
-                              return IconButton(
-                                icon: Icon(Icons.close_rounded,
-                                    color: Colors.white60, size: 16.w),
-                                onPressed: () {
-                                  searchController.clear();
-                                  context
-                                      .read<AdoptionBrowseBloc>()
-                                      .add(const SearchPetsEvent(''));
-                                },
-                              );
-                            },
-                          ),
-                          border: InputBorder.none,
-                          contentPadding:
-                              EdgeInsets.symmetric(vertical: 12.h),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 10.w),
-                  // Filter button
-                  BlocBuilder<AdoptionBrowseBloc, AdoptionBrowseState>(
-                    buildWhen: (p, c) =>
-                        p.hasActiveFilters != c.hasActiveFilters,
-                    builder: (context, state) {
-                      return GestureDetector(
-                        onTap: () => showFilterSheet(context),
-                        child: Container(
-                          width: 44.w,
-                          height: 44.h,
-                          decoration: BoxDecoration(
-                            color: state.hasActiveFilters
-                                ? AppColors.current.gold
-                                : Colors.white.withAlpha(20),
-                            borderRadius: BorderRadius.circular(14.r),
-                            border: Border.all(
-                                color: state.hasActiveFilters
-                                    ? AppColors.current.gold
-                                    : Colors.white.withAlpha(40),
-                                width: 1),
-                          ),
-                          child: Icon(Icons.tune_rounded,
-                              color: Colors.white, size: 20.w),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ],
+        color: AppColors.current.white,
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: AppColors.current.lightGray, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
           ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        onChanged: (q) =>
+            context.read<AdoptionBrowseBloc>().add(SearchPetsEvent(q)),
+        style: TextStyle(color: AppColors.current.text, fontSize: 13.sp),
+        decoration: InputDecoration(
+          hintText: 'Search by name...',
+          hintStyle: TextStyle(color: AppColors.current.midGray, fontSize: 13.sp),
+          prefixIcon: Icon(
+            Icons.search_rounded,
+            color: AppColors.current.midGray,
+            size: 18.w,
+          ),
+          suffixIcon: BlocBuilder<AdoptionBrowseBloc, AdoptionBrowseState>(
+            buildWhen: (p, c) =>
+                (p.searchQuery?.isNotEmpty ?? false) !=
+                (c.searchQuery?.isNotEmpty ?? false),
+            builder: (context, state) {
+              final hasQuery =
+                  state.searchQuery != null && state.searchQuery!.isNotEmpty;
+              if (!hasQuery) return const SizedBox.shrink();
+              return IconButton(
+                icon: Icon(
+                  Icons.close_rounded,
+                  color: AppColors.current.midGray,
+                  size: 16.w,
+                ),
+                onPressed: () {
+                  controller.clear();
+                  context
+                      .read<AdoptionBrowseBloc>()
+                      .add(const SearchPetsEvent(''));
+                },
+              );
+            },
+          ),
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(vertical: 12.h),
         ),
       ),
+    );
+  }
+}
+
+class _FilterButton extends StatelessWidget {
+  const _FilterButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AdoptionBrowseBloc, AdoptionBrowseState>(
+      buildWhen: (p, c) => p.hasActiveFilters != c.hasActiveFilters,
+      builder: (context, state) {
+        return GestureDetector(
+          onTap: () => showFilterSheet(context),
+          child: Container(
+            width: 44.w,
+            height: 44.h,
+            decoration: BoxDecoration(
+              color: state.hasActiveFilters
+                  ? AppColors.current.gold
+                  : AppColors.current.white,
+              borderRadius: BorderRadius.circular(14.r),
+              border: Border.all(
+                color: state.hasActiveFilters
+                    ? AppColors.current.gold
+                    : AppColors.current.lightGray,
+                width: 1,
+              ),
+            ),
+            child: Icon(
+              Icons.tune_rounded,
+              color: state.hasActiveFilters
+                  ? AppColors.current.white
+                  : AppColors.current.midGray,
+              size: 20.w,
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -244,6 +230,8 @@ class _AdoptionHeader extends StatelessWidget {
 // ─── Category chips ───────────────────────────────────────────────────────────
 
 class _CategoryFilterSliver extends StatelessWidget {
+  const _CategoryFilterSliver();
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AdoptionBrowseBloc, AdoptionBrowseState>(
@@ -257,8 +245,7 @@ class _CategoryFilterSliver extends StatelessWidget {
             height: 44.h,
             child: ListView(
               scrollDirection: Axis.horizontal,
-              padding:
-                  EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
               children: [
                 _CategoryChip(
                   label: 'All',
@@ -267,13 +254,15 @@ class _CategoryFilterSliver extends StatelessWidget {
                       .read<AdoptionBrowseBloc>()
                       .add(const FilterByCategoryEvent(null)),
                 ),
-                ...state.categories.map((cat) => _CategoryChip(
-                      label: cat.name,
-                      selected: state.selectedCategoryId == cat.id,
-                      onTap: () => context
-                          .read<AdoptionBrowseBloc>()
-                          .add(FilterByCategoryEvent(cat.id)),
-                    )),
+                ...state.categories.map(
+                  (cat) => _CategoryChip(
+                    label: cat.name,
+                    selected: state.selectedCategoryId == cat.id,
+                    onTap: () => context
+                        .read<AdoptionBrowseBloc>()
+                        .add(FilterByCategoryEvent(cat.id)),
+                  ),
+                ),
               ],
             ),
           ),
@@ -311,17 +300,15 @@ class _CategoryChip extends StatelessWidget {
             color: selected
                 ? AppColors.current.primary
                 : AppColors.current.lightGray,
-            width: 1,
           ),
         ),
         child: Center(
           child: Text(
             label,
             style: TextStyle(
-              color: selected ? Colors.white : AppColors.current.text,
+              color: selected ? AppColors.current.white : AppColors.current.text,
               fontSize: 12.sp,
-              fontWeight:
-                  selected ? FontWeight.w700 : FontWeight.w500,
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
             ),
           ),
         ),
@@ -333,6 +320,8 @@ class _CategoryChip extends StatelessWidget {
 // ─── Results count ────────────────────────────────────────────────────────────
 
 class _ResultsCountSliver extends StatelessWidget {
+  const _ResultsCountSliver();
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AdoptionBrowseBloc, AdoptionBrowseState>(
@@ -344,8 +333,7 @@ class _ResultsCountSliver extends StatelessWidget {
         if (!isLoaded) return const SliverToBoxAdapter();
         return SliverToBoxAdapter(
           child: Padding(
-            padding:
-                EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -383,17 +371,17 @@ class _ResultsCountSliver extends StatelessWidget {
 // ─── Pet grid ─────────────────────────────────────────────────────────────────
 
 class _PetGridSliver extends StatelessWidget {
+  const _PetGridSliver();
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AdoptionBrowseBloc, AdoptionBrowseState>(
       buildWhen: (p, c) => p.pets != c.pets || p.status != c.status,
       builder: (context, state) {
         if (state.status == AdoptionBrowseStatus.loading) {
-          return _SkeletonGrid();
+          return const _SkeletonGrid();
         }
-
-        if (state.status == AdoptionBrowseStatus.error &&
-            state.pets.isEmpty) {
+        if (state.status == AdoptionBrowseStatus.error && state.pets.isEmpty) {
           return _ErrorSliver(
             message: state.errorMessage,
             onRetry: () => context
@@ -401,15 +389,11 @@ class _PetGridSliver extends StatelessWidget {
                 .add(const RefreshPetsEvent()),
           );
         }
-
-        if (state.pets.isEmpty &&
-            state.status == AdoptionBrowseStatus.loaded) {
-          return _EmptySliver();
+        if (state.pets.isEmpty && state.status == AdoptionBrowseStatus.loaded) {
+          return const _EmptySliver();
         }
-
         return SliverPadding(
-          padding:
-              EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
           sliver: SliverGrid(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
@@ -435,9 +419,11 @@ class _PetGridSliver extends StatelessWidget {
   }
 }
 
-// ─── Load more indicator ──────────────────────────────────────────────────────
+// ─── Load more ────────────────────────────────────────────────────────────────
 
 class _LoadMoreSliver extends StatelessWidget {
+  const _LoadMoreSliver();
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AdoptionBrowseBloc, AdoptionBrowseState>(
@@ -469,6 +455,8 @@ class _LoadMoreSliver extends StatelessWidget {
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
 class _SkeletonGrid extends StatelessWidget {
+  const _SkeletonGrid();
+
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
@@ -483,7 +471,7 @@ class _SkeletonGrid extends StatelessWidget {
         delegate: SliverChildBuilderDelegate(
           (_, __) => Container(
             decoration: BoxDecoration(
-              color: AppColors.current.lightBlue,
+              color: AppColors.current.lightGray,
               borderRadius: BorderRadius.circular(20.r),
             ),
           ),
@@ -497,6 +485,8 @@ class _SkeletonGrid extends StatelessWidget {
 // ─── Empty / Error states ─────────────────────────────────────────────────────
 
 class _EmptySliver extends StatelessWidget {
+  const _EmptySliver();
+
   @override
   Widget build(BuildContext context) {
     return SliverFillRemaining(
@@ -506,7 +496,7 @@ class _EmptySliver extends StatelessWidget {
           children: [
             Icon(Icons.search_off_rounded,
                 size: 64.w, color: AppColors.current.blueGray),
-            SizedBox(height: 16.h),
+            SizedBoxConstants.verticalMedium,
             Text(
               'No pets found',
               style: TextStyle(
@@ -536,21 +526,22 @@ class _ErrorSliver extends StatelessWidget {
           children: [
             Icon(Icons.error_outline_rounded,
                 size: 48.w, color: AppColors.current.red),
-            SizedBox(height: 12.h),
+            SizedBoxConstants.verticalSmall,
             Text(
               message ?? 'Something went wrong',
               style: TextStyle(
                   color: AppColors.current.midGray, fontSize: 13.sp),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 16.h),
+            SizedBoxConstants.verticalMedium,
             TextButton(
               onPressed: onRetry,
               child: Text(
                 'Retry',
                 style: TextStyle(
-                    color: AppColors.current.primary,
-                    fontWeight: FontWeight.w700),
+                  color: AppColors.current.primary,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ],
@@ -559,4 +550,3 @@ class _ErrorSliver extends StatelessWidget {
     );
   }
 }
-

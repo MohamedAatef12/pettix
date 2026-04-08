@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pettix/core/constants/sized_box.dart';
+import 'package:pettix/core/constants/text_styles.dart';
+import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/features/adoption/presentation/bloc/adoption_bloc.dart';
 import 'package:pettix/features/adoption/presentation/bloc/adoption_event.dart';
@@ -15,87 +19,148 @@ class PetApplicationBody extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       padding: EdgeInsets.zero,
       children: [
-        Stack(
-          alignment: Alignment.topCenter,
-          children: [
-            SizedBox(
-              child: SvgPicture.asset(
-                'assets/images/adopt_animal.svg',
-                fit: BoxFit.fill,
-                width: MediaQuery.of(context).size.width,
-              ),
-            ),
-            Positioned(
-              top: MediaQuery.of(context).size.height * 0.06,
-              left: 10,
-              child: InkWell(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                splashFactory: NoSplash.splashFactory,
-                onTap: () {
-                  context.pop();
-                },
-                child: SvgPicture.asset('assets/icons/backButton.svg'),
-              ),
-            ),
-            Positioned(
-              top: MediaQuery.of(context).size.height * 0.07,
-              right: MediaQuery.of(context).size.width / 2.9,
-              child: const Text(
-                'Adopt Charlie',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF3F425A),
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 20),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20),
+        _HeroSection(),
+        SizedBoxConstants.verticalLarge,
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Text(
-            'Ready to welcome Charlie at your home ?',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
+            'Ready to welcome a pet at your home?',
+            style: AppTextStyles.title.copyWith(
+              fontSize: 22.sp,
+              color: AppColors.current.text,
+            ),
           ),
         ),
-        const SizedBox(height: 20),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20),
+        SizedBoxConstants.verticalSmall,
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Text(
-            'Thank you for choosing to adopt Charlie! to ensure right choice, we should ask you a few questions',
-            style: TextStyle(fontSize: 18),
+            'To ensure the right choice, we\'ll ask you a few questions about your living situation and experience.',
+            style: TextStyle(
+              fontSize: 15.sp,
+              color: AppColors.current.lightText,
+              height: 1.6,
+            ),
           ),
         ),
-        const SizedBox(height: 20),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20),
+        SizedBoxConstants.verticalLarge,
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Text(
             'What to Expect',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+            style: AppTextStyles.bodyTitle.copyWith(
+              fontSize: 16.sp,
+              color: AppColors.current.text,
+            ),
           ),
         ),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          child: Text(
-            'Thank you for choosing to adopt Charlie! to ensure right choice, we should ask you a few questions',
-            style: TextStyle(fontSize: 18),
-          ),
+        SizedBoxConstants.verticalSmall,
+        const _ExpectationItem(
+          icon: Icons.person_outline_rounded,
+          text: 'Fill in your personal information',
         ),
-        const SizedBox(height: 20),
+        const _ExpectationItem(
+          icon: Icons.home_outlined,
+          text: 'Describe your living situation',
+        ),
+        const _ExpectationItem(
+          icon: Icons.pets_outlined,
+          text: 'Share your pet experience',
+        ),
+        const _ExpectationItem(
+          icon: Icons.fact_check_outlined,
+          text: 'Review and submit your application',
+        ),
+        SizedBoxConstants.verticalLarge,
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: CustomFilledButton(
             text: 'Start Application',
-            onPressed: () {
-              context.read<AdoptionBloc>().add(NextStep());
-            },
+            onPressed: () =>
+                context.read<AdoptionBloc>().add(NextStep()),
             heightFactor: 0.06,
+            backgroundColor: AppColors.current.primary,
+            textStyle: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
+              color: AppColors.current.white,
+            ),
           ),
         ),
-        const SizedBox(height: 20),
+        SizedBoxConstants.verticalLarge,
       ],
+    );
+  }
+}
+
+class _HeroSection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        SvgPicture.asset(
+          'assets/images/adopt_animal.svg',
+          fit: BoxFit.fill,
+          width: MediaQuery.of(context).size.width,
+        ),
+        Positioned(
+          top: MediaQuery.of(context).size.height * 0.06,
+          left: 10,
+          child: GestureDetector(
+            onTap: () => context.pop(),
+            child: Container(
+              width: 40.w,
+              height: 40.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.current.white.withValues(alpha: 0.85),
+              ),
+              child: Icon(
+                Icons.arrow_back_ios_rounded,
+                color: AppColors.current.text,
+                size: 18.w,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ExpectationItem extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const _ExpectationItem({required this.icon, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 6.h),
+      child: Row(
+        children: [
+          Container(
+            width: 36.w,
+            height: 36.w,
+            decoration: BoxDecoration(
+              color: AppColors.current.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+            child: Icon(icon, size: 18.w, color: AppColors.current.primary),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: AppColors.current.lightText,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

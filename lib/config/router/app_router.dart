@@ -29,6 +29,7 @@ import 'routes.dart';
 import 'package:pettix/features/adoption/presentation/view/adoption_screen.dart';
 import 'package:pettix/features/adoption/presentation/view/pet_application.dart';
 import 'package:pettix/features/adoption/presentation/view/pet_profile_screen.dart';
+import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 import 'package:pettix/features/auth/presentation/pages/forgot_password/forgot_password_page.dart';
 import 'package:pettix/features/auth/presentation/pages/forgot_password/otp_forgot_password_page.dart';
 import 'package:pettix/features/auth/presentation/pages/login/login_page.dart';
@@ -194,7 +195,8 @@ GoRouter appRouter() => GoRouter(
     GoRoute(
       path: AppRoutes.petProfile,
       name: AppRouteNames.petProfile,
-      builder: (context, state) => const PetProfileScreen(),
+      builder: (context, state) =>
+          PetProfileScreen(pet: state.extra as PetEntity),
     ),
     GoRoute(
       path: AppRoutes.petApplication,

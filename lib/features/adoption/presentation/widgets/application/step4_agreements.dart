@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/sized_box.dart';
+import 'package:pettix/core/themes/app_colors.dart';
 import '../../bloc/adoption_bloc.dart';
 import '../../bloc/adoption_event.dart';
 import '../../bloc/adoption_state.dart';
@@ -10,117 +13,139 @@ class Step4Agreements extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20.w),
       child: BlocBuilder<AdoptionBloc, AdoptionState>(
         builder: (context, state) {
           final bloc = context.read<AdoptionBloc>();
           return ListView(
             children: [
-              const Text(
-                "I Understand that:",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-              ),
-              const SizedBox(height: 8),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  "• Pettix is a platform to connect pet lovers, adopters, clinics, and stores, but it does not replace professional veterinary advice.",
-                  style: TextStyle(height: 1.5, fontSize: 16),
+              Text(
+                'I Understand that:',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18.sp,
+                  color: AppColors.current.text,
                 ),
               ),
-              const SizedBox(height: 8),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  "• Any shared content in the community section is the responsibility of the user who posts it.",
-                  style: TextStyle(height: 1.5, fontSize: 16),
+              SizedBoxConstants.verticalSmall,
+              const _AgreementPoint(
+                text:
+                    'Pettix is a platform to connect pet lovers, adopters, clinics, and stores, but it does not replace professional veterinary advice.',
+              ),
+              SizedBoxConstants.verticalSmall,
+              const _AgreementPoint(
+                text:
+                    'Any shared content in the community section is the responsibility of the user who posts it.',
+              ),
+              SizedBoxConstants.verticalLarge,
+              Text(
+                'I Agree to:',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18.sp,
+                  color: AppColors.current.text,
                 ),
               ),
-              const SizedBox(height: 20),
-              const Text(
-                "I Agree to:",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              SizedBoxConstants.verticalSmall,
+              const _AgreementPoint(
+                text:
+                    'Use Pettix responsibly and respectfully, without harmful or inappropriate behavior.',
               ),
-              const SizedBox(height: 8),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  "• Use Pettix responsibly and respectfully, without harmful or inappropriate behavior.",
-                  style: TextStyle(height: 1.5, fontSize: 16),
-                ),
+              SizedBoxConstants.verticalSmall,
+              const _AgreementPoint(
+                text:
+                    'Provide accurate and truthful information when creating my profile or posting.',
               ),
-              const SizedBox(height: 8),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  "• Provide accurate and truthful information when creating my profile or posting.",
-                  style: TextStyle(height: 1.5, fontSize: 16),
-                ),
+              SizedBoxConstants.verticalLarge,
+              _StyledCheckbox(
+                value: state.agreed,
+                label: 'I have read and understood the points above.',
+                onChanged: (v) => bloc.add(ToggleAgreement(v!)),
               ),
-              const SizedBox(height: 20),
-              Column(
-                children: [
-                  Theme(
-                    data: Theme.of(context).copyWith(
-                      splashColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
-                      hoverColor: Colors.transparent,
-                    ),
-                    child: CheckboxListTile(
-                      contentPadding: EdgeInsets.zero,
-                      controlAffinity: ListTileControlAffinity.leading,
-                      visualDensity: VisualDensity.compact,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      activeColor: const Color(0xff5379B2),
-                      checkColor: Colors.white,
-                      side: const BorderSide(
-                        color: Color(0xffD0D5DD),
-                        width: 1.5,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      value: state.agreed,
-                      onChanged: (v) => bloc.add(ToggleAgreement(v!)),
-                      title: const Text(
-                        "I have read and understood the points above.",
-                        style: TextStyle(color: Color(0xff475467)),
-                      ),
-                    ),
-                  ),
-                  Theme(
-                    data: Theme.of(context).copyWith(
-                      splashColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
-                      hoverColor: Colors.transparent,
-                    ),
-                    child: CheckboxListTile(
-                      contentPadding: EdgeInsets.zero,
-                      controlAffinity: ListTileControlAffinity.leading,
-                      visualDensity: VisualDensity.compact,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      activeColor: const Color(0xff5379B2),
-                      checkColor: Colors.white,
-                      side: const BorderSide(
-                        color: Color(0xffD0D5DD),
-                        width: 1.5,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      value: state.termsAccepted,
-                      onChanged: (v) => bloc.add(ToggleTermsAcceptance(v!)),
-                      title: const Text(
-                        "I agree to all the terms and conditions.",
-                        style: TextStyle(color: Color(0xff475467)),
-                      ),
-                    ),
-                  ),
-                ],
+              SizedBoxConstants.verticalSmall,
+              _StyledCheckbox(
+                value: state.termsAccepted,
+                label: 'I agree to all the terms and conditions.',
+                onChanged: (v) => bloc.add(ToggleTermsAcceptance(v!)),
               ),
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _AgreementPoint extends StatelessWidget {
+  final String text;
+
+  const _AgreementPoint({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 6.w,
+          height: 6.w,
+          margin: EdgeInsets.only(top: 6.h, left: 8.w, right: 10.w),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.current.primary,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              height: 1.5,
+              fontSize: 14.sp,
+              color: AppColors.current.lightText,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StyledCheckbox extends StatelessWidget {
+  final bool value;
+  final String label;
+  final ValueChanged<bool?> onChanged;
+
+  const _StyledCheckbox({
+    required this.value,
+    required this.label,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Theme(
+      data: Theme.of(context).copyWith(
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+      ),
+      child: CheckboxListTile(
+        contentPadding: EdgeInsets.zero,
+        controlAffinity: ListTileControlAffinity.leading,
+        visualDensity: VisualDensity.compact,
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        activeColor: AppColors.current.primary,
+        checkColor: AppColors.current.white,
+        side: BorderSide(color: AppColors.current.lightGray, width: 1.5),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.r)),
+        value: value,
+        onChanged: onChanged,
+        title: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13.sp,
+            color: AppColors.current.lightText,
+          ),
+        ),
       ),
     );
   }

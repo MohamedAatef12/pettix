@@ -1,193 +1,124 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/data/network/constants.dart';
+import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 
 class PetGallery extends StatelessWidget {
-  const PetGallery({super.key});
+  final PetEntity pet;
+
+  const PetGallery({super.key, required this.pet});
 
   @override
   Widget build(BuildContext context) {
-    // Example image URLs
-    final images = [
-      'https://images.unsplash.com/photo-1517423440428-a5a00ad493e8?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1507149833265-60c372daea22?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1525253086316-d0c936c814f8?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1517423440428-a5a00ad493e8?auto=format&fit=crop&w=800&q=80',
-    ];
+    final urls = pet.imageUrls
+        .map((u) => u.startsWith('http') ? u : '${Constants.baseUrl}/$u')
+        .toList();
 
-    final total = images.length;
-
-    // Case 1: Only 1–4 images (grid)
-    if (total <= 4) {
-      return GridView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        padding: const EdgeInsets.all(8),
-        itemCount: total,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
-        ),
-        itemBuilder: (context, index) {
-          final image = images[index];
-          return GestureDetector(
-            onTap: () => _openImage(context, image),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(image, fit: BoxFit.cover),
-            ),
-          );
-        },
-      );
+    if (urls.isEmpty) {
+      return _placeholder();
     }
 
-    // Case 2: 5 or more images
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
-      child: Column(
-        children: [
-          // Large top image
-          GestureDetector(
-            onTap: () => _openImage(context, images[0]),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Image.network(
-                images[0],
-                fit: BoxFit.cover,
-                height: 320.h,
-                width: double.infinity,
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
+    if (urls.length == 1) {
+      return _singleImage(context, urls.first);
+    }
 
-          // 4 small images below
-        //   MasonryGridView.count(
-        //     physics: const NeverScrollableScrollPhysics(),
-        //     shrinkWrap: true,
-        //     crossAxisCount: 4,
-        //     mainAxisSpacing: 8,
-        //     crossAxisSpacing: 8,
-        //     itemCount: 4,
-        //     itemBuilder: (context, index) {
-        //       final image = images[index + 1];
-        //       final isLast = index == 3 && remaining > 0;
+    return _gridImages(context, urls);
+  }
 
-        //       return GestureDetector(
-        //         onTap:
-        //             () =>
-        //                 isLast
-        //                     ? _openGallery(context, images)
-        //                     : _openImage(context, image),
-        //         child: Stack(
-        //           children: [
-        //             ClipRRect(
-        //               borderRadius: BorderRadius.circular(12),
-        //               child: Image.network(
-        //                 image,
-        //                 fit: BoxFit.cover,
-        //                 height: 120.h,
-        //                 width: double.infinity,
-        //               ),
-        //             ),
-        //             if (isLast)
-        //               Container(
-        //                 height: 120.h,
-        //                 decoration: BoxDecoration(
-        //                   color: Colors.black.withOpacity(0.45),
-        //                   borderRadius: BorderRadius.circular(12),
-        //                 ),
-        //                 alignment: Alignment.center,
-        //                 child: Text(
-        //                   '+$remaining',
-        //                   style: const TextStyle(
-        //                     color: Colors.white,
-        //                     fontSize: 22,
-        //                     fontWeight: FontWeight.bold,
-        //                   ),
-        //                 ),
-        //               ),
-        //           ],
-        //         ),
-        //       );
-        //     },
-        //   ),
-        ],
+  Widget _singleImage(BuildContext context, String url) {
+    return GestureDetector(
+      onTap: () => _openFullscreen(context, url),
+      child: CachedNetworkImage(
+        imageUrl: url,
+        height: 280.h,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        placeholder: (_, __) => _shimmer(),
+        errorWidget: (_, __, ___) => _placeholder(),
       ),
     );
   }
 
-  // 🖼 Open a single image fullscreen
-  void _openImage(BuildContext context, String image) {
+  Widget _gridImages(BuildContext context, List<String> urls) {
+    final shown = urls.take(4).toList();
+    final extra = urls.length - 4;
+    return GridView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      padding: const EdgeInsets.all(4),
+      itemCount: shown.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 4,
+        crossAxisSpacing: 4,
+      ),
+      itemBuilder: (context, i) {
+        final isLast = i == 3 && extra > 0;
+        return GestureDetector(
+          onTap: () => _openFullscreen(context, shown[i]),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8.r),
+                child: CachedNetworkImage(
+                  imageUrl: shown[i],
+                  fit: BoxFit.cover,
+                  placeholder: (_, __) => _shimmer(),
+                  errorWidget: (_, __, ___) => _placeholder(),
+                ),
+              ),
+              if (isLast)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8.r),
+                  child: Container(
+                    color: Colors.black54,
+                    alignment: Alignment.center,
+                    child: Text(
+                      '+$extra',
+                      style: TextStyle(
+                        color: AppColors.current.white,
+                        fontSize: 22.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _shimmer() => Container(color: AppColors.current.lightGray);
+
+  Widget _placeholder() => Container(
+        height: 280.h,
+        color: AppColors.current.lightGray,
+        child: Icon(Icons.pets_rounded,
+            size: 64.w, color: AppColors.current.blueGray),
+      );
+
+  void _openFullscreen(BuildContext context, String url) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => _FullImageView(imageUrl: image)),
-    );
-  }
-
-  // 🗂 Open full gallery view
-  // void _openGallery(BuildContext context, List<String> images) {
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(builder: (_) => _FullGalleryView(images: images)),
-  //   );
-  // }
-}
-
-// -------------------------------
-// 🖼 Fullscreen image view
-// -------------------------------
-class _FullImageView extends StatelessWidget {
-  final String imageUrl;
-  const _FullImageView({required this.imageUrl});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(backgroundColor: Colors.transparent),
-      body: Center(child: InteractiveViewer(child: Image.network(imageUrl))),
+      MaterialPageRoute(
+        builder: (_) => Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            iconTheme: const IconThemeData(color: Colors.white),
+          ),
+          body: Center(
+            child: InteractiveViewer(
+              child: CachedNetworkImage(imageUrl: url),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
-
-// -------------------------------
-// 🗂 Full gallery grid view
-// -------------------------------
-// class _FullGalleryView extends StatelessWidget {
-//   final List<String> images;
-//   const _FullGalleryView({required this.images});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: const Text('Gallery')),
-//       body: GridView.builder(
-//         padding: const EdgeInsets.all(8),
-//         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-//           crossAxisCount: 3,
-//           mainAxisSpacing: 8,
-//           crossAxisSpacing: 8,
-//         ),
-//         itemCount: images.length,
-//         itemBuilder:
-//             (context, index) => GestureDetector(
-//               onTap:
-//                   () => Navigator.push(
-//                     context,
-//                     MaterialPageRoute(
-//                       builder: (_) => _FullImageView(imageUrl: images[index]),
-//                     ),
-//                   ),
-//               child: ClipRRect(
-//                 borderRadius: BorderRadius.circular(8),
-//                 child: Image.network(images[index], fit: BoxFit.cover),
-//               ),
-//             ),
-//       ),
-//     );
-//   }
-// }

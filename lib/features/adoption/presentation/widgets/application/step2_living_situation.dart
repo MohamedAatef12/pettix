@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/themes/app_colors.dart';
 import '../../bloc/adoption_bloc.dart';
 import '../../bloc/adoption_event.dart';
 import '../../bloc/adoption_state.dart';
@@ -90,13 +91,14 @@ class CustomChoiceChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
         height: 60.h,
         decoration: BoxDecoration(
-          color:
-              selected
-                  ? const Color(0xff5379B2).withValues(alpha: 0.1)
-                  : Colors.white,
+          color: selected
+              ? AppColors.current.primary.withValues(alpha: 0.1)
+              : AppColors.current.white,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: selected ? const Color(0xff5379B2) : const Color(0xffD0D5DD),
+            color: selected
+                ? AppColors.current.primary
+                : AppColors.current.lightGray,
             width: 1.5,
           ),
         ),
@@ -104,7 +106,9 @@ class CustomChoiceChip extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            color: selected ? const Color(0xff5379B2) : Colors.black87,
+            color: selected
+                ? AppColors.current.primary
+                : AppColors.current.text,
             fontWeight: FontWeight.w500,
             fontSize: 14.sp,
           ),

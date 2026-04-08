@@ -38,78 +38,69 @@ class AdoptionHistoryScreen extends StatelessWidget {
 class _HistoryHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.current.primary, const Color(0xFF2A4E8F)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            // Top bar
-            Padding(
-              padding: EdgeInsets.fromLTRB(4.w, 8.h, 20.w, 0),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: Icon(Icons.arrow_back_ios_new_rounded,
-                        color: Colors.white, size: 20.w),
-                  ),
-                  Expanded(
-                    child: Text(
-                      'Adoption History',
-                      style: AppTextStyles.appbar.copyWith(
-                        color: Colors.white,
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.w700,
-                      ),
+    return SafeArea(
+      bottom: false,
+      child: Column(
+        children: [
+          // Top bar
+          Padding(
+            padding: EdgeInsets.fromLTRB(4.w, 8.h, 20.w, 0),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: Icon(Icons.arrow_back_ios_new_rounded,
+                      color: Colors.white, size: 20.w),
+                ),
+                Expanded(
+                  child: Text(
+                    'Adoption History',
+                    style: AppTextStyles.appbar.copyWith(
+                      color: Colors.white,
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  Icon(Icons.pets_rounded,
-                      color: AppColors.current.gold, size: 22.w),
-                ],
-              ),
-            ),
-            SizedBox(height: 12.h),
-            // Tab bar
-            TabBar(
-              indicatorColor: AppColors.current.gold,
-              indicatorWeight: 3,
-              indicatorSize: TabBarIndicatorSize.label,
-              labelColor: Colors.white,
-              unselectedLabelColor: Colors.white.withAlpha(140),
-              labelStyle: TextStyle(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w700,
-              ),
-              unselectedLabelStyle: TextStyle(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w500,
-              ),
-              tabs: const [
-                Tab(text: 'My Applications'),
-                Tab(text: 'On My Pets'),
+                ),
+                Icon(Icons.pets_rounded,
+                    color: AppColors.current.gold, size: 22.w),
               ],
-              onTap: (index) {
-                final bloc = context.read<AdoptionHistoryBloc>();
-                if (index == 0 &&
-                    bloc.state.clientStatus ==
-                        AdoptionHistoryStatus.initial) {
-                  bloc.add(const FetchClientFormsEvent());
-                } else if (index == 1 &&
-                    bloc.state.ownerStatus ==
-                        AdoptionHistoryStatus.initial) {
-                  bloc.add(const FetchOwnerFormsEvent());
-                }
-              },
             ),
-          ],
-        ),
+          ),
+          SizedBox(height: 12.h),
+          // Tab bar
+          TabBar(
+            indicatorColor: AppColors.current.gold,
+            indicatorWeight: 3,
+            indicatorSize: TabBarIndicatorSize.label,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white.withAlpha(140),
+            labelStyle: TextStyle(
+              fontSize: 13.sp,
+              fontWeight: FontWeight.w700,
+            ),
+            unselectedLabelStyle: TextStyle(
+              fontSize: 13.sp,
+              fontWeight: FontWeight.w500,
+            ),
+            tabs: const [
+              Tab(text: 'My Applications'),
+              Tab(text: 'On My Pets'),
+            ],
+            onTap: (index) {
+              final bloc = context.read<AdoptionHistoryBloc>();
+              if (index == 0 &&
+                  bloc.state.clientStatus ==
+                      AdoptionHistoryStatus.initial) {
+                bloc.add(const FetchClientFormsEvent());
+              } else if (index == 1 &&
+                  bloc.state.ownerStatus ==
+                      AdoptionHistoryStatus.initial) {
+                bloc.add(const FetchOwnerFormsEvent());
+              }
+            },
+          ),
+        ],
       ),
     );
   }

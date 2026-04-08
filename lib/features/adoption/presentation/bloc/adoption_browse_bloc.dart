@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pettix/features/adoption/domain/entities/paged_pets_params.dart';
@@ -13,6 +14,9 @@ class AdoptionBrowseBloc
   final GetPagedPetsUseCase _getPagedPets;
   final GetPetOptionsUseCase _getPetOptions;
 
+  /// Owned by the BLoC so the search TextField can remain stateless.
+  final searchController = TextEditingController();
+
   static const int _pageSize = 10;
 
   AdoptionBrowseBloc(this._getPagedPets, this._getPetOptions)
@@ -25,6 +29,12 @@ class AdoptionBrowseBloc
     on<FilterByGenderEvent>(_onFilterGender);
     on<SortPetsEvent>(_onSort);
     on<ResetFiltersEvent>(_onReset);
+  }
+
+  @override
+  Future<void> close() {
+    searchController.dispose();
+    return super.close();
   }
 
   // ─── Helpers ────────────────────────────────────────────────────────────────

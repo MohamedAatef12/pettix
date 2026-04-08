@@ -63,21 +63,21 @@ class Step3PetExperience extends StatelessWidget {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: const Color(0xffF0E8DB),
+                      color: AppColors.current.lightGray,
                       width: 1.w,
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: const Color(0xffF0E8DB),
+                      color: AppColors.current.lightGray,
                       width: 1.w,
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: const Color(0xffF0E8DB),
+                      color: AppColors.current.lightGray,
                       width: 1.w,
                     ),
                   ),

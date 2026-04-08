@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/sized_box.dart';
+import 'package:pettix/core/constants/text_styles.dart';
+import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import '../../bloc/adoption_bloc.dart';
 import '../../bloc/adoption_event.dart';
@@ -14,73 +17,61 @@ class StepReviewApplication extends StatelessWidget {
     return BlocBuilder<AdoptionBloc, AdoptionState>(
       builder: (context, state) {
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: ListView(
             children: [
               Text(
-                "Review Your Application",
+                'Please review your information before submitting.',
                 style: TextStyle(
-                  fontSize: 22.sp,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xff3F425A),
+                  fontSize: 14.sp,
+                  color: AppColors.current.midGray,
                 ),
               ),
-              const SizedBox(height: 8),
-              const Text(
-                "Please review your information before submitting.",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+              SizedBoxConstants.verticalLarge,
+              _ReviewSection(
+                title: 'Personal Information',
+                onEdit: () => context.read<AdoptionBloc>().add(JumpToStep(1)),
+                items: [
+                  'Full Name: ${state.fullName}',
+                  'Email: ${state.email}',
+                  'Phone: ${state.phoneNumber}',
+                  'Date of Birth: ${state.dateOfBirth}',
+                ],
               ),
-              const SizedBox(height: 24),
-              _buildSectionHeader(
-                context,
-                "Personal Information",
-                () => _jumpToStep(context, 1),
+              SizedBoxConstants.verticalMedium,
+              _ReviewSection(
+                title: 'Living Situation',
+                onEdit: () => context.read<AdoptionBloc>().add(JumpToStep(2)),
+                items: [
+                  'Living Situation: ${_getLivingSituationName(state)}',
+                  'Type of Residence: ${_getResidenceTypeName(state)}',
+                ],
               ),
-              const SizedBox(height: 8),
-              _buildInfoCard([
-                "Full Name: ${state.fullName}",
-                "Email: ${state.email}",
-                "Phone Number: ${state.phoneNumber}",
-                "Date Of Birth: ${state.dateOfBirth}",
-              ]),
-              const SizedBox(height: 16),
-              _buildSectionHeader(
-                context,
-                "Living Situation",
-                () => _jumpToStep(context, 2),
+              SizedBoxConstants.verticalMedium,
+              _ReviewSection(
+                title: 'Pet Experience',
+                onEdit: () => context.read<AdoptionBloc>().add(JumpToStep(3)),
+                items: [
+                  'Owned a pet before?: ${state.hasOwnedPetBefore == true ? 'Yes' : 'No'}',
+                  if (state.hasOwnedPetBefore == true)
+                    'Kind of pet: ${state.petType}',
+                ],
               ),
-              const SizedBox(height: 8),
-              _buildInfoCard([
-                "Living Situation: ${_getLivingSituationName(state)}",
-                "Type of Residence: ${_getResidenceTypeName(state)}",
-              ]),
-              const SizedBox(height: 16),
-              _buildSectionHeader(
-                context,
-                "Pet Experience",
-                () => _jumpToStep(context, 3),
-              ),
-              const SizedBox(height: 8),
-              _buildInfoCard([
-                "Have you owned or cared with a pet before?: ${state.hasOwnedPetBefore == true ? 'Yes' : 'No'}",
-                if (state.hasOwnedPetBefore == true)
-                  "Kind Of Pet: ${state.petType}",
-              ]),
-              const SizedBox(height: 30),
+              SizedBoxConstants.verticalLarge,
               CustomFilledButton(
-                onPressed: () {
-                  context.read<AdoptionBloc>().add(const SubmitAdoptionForm());
-                },
-                text: "Submit Application",
+                onPressed: () => context
+                    .read<AdoptionBloc>()
+                    .add(const SubmitAdoptionForm()),
+                text: 'Submit Application',
                 heightFactor: 0.06,
-                backgroundColor: const Color(0xff5379B2),
+                backgroundColor: AppColors.current.primary,
                 textStyle: TextStyle(
-                  fontSize: 18.sp,
+                  fontSize: 16.sp,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: AppColors.current.white,
                 ),
               ),
-              const SizedBox(height: 40),
+              SizedBoxConstants.verticalExtraLarge,
             ],
           ),
         );
@@ -88,97 +79,97 @@ class StepReviewApplication extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(
-    BuildContext context,
-    String title,
-    VoidCallback onEdit,
-  ) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  String _getLivingSituationName(AdoptionState state) {
+    if (state.options == null || state.options!.livingSituations.isEmpty) {
+      return 'Unknown';
+    }
+    try {
+      return state.options!.livingSituations
+          .firstWhere((e) => e.id == state.selectedLivingSituationId)
+          .name;
+    } catch (_) {
+      return state.options!.livingSituations.first.name;
+    }
+  }
+
+  String _getResidenceTypeName(AdoptionState state) {
+    if (state.options == null || state.options!.residenceTypes.isEmpty) {
+      return 'Unknown';
+    }
+    try {
+      return state.options!.residenceTypes
+          .firstWhere((e) => e.id == state.selectedResidenceTypeId)
+          .name;
+    } catch (_) {
+      return state.options!.residenceTypes.first.name;
+    }
+  }
+}
+
+class _ReviewSection extends StatelessWidget {
+  final String title;
+  final VoidCallback onEdit;
+  final List<String> items;
+
+  const _ReviewSection({
+    required this.title,
+    required this.onEdit,
+    required this.items,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Color(0xff3F425A),
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: AppTextStyles.bodyTitle.copyWith(
+                fontSize: 15.sp,
+                color: AppColors.current.text,
+              ),
+            ),
+            GestureDetector(
+              onTap: onEdit,
+              child: Icon(
+                Icons.mode_edit_outline_outlined,
+                size: 20.w,
+                color: AppColors.current.primary,
+              ),
+            ),
+          ],
         ),
-        GestureDetector(
-          onTap: onEdit,
-          child: const Icon(
-            Icons.mode_edit_outline_outlined,
-            size: 20,
-            color: Color(0xff4A4C68),
+        SizedBox(height: 8.h),
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(16.w),
+          decoration: BoxDecoration(
+            color: AppColors.current.lightBlue,
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: items
+                .map(
+                  (item) => Padding(
+                    padding: EdgeInsets.only(bottom: 6.h),
+                    child: Text(
+                      item,
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        color: AppColors.current.lightText,
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
           ),
         ),
       ],
     );
-  }
-
-  Widget _buildInfoCard(List<String> items) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-      decoration: BoxDecoration(
-        color: const Color(0xffF0E8DB),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(8.r),
-          topRight: Radius.circular(40.r),
-          bottomLeft: Radius.circular(8.r),
-          bottomRight: Radius.circular(40.r),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children:
-            items.map((item) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Text(
-                  item,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xff4A4C68),
-                    height: 1.5,
-                  ),
-                ),
-              );
-            }).toList(),
-      ),
-    );
-  }
-
-  void _jumpToStep(BuildContext context, int step) {
-    context.read<AdoptionBloc>().add(JumpToStep(step));
-  }
-
-  String _getLivingSituationName(AdoptionState state) {
-    // Determine the living situation name safely
-    if (state.options != null && state.options!.livingSituations.isNotEmpty) {
-      try {
-        final item = state.options!.livingSituations.firstWhere(
-          (element) => element.id == state.selectedLivingSituationId,
-        );
-        return item.name;
-      } catch (e) {
-        return state.options!.livingSituations.first.name;
-      }
-    }
-    return "Unknown";
-  }
-
-  String _getResidenceTypeName(AdoptionState state) {
-    if (state.options != null && state.options!.residenceTypes.isNotEmpty) {
-      try {
-        final item = state.options!.residenceTypes.firstWhere(
-          (element) => element.id == state.selectedResidenceTypeId,
-        );
-        return item.name;
-      } catch (e) {
-        return state.options!.residenceTypes.first.name;
-      }
-    }
-    return "Unknown";
   }
 }

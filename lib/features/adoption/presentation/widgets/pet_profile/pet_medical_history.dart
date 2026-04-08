@@ -1,45 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
-import 'package:pettix/config/router/routes.dart';
-
-import '../../../../../core/utils/custom_button.dart';
+import 'package:pettix/core/constants/sized_box.dart';
+import 'package:pettix/core/constants/text_styles.dart';
+import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 
 class PetMedicalHistory extends StatelessWidget {
-  const PetMedicalHistory({super.key});
+  final PetEntity pet;
+
+  const PetMedicalHistory({super.key, required this.pet});
 
   @override
   Widget build(BuildContext context) {
+    if (pet.vaccinations.isEmpty) return const SizedBox.shrink();
+
     return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Color(0xffAEBED6), width: 1),
+        color: AppColors.current.white,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: AppColors.current.lightGray),
       ),
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Medical History',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF3F425A),
+            style: AppTextStyles.bodyTitle.copyWith(
+              fontSize: 16.sp,
+              color: AppColors.current.text,
             ),
           ),
-          const SizedBox(height: 10),
-          PetFeaturesWidget(),
-          const SizedBox(height: 10),
-
-          CustomFilledButton(
-            text: 'Apply To Adopt',
-            onPressed: () {
-              context.push(AppRoutes.petApplication);
-            },
-            leading: const Icon(Icons.pets, color: Colors.white),
-            hasLeading: true,
-            widthFactor: 1,
-            heightFactor: 0.06,
+          SizedBoxConstants.verticalSmall,
+          Wrap(
+            spacing: 8.w,
+            runSpacing: 8.h,
+            children: pet.vaccinations
+                .map((v) => _VaccinationChip(name: v.name))
+                .toList(),
           ),
         ],
       ),
@@ -47,84 +46,34 @@ class PetMedicalHistory extends StatelessWidget {
   }
 }
 
-class PetFeaturesWidget extends StatelessWidget {
-  const PetFeaturesWidget({super.key});
+class _VaccinationChip extends StatelessWidget {
+  final String name;
+
+  const _VaccinationChip({required this.name});
 
   @override
   Widget build(BuildContext context) {
-    final features = [
-      'vaccinated',
-      'Good Kids Energy',
-      'Medium Energy',
-      'Operations Man',
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: AppColors.current.green.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(
+            color: AppColors.current.green.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // ✅ Features chips
-          Wrap(
-            spacing: 10.w,
-            runSpacing: 3.h,
-            alignment: WrapAlignment.start,
-            children:
-                features.map((feature) {
-                  return Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.check_circle,
-                        color: Colors.green,
-                        size: 20.sp,
-                      ),
-                      SizedBox(width: 6.w),
-                      Text(
-                        feature,
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          color: const Color(0xFF2E2E3A),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  );
-                }).toList(),
-          ),
-
-          SizedBox(height: 12.h),
-          Row(
-            children: [
-              Icon(Icons.info_outline, color: Colors.grey, size: 20.sp),
-              SizedBox(width: 6.w),
-              Expanded(
-                child: Text.rich(
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Ideal Home for Buddy: ',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      TextSpan(
-                        text: 'active Family.',
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+          Icon(Icons.check_circle_rounded,
+              size: 14.w, color: AppColors.current.green),
+          SizedBox(width: 4.w),
+          Text(
+            name,
+            style: TextStyle(
+              fontSize: 12.sp,
+              color: AppColors.current.green,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),

@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:pettix/core/constants/sized_box.dart';
+import 'package:pettix/core/constants/text_styles.dart';
+import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 
 class StepSubmitted extends StatelessWidget {
-  final String petName;
-  final String applicantName;
   final VoidCallback onViewApplication;
   final VoidCallback onBrowseMore;
 
   const StepSubmitted({
     super.key,
-    this.petName = "Buddy",
-    this.applicantName = "User",
     required this.onViewApplication,
     required this.onBrowseMore,
   });
@@ -20,101 +18,95 @@ class StepSubmitted extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20.w),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Text(
-            "Submitted your application",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Color(0xff3F425A),
+          const Spacer(),
+          Icon(Icons.mark_email_read_rounded,
+              size: 100.w, color: AppColors.current.primary),
+          SizedBoxConstants.verticalLarge,
+          Text(
+            'Application Submitted!',
+            style: AppTextStyles.title.copyWith(
+              fontSize: 22.sp,
+              color: AppColors.current.text,
             ),
-          ),
-          const SizedBox(height: 40),
-          // Placeholder for the envelope icon/image
-          SvgPicture.asset(
-            'assets/icons/success_envelope.svg', // Ensure this asset exists or use Icon
-            height: 150.h,
-            // fallback if svg not found
-            placeholderBuilder:
-                (context) => Icon(
-                  Icons.mark_email_read,
-                  size: 100.h,
-                  color: Color(0xff5379B2),
-                ),
-          ),
-          const SizedBox(height: 40),
-          RichText(
             textAlign: TextAlign.center,
-            text: TextSpan(
-              style: const TextStyle(
-                fontSize: 16,
-                color: Color(0xff4A4C68),
-                height: 1.5,
-              ),
-              children: [
-                const TextSpan(text: "Thank you , "),
-                TextSpan(
-                  text: "$applicantName . \n",
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                TextSpan(
-                  text:
-                      "your application for $petName has submitted\nsuccessfully",
-                ),
-              ],
-            ),
           ),
-          const SizedBox(height: 30),
-          const Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              "What Next",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xff3F425A),
-              ),
+          SizedBoxConstants.verticalMedium,
+          Text(
+            'Thank you for submitting your adoption application. The owner will review it and may contact you via chat.',
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: AppColors.current.lightText,
+              height: 1.6,
             ),
+            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 10),
-          const Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(
-                Icons.check_circle_outline,
-                color: Color(0xff5379B2),
-                size: 20,
-              ),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  "The Owner will Review your application and may contact via chat",
-                  style: TextStyle(color: Color(0xff4A4C68), fontSize: 14),
-                ),
-              ),
-            ],
+          SizedBoxConstants.verticalLarge,
+          const _NextStep(
+            icon: Icons.check_circle_outline_rounded,
+            text:
+                'The owner will review your application and may contact you via chat.',
           ),
           const Spacer(),
           CustomFilledButton(
             onPressed: onViewApplication,
-            text: "View Your Application",
-            backgroundColor: const Color(0xff5379B2),
+            text: 'View Your Application',
+            backgroundColor: AppColors.current.primary,
+            textStyle: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
+              color: AppColors.current.white,
+            ),
           ),
-          const SizedBox(height: 12),
+          SizedBoxConstants.verticalSmall,
           CustomFilledButton(
             onPressed: onBrowseMore,
-            text: "Browse More Pets",
-            backgroundColor: Colors.white,
-            textColor: const Color(0xff5379B2),
-            // Border or outline style if CustomFilledButton supports it?
-            // Assuming default implementation allows some customization or we wrap it.
-            // If CustomFilledButton doesn't support border, we might need a different widget or careful styling.
-            // For now assume it's fine.
+            text: 'Browse More Pets',
+            backgroundColor: AppColors.current.lightBlue,
+            textStyle: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
+              color: AppColors.current.primary,
+            ),
           ),
-          const SizedBox(height: 20),
+          SizedBoxConstants.verticalMedium,
+        ],
+      ),
+    );
+  }
+}
+
+class _NextStep extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const _NextStep({required this.icon, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: AppColors.current.lightBlue,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: AppColors.current.primary, size: 20.w),
+          SizedBox(width: 10.w),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 13.sp,
+                color: AppColors.current.lightText,
+                height: 1.5,
+              ),
+            ),
+          ),
         ],
       ),
     );
