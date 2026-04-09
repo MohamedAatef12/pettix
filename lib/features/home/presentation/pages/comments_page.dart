@@ -17,199 +17,190 @@ import 'package:pettix/features/home/presentation/widgets/post_card.dart';
 
 class CommentsPage extends StatelessWidget {
   final PostEntity post;
+  final String? postId;
 
-  const CommentsPage({super.key, required this.post});
+  const CommentsPage({super.key, required this.post, this.postId});
 
   /// Navigate to the comments page from any context that has a HomeBloc.
-  static void navigate({
-    required BuildContext context,
-    required PostEntity post,
-  }) {
-    final homeBloc = context.read<HomeBloc>();
-    homeBloc.add(FetchPostsCommentsEvent(post.id));
-    homeBloc.add(SetReplyingToEvent(null));
-
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder:
-            (_) => BlocProvider.value(
-              value: homeBloc,
-              child: CommentsPage(post: post),
-            ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final user = DI.find<ICacheManager>().getUserData();
-    final bloc = context.read<HomeBloc>();
+    return BlocProvider(
+      create: (context) => HomeBloc.fromDI()
+        ..add(FetchPostsCommentsEvent(post.id))
+        ..add(SetReplyingToEvent(null)),
+      child: Builder(
+        builder: (context) {
+          final user = DI.find<ICacheManager>().getUserData();
+          final bloc = context.read<HomeBloc>();
 
-    return Scaffold(
-      backgroundColor: AppColors.current.lightBlue,
-      appBar: AppBar(
-        backgroundColor: AppColors.current.white,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        leading: GestureDetector(
-          onTap: () => Navigator.of(context).pop(),
-          child: Padding(
-            padding: EdgeInsets.all(8.r),
-            child: Icon(
-              Icons.arrow_back_ios_new_rounded,
-              color: AppColors.current.text,
-              size: 22.r,
-            ),
-          ),
-        ),
-        title: Text(
-          'Comments',
-          style: AppTextStyles.bold.copyWith(fontSize: 18.sp),
-        ),
-        centerTitle: true,
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(1.h),
-          child: Container(
-            color: AppColors.current.lightGray.withOpacity(0.5),
-            height: 1.h,
-          ),
-        ),
-      ),
-      body: Column(
-        children: [
-          // Scrollable area: PostCard + Comments
-          Expanded(
-            child: CommentsBody(
-              postId: post.id,
-              headerWidget: Padding(
-                padding: EdgeInsets.only(bottom: 8.h, top: 4.h),
-                child: PostCard(post: post, isDetailView: true),
+          return Scaffold(
+            backgroundColor: AppColors.current.lightBlue,
+            appBar: AppBar(
+              backgroundColor: AppColors.current.white,
+              surfaceTintColor: Colors.transparent,
+              elevation: 0,
+              leading: GestureDetector(
+                onTap: () => Navigator.of(context).pop(),
+                child: Padding(
+                  padding: EdgeInsets.all(8.r),
+                  child: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: AppColors.current.text,
+                    size: 22.r,
+                  ),
+                ),
+              ),
+              title: Text(
+                'Comments',
+                style: AppTextStyles.bold.copyWith(fontSize: 18.sp),
+              ),
+              centerTitle: true,
+              bottom: PreferredSize(
+                preferredSize: Size.fromHeight(1.h),
+                child: Container(
+                  color: AppColors.current.lightGray.withOpacity(0.5),
+                  height: 1.h,
+                ),
               ),
             ),
-          ),
-
-          // Comment Input - fixed at bottom
-          BlocBuilder<HomeBloc, HomeState>(
-            buildWhen: (prev, curr) => prev.replyingTo != curr.replyingTo,
-            builder: (context, state) {
-              return Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-                decoration: BoxDecoration(
-                  color: AppColors.current.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
-                      blurRadius: 12,
-                      offset: const Offset(0, -3),
+            body: Column(
+              children: [
+                // Scrollable area: PostCard + Comments
+                Expanded(
+                  child: CommentsBody(
+                    postId: post.id,
+                    headerWidget: Padding(
+                      padding: EdgeInsets.only(bottom: 8.h, top: 4.h),
+                      child: PostCard(post: post, isDetailView: true),
                     ),
-                  ],
+                  ),
                 ),
-                child: SafeArea(
-                  top: false,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (state.replyingTo != null) ...[
-                        Container(
-                          margin: EdgeInsets.only(left: 45.w),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 10.w,
-                            vertical: 5.h,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.current.primary.withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(15.r),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'Replying to ',
-                                style: AppTextStyles.description.copyWith(
-                                  fontSize: 11.sp,
-                                  color: AppColors.current.text.withOpacity(
-                                    0.6,
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                state.replyingTo!.author.nameEn ?? '',
-                                style: AppTextStyles.bold.copyWith(
-                                  fontSize: 11.sp,
-                                  color: AppColors.current.primary,
-                                ),
-                              ),
-                              SizedBox(width: 8.w),
-                              GestureDetector(
-                                onTap: () => bloc.add(SetReplyingToEvent(null)),
-                                child: Icon(
-                                  Icons.cancel,
-                                  size: 16.r,
-                                  color: AppColors.current.primary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 8.h),
-                      ],
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 20.r,
-                            backgroundImage:
-                                (user?.avatar != null &&
-                                        user!.avatar.toString().isNotEmpty &&
-                                        user.avatar.toString().startsWith(
-                                          'http',
-                                        ))
-                                    ? NetworkImage(user.avatar.toString())
-                                    : const AssetImage(
-                                          'assets/images/no_user.png',
-                                        )
-                                        as ImageProvider,
-                          ),
-                          SizedBox(width: 10.w),
-                          Expanded(
-                            child: TextField(
-                              controller: bloc.commentTextController,
-                              decoration: InputDecoration(
-                                hintText: 'Add a comment...',
-                                hintStyle: AppTextStyles.description.copyWith(
-                                  fontSize: 13.sp,
-                                ),
-                                filled: true,
-                                fillColor: AppColors.current.gray.withOpacity(
-                                  0.08,
-                                ),
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 16.w,
-                                  vertical: 10.h,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(24.r),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 10.w),
-                          GestureDetector(
-                            onTap: () => _onSubmitComment(context, bloc, user),
-                            child: SvgPicture.asset(
-                              'assets/icons/add_comment.svg',
-                            ),
+
+                // Comment Input - fixed at bottom
+                BlocBuilder<HomeBloc, HomeState>(
+                  buildWhen: (prev, curr) => prev.replyingTo != curr.replyingTo,
+                  builder: (context, state) {
+                    return Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                      decoration: BoxDecoration(
+                        color: AppColors.current.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.06),
+                            blurRadius: 12,
+                            offset: const Offset(0, -3),
                           ),
                         ],
                       ),
-                    ],
-                  ),
+                      child: SafeArea(
+                        top: false,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (state.replyingTo != null) ...[
+                              Container(
+                                margin: EdgeInsets.only(left: 45.w),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 10.w,
+                                  vertical: 5.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.current.primary.withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(15.r),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'Replying to ',
+                                      style: AppTextStyles.description.copyWith(
+                                        fontSize: 11.sp,
+                                        color: AppColors.current.text.withOpacity(
+                                          0.6,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      state.replyingTo!.author.nameEn ?? '',
+                                      style: AppTextStyles.bold.copyWith(
+                                        fontSize: 11.sp,
+                                        color: AppColors.current.primary,
+                                      ),
+                                    ),
+                                    SizedBox(width: 8.w),
+                                    GestureDetector(
+                                      onTap: () => bloc.add(SetReplyingToEvent(null)),
+                                      child: Icon(
+                                        Icons.cancel,
+                                        size: 16.r,
+                                        color: AppColors.current.primary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 8.h),
+                            ],
+                            Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 20.r,
+                                  backgroundImage:
+                                      (user?.avatar != null &&
+                                              user!.avatar.toString().isNotEmpty &&
+                                              user.avatar.toString().startsWith(
+                                                'http',
+                                              ))
+                                          ? NetworkImage(user.avatar.toString())
+                                          : const AssetImage(
+                                                'assets/images/no_user.png',
+                                              )
+                                              as ImageProvider,
+                                ),
+                                SizedBox(width: 10.w),
+                                Expanded(
+                                  child: TextField(
+                                    controller: bloc.commentTextController,
+                                    decoration: InputDecoration(
+                                      hintText: 'Add a comment...',
+                                      hintStyle: AppTextStyles.description.copyWith(
+                                        fontSize: 13.sp,
+                                      ),
+                                      filled: true,
+                                      fillColor: AppColors.current.gray.withOpacity(
+                                        0.08,
+                                      ),
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 16.w,
+                                        vertical: 10.h,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(24.r),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 10.w),
+                                GestureDetector(
+                                  onTap: () => _onSubmitComment(context, bloc, user),
+                                  child: SvgPicture.asset(
+                                    'assets/icons/add_comment.svg',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
-        ],
+              ],
+            ),
+          );
+        },
       ),
     );
   }

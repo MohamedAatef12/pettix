@@ -20,6 +20,7 @@ class NotificationService {
       alert: true,
       badge: true,
       sound: true,
+  
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
@@ -40,7 +41,9 @@ class NotificationService {
 
     await _localNotifications.initialize(
       settings: initSettings,
+
       onDidReceiveNotificationResponse: (details) {
+
         log('Notification clicked: ${details.payload}');
         if (details.payload != null) {
           try {
@@ -163,7 +166,7 @@ class NotificationService {
 
     if (type == 'comment' || type == 'like' || type == 'post') {
       if (postId != null) {
-        router.push('${AppRoutes.comments}/$postId');
+        router.push(AppRoutes.comments, extra: int.tryParse(postId ?? '') ?? 0);
       } else {
         router.push(AppRoutes.notifications);
       }

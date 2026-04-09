@@ -17,9 +17,11 @@ import 'package:pettix/data/network/constants.dart';
 import 'package:pettix/features/home/domain/entities/post_entity.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
-import 'package:pettix/features/home/presentation/pages/comments_page.dart';
+
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:pettix/features/home/presentation/blocs/home_state.dart';
+
+import '../../../../config/router/routes.dart';
 
 class PostCard extends StatelessWidget {
   const PostCard({super.key, required this.post, this.isDetailView = false});
@@ -568,19 +570,22 @@ class PostCard extends StatelessWidget {
                       GestureDetector(
                         onTap: () {
                           if (isDetailView) return;
-                          CommentsPage.navigate(context: context, post: post);
+                          context.push(AppRoutes.comments, extra: post.id);
                         },
-                        child: SvgPicture.asset(
-                          'assets/icons/comment.svg',
-                          height: 22.h,
-                          width: 22.w,
+                        child: Row(
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/comment.svg',
+                              height: 22.h,
+                              width: 22.w,
+                            ),
+                            SizedBox(width: 4.w),
+                            Text(
+                              commentsCount.toString(),
+                              style: AppTextStyles.description,
+                            ),
+                          ],
                         ),
-                      ),
-                      SizedBox(width: 4.w),
-
-                      Text(
-                        commentsCount.toString(),
-                        style: AppTextStyles.description,
                       ),
 
                       const Spacer(),

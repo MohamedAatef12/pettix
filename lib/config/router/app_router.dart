@@ -26,6 +26,8 @@ import 'package:pettix/features/select_language/presentation/view/select_languag
 import 'package:pettix/features/side_menu/presentation/view/pages/side_menu_page.dart';
 import 'package:pettix/features/splash/persentation/view/splash_screen.dart';
 
+import '../../features/home/domain/entities/author_entity.dart';
+import '../../features/home/domain/entities/post_entity.dart';
 import 'routes.dart';
 
 GoRouter appRouter() => GoRouter(
@@ -161,21 +163,40 @@ GoRouter appRouter() => GoRouter(
       name: AppRouteNames.chatList,
       builder: (context, state) => const ChatListPage(),
     ),
-    // GoRoute(
-    //   path: AppRoutes.comments,
-    //   builder: (context, state) {
-    //     final postId = state.extra as int;
-    //
-    //     // ✅ نستخدم BlocProvider مستقل من DI أو نمرر الـ bloc الموجود من صفحة Home
-    //     return BlocProvider(
-    //       create: (_) => HomeBloc.fromDI()
-    //         ..add(
-    //           FetchPostsCommentsEvent(postId),
-    //         ),
-    //       child: CommentsPage(postId: postId),
-    //     );
-    //   },
-    // ),
+    GoRoute(
+      path: AppRoutes.comments,
+      builder: (context, state) {
+        final extra = state.extra;
+        final int postId = extra is int ? extra : int.tryParse(extra?.toString() ?? '') ?? 0;
+
+        return CommentsPage(
+          postId: postId.toString(),
+          post: PostEntity(
+            id: postId,
+            content: '',
+            creationDate: '',
+            author: const AuthorEntity(
+              id: 0,
+              nameAr: '',
+              nameEn: '',
+              avatar: '',
+              email: '',
+              phone: '',
+              genderId: 0,
+              genderName: '',
+              contactTypeId: 0,
+              statusId: 0,
+              age: 0,
+            ),
+            comments: const [],
+            likes: const [],
+            images: const [],
+            statusId: 0,
+            isSaved: false,
+          ),
+        );
+      },
+    ),
 
 
     GoRoute(
