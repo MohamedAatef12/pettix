@@ -242,11 +242,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           posts.map((post) async {
             postLikesMap[post.id] = post.likes.length;
 
-            final countResult = await getPostCommentsCountUseCase(post.id);
-            countResult.fold(
-              (_) => postCommentsMap[post.id] = post.comments.length,
-              (count) => postCommentsMap[post.id] = count,
-            );
+            postCommentsMap[post.id] = post.totalComments;
 
             if (currentUserId != null &&
                 post.likes.any((like) => like.author.id == currentUserId)) {
@@ -308,11 +304,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           newPosts.map((post) async {
             postLikesMap[post.id] = post.likes.length;
 
-            final countResult = await getPostCommentsCountUseCase(post.id);
-            countResult.fold(
-              (_) => postCommentsMap[post.id] = post.comments.length,
-              (count) => postCommentsMap[post.id] = count,
-            );
+            postCommentsMap[post.id] = post.totalComments;
 
             if (currentUserId != null &&
                 post.likes.any((like) => like.author.id == currentUserId)) {
@@ -639,7 +631,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         emit(state.copyWith(comments: finalComments, error: null));
 
         add(RefreshCommentsSilentlyEvent(event.comment.postId));
-        add(GetPostCommentsCountsEvent(event.comment.postId));
       },
     );
 
@@ -732,7 +723,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
         emit(state.copyWith(comments: updatedComments, error: null));
         add(RefreshCommentsSilentlyEvent(event.reply.postId));
-        add(GetPostCommentsCountsEvent(event.reply.postId));
       },
     );
     commentTextController.clear();

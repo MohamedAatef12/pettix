@@ -85,6 +85,11 @@ class TokenInterceptor extends Interceptor {
 
       _queue.clear();
     } catch (e) {
+      if (e is DioException) {
+        talker.error('Refresh API failed: ${e.response?.statusCode} - ${e.response?.data}');
+      } else {
+        talker.error('Refresh failed error: $e');
+      }
       talker.error('Refresh failed → logout');
 
       await cache.logout();
