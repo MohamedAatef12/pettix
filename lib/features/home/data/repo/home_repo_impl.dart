@@ -111,14 +111,6 @@ class HomeRepositoryImpl implements HomeDomainRepository {
         if (creatorId != null) {
           final currentUser = homeLocalDataSource.getUserData();
           final isReply = parentCommentId != null;
-          
-          notificationRemoteDataSource.sendNotification(
-            userId: creatorId,
-            sentBy: currentUser.id,
-            notificationTypeId: isReply ? 3 : 2, // 2 for comment, 3 for reply
-            title: isReply ? "New Reply! 💬" : "New Comment! 💬",
-            body: "${currentUser.userName} ${isReply ? 'replied to your comment' : 'commented on your post'}.",
-          );
         }
         return const Right(null);
       },
@@ -169,13 +161,6 @@ class HomeRepositoryImpl implements HomeDomainRepository {
       (success) {
         if (creatorId != null) {
           final currentUser = homeLocalDataSource.getUserData();
-          notificationRemoteDataSource.sendNotification(
-            userId: creatorId,
-            sentBy: currentUser.id,
-            notificationTypeId: 1, // 1 for Like
-            title: "New Like! ❤️",
-            body: "${currentUser.userName} liked your post.",
-          );
         }
         
         return Right(
@@ -259,13 +244,6 @@ class HomeRepositoryImpl implements HomeDomainRepository {
       (success) {
         if (creatorId != null) {
           final currentUser = homeLocalDataSource.getUserData();
-          notificationRemoteDataSource.sendNotification(
-            userId: creatorId,
-            sentBy: currentUser.id,
-            notificationTypeId: 1, // 1 for Like
-            title: "Comment Liked! ❤️",
-            body: "${currentUser.userName} liked your comment.",
-          );
         }
         
         return Right(

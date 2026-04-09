@@ -11,7 +11,7 @@ class NotificationService {
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   static final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
-  
+
   static late AndroidNotificationChannel channel;
 
   static Future<void> initialize() async {
@@ -32,7 +32,7 @@ class NotificationService {
     const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
     const DarwinInitializationSettings iosSettings = DarwinInitializationSettings();
-    
+
     const InitializationSettings initSettings = InitializationSettings(
       android: androidSettings,
       iOS: iosSettings,
@@ -55,7 +55,7 @@ class NotificationService {
 
     // 3. Create Android notification channel (Original ID)
     channel = const AndroidNotificationChannel(
-      'high_importance_channel', 
+      'high_importance_channel',
       'High Importance Notifications',
       description: 'Used for important notifications',
       importance: Importance.max,
@@ -87,9 +87,9 @@ class NotificationService {
 
   static void displayNotification(RemoteMessage message) {
     log('🔔 PREPARING TO DISPLAY: ${message.data}');
-    
+
     RemoteNotification? notification = message.notification;
-    
+
     final String title = notification?.title ?? message.data['title'] ?? 'Pettix';
     final String body = notification?.body ?? message.data['body'] ?? '';
 
@@ -144,23 +144,35 @@ class NotificationService {
   static void _handleNotificationClick(Map<String, dynamic> data) {
     log('🚀 HANDLING NOTIFICATION CLICK: $data');
 
-    // Root of notifications is the notifications page
-    router.push(AppRoutes.notifications);
-    
-    // If you want more specific navigation, you can add it here:
+    String? type = data['type'];
+    String? postId = data['postId'];
 
-    final String? type = data['type'];
-    final String? postId = data['postId'];
-    print('$postId');
-    
-    if (type == 'comment' || type == 'like') {
+    // Handle new Node.js metadata payload format (e.g., 'type=post&id=84')
+    if (data.containsKey('metadata')) {
+      try {
+        final String metadataStr = data['metadata'];
+        final Map<String, String> metadataMap = Uri.splitQueryString(metadataStr);
+        type = metadataMap['type'] ?? type;
+        postId = metadataMap['id'] ?? postId;
+      } catch (e) {
+        log('Error parsing metadata: $e');
+      }
+    }
+
+    log('Parsed Notification - Type: $type, PostId: $postId');
+
+    if (type == 'comment' || type == 'like' || type == 'post') {
       if (postId != null) {
         router.push('${AppRoutes.comments}/$postId');
+      } else {
+        router.push(AppRoutes.notifications);
       }
     } else if (type == 'chat') {
        router.push(AppRoutes.chatList);
+    } else {
+       // Default fallback
+       router.push(AppRoutes.notifications);
     }
-
   }
 
   @pragma('vm:entry-point')

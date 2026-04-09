@@ -16,15 +16,6 @@ abstract class NotificationRemoteDataSource {
 
   Future<NotificationResponse> markAsRead({required int id});
 
-  Future<NotificationResponse> sendNotification({
-    required int userId,
-    required String title,
-    required String body,
-    required int sentBy,
-    required int notificationTypeId,
-    String? fireBaseToken,
-    String? correlationId,
-  });
 }
 
 @LazySingleton(as: NotificationRemoteDataSource)
@@ -53,7 +44,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
       endPoint: Constants.notificationSearchEndpoint,
       queryParameters: queryParams,
       headers:
-          userToken != null ? {'Authorization': 'Bearer $userToken'} : null,
+      userToken != null ? {'Authorization': 'Bearer $userToken'} : null,
     );
 
     return NotificationResponse(
@@ -61,11 +52,11 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
       message: response.message,
       traceId: response.traceId,
       result:
-          response.result != null
-              ? NotificationResult.fromJson(
-                response.result as Map<String, dynamic>,
-              )
-              : null,
+      response.result != null
+          ? NotificationResult.fromJson(
+        response.result as Map<String, dynamic>,
+      )
+          : null,
     );
   }
 
@@ -79,7 +70,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
       endPoint: Constants.readAllNotificationsEndpoint,
       queryParameters: {'notificationTypeId': notificationTypeId},
       headers:
-          userToken != null ? {'Authorization': 'Bearer $userToken'} : null,
+      userToken != null ? {'Authorization': 'Bearer $userToken'} : null,
     );
 
     return NotificationResponse(
@@ -87,11 +78,11 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
       message: response.message,
       traceId: response.traceId,
       result:
-          response.result != null
-              ? NotificationResult.fromJson(
-                response.result as Map<String, dynamic>,
-              )
-              : null,
+      response.result != null
+          ? NotificationResult.fromJson(
+        response.result as Map<String, dynamic>,
+      )
+          : null,
     );
   }
 
@@ -105,7 +96,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
         id.toString(),
       ),
       headers:
-          userToken != null ? {'Authorization': 'Bearer $userToken'} : null,
+      userToken != null ? {'Authorization': 'Bearer $userToken'} : null,
     );
 
     return NotificationResponse(
@@ -113,46 +104,12 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
       message: response.message,
       traceId: response.traceId,
       result:
-          response.result != null
-              ? NotificationResult.fromJson(
-                response.result as Map<String, dynamic>,
-              )
-              : null,
-    );
-  }
-
-  @override
-  Future<NotificationResponse> sendNotification({
-    required int userId,
-    required String title,
-    required String body,
-    required int sentBy,
-    required int notificationTypeId,
-    String? fireBaseToken,
-    String? correlationId,
-  }) async {
-    final userToken = await DI.find<ICacheManager>().getToken();
-
-    final response = await _apiService.post(
-      endPoint: Constants.sendNotificationEndpoint,
-      data: {
-        "userId": userId,
-        "fireBaseToken": fireBaseToken ?? "",
-        "title": title,
-        "body": body,
-        "sentBy": sentBy,
-        "notificationTypeId": notificationTypeId,
-        "correlationId": correlationId ?? "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-      },
-      headers:
-          userToken != null ? {'Authorization': 'Bearer $userToken'} : null,
-    );
-
-    return NotificationResponse(
-      success: response.success,
-      message: response.message,
-      traceId: response.traceId,
-      result: null,
+      response.result != null
+          ? NotificationResult.fromJson(
+        response.result as Map<String, dynamic>,
+      )
+          : null,
     );
   }
 }
+
