@@ -20,7 +20,6 @@ class CommentsPage extends StatelessWidget {
 
   const CommentsPage({super.key, required this.post});
 
-  /// Navigate to the comments page from any context that has a HomeBloc.
   static void navigate({
     required BuildContext context,
     required PostEntity post,

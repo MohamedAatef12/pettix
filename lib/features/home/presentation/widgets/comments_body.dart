@@ -24,7 +24,6 @@ class CommentsBody extends StatelessWidget {
     this.scrollController,
     this.headerWidget,
   });
-
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<HomeBloc>();

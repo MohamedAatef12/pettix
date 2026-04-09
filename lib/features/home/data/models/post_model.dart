@@ -18,7 +18,8 @@ class PostModel extends PostEntity {
     super.modifyDate,
     required super.images,
     required super.statusId,
-    required super.isSaved
+    required super.isSaved,
+    required super.totalComments,
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) {
@@ -55,7 +56,8 @@ class PostModel extends PostEntity {
           .toList() ??
           [],
       statusId: json['statusId'],
-      isSaved: json['isSaved'] ,
+      isSaved: json['isSaved'],
+      totalComments: json['totalComments'] is int ? json['totalComments'] : int.tryParse(json['totalComments']?.toString() ?? '0') ?? 0,
     );
   }
 
@@ -105,7 +107,8 @@ class PostModel extends PostEntity {
       "content": content,
       "images": encodedImages,
       "statusId":statusId,
-    "isSaved": isSaved
+      "isSaved": isSaved,
+      "totalComments": totalComments,
     };
   }
   PostModel.fromEntity(PostEntity postEntity)
@@ -119,7 +122,8 @@ class PostModel extends PostEntity {
     modifyDate: postEntity.modifyDate,
     images: postEntity.images,
     statusId: postEntity.statusId,
-    isSaved:  postEntity.isSaved
+    isSaved:  postEntity.isSaved,
+    totalComments: postEntity.totalComments,
   );
 
   PostEntity toEntity() => PostEntity(
@@ -132,6 +136,7 @@ class PostModel extends PostEntity {
     modifyDate: modifyDate,
     images: images,
     statusId: statusId,
-    isSaved: isSaved
+    isSaved: isSaved,
+    totalComments: totalComments,
   );
 }

@@ -58,9 +58,12 @@ class PostCard extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        post.author.nameEn.toString(),
-                        style: AppTextStyles.bold,
+                      SizedBox(
+                        width: 180.w,
+                        child: Text(
+                          post.author.nameEn.toString(),
+                          style: AppTextStyles.bold,
+                        ),
                       ),
                       Text(
                         _formatCreationDate(post.creationDate),
@@ -529,7 +532,7 @@ class PostCard extends StatelessWidget {
                         prev.postCommentsCount != curr.postCommentsCount,
                 builder: (context, state) {
                   final homeBloc = context.read<HomeBloc>();
-                  final commentsCount = state.postCommentsCount[post.id] ?? 0;
+                  final commentsCount = state.postCommentsCount[post.id] ?? post.totalComments;
                   final isLiked = state.likedPostIds.contains(post.id);
                   final isSaved = state.savedPostIds.contains(post.id);
                   final likesCount =
