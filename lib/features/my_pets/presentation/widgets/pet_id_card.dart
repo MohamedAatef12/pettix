@@ -4,6 +4,8 @@ import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 import 'package:pettix/features/my_pets/presentation/widgets/pet_passport.dart';
 
+import '../../../../data/network/constants.dart';
+
 /// National-ID-style card displayed in the horizontal pet list on the profile.
 class PetIdCard extends StatelessWidget {
   final PetEntity pet;
@@ -22,13 +24,14 @@ class PetIdCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => showPetPassport(
-        context,
-        pet,
-        onToggleStatus: onToggleStatus,
-        onEditPet: onEditPet,
-        onDeletePet: onDeletePet,
-      ),
+      onTap:
+          () => showPetPassport(
+            context,
+            pet,
+            onToggleStatus: onToggleStatus,
+            onEditPet: onEditPet,
+            onDeletePet: onDeletePet,
+          ),
       child: Container(
         width: 220.w,
         height: 125.h,
@@ -36,10 +39,7 @@ class PetIdCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16.r),
           gradient: LinearGradient(
-            colors: [
-              AppColors.current.primary,
-              const Color(0xFF2A4E8F),
-            ],
+            colors: [AppColors.current.primary, const Color(0xFF2A4E8F)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -101,13 +101,14 @@ class _PetAvatar extends StatelessWidget {
         border: Border.all(color: Colors.white.withAlpha(100), width: 2),
       ),
       child: ClipOval(
-        child: imageUrl != null && imageUrl!.isNotEmpty
-            ? Image.network(
-                imageUrl!,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => _PawPlaceholder(),
-              )
-            : _PawPlaceholder(),
+        child:
+            imageUrl != null && imageUrl!.isNotEmpty
+                ? Image.network(
+                  '${Constants.baseUrl}/$imageUrl',
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => _PawPlaceholder(),
+                )
+                : _PawPlaceholder(),
       ),
     );
   }
@@ -117,7 +118,11 @@ class _PawPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Icon(Icons.pets_rounded, color: Colors.white.withAlpha(160), size: 28.w),
+      child: Icon(
+        Icons.pets_rounded,
+        color: Colors.white.withAlpha(160),
+        size: 28.w,
+      ),
     );
   }
 }
@@ -212,7 +217,11 @@ class _PetCardInfo extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.vaccines_rounded, color: Colors.white, size: 8.w),
+                    Icon(
+                      Icons.vaccines_rounded,
+                      color: Colors.white,
+                      size: 8.w,
+                    ),
                     SizedBox(width: 2.w),
                     Text(
                       '${pet.vaccinations.length}',
@@ -232,10 +241,11 @@ class _PetCardInfo extends StatelessWidget {
 class _StripePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withAlpha(10)
-      ..strokeWidth = 20
-      ..style = PaintingStyle.stroke;
+    final paint =
+        Paint()
+          ..color = Colors.white.withAlpha(10)
+          ..strokeWidth = 20
+          ..style = PaintingStyle.stroke;
 
     for (double i = -size.height; i < size.width + size.height; i += 30) {
       canvas.drawLine(

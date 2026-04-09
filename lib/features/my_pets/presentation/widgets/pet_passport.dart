@@ -7,6 +7,8 @@ import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 
+import '../../../../data/network/constants.dart';
+
 /// Opens the pet passport overlay.
 /// [onToggleStatus] is called when the owner taps the availability toggle.
 /// Pass null to hide the toggle (e.g., when viewing someone else's pet).
@@ -23,12 +25,13 @@ void showPetPassport(
     barrierLabel: 'Pet Passport',
     barrierColor: Colors.black.withAlpha(160),
     transitionDuration: const Duration(milliseconds: 300),
-    pageBuilder: (_, __, ___) => _PetPassportDialog(
-      pet: pet,
-      onToggleStatus: onToggleStatus,
-      onEditPet: onEditPet,
-      onDeletePet: onDeletePet,
-    ),
+    pageBuilder:
+        (_, __, ___) => _PetPassportDialog(
+          pet: pet,
+          onToggleStatus: onToggleStatus,
+          onEditPet: onEditPet,
+          onDeletePet: onDeletePet,
+        ),
     transitionBuilder: (_, animation, __, child) {
       final curved = CurvedAnimation(
         parent: animation,
@@ -71,9 +74,10 @@ class _PetPassportDialogState extends State<_PetPassportDialog>
       vsync: this,
       duration: const Duration(milliseconds: 450),
     );
-    _animation = Tween<double>(begin: 0, end: pi).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _animation = Tween<double>(
+      begin: 0,
+      end: pi,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -110,22 +114,20 @@ class _PetPassportDialogState extends State<_PetPassportDialog>
                   return Transform(
                     transform: Matrix4.rotationY(angle),
                     alignment: Alignment.center,
-                    child: isFrontVisible
-                        ? _PassportFront(
-                            pet: widget.pet,
-                            onFlip: _flip,
-                          )
-                        : Transform(
-                            transform: Matrix4.rotationY(pi),
-                            alignment: Alignment.center,
-                            child: _PassportBack(
-                              pet: widget.pet,
-                              onFlip: _flip,
-                              onToggleStatus: widget.onToggleStatus,
-                              onEditPet: widget.onEditPet,
-                              onDeletePet: widget.onDeletePet,
+                    child:
+                        isFrontVisible
+                            ? _PassportFront(pet: widget.pet, onFlip: _flip)
+                            : Transform(
+                              transform: Matrix4.rotationY(pi),
+                              alignment: Alignment.center,
+                              child: _PassportBack(
+                                pet: widget.pet,
+                                onFlip: _flip,
+                                onToggleStatus: widget.onToggleStatus,
+                                onEditPet: widget.onEditPet,
+                                onDeletePet: widget.onDeletePet,
+                              ),
                             ),
-                          ),
                   );
                 },
               ),
@@ -174,10 +176,7 @@ class _PassportFront extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20.r),
           gradient: LinearGradient(
-            colors: [
-              AppColors.current.primary,
-              const Color(0xFF1E3A6E),
-            ],
+            colors: [AppColors.current.primary, const Color(0xFF1E3A6E)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -211,7 +210,11 @@ class _PassportFrontHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.pets_rounded, color: AppColors.current.gold, size: 16.w),
+              Icon(
+                Icons.pets_rounded,
+                color: AppColors.current.gold,
+                size: 16.w,
+              ),
               SizedBox(width: 6.w),
               Text(
                 'PETTIX',
@@ -257,21 +260,19 @@ class _PassportFrontBody extends StatelessWidget {
             shape: BoxShape.circle,
             border: Border.all(color: AppColors.current.gold, width: 3),
             boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(60),
-                blurRadius: 20,
-              ),
+              BoxShadow(color: Colors.black.withAlpha(60), blurRadius: 20),
             ],
           ),
           child: ClipOval(
-            child: imageUrl != null && imageUrl.isNotEmpty
-                ? Image.network(
-                    imageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) =>
-                        _PhotoPlaceholder(size: 120.w),
-                  )
-                : _PhotoPlaceholder(size: 120.w),
+            child:
+                imageUrl != null && imageUrl.isNotEmpty
+                    ? Image.network(
+                      '${Constants.baseUrl}/$imageUrl',
+                      fit: BoxFit.cover,
+                      errorBuilder:
+                          (_, __, ___) => _PhotoPlaceholder(size: 120.w),
+                    )
+                    : _PhotoPlaceholder(size: 120.w),
           ),
         ),
         SizedBox(height: 16.h),
@@ -329,8 +330,11 @@ class _PassportFrontFooter extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.touch_app_rounded,
-                  color: Colors.white.withAlpha(120), size: 14.w),
+              Icon(
+                Icons.touch_app_rounded,
+                color: Colors.white.withAlpha(120),
+                size: 14.w,
+              ),
               SizedBox(width: 6.w),
               Text(
                 'Tap to see full details',
@@ -400,7 +404,10 @@ class _PassportBack extends StatelessWidget {
                     if (pet.description != null && pet.description!.isNotEmpty)
                       _InfoBlock(label: 'About', value: pet.description!),
                     if (pet.details != null && pet.details!.isNotEmpty)
-                      _InfoBlock(label: 'Health & Details', value: pet.details!),
+                      _InfoBlock(
+                        label: 'Health & Details',
+                        value: pet.details!,
+                      ),
                     if (pet.vaccinations.isNotEmpty) ...[
                       _BackSectionTitle('Medical Records'),
                       ...pet.vaccinations.map(
@@ -426,12 +433,22 @@ class _PassportBack extends StatelessWidget {
                                 child: Container(
                                   padding: EdgeInsets.symmetric(vertical: 12.h),
                                   decoration: BoxDecoration(
-                                    color: AppColors.current.primary.withAlpha(20),
+                                    color: AppColors.current.primary.withAlpha(
+                                      20,
+                                    ),
                                     borderRadius: BorderRadius.circular(12.r),
-                                    border: Border.all(color: AppColors.current.primary.withAlpha(80), width: 1),
+                                    border: Border.all(
+                                      color: AppColors.current.primary
+                                          .withAlpha(80),
+                                      width: 1,
+                                    ),
                                   ),
                                   alignment: Alignment.center,
-                                  child: Icon(Icons.edit_rounded, color: AppColors.current.primary, size: 20.w),
+                                  child: Icon(
+                                    Icons.edit_rounded,
+                                    color: AppColors.current.primary,
+                                    size: 20.w,
+                                  ),
                                 ),
                               ),
                             ),
@@ -446,10 +463,19 @@ class _PassportBack extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     color: AppColors.current.red.withAlpha(20),
                                     borderRadius: BorderRadius.circular(12.r),
-                                    border: Border.all(color: AppColors.current.red.withAlpha(80), width: 1),
+                                    border: Border.all(
+                                      color: AppColors.current.red.withAlpha(
+                                        80,
+                                      ),
+                                      width: 1,
+                                    ),
                                   ),
                                   alignment: Alignment.center,
-                                  child: Icon(Icons.delete_rounded, color: AppColors.current.red, size: 20.w),
+                                  child: Icon(
+                                    Icons.delete_rounded,
+                                    color: AppColors.current.red,
+                                    size: 20.w,
+                                  ),
                                 ),
                               ),
                             ),
@@ -494,14 +520,15 @@ class _BackHeader extends StatelessWidget {
               border: Border.all(color: Colors.white.withAlpha(100), width: 2),
             ),
             child: ClipOval(
-              child: pet.imageUrls.firstOrNull != null
-                  ? Image.network(
-                      pet.imageUrls.first,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
-                          _PhotoPlaceholder(size: 36.w),
-                    )
-                  : _PhotoPlaceholder(size: 36.w),
+              child:
+                  pet.imageUrls.firstOrNull != null
+                      ? Image.network(
+                        pet.imageUrls.first,
+                        fit: BoxFit.cover,
+                        errorBuilder:
+                            (_, __, ___) => _PhotoPlaceholder(size: 36.w),
+                      )
+                      : _PhotoPlaceholder(size: 36.w),
             ),
           ),
           SizedBox(width: 10.w),
@@ -642,9 +669,10 @@ class _VaccinationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final date = vaccination.vaccinationDate;
-    final dateLabel = date != null
-        ? '${date.day}/${date.month}/${date.year}'
-        : 'Date unknown';
+    final dateLabel =
+        date != null
+            ? '${date.day}/${date.month}/${date.year}'
+            : 'Date unknown';
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 4.h),
@@ -698,7 +726,10 @@ class _StatusToggleButton extends StatefulWidget {
   final int? adoptionStatus;
   final ValueChanged<int> onToggle;
 
-  const _StatusToggleButton({required this.adoptionStatus, required this.onToggle});
+  const _StatusToggleButton({
+    required this.adoptionStatus,
+    required this.onToggle,
+  });
 
   @override
   State<_StatusToggleButton> createState() => _StatusToggleButtonState();
@@ -726,7 +757,8 @@ class _StatusToggleButtonState extends State<_StatusToggleButton> {
     final isAvailable = currentStatus == 1;
 
     final color = isAvailable ? AppColors.current.red : AppColors.current.green;
-    final icon = isAvailable ? Icons.visibility_off_rounded : Icons.pets_rounded;
+    final icon =
+        isAvailable ? Icons.visibility_off_rounded : Icons.pets_rounded;
     final label = isAvailable ? 'Make Private' : 'Make Available for Adoption';
 
     return GestureDetector(
@@ -745,12 +777,12 @@ class _StatusToggleButtonState extends State<_StatusToggleButton> {
             Icon(icon, color: color, size: 16.w),
             SizedBox(width: 8.w),
             Text(
-               label,
-               style: TextStyle(
-                 color: color,
-                 fontSize: 12.sp,
-                 fontWeight: FontWeight.w700,
-               ),
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ],
         ),
@@ -771,7 +803,11 @@ class _PhotoPlaceholder extends StatelessWidget {
       width: size,
       height: size,
       color: Colors.white.withAlpha(20),
-      child: Icon(Icons.pets_rounded, color: Colors.white.withAlpha(120), size: size * 0.4),
+      child: Icon(
+        Icons.pets_rounded,
+        color: Colors.white.withAlpha(120),
+        size: size * 0.4,
+      ),
     );
   }
 }

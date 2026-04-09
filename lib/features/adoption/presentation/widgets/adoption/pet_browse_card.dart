@@ -17,9 +17,7 @@ class PetBrowseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final imageUrl = pet.imageUrls.firstOrNull;
-    final fullUrl = imageUrl != null && imageUrl.isNotEmpty
-        ? '${Constants.baseUrl}/$imageUrl'
-        : null;
+    final fullUrl = imageUrl != null && imageUrl.isNotEmpty ? imageUrl : null;
 
     return Container(
       decoration: BoxDecoration(
@@ -42,16 +40,17 @@ class PetBrowseCard extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(20.r)),
-                  child: fullUrl != null
-                      ? Image.network(
-                          fullUrl,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) =>
-                              _PhotoPlaceholder(),
-                        )
-                      : _PhotoPlaceholder(),
+                    top: Radius.circular(20.r),
+                  ),
+                  child:
+                      fullUrl != null
+                          ? Image.network(
+                            fullUrl,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => _PhotoPlaceholder(),
+                          )
+                          : _PhotoPlaceholder(),
                 ),
                 // Gender badge
                 if (pet.genderName != null)
@@ -83,8 +82,11 @@ class PetBrowseCard extends StatelessWidget {
                 Row(
                   children: [
                     if (pet.categoryName != null) ...[
-                      Icon(Icons.pets_rounded,
-                          color: AppColors.current.primary, size: 11.w),
+                      Icon(
+                        Icons.pets_rounded,
+                        color: AppColors.current.primary,
+                        size: 11.w,
+                      ),
                       SizedBox(width: 3.w),
                       Flexible(
                         child: Text(
@@ -128,7 +130,9 @@ class PetBrowseCard extends StatelessWidget {
                     child: Text(
                       'View Profile',
                       style: TextStyle(
-                          fontSize: 11.sp, fontWeight: FontWeight.w700),
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ),
@@ -148,8 +152,11 @@ class _PhotoPlaceholder extends StatelessWidget {
     return Container(
       color: AppColors.current.lightBlue,
       child: Center(
-        child: Icon(Icons.pets_rounded,
-            color: AppColors.current.primary.withAlpha(80), size: 48.w),
+        child: Icon(
+          Icons.pets_rounded,
+          color: AppColors.current.primary.withAlpha(80),
+          size: 48.w,
+        ),
       ),
     );
   }
@@ -171,9 +178,7 @@ class _GenderBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(20.r),
-        boxShadow: [
-          BoxShadow(color: color.withAlpha(80), blurRadius: 6),
-        ],
+        boxShadow: [BoxShadow(color: color.withAlpha(80), blurRadius: 6)],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
