@@ -17,6 +17,9 @@ import 'package:pettix/data/network/constants.dart';
 import 'package:pettix/features/home/domain/entities/post_entity.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
+import 'package:pettix/features/home/presentation/pages/comments_page.dart';
+import 'package:pettix/features/home/presentation/pages/comments_page.dart';
+import 'package:pettix/main/my_app.dart';
 
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:pettix/features/home/presentation/blocs/home_state.dart';
@@ -573,7 +576,7 @@ class PostCard extends StatelessWidget {
                       GestureDetector(
                         onTap: () {
                           if (isDetailView) return;
-                          context.push(AppRoutes.comments, extra: post.id);
+                          router.push(AppRoutes.comments, extra: post);
                         },
                         child: Row(
                           children: [

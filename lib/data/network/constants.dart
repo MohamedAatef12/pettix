@@ -1,6 +1,6 @@
 class Constants {
   // static const String baseUrl = 'https://pettix-production.up.railway.app';
-  static const String baseUrl = 'https://f187-81-10-3-82.ngrok-free.app';
+  static const String baseUrl = 'https://5484-81-10-3-82.ngrok-free.app';
   static const commentsEndpoint = '/api/Timeline/Comments/param';
   static const addCommentEndpoint = '/api/Timeline/Comments/post';
   static const commentLikesEndpoint = '/api/Timeline/CommentLikes/comment';
@@ -9,6 +9,7 @@ class Constants {
   static const postCommentsCount = '/api/Timeline/Comments/post';
   static const postsEndpoint = '/api/Timeline/Posts/paged';
   static const addPostsEndpoint = '/api/Timeline/Posts';
+  static const getPostByIdEndpoint = '/api/Timeline/Posts';
   static const postLikesEndpoint = '/api/Timeline/PostLikes';
   static const postUnLikesEndpoint = '/api/Timeline/PostLikes';
   static const likeCommentEndpoint = '/api/Timeline/CommentLikes';

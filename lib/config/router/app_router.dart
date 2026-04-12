@@ -167,6 +167,12 @@ GoRouter appRouter() => GoRouter(
       path: AppRoutes.comments,
       builder: (context, state) {
         final extra = state.extra;
+        if (extra is PostEntity) {
+          return CommentsPage(
+            postId: extra.id.toString(),
+            post: extra,
+          );
+        }
         final int postId = extra is int ? extra : int.tryParse(extra?.toString() ?? '') ?? 0;
 
         return CommentsPage(

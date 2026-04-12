@@ -54,6 +54,15 @@ class HomeRepositoryImpl implements HomeDomainRepository {
   }
 
   @override
+  Future<Either<Failure, PostEntity>> getPostById(int id) async {
+    final result = await remoteDataSource.getPostById(id);
+    return result.fold(
+      (failure) => Left(failure),
+      (model) => Right(model.toEntity()),
+    );
+  }
+
+  @override
   Future<Either<Failure, void>> addPost(PostEntity post) async {
     final postModel = PostModel.fromEntity(post);
     return remoteDataSource.addPost(postModel);

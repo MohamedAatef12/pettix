@@ -37,7 +37,16 @@ class CommentsBody extends StatelessWidget {
               prev.likedCommentId != curr.likedCommentId,
       builder: (context, state) {
         if (state.isCommentsLoading) {
-          return CommentsShimmer(hasHeader: headerWidget != null);
+          return CustomScrollView(
+            controller: scrollController,
+            slivers: [
+              if (headerWidget != null)
+                SliverToBoxAdapter(child: headerWidget!),
+              SliverToBoxAdapter(
+                child: CommentsShimmer(hasHeader: false),
+              ),
+            ],
+          );
         }
 
         if (state.error != null && state.comments.isEmpty) {

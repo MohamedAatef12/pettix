@@ -50,6 +50,7 @@ import '../../features/home/domain/usecases/delete_post.dart' as _i354;
 import '../../features/home/domain/usecases/dislike_post.dart' as _i1036;
 import '../../features/home/domain/usecases/get_comment_likes.dart' as _i229;
 import '../../features/home/domain/usecases/get_comments_id.dart' as _i604;
+import '../../features/home/domain/usecases/get_post_by_id.dart' as _i174;
 import '../../features/home/domain/usecases/get_post_comments_count.dart'
     as _i38;
 import '../../features/home/domain/usecases/get_posts.dart' as _i1026;
@@ -193,6 +194,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i947.GetPostLikesUseCase>(
       () => _i947.GetPostLikesUseCase(gh<_i986.HomeDomainRepository>()),
+    );
+    gh.factory<_i174.GetPostByIdUseCase>(
+      () => _i174.GetPostByIdUseCase(gh<_i986.HomeDomainRepository>()),
     );
     gh.factory<_i38.GetPostCommentsCountsUseCase>(
       () => _i38.GetPostCommentsCountsUseCase(gh<_i986.HomeDomainRepository>()),

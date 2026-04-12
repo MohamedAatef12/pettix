@@ -5,6 +5,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
+import 'package:pettix/features/home/domain/entities/post_entity.dart';
+import 'package:pettix/features/home/domain/usecases/get_post_by_id.dart';
 import 'package:pettix/main/my_app.dart';
 
 class NotificationService {
@@ -13,6 +15,10 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   static late AndroidNotificationChannel channel;
+
+  /// Stores notification data when the app was launched from a terminated state.
+  /// Navigation is deferred until the app (router + auth) is fully ready.
+  static Map<String, dynamic>? _pendingNotificationData;
 
   static Future<void> initialize() async {
     // 1. Request permission
@@ -42,13 +48,13 @@ class NotificationService {
     await _localNotifications.initialize(
       settings: initSettings,
 
-      onDidReceiveNotificationResponse: (details) {
+      onDidReceiveNotificationResponse: (details) async {
 
         log('Notification clicked: ${details.payload}');
         if (details.payload != null) {
           try {
             final Map<String, dynamic> data = jsonDecode(details.payload!);
-            _handleNotificationClick(data);
+            await _handleNotificationClick(data);
           } catch (e) {
             log('Error parsing notification payload: $e');
           }
@@ -131,20 +137,33 @@ class NotificationService {
       await DI.find<ICacheManager>().setFcmToken(token);
     });
 
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
       log('🟣 Notification tapped (App in background)');
-      _handleNotificationClick(message.data);
+      await _handleNotificationClick(message.data);
     });
 
     _messaging.getInitialMessage().then((RemoteMessage? message) {
       if (message != null) {
-        log('🔴 Notification tapped (App was terminated)');
-        _handleNotificationClick(message.data);
+        log('🔴 Notification tapped (App was terminated) — storing pending navigation');
+        // Do NOT navigate here: the router doesn't exist yet.
+        // SplashScreen will call consumePendingNavigation() once the app is ready.
+        _pendingNotificationData = message.data;
       }
     });
   }
 
-  static void _handleNotificationClick(Map<String, dynamic> data) {
+  /// Call this from the Splash screen after navigating to the home screen.
+  /// It processes any notification tap that opened the app from a terminated state.
+  static Future<void> consumePendingNavigation() async {
+    if (_pendingNotificationData != null) {
+      final data = _pendingNotificationData!;
+      _pendingNotificationData = null;
+      log('🔴 Processing pending terminated-state notification navigation');
+      await _handleNotificationClick(data);
+    }
+  }
+
+  static Future<void> _handleNotificationClick(Map<String, dynamic> data) async {
     log('🚀 HANDLING NOTIFICATION CLICK: $data');
 
     String? type = data['type'];
@@ -166,15 +185,28 @@ class NotificationService {
 
     if (type == 'comment' || type == 'like' || type == 'post') {
       if (postId != null) {
-        router.push(AppRoutes.comments, extra: int.tryParse(postId ?? '') ?? 0);
+        final int parsedId = int.tryParse(postId) ?? 0;
+        PostEntity? post;
+
+        try {
+          final result = await DI.find<GetPostByIdUseCase>().call(parsedId);
+          result.fold(
+            (failure) => log('❌ Failed to fetch post: ${failure.message}'),
+            (fetchedPost) => post = fetchedPost,
+          );
+        } catch (e) {
+          log('❌ Error fetching post by id: $e');
+        }
+
+        router.push(AppRoutes.comments, extra: post ?? parsedId);
       } else {
         router.push(AppRoutes.notifications);
       }
     } else if (type == 'chat') {
-       router.push(AppRoutes.chatList);
+      router.push(AppRoutes.chatList);
     } else {
-       // Default fallback
-       router.push(AppRoutes.notifications);
+      // Default fallback
+      router.push(AppRoutes.notifications);
     }
   }
 
