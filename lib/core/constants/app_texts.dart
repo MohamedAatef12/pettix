@@ -157,7 +157,6 @@ abstract class AppText {
   static String get myAddresses => 'My Addresses'.tr();
   static String get paymentMethods => 'Payment Methods'.tr();
   static String get refundsReturns => 'Refunds & Returns'.tr();
-  static String get emergency => 'Emergency'.tr();
   static String get emergencyReports => 'My Emergency Reports'.tr();
   static String get helpSupport => 'Help & Support'.tr();
   static String get legal => 'Legal'.tr();
