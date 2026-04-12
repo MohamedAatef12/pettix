@@ -18,8 +18,13 @@ import 'package:pettix/features/home/domain/entities/post_entity.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 import 'package:pettix/features/home/presentation/pages/comments_page.dart';
+import 'package:pettix/features/home/presentation/pages/comments_page.dart';
+import 'package:pettix/main/my_app.dart';
+
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:pettix/features/home/presentation/blocs/home_state.dart';
+
+import '../../../../config/router/routes.dart';
 
 class PostCard extends StatelessWidget {
   const PostCard({super.key, required this.post, this.isDetailView = false});
@@ -58,9 +63,12 @@ class PostCard extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        post.author.nameEn.toString(),
-                        style: AppTextStyles.bold,
+                      SizedBox(
+                        width: 180.w,
+                        child: Text(
+                          post.author.nameEn.toString(),
+                          style: AppTextStyles.bold,
+                        ),
                       ),
                       Text(
                         _formatCreationDate(post.creationDate),
@@ -529,7 +537,7 @@ class PostCard extends StatelessWidget {
                         prev.postCommentsCount != curr.postCommentsCount,
                 builder: (context, state) {
                   final homeBloc = context.read<HomeBloc>();
-                  final commentsCount = state.postCommentsCount[post.id] ?? 0;
+                  final commentsCount = state.postCommentsCount[post.id] ?? post.totalComments;
                   final isLiked = state.likedPostIds.contains(post.id);
                   final isSaved = state.savedPostIds.contains(post.id);
                   final likesCount =
@@ -568,19 +576,22 @@ class PostCard extends StatelessWidget {
                       GestureDetector(
                         onTap: () {
                           if (isDetailView) return;
-                          CommentsPage.navigate(context: context, post: post);
+                          router.push(AppRoutes.comments, extra: post);
                         },
-                        child: SvgPicture.asset(
-                          'assets/icons/comment.svg',
-                          height: 22.h,
-                          width: 22.w,
+                        child: Row(
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/comment.svg',
+                              height: 22.h,
+                              width: 22.w,
+                            ),
+                            SizedBox(width: 4.w),
+                            Text(
+                              commentsCount.toString(),
+                              style: AppTextStyles.description,
+                            ),
+                          ],
                         ),
-                      ),
-                      SizedBox(width: 4.w),
-
-                      Text(
-                        commentsCount.toString(),
-                        style: AppTextStyles.description,
                       ),
 
                       const Spacer(),

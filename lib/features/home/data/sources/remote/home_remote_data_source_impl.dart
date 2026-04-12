@@ -48,6 +48,27 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   }
 
   @override
+  Future<Either<Failure, PostModel>> getPostById(int id) async {
+    final userToken = await DI.find<ICacheManager>().getToken();
+    if (userToken == null) return Left(Failure("User is not authenticated"));
+    try {
+      final response = await apiService.get(
+        endPoint: '${Constants.getPostByIdEndpoint}/$id',
+        headers: {'Authorization': 'Bearer $userToken'},
+      );
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
+
+      final resultData = response.result as Map<String, dynamic>? ?? {};
+      return Right(PostModel.fromJson(resultData));
+    } catch (e) {
+      log('Error fetching post: $e');
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
+
+  @override
   Future<Either<Failure, void>> editPost(PostModel post) async {
     final userToken = await DI.find<ICacheManager>().getToken();
     if (userToken == null) return Left(Failure("User is not authenticated"));

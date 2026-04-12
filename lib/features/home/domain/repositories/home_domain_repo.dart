@@ -16,6 +16,7 @@ import 'package:pettix/features/home/domain/entities/paginated_posts.dart';
 abstract class HomeDomainRepository {
   // Posts
   Future<Either<Failure, PaginatedPosts>> getPosts({int pageIndex = 1, int pageSize = 10});
+  Future<Either<Failure, PostEntity>> getPostById(int id);
   Future<Either<Failure, void>> addPost(PostEntity post);
   Future<Either<Failure, void>> deletePost(int id);
   Future<Either<Failure, void>> editPost(PostEntity post);

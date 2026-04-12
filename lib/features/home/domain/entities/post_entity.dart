@@ -15,6 +15,7 @@ class PostEntity extends Equatable {
   final List<String> images;
   final int statusId;
   final bool isSaved;
+  final int totalComments;
   const PostEntity({
     required this.id,
     required this.content,
@@ -25,7 +26,8 @@ class PostEntity extends Equatable {
     required this.likes,
     required this.images,
     required this.statusId,
-    required this.isSaved
+    required this.isSaved,
+    this.totalComments = 0,
   });
 
   @override
@@ -39,6 +41,7 @@ class PostEntity extends Equatable {
     likes,
     images,
     statusId,
-    isSaved
+    isSaved,
+    totalComments,
   ];
 }

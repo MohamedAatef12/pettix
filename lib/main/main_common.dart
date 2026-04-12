@@ -21,6 +21,11 @@ Future<void> mainCommon(AppConfig config) async {
   
   // Set background message handler
   FirebaseMessaging.onBackgroundMessage(NotificationService.onBackgroundMessage);
+  FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
   
   await SharedPrefsHelper.init();
   // Initialize dependency injection

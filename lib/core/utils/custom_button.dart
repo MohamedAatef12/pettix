@@ -3,7 +3,7 @@ import 'package:pettix/core/themes/app_colors.dart';
 
 class CustomFilledButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final double? widthFactor;
   final double? heightFactor;
   final double borderRadius;

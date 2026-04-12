@@ -25,8 +25,8 @@ class _CommentsShimmerState extends State<CommentsShimmer>
       duration: const Duration(milliseconds: 1200),
     )..repeat(reverse: true);
     _animation = Tween<double>(
-      begin: 0.3,
-      end: 0.8,
+      begin: 0.4,
+      end: 0.7,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
@@ -49,11 +49,10 @@ class _CommentsShimmerState extends State<CommentsShimmer>
           width: width,
           height: height,
           decoration: BoxDecoration(
-            color: AppColors.current.lightGray.withOpacity(_animation.value),
-            borderRadius:
-                shape == BoxShape.rectangle
-                    ? BorderRadius.circular(borderRadius ?? 8.r)
-                    : null,
+            color: AppColors.current.lightGray,
+            borderRadius: shape == BoxShape.rectangle
+                ? BorderRadius.circular(borderRadius ?? 8.r)
+                : null,
             shape: shape,
           ),
         );
@@ -73,7 +72,6 @@ class _CommentsShimmerState extends State<CommentsShimmer>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Author row
           Row(
             children: [
               _shimmerBox(width: 54.r, height: 54.r, shape: BoxShape.circle),
@@ -89,24 +87,14 @@ class _CommentsShimmerState extends State<CommentsShimmer>
             ],
           ),
           SizedBox(height: 14.h),
-
-          // Content lines
           _shimmerBox(width: 260.w, height: 10.h, borderRadius: 6.r),
           SizedBox(height: 6.h),
           _shimmerBox(width: 200.w, height: 10.h, borderRadius: 6.r),
           SizedBox(height: 6.h),
           _shimmerBox(width: 240.w, height: 10.h, borderRadius: 6.r),
           SizedBox(height: 14.h),
-
-          // Image placeholder
-          _shimmerBox(
-            width: double.infinity,
-            height: 180.h,
-            borderRadius: 15.r,
-          ),
+          _shimmerBox(width: double.infinity, height: 180.h, borderRadius: 15.r),
           SizedBox(height: 14.h),
-
-          // Action row
           Row(
             children: [
               _shimmerBox(width: 24.w, height: 24.h, borderRadius: 4.r),
@@ -118,8 +106,6 @@ class _CommentsShimmerState extends State<CommentsShimmer>
               _shimmerBox(width: 20.w, height: 10.h, borderRadius: 4.r),
               const Spacer(),
               _shimmerBox(width: 24.w, height: 24.h, borderRadius: 4.r),
-              SizedBox(width: 10.w),
-              _shimmerBox(width: 24.w, height: 24.h, borderRadius: 4.r),
             ],
           ),
         ],
@@ -127,67 +113,52 @@ class _CommentsShimmerState extends State<CommentsShimmer>
     );
   }
 
-  Widget _buildCommentShimmer({bool isReply = false}) {
-    final avatarRadius = isReply ? 18.r : 26.r;
-    return Padding(
-      padding: EdgeInsets.only(left: isReply ? 50.w : 0, bottom: 16.h),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _shimmerBox(
-            width: avatarRadius * 2,
-            height: avatarRadius * 2,
-            shape: BoxShape.circle,
+  Widget _buildCommentShimmer() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _shimmerBox(width: 40.r, height: 40.r, shape: BoxShape.circle),
+        SizedBox(width: 10.w),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _shimmerBox(width: 110.w, height: 11.h, borderRadius: 6.r),
+              SizedBox(height: 7.h),
+              _shimmerBox(width: double.infinity, height: 11.h, borderRadius: 6.r),
+              SizedBox(height: 7.h),
+              _shimmerBox(width: 180.w, height: 11.h, borderRadius: 6.r),
+              SizedBox(height: 10.h),
+              Row(
+                children: [
+                  _shimmerBox(width: 40.w, height: 9.h, borderRadius: 4.r),
+                  SizedBox(width: 16.w),
+                  _shimmerBox(width: 55.w, height: 9.h, borderRadius: 4.r),
+                  SizedBox(width: 16.w),
+                  _shimmerBox(width: 45.w, height: 9.h, borderRadius: 4.r),
+                ],
+              ),
+            ],
           ),
-          SizedBox(width: 10.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _shimmerBox(width: 100.w, height: 10.h, borderRadius: 6.r),
-                SizedBox(height: 6.h),
-                _shimmerBox(width: 200.w, height: 10.h, borderRadius: 6.r),
-                SizedBox(height: 6.h),
-                _shimmerBox(width: 160.w, height: 10.h, borderRadius: 6.r),
-                SizedBox(height: 8.h),
-                Row(
-                  children: [
-                    _shimmerBox(width: 40.w, height: 8.h, borderRadius: 4.r),
-                    SizedBox(width: 16.w),
-                    _shimmerBox(width: 50.w, height: 8.h, borderRadius: 4.r),
-                    SizedBox(width: 16.w),
-                    _shimmerBox(width: 40.w, height: 8.h, borderRadius: 4.r),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          _shimmerBox(width: 20.w, height: 20.h, borderRadius: 4.r),
-        ],
-      ),
+        ),
+        SizedBox(width: 10.w),
+        _shimmerBox(width: 22.w, height: 22.h, shape: BoxShape.circle),
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    return ListView.separated(
+      shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-      children: [
-        // Post card shimmer (only when used as full page)
-        if (widget.hasHeader) ...[
-          _buildPostCardShimmer(),
-          SizedBox(height: 16.h),
-        ],
-
-        // Comment items shimmer
-        _buildCommentShimmer(),
-        _buildCommentShimmer(isReply: true),
-        _buildCommentShimmer(),
-        _buildCommentShimmer(),
-        _buildCommentShimmer(isReply: true),
-        _buildCommentShimmer(),
-      ],
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      separatorBuilder: (_, __) => SizedBox(height: 20.h),
+      itemCount: widget.hasHeader ? 7 : 6,
+      itemBuilder: (context, index) {
+        if (widget.hasHeader && index == 0) return _buildPostCardShimmer();
+        return _buildCommentShimmer();
+      },
     );
   }
 }

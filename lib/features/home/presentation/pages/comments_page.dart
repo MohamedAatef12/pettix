@@ -15,29 +15,22 @@ import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/features/home/presentation/widgets/comments_body.dart';
 import 'package:pettix/features/home/presentation/widgets/post_card.dart';
 
-class CommentsPage extends StatelessWidget {
+class CommentsPage extends StatefulWidget {
   final PostEntity post;
+  final String? postId;
 
-  const CommentsPage({super.key, required this.post});
+  const CommentsPage({super.key, required this.post, this.postId});
 
-  /// Navigate to the comments page from any context that has a HomeBloc.
-  static void navigate({
-    required BuildContext context,
-    required PostEntity post,
-  }) {
-    final homeBloc = context.read<HomeBloc>();
-    homeBloc.add(FetchPostsCommentsEvent(post.id));
-    homeBloc.add(SetReplyingToEvent(null));
+  @override
+  State<CommentsPage> createState() => _CommentsPageState();
+}
 
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder:
-            (_) => BlocProvider.value(
-              value: homeBloc,
-              child: CommentsPage(post: post),
-            ),
-      ),
-    );
+class _CommentsPageState extends State<CommentsPage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<HomeBloc>().add(FetchPostsCommentsEvent(widget.post.id));
+    context.read<HomeBloc>().add(SetReplyingToEvent(null));
   }
 
   @override
@@ -80,10 +73,10 @@ class CommentsPage extends StatelessWidget {
           // Scrollable area: PostCard + Comments
           Expanded(
             child: CommentsBody(
-              postId: post.id,
+              postId: widget.post.id,
               headerWidget: Padding(
                 padding: EdgeInsets.only(bottom: 8.h, top: 4.h),
-                child: PostCard(post: post, isDetailView: true),
+                child: PostCard(post: widget.post, isDetailView: true),
               ),
             ),
           ),
@@ -250,14 +243,18 @@ class CommentsPage extends StatelessWidget {
             age: userData.age,
           ),
           creationDate: DateTime.now().toIso8601String(),
-          postId: post.id,
+          postId: widget.post.id,
           parentCommentId: replyingTo?.id,
           replies: [],
           likes: [],
           status: 1,
         );
 
-        bloc.add(AddCommentEvent(comment, creatorId: replyingTo?.author.id ?? post.author.id));
+        bloc.add(AddCommentEvent(
+          comment,
+          creatorId: replyingTo?.author.id ?? widget.post.author.id,
+          initialCount: bloc.state.postCommentsCount[widget.post.id] ?? widget.post.totalComments,
+        ));
         bloc.commentTextController.clear();
         bloc.add(SetReplyingToEvent(null));
       },

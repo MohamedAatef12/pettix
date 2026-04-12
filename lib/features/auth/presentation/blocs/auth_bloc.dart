@@ -108,7 +108,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   /// Handle Register
   Future<void> _registerStepOne(
-      RegisterStepOneSubmitted event, Emitter<AuthState> emit) async {
+    RegisterStepOneSubmitted event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(RegisterLoading());
 
     _tempRegisterData = RegisterEntity(
@@ -130,10 +132,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(RegisterStepOneSuccess());
   }
 
-
-// Step 2: Confirm Password
+  // Step 2: Confirm Password
   Future<void> _registerStepTwo(
-      RegisterStepTwoSubmitted event, Emitter<AuthState> emit) async {
+    RegisterStepTwoSubmitted event,
+    Emitter<AuthState> emit,
+  ) async {
     if (_tempRegisterData == null) {
       emit(RegisterFailure("Step one not completed"));
       return;
@@ -144,24 +147,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       return;
     }
 
-    _tempRegisterData = _tempRegisterData!.copyWith(
-      password: event.password,
-    );
-    
+    _tempRegisterData = _tempRegisterData!.copyWith(password: event.password);
+
     emit(RegisterLoading());
-    
+
     // Call the register endpoint to send the OTP to the user's email
     final result = await registerUseCase(_tempRegisterData!);
 
     result.fold(
-          (failure) => emit(RegisterFailure(failure.message)),
-          (_) => emit(RegisterStepTwoSuccess()),
+      (failure) => emit(RegisterFailure(failure.message)),
+      (_) => emit(RegisterStepTwoSuccess()),
     );
   }
 
-// Step 3: OTP
+  // Step 3: OTP
   Future<void> _registerOtp(
-      RegisterOtpSubmitted event, Emitter<AuthState> emit) async {
+    RegisterOtpSubmitted event,
+    Emitter<AuthState> emit,
+  ) async {
     // Support both the registration flow (_tempRegisterData) and the
     // login "activate email" flow (_pendingEmail set by ResendOtpEvent).
     final email = _tempRegisterData?.email ?? _pendingEmail;
@@ -174,22 +177,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     final verified = await verifyOtp(email, event.otp);
 
-    verified.fold(
-          (failure) => emit(RegisterFailure(failure.message)),
-          (_) {
-            if (_tempRegisterData != null) {
-              _tempRegisterData = _tempRegisterData!.copyWith(otp: event.otp);
-            }
-            _pendingEmail = null; // clear after successful verification
-            emit(RegisterOtpSuccess());
-          },
-    );
+    verified.fold((failure) => emit(RegisterFailure(failure.message)), (_) {
+      if (_tempRegisterData != null) {
+        _tempRegisterData = _tempRegisterData!.copyWith(otp: event.otp);
+      }
+      _pendingEmail = null; // clear after successful verification
+      emit(RegisterOtpSuccess());
+    });
   }
 
-Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) async {
+  Future<void> _loginSubmitted(
+    LoginSubmitted event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(LoginLoading());
 
-    final result = await loginUseCase(event.model);
+    final fcmToken = await DI.find<ICacheManager>().getFcmToken();
+    print('🚀 FCM TOKEN FOR LOGIN: $fcmToken');
+    final result = await loginUseCase(event.model.copyWith(fcmToken: fcmToken));
     await result.fold(
           (failure) async {
             debugPrint('failure message: ${failure.message}');
@@ -198,12 +203,14 @@ Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) asyn
         await DI.find<ICacheManager>()
             .setUserData(UserModel.fromEntity(loginResponse.contact));
         await DI.find<ICacheManager>().setToken(loginResponse.token);
-        await DI.find<ICacheManager>().setRefreshToken(loginResponse.refreshToken.toString());
+        await DI.find<ICacheManager>().setRefreshToken(
+          loginResponse.refreshToken.toString(),
+        );
         await DI.find<ICacheManager>().setSavedCredentials(
           event.model.email,
           event.model.password,
         );
-        
+
         if (event.rememberMe) {
           await DI.find<ICacheManager>().saveLogin(true);
         } else {
@@ -214,8 +221,11 @@ Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) asyn
       },
     );
   }
+
   Future<void> _googleLoginSubmitted(
-      GoogleLoginSubmitted event, Emitter<AuthState> emit) async {
+    GoogleLoginSubmitted event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(GoogleLoginLoading());
 
     try {
@@ -234,19 +244,25 @@ Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) asyn
         return;
       }
 
+      final fcmToken = await DI.find<ICacheManager>().getFcmToken();
+      print('🚀 FCM TOKEN FOR GOOGLE LOGIN: $fcmToken');
       final result = await googleLoginUseCase(
-        GoogleLoginEntity(idToken: googleAuth.idToken!),
+        GoogleLoginEntity(idToken: googleAuth.idToken!, fcmToken: fcmToken),
       );
 
       await result.fold(
-            (failure) {
+        (failure) {
           emit(GoogleLoginFailure(failure.message));
         },
-            (loginResponse) async {
+        (loginResponse) async {
           // هنا loginResponse.result عبارة عن String
           await DI.find<ICacheManager>().setToken(loginResponse.token);
-          await DI.find<ICacheManager>().setRefreshToken(loginResponse.refreshToken);
-          await DI.find<ICacheManager>().setUserData(UserModel.fromEntity(loginResponse.user));
+          await DI.find<ICacheManager>().setRefreshToken(
+            loginResponse.refreshToken,
+          );
+          await DI.find<ICacheManager>().setUserData(
+            UserModel.fromEntity(loginResponse.user),
+          );
 
           if (event.rememberMe) {
             await DI.find<ICacheManager>().saveLogin(true);
@@ -304,15 +320,16 @@ Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) asyn
 
     final result = await resendOtpUseCase(event.email);
 
-    result.fold(
-          (failure) {
-            _pendingEmail = null; // clear on failure
-            emit(RegisterFailure(failure.message));
-          },
-          (_) => emit(OtpSent()),
-    );
+    result.fold((failure) {
+      _pendingEmail = null; // clear on failure
+      emit(RegisterFailure(failure.message));
+    }, (_) => emit(OtpSent()));
   }
-  Future<void> _forgotPassword(ForgotPasswordEvent event, Emitter<AuthState> emit) async {
+
+  Future<void> _forgotPassword(
+    ForgotPasswordEvent event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(ForgotPasswordLoading());
 
     _pendingEmail = event.email; // ensure OTP verification can use this email
@@ -320,11 +337,15 @@ Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) asyn
     final result = await forgotPasswordUseCase(event.email);
 
     result.fold(
-          (failure) => emit(AuthError(failure.message)),
-          (_) => emit(OtpSent()),
+      (failure) => emit(AuthError(failure.message)),
+      (_) => emit(OtpSent()),
     );
   }
-  Future<void> _resetPassword(ResetPasswordEvent event, Emitter<AuthState> emit) async {
+
+  Future<void> _resetPassword(
+    ResetPasswordEvent event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
 
     final result = await resetPasswordUseCase(
@@ -335,20 +356,24 @@ Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) asyn
     );
 
     result.fold(
-          (failure) => emit(AuthError(failure.message)),
-          (_) => emit(AuthSuccess(UserEntity(
-        id: 0,
-        email: event.email,
-        userName: '',
-        phone: '',
-        country: '',
-        city: '',
-        image: '',
-        gender: '',
-        age: 0,
-        address: '',
-        idImage: '',
-      ))),
+      (failure) => emit(AuthError(failure.message)),
+      (_) => emit(
+        AuthSuccess(
+          UserEntity(
+            id: 0,
+            email: event.email,
+            userName: '',
+            phone: '',
+            country: '',
+            city: '',
+            image: '',
+            gender: '',
+            age: 0,
+            address: '',
+            idImage: '',
+          ),
+        ),
+      ),
     );
-    }
+  }
 }

@@ -114,6 +114,16 @@
   "Please check your email and click on the activation link to verify your account.": "Please check your email and click on the activation link to verify your account.",
   "Account created! Check your email for the OTP.": "Account created! Check your email for the OTP.",
   "Send OTP": "Send OTP",
-  "Send": "Send"
-
+  "Send": "Send",
+  "Mark all as read": "Mark all as read",
+  "Timeline": "Timeline",
+  "Emergency": "Emergency",
+  "Read More": "Read More",
+  "New": "New",
+  "New Like": "New Like",
+  "Someone liked your post": "Someone liked your post",
+  "New Comment": "New Comment",
+  "Someone commented on your post": "Someone commented on your post",
+  "New Reply": "New Reply",
+  "replied to your comment": "replied to your comment"
 }

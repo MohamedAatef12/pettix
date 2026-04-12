@@ -132,6 +132,17 @@ abstract class AppText {
   static String get verificationEmailSent => 'Account created! Check your email for the OTP.'.tr();
   static String get send => 'Send'.tr();
   static String get sendOtp => "Send OTP".tr();
+  static String get markAllAsReadNotify => "Mark all as read".tr();
+  static String get timeline => "Timeline".tr();
+  static String get emergency => "Emergency".tr();
+  static String get readMore => "Read More".tr();
+  static String get new_ => "New".tr();
+  static String get newLikeTitle => "New Like".tr();
+  static String get newLikeBody => "Someone liked your post".tr();
+  static String get newCommentTitle => "New Comment".tr();
+  static String get newCommentBody => "Someone commented on your post".tr();
+  static String get newReplyTitle => "New Reply".tr();
+  static String get repliedToYourComment => "replied to your comment".tr();
 
   // ── Drawer ──────────────────────────────────────────────────────────────────
   static String get myProfile => 'My Profile'.tr();
