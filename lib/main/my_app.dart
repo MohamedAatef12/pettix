@@ -1,8 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/config/env/app_config.dart';
 import 'package:pettix/config/router/app_router.dart';
+import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
+import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 final router = appRouter();
 class MyApp extends StatelessWidget {
   final AppConfig appConfig;
@@ -13,10 +16,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final isDev = appConfig.envName == 'Development';
-    return ScreenUtilInit(
-      designSize: const Size(360, 760),
-      builder:
-          (cxt, child) => MaterialApp.router(
+    return BlocProvider(
+      create: (context) => HomeBloc.fromDI()..add(FetchPostsEvent()),
+      child: ScreenUtilInit(
+        designSize: const Size(360, 760),
+        builder:
+            (cxt, child) => MaterialApp.router(
             title: 'Flutter ${appConfig.envName}',
             locale: context.locale, // Local'en'
             localizationsDelegates: context.localizationDelegates,
@@ -40,6 +45,7 @@ class MyApp extends StatelessWidget {
             ),
             routerConfig: router,
           ),
+      ),
     );
   }
 }

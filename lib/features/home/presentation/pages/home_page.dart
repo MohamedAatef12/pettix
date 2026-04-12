@@ -14,18 +14,15 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.current.lightBlue,
-      body: SafeArea(child: BlocProvider(
-          create: (context) => HomeBloc.fromDI()
-            ..add(
-              FetchPostsEvent(),
-            ),
-          child: Column(
-            children: [
-              HomeAppBar(),
-              SizedBox(height: 10.h),
-              HomeBody(),
-            ],
-          ))),
+      body: SafeArea(
+        child: Column(
+          children: [
+            HomeAppBar(),
+            SizedBox(height: 10.h),
+            HomeBody(),
+          ],
+        ),
+      ),
     );
   }
 }

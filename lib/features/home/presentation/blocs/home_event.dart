@@ -35,9 +35,10 @@ class FetchPostsCommentsEvent extends HomeEvent {
 class AddCommentEvent extends HomeEvent {
   final CommentEntity comment;
   final int? creatorId;
-  AddCommentEvent(this.comment, {this.creatorId});
+  final int? initialCount;
+  AddCommentEvent(this.comment, {this.creatorId, this.initialCount});
   @override
-  List<Object?> get props => [comment, creatorId];
+  List<Object?> get props => [comment, creatorId, initialCount];
 }
 
 class FetchPostsLikesEvent extends HomeEvent {
@@ -87,9 +88,10 @@ class AddReplyEvent extends HomeEvent {
   final CommentEntity reply;
   final int parentCommentId;
   final int? creatorId;
-  AddReplyEvent(this.reply, this.parentCommentId, {this.creatorId});
+  final int? initialCount;
+  AddReplyEvent(this.reply, this.parentCommentId, {this.creatorId, this.initialCount});
   @override
-  List<Object?> get props => [reply, parentCommentId, creatorId];
+  List<Object?> get props => [reply, parentCommentId, creatorId, initialCount];
 }
 class SetReplyingToEvent extends HomeEvent {
   final CommentEntity? comment;

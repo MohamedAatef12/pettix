@@ -565,7 +565,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     if (event.comment.parentCommentId != null &&
         replyingToBeforeSend != null &&
         replyingToBeforeSend.id == event.comment.parentCommentId) {
-      add(AddReplyEvent(event.comment, event.comment.parentCommentId!));
+      add(AddReplyEvent(event.comment, event.comment.parentCommentId!, initialCount: event.initialCount));
       return;
     }
 
@@ -584,14 +584,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final updatedComments = List<CommentEntity>.from(state.comments)
       ..insert(0, tempComment);
 
-    final currentCount = state.postCommentsCount[event.comment.postId] ?? 0;
-    final updatedCount = Map<int, int>.from(state.postCommentsCount)
-      ..[event.comment.postId] = currentCount + 1;
-
     emit(
       state.copyWith(
         comments: updatedComments,
-        postCommentsCount: updatedCount,
         error: null,
       ),
     );
@@ -608,16 +603,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         final revertedComments = List<CommentEntity>.from(state.comments)
           ..removeWhere((c) => c.id == tempComment.id);
 
-        final revertedCount = Map<int, int>.from(state.postCommentsCount)
-          ..[event.comment.postId] =
-              (updatedCount[event.comment.postId]! - 1)
-                  .clamp(0, double.infinity)
-                  .toInt();
-
         emit(
           state.copyWith(
             comments: revertedComments,
-            postCommentsCount: revertedCount,
           ),
         );
         debugPrint('⚠️ Failed to add comment: ${failure.message}');
@@ -628,7 +616,15 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
               ..removeWhere((c) => c.id == tempComment.id)
               ..insert(0, event.comment);
 
-        emit(state.copyWith(comments: finalComments, error: null));
+        final currentCount = state.postCommentsCount[event.comment.postId] ?? event.initialCount ?? 0;
+        final updatedCountMap = Map<int, int>.from(state.postCommentsCount)
+          ..[event.comment.postId] = currentCount + 1;
+
+        emit(state.copyWith(
+          comments: finalComments, 
+          postCommentsCount: updatedCountMap,
+          error: null,
+        ));
 
         add(RefreshCommentsSilentlyEvent(event.comment.postId));
       },
@@ -721,7 +717,15 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           return comment;
         }).toList();
 
-        emit(state.copyWith(comments: updatedComments, error: null));
+        final currentCount = state.postCommentsCount[event.reply.postId] ?? event.initialCount ?? 0;
+        final updatedCountMap = Map<int, int>.from(state.postCommentsCount)
+          ..[event.reply.postId] = currentCount + 1;
+
+        emit(state.copyWith(
+          comments: updatedComments, 
+          postCommentsCount: updatedCountMap,
+          error: null,
+        ));
         add(RefreshCommentsSilentlyEvent(event.reply.postId));
       },
     );
