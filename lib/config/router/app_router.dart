@@ -167,38 +167,57 @@ GoRouter appRouter() => GoRouter(
       path: AppRoutes.comments,
       builder: (context, state) {
         final extra = state.extra;
+
+        if (extra is Map<String, dynamic>) {
+          final post = extra['post'] as PostEntity;
+          final bloc = extra['bloc'] as HomeBloc;
+          return BlocProvider.value(
+            value: bloc,
+            child: CommentsPage(
+              postId: post.id.toString(),
+              post: post,
+            ),
+          );
+        }
+
         if (extra is PostEntity) {
-          return CommentsPage(
-            postId: extra.id.toString(),
-            post: extra,
+          return BlocProvider(
+            create: (context) => HomeBloc.fromDI(),
+            child: CommentsPage(
+              postId: extra.id.toString(),
+              post: extra,
+            ),
           );
         }
         final int postId = extra is int ? extra : int.tryParse(extra?.toString() ?? '') ?? 0;
 
-        return CommentsPage(
-          postId: postId.toString(),
-          post: PostEntity(
-            id: postId,
-            content: '',
-            creationDate: '',
-            author: const AuthorEntity(
-              id: 0,
-              nameAr: '',
-              nameEn: '',
-              avatar: '',
-              email: '',
-              phone: '',
-              genderId: 0,
-              genderName: '',
-              contactTypeId: 0,
+        return BlocProvider(
+          create: (context) => HomeBloc.fromDI(),
+          child: CommentsPage(
+            postId: postId.toString(),
+            post: PostEntity(
+              id: postId,
+              content: '',
+              creationDate: '',
+              author: const AuthorEntity(
+                id: 0,
+                nameAr: '',
+                nameEn: '',
+                avatar: '',
+                email: '',
+                phone: '',
+                genderId: 0,
+                genderName: '',
+                contactTypeId: 0,
+                statusId: 0,
+                age: 0,
+              ),
+              comments: const [],
+              likes: const [],
+              images: const [],
               statusId: 0,
-              age: 0,
+              isSaved: false,
             ),
-            comments: const [],
-            likes: const [],
-            images: const [],
-            statusId: 0,
-            isSaved: false,
           ),
         );
       },

@@ -15,12 +15,15 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.current.lightBlue,
       body: SafeArea(
-        child: Column(
-          children: [
-            HomeAppBar(),
-            SizedBox(height: 10.h),
-            HomeBody(),
-          ],
+        child: BlocProvider(
+          create: (context) => HomeBloc.fromDI()..add(FetchPostsEvent()),
+          child: Column(
+            children: [
+              HomeAppBar(),
+              SizedBox(height: 10.h),
+              HomeBody(),
+            ],
+          ),
         ),
       ),
     );
