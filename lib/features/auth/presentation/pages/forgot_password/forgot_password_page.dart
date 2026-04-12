@@ -6,13 +6,13 @@ import 'package:go_router/go_router.dart';
 import 'package:pettix/config/di/di.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
-import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/core/widgets/rtl_aware_icon.dart';
 import 'package:pettix/data/network/email_auth_service.dart';
+import 'package:pettix/features/auth/domain/usecases/apple_login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/forgot_password.dart';
 import 'package:pettix/features/auth/domain/usecases/google_login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/login_use_case.dart';
@@ -38,6 +38,7 @@ class ForgotPasswordPage extends StatelessWidget {
       body: BlocProvider(
         create: (context) => AuthBloc(
           googleLoginUseCase: getIt<GoogleLoginUseCase>(),
+          appleLoginUseCase: getIt<AppleLoginUseCase>(),
           loginUseCase: getIt<LoginUseCase>(),
           registerUseCase: getIt<RegisterUseCase>(),
           emailAuthService: getIt<EmailAuthService>(),
@@ -58,7 +59,6 @@ class ForgotPasswordPage extends StatelessWidget {
                 }
               },
               builder: (context, state) {
-                final isLoading = state is AuthLoading;
                 return Column(
                   children: [
                     Stack(

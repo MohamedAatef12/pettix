@@ -9,7 +9,6 @@ class OTPEntity extends Equatable {
     required this.email, required this.otp});
 
   @override
-  // TODO: implement props
   List<Object?> get props => [
     email,otp
   ];

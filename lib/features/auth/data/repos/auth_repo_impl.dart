@@ -1,9 +1,11 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
+import 'package:pettix/features/auth/data/models/login/apple_login_model.dart';
 import 'package:pettix/features/auth/data/models/login/google_login_model.dart';
 import 'package:pettix/features/auth/data/models/login/login_model.dart';
 import 'package:pettix/features/auth/data/models/register/register_model.dart';
 import 'package:pettix/features/auth/data/sources/remote/auth_remote_data_source.dart';
+import 'package:pettix/features/auth/domain/entities/apple_login_entity.dart';
 import 'package:pettix/features/auth/domain/entities/google_login_entity.dart';
 import 'package:pettix/features/auth/domain/entities/google_login_response_entity.dart';
 import 'package:pettix/features/auth/domain/entities/login_entity.dart';
@@ -33,6 +35,12 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, GoogleLoginResponseEntity>> loginWithGoogle(GoogleLoginEntity model) async {
     final googleLoginModel = GoogleLoginModel.fromEntity(model);
     return await remoteDataSource.loginWithGoogle(googleLoginModel);
+  }
+
+  @override
+  Future<Either<Failure, GoogleLoginResponseEntity>> loginWithApple(AppleLoginEntity model) async {
+    final appleLoginModel = AppleLoginModel.fromEntity(model);
+    return await remoteDataSource.loginWithApple(appleLoginModel);
   }
 
   @override

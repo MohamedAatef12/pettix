@@ -1,5 +1,5 @@
-// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format width=80
 
 // **************************************************************************
 // InjectableConfigGenerator
@@ -18,13 +18,46 @@ import '../../data/caching/i_cache_manager.dart' as _i694;
 import '../../data/network/api_services.dart' as _i655;
 import '../../data/network/dio_factory.dart' as _i719;
 import '../../data/network/email_auth_service.dart' as _i1;
-import '../../data/network/twilio_service.dart' as _i718;
+import '../../features/adoption/data/datasources/adoption_browse_data_source.dart'
+    as _i714;
+import '../../features/adoption/data/datasources/adoption_remote_data_source.dart'
+    as _i956;
+import '../../features/adoption/data/repositories/adoption_browse_repo_impl.dart'
+    as _i557;
+import '../../features/adoption/data/repositories/adoption_repo_impl.dart'
+    as _i35;
+import '../../features/adoption/domain/repositories/adoption_browse_repository.dart'
+    as _i838;
+import '../../features/adoption/domain/repositories/adoption_repository.dart'
+    as _i133;
+import '../../features/adoption/domain/usecases/get_adoption_options_usecase.dart'
+    as _i756;
+import '../../features/adoption/domain/usecases/get_paged_pets_usecase.dart'
+    as _i1025;
+import '../../features/adoption/domain/usecases/submit_adoption_form_usecase.dart'
+    as _i843;
+import '../../features/adoption/presentation/bloc/adoption_bloc.dart' as _i943;
+import '../../features/adoption/presentation/bloc/adoption_browse_bloc.dart'
+    as _i1029;
+import '../../features/adoption_history/data/datasources/adoption_history_remote_data_source.dart'
+    as _i221;
+import '../../features/adoption_history/data/repositories/adoption_history_repo_impl.dart'
+    as _i81;
+import '../../features/adoption_history/domain/repositories/adoption_history_repository.dart'
+    as _i947;
+import '../../features/adoption_history/domain/usecases/get_client_forms_usecase.dart'
+    as _i823;
+import '../../features/adoption_history/domain/usecases/get_owner_forms_usecase.dart'
+    as _i139;
+import '../../features/adoption_history/presentation/bloc/adoption_history_bloc.dart'
+    as _i109;
 import '../../features/auth/data/repos/auth_repo_impl.dart' as _i152;
 import '../../features/auth/data/sources/remote/auth_remote_data_source.dart'
     as _i865;
 import '../../features/auth/data/sources/remote/auth_remote_data_source_impl.dart'
     as _i523;
 import '../../features/auth/domain/repositories/auth_repository.dart' as _i787;
+import '../../features/auth/domain/usecases/apple_login_use_case.dart' as _i700;
 import '../../features/auth/domain/usecases/forgot_password.dart' as _i510;
 import '../../features/auth/domain/usecases/google_login_use_case.dart'
     as _i550;
@@ -62,6 +95,24 @@ import '../../features/home/domain/usecases/like_post.dart' as _i58;
 import '../../features/home/domain/usecases/save_post_usecase.dart' as _i989;
 import '../../features/home/domain/usecases/unlike_comment.dart' as _i975;
 import '../../features/home/domain/usecases/unsave_post_usecase.dart' as _i86;
+import '../../features/my_pets/data/datasources/my_pets_remote_data_source.dart'
+    as _i1050;
+import '../../features/my_pets/data/repositories/my_pets_repo_impl.dart'
+    as _i601;
+import '../../features/my_pets/domain/repositories/my_pets_repository.dart'
+    as _i835;
+import '../../features/my_pets/domain/usecases/add_pet_usecase.dart' as _i578;
+import '../../features/my_pets/domain/usecases/delete_pet_usecase.dart'
+    as _i649;
+import '../../features/my_pets/domain/usecases/get_pet_options_usecase.dart'
+    as _i982;
+import '../../features/my_pets/domain/usecases/get_user_pets_usecase.dart'
+    as _i19;
+import '../../features/my_pets/domain/usecases/update_pet_status_usecase.dart'
+    as _i152;
+import '../../features/my_pets/domain/usecases/update_pet_usecase.dart'
+    as _i931;
+import '../../features/my_pets/presentation/bloc/my_pets_bloc.dart' as _i496;
 import '../../features/notification/data/data_sources/notification_remote_data_source.dart'
     as _i934;
 import '../../features/notification/data/repo/notification_repo_impl.dart'
@@ -76,6 +127,17 @@ import '../../features/notification/domain/use_cases/mark_notification_as_read_u
     as _i46;
 import '../../features/notification/presentation/bloc/notification_bloc.dart'
     as _i29;
+import '../../features/profile/data/datasources/profile_remote_data_source.dart'
+    as _i847;
+import '../../features/profile/data/repositories/profile_repo_impl.dart'
+    as _i988;
+import '../../features/profile/domain/repositories/profile_repository.dart'
+    as _i894;
+import '../../features/profile/domain/usecases/get_profile_usecase.dart'
+    as _i965;
+import '../../features/profile/domain/usecases/update_profile_usecase.dart'
+    as _i478;
+import '../../features/profile/presentation/bloc/profile_bloc.dart' as _i469;
 import 'di.dart' as _i913;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -90,10 +152,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i719.DioFactory>(() => registerModule.dioFactory);
     gh.lazySingleton<_i694.ICacheManager>(() => registerModule.cacheManager);
     gh.lazySingleton<_i1.EmailAuthService>(() => _i1.EmailAuthService());
-    gh.lazySingleton<_i718.TwilioService>(() => _i718.TwilioService());
-    gh.factory<_i526.GetUserLocalDataSource>(
-      () => _i298.GetUserDataSourceImpl(gh<_i694.ICacheManager>()),
-    );
     gh.lazySingleton<_i361.Dio>(
       () => registerModule.dio(gh<_i719.DioFactory>(), gh<_i207.Talker>()),
     );
@@ -109,15 +167,53 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i1.EmailAuthService>(),
       ),
     );
+    gh.lazySingleton<_i1050.MyPetsRemoteDataSource>(
+      () => _i1050.MyPetsRemoteDataSourceImpl(gh<_i655.ApiService>()),
+    );
+    gh.factory<_i526.GetUserLocalDataSource>(
+      () => _i298.GetUserDataSourceImpl(gh<_i694.ICacheManager>()),
+    );
+    gh.lazySingleton<_i835.MyPetsRepository>(
+      () => _i601.MyPetsRepositoryImpl(gh<_i1050.MyPetsRemoteDataSource>()),
+    );
+    gh.lazySingleton<_i221.AdoptionHistoryRemoteDataSource>(
+      () => _i221.AdoptionHistoryRemoteDataSourceImpl(gh<_i655.ApiService>()),
+    );
+    gh.lazySingleton<_i956.AdoptionRemoteDataSource>(
+      () => _i956.AdoptionRemoteDataSourceImpl(gh<_i655.ApiService>()),
+    );
+    gh.factory<_i578.AddPetUseCase>(
+      () => _i578.AddPetUseCase(gh<_i835.MyPetsRepository>()),
+    );
+    gh.factory<_i649.DeletePetUseCase>(
+      () => _i649.DeletePetUseCase(gh<_i835.MyPetsRepository>()),
+    );
+    gh.factory<_i982.GetPetOptionsUseCase>(
+      () => _i982.GetPetOptionsUseCase(gh<_i835.MyPetsRepository>()),
+    );
+    gh.factory<_i19.GetUserPetsUseCase>(
+      () => _i19.GetUserPetsUseCase(gh<_i835.MyPetsRepository>()),
+    );
+    gh.factory<_i152.UpdatePetStatusUseCase>(
+      () => _i152.UpdatePetStatusUseCase(gh<_i835.MyPetsRepository>()),
+    );
+    gh.factory<_i931.UpdatePetUseCase>(
+      () => _i931.UpdatePetUseCase(gh<_i835.MyPetsRepository>()),
+    );
+    gh.factory<_i496.MyPetsBloc>(
+      () => _i496.MyPetsBloc(
+        gh<_i19.GetUserPetsUseCase>(),
+        gh<_i982.GetPetOptionsUseCase>(),
+        gh<_i578.AddPetUseCase>(),
+        gh<_i649.DeletePetUseCase>(),
+        gh<_i152.UpdatePetStatusUseCase>(),
+        gh<_i931.UpdatePetUseCase>(),
+        gh<_i694.ICacheManager>(),
+      ),
+    );
     gh.lazySingleton<_i588.NotificationRepo>(
       () =>
           _i933.NotificationRepoImpl(gh<_i934.NotificationRemoteDataSource>()),
-    );
-    gh.factory<_i787.AuthRepository>(
-      () => _i152.AuthRepositoryImpl(gh<_i865.AuthRemoteDataSource>()),
-    );
-    gh.lazySingleton<_i1055.RemoteDataSource>(
-      () => _i621.RemoteDataSourceImpl(gh<_i655.ApiService>()),
     );
     gh.lazySingleton<_i571.GetNotificationsUseCase>(
       () => _i571.GetNotificationsUseCase(gh<_i588.NotificationRepo>()),
@@ -129,12 +225,129 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i46.MarkNotificationAsReadUseCase>(
       () => _i46.MarkNotificationAsReadUseCase(gh<_i588.NotificationRepo>()),
     );
+    gh.lazySingleton<_i1055.RemoteDataSource>(
+      () => _i621.RemoteDataSourceImpl(gh<_i655.ApiService>()),
+    );
+    gh.factory<_i787.AuthRepository>(
+      () => _i152.AuthRepositoryImpl(gh<_i865.AuthRemoteDataSource>()),
+    );
+    gh.lazySingleton<_i947.AdoptionHistoryRepository>(
+      () => _i81.AdoptionHistoryRepositoryImpl(
+        gh<_i221.AdoptionHistoryRemoteDataSource>(),
+      ),
+    );
+    gh.lazySingleton<_i714.AdoptionBrowseDataSource>(
+      () => _i714.AdoptionBrowseDataSourceImpl(gh<_i655.ApiService>()),
+    );
+    gh.lazySingleton<_i847.ProfileRemoteDataSource>(
+      () => _i847.ProfileRemoteDataSourceImpl(gh<_i655.ApiService>()),
+    );
+    gh.lazySingleton<_i894.ProfileRepository>(
+      () => _i988.ProfileRepositoryImpl(gh<_i847.ProfileRemoteDataSource>()),
+    );
+    gh.factory<_i986.HomeDomainRepository>(
+      () => _i1024.HomeRepositoryImpl(
+        gh<_i1055.RemoteDataSource>(),
+        gh<_i526.GetUserLocalDataSource>(),
+        gh<_i934.NotificationRemoteDataSource>(),
+      ),
+    );
+    gh.lazySingleton<_i838.AdoptionBrowseRepository>(
+      () => _i557.AdoptionBrowseRepoImpl(gh<_i714.AdoptionBrowseDataSource>()),
+    );
+    gh.factory<_i700.AppleLoginUseCase>(
+      () => _i700.AppleLoginUseCase(gh<_i787.AuthRepository>()),
+    );
+    gh.factory<_i1025.GetPagedPetsUseCase>(
+      () => _i1025.GetPagedPetsUseCase(gh<_i838.AdoptionBrowseRepository>()),
+    );
+    gh.lazySingleton<_i133.AdoptionRepository>(
+      () => _i35.AdoptionRepositoryImpl(gh<_i956.AdoptionRemoteDataSource>()),
+    );
+    gh.factory<_i823.GetClientFormsUseCase>(
+      () => _i823.GetClientFormsUseCase(gh<_i947.AdoptionHistoryRepository>()),
+    );
+    gh.factory<_i139.GetOwnerFormsUseCase>(
+      () => _i139.GetOwnerFormsUseCase(gh<_i947.AdoptionHistoryRepository>()),
+    );
+    gh.factory<_i829.AddCommentUseCase>(
+      () => _i829.AddCommentUseCase(gh<_i986.HomeDomainRepository>()),
+    );
+    gh.factory<_i1009.LikeCommentUseCase>(
+      () => _i1009.LikeCommentUseCase(gh<_i986.HomeDomainRepository>()),
+    );
+    gh.factory<_i1056.AddPostUseCase>(
+      () => _i1056.AddPostUseCase(gh<_i986.HomeDomainRepository>()),
+    );
+    gh.factory<_i1054.AddReportUseCase>(
+      () => _i1054.AddReportUseCase(gh<_i986.HomeDomainRepository>()),
+    );
+    gh.factory<_i354.DeletePostUseCase>(
+      () => _i354.DeletePostUseCase(gh<_i986.HomeDomainRepository>()),
+    );
+    gh.factory<_i1036.UnLikePostUseCase>(
+      () => _i1036.UnLikePostUseCase(gh<_i986.HomeDomainRepository>()),
+    );
+    gh.factory<_i229.GetCommentLikesUseCase>(
+      () => _i229.GetCommentLikesUseCase(gh<_i986.HomeDomainRepository>()),
+    );
+    gh.factory<_i604.GetPostCommentsUseCase>(
+      () => _i604.GetPostCommentsUseCase(gh<_i986.HomeDomainRepository>()),
+    );
+    gh.factory<_i38.GetPostCommentsCountsUseCase>(
+      () => _i38.GetPostCommentsCountsUseCase(gh<_i986.HomeDomainRepository>()),
+    );
+    gh.factory<_i1026.GetPostsUseCase>(
+      () => _i1026.GetPostsUseCase(gh<_i986.HomeDomainRepository>()),
+    );
+    gh.factory<_i947.GetPostLikesUseCase>(
+      () => _i947.GetPostLikesUseCase(gh<_i986.HomeDomainRepository>()),
+    );
+    gh.factory<_i660.GetReportReasonsUseCase>(
+      () => _i660.GetReportReasonsUseCase(gh<_i986.HomeDomainRepository>()),
+    );
+    gh.factory<_i623.GetReportedPostsUseCase>(
+      () => _i623.GetReportedPostsUseCase(gh<_i986.HomeDomainRepository>()),
+    );
+    gh.factory<_i58.LikePostUseCase>(
+      () => _i58.LikePostUseCase(gh<_i986.HomeDomainRepository>()),
+    );
+    gh.factory<_i989.SavePostUseCase>(
+      () => _i989.SavePostUseCase(gh<_i986.HomeDomainRepository>()),
+    );
+    gh.factory<_i975.UnLikeCommentUseCase>(
+      () => _i975.UnLikeCommentUseCase(gh<_i986.HomeDomainRepository>()),
+    );
+    gh.factory<_i86.UnSavePostUseCase>(
+      () => _i86.UnSavePostUseCase(gh<_i986.HomeDomainRepository>()),
+    );
+    gh.factory<_i109.AdoptionHistoryBloc>(
+      () => _i109.AdoptionHistoryBloc(
+        gh<_i823.GetClientFormsUseCase>(),
+        gh<_i139.GetOwnerFormsUseCase>(),
+      ),
+    );
     gh.factory<_i29.NotificationBloc>(
       () => _i29.NotificationBloc(
         gh<_i571.GetNotificationsUseCase>(),
         gh<_i475.MarkAllNotificationsAsReadUseCase>(),
         gh<_i46.MarkNotificationAsReadUseCase>(),
       ),
+    );
+    gh.factory<_i118.GetUserDataUseCase>(
+      () => _i118.GetUserDataUseCase(gh<_i986.HomeDomainRepository>()),
+    );
+    gh.factory<_i756.GetAdoptionOptionsUseCase>(
+      () => _i756.GetAdoptionOptionsUseCase(gh<_i133.AdoptionRepository>()),
+    );
+    gh.factory<_i843.SubmitAdoptionFormUseCase>(
+      () => _i843.SubmitAdoptionFormUseCase(gh<_i133.AdoptionRepository>()),
+    );
+    gh.factory<_i965.GetProfileUseCase>(
+      () => _i965.GetProfileUseCase(gh<_i894.ProfileRepository>()),
+    );
+    gh.factory<_i478.UpdateProfileUseCase>(
+      () => _i478.UpdateProfileUseCase(gh<_i894.ProfileRepository>()),
     );
     gh.factory<_i510.ForgotPasswordUseCase>(
       () => _i510.ForgotPasswordUseCase(gh<_i787.AuthRepository>()),
@@ -157,66 +370,24 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i975.VerifyOtp>(
       () => _i975.VerifyOtp(gh<_i787.AuthRepository>()),
     );
-    gh.factory<_i986.HomeDomainRepository>(
-      () => _i1024.HomeRepositoryImpl(
-        gh<_i1055.RemoteDataSource>(),
-        gh<_i526.GetUserLocalDataSource>(),
-        gh<_i934.NotificationRemoteDataSource>(),
+    gh.factory<_i1029.AdoptionBrowseBloc>(
+      () => _i1029.AdoptionBrowseBloc(
+        gh<_i1025.GetPagedPetsUseCase>(),
+        gh<_i982.GetPetOptionsUseCase>(),
       ),
     );
-    gh.factory<_i829.AddCommentUseCase>(
-      () => _i829.AddCommentUseCase(gh<_i986.HomeDomainRepository>()),
+    gh.factory<_i469.ProfileBloc>(
+      () => _i469.ProfileBloc(
+        gh<_i965.GetProfileUseCase>(),
+        gh<_i478.UpdateProfileUseCase>(),
+        gh<_i694.ICacheManager>(),
+      ),
     );
-    gh.factory<_i1009.LikeCommentUseCase>(
-      () => _i1009.LikeCommentUseCase(gh<_i986.HomeDomainRepository>()),
-    );
-    gh.factory<_i1056.AddPostUseCase>(
-      () => _i1056.AddPostUseCase(gh<_i986.HomeDomainRepository>()),
-    );
-    gh.factory<_i1054.AddReportUseCase>(
-      () => _i1054.AddReportUseCase(gh<_i986.HomeDomainRepository>()),
-    );
-    gh.factory<_i354.DeletePostUseCase>(
-      () => _i354.DeletePostUseCase(gh<_i986.HomeDomainRepository>()),
-    );
-    gh.factory<_i1036.UnLikePostUseCase>(
-      () => _i1036.UnLikePostUseCase(gh<_i986.HomeDomainRepository>()),
-    );
-    gh.factory<_i604.GetPostCommentsUseCase>(
-      () => _i604.GetPostCommentsUseCase(gh<_i986.HomeDomainRepository>()),
-    );
-    gh.factory<_i229.GetCommentLikesUseCase>(
-      () => _i229.GetCommentLikesUseCase(gh<_i986.HomeDomainRepository>()),
-    );
-    gh.factory<_i1026.GetPostsUseCase>(
-      () => _i1026.GetPostsUseCase(gh<_i986.HomeDomainRepository>()),
-    );
-    gh.factory<_i947.GetPostLikesUseCase>(
-      () => _i947.GetPostLikesUseCase(gh<_i986.HomeDomainRepository>()),
-    );
-    gh.factory<_i38.GetPostCommentsCountsUseCase>(
-      () => _i38.GetPostCommentsCountsUseCase(gh<_i986.HomeDomainRepository>()),
-    );
-    gh.factory<_i623.GetReportedPostsUseCase>(
-      () => _i623.GetReportedPostsUseCase(gh<_i986.HomeDomainRepository>()),
-    );
-    gh.factory<_i660.GetReportReasonsUseCase>(
-      () => _i660.GetReportReasonsUseCase(gh<_i986.HomeDomainRepository>()),
-    );
-    gh.factory<_i58.LikePostUseCase>(
-      () => _i58.LikePostUseCase(gh<_i986.HomeDomainRepository>()),
-    );
-    gh.factory<_i989.SavePostUseCase>(
-      () => _i989.SavePostUseCase(gh<_i986.HomeDomainRepository>()),
-    );
-    gh.factory<_i975.UnLikeCommentUseCase>(
-      () => _i975.UnLikeCommentUseCase(gh<_i986.HomeDomainRepository>()),
-    );
-    gh.factory<_i86.UnSavePostUseCase>(
-      () => _i86.UnSavePostUseCase(gh<_i986.HomeDomainRepository>()),
-    );
-    gh.factory<_i118.GetUserDataUseCase>(
-      () => _i118.GetUserDataUseCase(gh<_i986.HomeDomainRepository>()),
+    gh.factory<_i943.AdoptionBloc>(
+      () => _i943.AdoptionBloc(
+        gh<_i756.GetAdoptionOptionsUseCase>(),
+        gh<_i843.SubmitAdoptionFormUseCase>(),
+      ),
     );
     return this;
   }

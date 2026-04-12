@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 
 @lazySingleton
@@ -12,12 +13,12 @@ class EmailAuthService {
       final otp = List.generate(otpLength, (_) => Random().nextInt(10)).join();
       _otpStore[email] = otp;
 
-      print("📩 Temporary OTP for $email: $otp");
+      debugPrint("📩 Temporary OTP for $email: $otp");
 
       // Simulate success as if the OTP was emailed
       return true;
     } catch (e) {
-      print("❌ Error generating OTP: $e");
+      debugPrint("❌ Error generating OTP: $e");
       return false;
     }
   }
@@ -31,10 +32,10 @@ class EmailAuthService {
       final isValid = stored == otp;
       if (isValid) _otpStore.remove(email); // invalidate after success
 
-      print("✅ OTP check for $email: $isValid");
+      debugPrint("✅ OTP check for $email: $isValid");
       return isValid;
     } catch (e) {
-      print("❌ Error verifying OTP: $e");
+      debugPrint("❌ Error verifying OTP: $e");
       return false;
     }
   }

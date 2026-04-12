@@ -1,10 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
-import 'package:pettix/core/models/response_model.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/data/network/api_services.dart';
 import 'package:pettix/data/network/constants.dart';
 import 'package:pettix/data/network/email_auth_service.dart';
+import 'package:pettix/features/auth/data/models/login/apple_login_model.dart';
 import 'package:pettix/features/auth/data/models/login/google_login_model.dart';
 import 'package:pettix/features/auth/data/models/login/google_login_response_model.dart';
 import 'package:pettix/features/auth/data/models/login/login_response_model.dart';
@@ -70,14 +71,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<Either<Failure, GoogleLoginResponseModel>> loginWithGoogle(
       GoogleLoginModel model,) async {
     try {
-      print('[DEBUG] Google Login - Sending idToken');
+      debugPrint('[DEBUG] Google Login - Sending idToken');
 
       final response = await apiService.post(
         endPoint: Constants.googleLoginEndpoint,
         data: {'idToken': model.idToken},
       );
 
-      print('[DEBUG] Google Login Response: $response');
+      debugPrint('[DEBUG] Google Login Response: $response');
 
       final result = response.result as Map<String, dynamic>?;
       if (result == null || response.success != true) {
@@ -90,7 +91,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final token = result['token'];
 
       if (userJson == null || token == null) {
-        print(
+        debugPrint(
             '[DEBUG] Google Login - Missing contact or token. Contact: $userJson, Token: $token');
         return Left(Failure("Invalid response format from server"));
       }
@@ -115,11 +116,54 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         ),
       );
     } catch (e) {
-      print('[ERROR] Google Login failed: $e');
+      debugPrint('[ERROR] Google Login failed: $e');
       return Left(DioFailure.fromDioError(e));
     }
   }
 
+
+  @override
+  Future<Either<Failure, GoogleLoginResponseModel>> loginWithApple(AppleLoginModel model) async {
+    try {
+      final response = await apiService.post(
+        endPoint: Constants.appleLoginEndpoint,
+        data: {'idToken': model.idToken},
+      );
+
+      final result = response.result as Map<String, dynamic>?;
+      if (result == null || response.success != true) {
+        return Left(Failure(response.message.isNotEmpty
+            ? response.message
+            : 'Invalid response from server'));
+      }
+
+      final userJson = result['contact'];
+      final token = result['token'];
+
+      if (userJson == null || token == null) {
+        return Left(Failure('Invalid response format from server'));
+      }
+
+      final userModel = UserModel.fromJson(userJson);
+      await DI.find<ICacheManager>().setUserData(userModel);
+
+      return Right(
+        GoogleLoginResponseModel(
+          success: response.success,
+          message: response.message,
+          traceId: response.traceId,
+          resultSuccess: result['success'] ?? true,
+          resultMessage: result['message'] ?? '',
+          token: token,
+          refreshToken: result['refreshToken'] ?? '',
+          role: result['role'] ?? '',
+          user: userModel,
+        ),
+      );
+    } catch (e) {
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
 
   @override
   Future<Either<Failure, bool>> verifyOtp(String email, String otp) async {
@@ -146,7 +190,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'email': email,
       });
       if (response.success == true) {
-        return Right(response.message);
+        return Right(null);
       }
       return Left(Failure(response.message));
     }
@@ -162,7 +206,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'email': email,
       });
       if (response.success == true) {
-        return Right(response.message);
+        return Right(null);
       }
       return Left(Failure(response.message));
     }
@@ -181,7 +225,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'confirmPassword': confirmPassword,
       });
       if (response.success == true) {
-        return Right(response.message);
+        return Right(null);
       }
       return Left(Failure(response.message));
     }

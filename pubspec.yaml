@@ -15,10 +15,12 @@ dependencies:
   firebase_core: ^3.9.0
   firebase_auth: ^5.3.1
 
-  # Google Sign-In
+  # Auth providers
   google_sign_in: ^6.2.2
+  sign_in_with_apple: ^6.1.0
   email_auth: ^2.0.0
   mailer: ^6.1.0
+
   # UI & Design
   cupertino_icons: ^1.0.8
   google_fonts: ^6.2.1
@@ -30,9 +32,12 @@ dependencies:
   cached_network_image: ^3.4.1
   flutter_screenutil: ^5.9.3
   device_preview: ^1.2.0
+  flutter_staggered_grid_view: ^0.7.0
   image_picker: ^1.2.0
   smooth_page_indicator: ^1.2.0
-  # State Management & Architecture
+  iconsax: ^0.0.8
+
+  # State Management & Architectures
   flutter_bloc: ^9.1.1
   equatable: ^2.0.7
   dartz: ^0.10.1
@@ -42,7 +47,7 @@ dependencies:
   # Networking
   dio: ^5.8.0+1
   pretty_dio_logger: ^1.4.0
-  intl: ^0.20.2
+  intl: 0.20.2
 
   # Caching & Storage
   shared_preferences: ^2.5.3

@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/features/on_boarding/presentation/bloc/on_boarding_events.dart';

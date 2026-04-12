@@ -11,10 +11,10 @@ class CustomFilledButton extends StatelessWidget {
   final Color? textColor;
   final TextStyle? textStyle;
   final bool isLoading;
-
-  // 🔹 Instead of ImageProvider, make it Widget
   final bool hasLeading;
+  final bool hasTrailing;
   final Widget? leading;
+  final Widget? trailing;
   final double spacing;
 
   const CustomFilledButton({
@@ -29,7 +29,9 @@ class CustomFilledButton extends StatelessWidget {
     this.textStyle,
     this.isLoading = false,
     this.hasLeading = false,
+    this.hasTrailing = false,
     this.leading,
+    this.trailing,
     this.spacing = 8.0,
   });
 

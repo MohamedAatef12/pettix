@@ -7,6 +7,8 @@ import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 import 'package:pettix/features/home/presentation/widgets/home_appbar.dart';
 import 'package:pettix/features/home/presentation/widgets/home_body.dart';
 
+import 'package:pettix/features/side_menu/presentation/view/widgets/custom_drawer.dart';
+
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -14,7 +16,10 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.current.lightBlue,
-      body: SafeArea(child: BlocProvider(
+      drawer: const CustomDrawer(),
+      body: SafeArea
+      (bottom: false,
+        child: BlocProvider(
           create: (context) => HomeBloc.fromDI()
             ..add(
               FetchPostsEvent(),

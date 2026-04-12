@@ -14,7 +14,7 @@ class ChatTextFormField extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.current.lightGray,
         borderRadius: BorderRadius.circular(15.r),
-        border: Border.all(color: AppColors.current.gray.withOpacity(0.1)),
+        border: Border.all(color: AppColors.current.gray.withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
@@ -31,7 +31,7 @@ class ChatTextFormField extends StatelessWidget {
           SizedBox(
             height: 24.h, // set divider height manually
             child: VerticalDivider(
-              color: AppColors.current.gray.withOpacity(0.4),
+              color: AppColors.current.gray.withValues(alpha: 0.4),
               thickness: 0.8,
               width: 20.w, // adds spacing around the line
             ),
@@ -66,7 +66,7 @@ class ChatTextFormField extends StatelessWidget {
           SizedBox(
             height: 24.h, // set divider height manually
             child: VerticalDivider(
-              color: AppColors.current.gray.withOpacity(0.4),
+              color: AppColors.current.gray.withValues(alpha: 0.4),
               thickness: 0.8,
               width: 20.w, // adds spacing around the line
             ),
