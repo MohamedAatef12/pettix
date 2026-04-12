@@ -576,7 +576,10 @@ class PostCard extends StatelessWidget {
                       GestureDetector(
                         onTap: () {
                           if (isDetailView) return;
-                          router.push(AppRoutes.comments, extra: post);
+                          router.push(AppRoutes.comments, extra: {
+                            'post': post,
+                            'bloc': context.read<HomeBloc>(),
+                          });
                         },
                         child: Row(
                           children: [
