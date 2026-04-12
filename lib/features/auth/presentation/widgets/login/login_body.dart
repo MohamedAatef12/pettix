@@ -47,6 +47,7 @@ class LoginBody extends StatelessWidget {
                 if (state is GoogleLoginSuccess ||
                     state is AppleLoginSuccess ||
                     state is LoginSuccess) {
+                  context.go(AppRoutes.bottomNav);
                   AuthToast.showSuccess(
                     context,
                     'Login Successful!',

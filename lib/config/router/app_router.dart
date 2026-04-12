@@ -1,6 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
+import '../../features/home/domain/entities/author_entity.dart';
+import '../../features/home/domain/entities/post_entity.dart';
+import '../../features/home/presentation/blocs/home_bloc.dart';
+import '../../features/home/presentation/pages/comments_page.dart';
 import 'routes.dart';
 
 import '../../features/adoption/presentation/view/application_view.dart';
@@ -156,6 +160,57 @@ final List<RouteBase> _homeRoutes = [
     name: AppRouteNames.notifications,
     builder: (_, __) => const NotificationPage(),
   ),
+  GoRoute(
+    path: AppRoutes.comments,
+    builder: (context, state) {
+      final extra = state.extra;
+      if (extra is Map<String, dynamic>) {
+        final post = extra['post'] as PostEntity;
+        final bloc = extra['bloc'] as HomeBloc;
+        return BlocProvider.value(
+          value: bloc,
+          child: CommentsPage(postId: post.id.toString(), post: post),
+        );
+      }
+      if (extra is PostEntity) {
+        return BlocProvider(
+          create: (context) => HomeBloc.fromDI(),
+          child: CommentsPage(postId: extra.id.toString(), post: extra),
+        );
+      }
+      final int postId =
+          extra is int ? extra : int.tryParse(extra?.toString() ?? '') ?? 0;
+      return BlocProvider(
+        create: (context) => HomeBloc.fromDI(),
+        child: CommentsPage(
+          postId: postId.toString(),
+          post: PostEntity(
+            id: postId,
+            content: '',
+            creationDate: '',
+            author: const AuthorEntity(
+              id: 0,
+              nameAr: '',
+              nameEn: '',
+              avatar: '',
+              email: '',
+              phone: '',
+              genderId: 0,
+              genderName: '',
+              contactTypeId: 0,
+              statusId: 0,
+              age: 0,
+            ),
+            comments: const [],
+            likes: const [],
+            images: const [],
+            statusId: 0,
+            isSaved: false,
+          ),
+        ),
+      );
+    },
+  ),
 ];
 
 final List<RouteBase> _socialRoutes = [
@@ -183,8 +238,8 @@ final List<RouteBase> _adoptionRoutes = [
   GoRoute(
     path: AppRoutes.petProfile,
     name: AppRouteNames.petProfile,
-    builder: (context, state) =>
-        PetProfileScreen(pet: state.extra as PetEntity),
+    builder:
+        (context, state) => PetProfileScreen(pet: state.extra as PetEntity),
   ),
   GoRoute(
     path: AppRoutes.applications,
@@ -200,10 +255,11 @@ final List<RouteBase> _profileRoutes = [
   GoRoute(
     path: AppRoutes.profile,
     name: AppRouteNames.profile,
-    builder: (context, state) => BlocProvider(
-      create: (_) => DI.find<ProfileBloc>(),
-      child: const ProfileScreen(),
-    ),
+    builder:
+        (context, state) => BlocProvider(
+          create: (_) => DI.find<ProfileBloc>(),
+          child: const ProfileScreen(),
+        ),
   ),
   GoRoute(
     path: AppRoutes.editProfile,
@@ -250,11 +306,14 @@ final List<RouteBase> _adoptionHistoryRoutes = [
   GoRoute(
     path: AppRoutes.adoptionHistory,
     name: AppRouteNames.adoptionHistory,
-    builder: (context, state) => BlocProvider(
-      create: (_) => DI.find<AdoptionHistoryBloc>()
-        ..add(const FetchClientFormsEvent()),
-      child: const AdoptionHistoryScreen(),
-    ),
+    builder:
+        (context, state) => BlocProvider(
+          create:
+              (_) =>
+                  DI.find<AdoptionHistoryBloc>()
+                    ..add(const FetchClientFormsEvent()),
+          child: const AdoptionHistoryScreen(),
+        ),
   ),
   GoRoute(
     path: AppRoutes.adoptionFormDetail,
@@ -328,18 +387,17 @@ final List<RouteBase> _legalRoutes = [
 // ── App Router ──────────────────────────────────────────────────────────────
 
 GoRouter appRouter() => GoRouter(
-      initialLocation: AppRoutes.splash,
-      routes: <RouteBase>[
-        ..._coreRoutes,
-        ..._authRoutes,
-        ..._homeRoutes,
-        ..._socialRoutes,
-        ..._adoptionRoutes,
-        ..._profileRoutes,
-        ..._myPetsRoutes,
-        ..._adoptionHistoryRoutes,
-        ..._supportRoutes,
-        ..._legalRoutes,
-      ],
-    );
-
+  initialLocation: AppRoutes.splash,
+  routes: <RouteBase>[
+    ..._coreRoutes,
+    ..._authRoutes,
+    ..._homeRoutes,
+    ..._socialRoutes,
+    ..._adoptionRoutes,
+    ..._profileRoutes,
+    ..._myPetsRoutes,
+    ..._adoptionHistoryRoutes,
+    ..._supportRoutes,
+    ..._legalRoutes,
+  ],
+);
