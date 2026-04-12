@@ -14,10 +14,12 @@ import '../widgets/application/step3_pet_experience.dart';
 import '../widgets/application/step4_agreements.dart';
 import '../widgets/application/step5_review_application.dart';
 import '../widgets/application/step6_submitted.dart';
-import '../widgets/pet_application/pet_application_body.dart';
+import '../widgets/application/step0_pet_application.dart';
 
 class ApplicationScreens extends StatelessWidget {
-  const ApplicationScreens({super.key});
+  final int petId;
+
+  const ApplicationScreens({super.key, required this.petId});
 
   static const List<String> _stepTitles = [
     'Set up your information',
@@ -31,6 +33,7 @@ class ApplicationScreens extends StatelessWidget {
     return BlocProvider(
       create: (context) => getIt<AdoptionBloc>()
         ..add(const ResetForm())
+        ..add(SetPetId(petId))
         ..add(FetchAdoptionOptions()),
       child: BlocConsumer<AdoptionBloc, AdoptionState>(
         listener: (context, state) {
@@ -54,8 +57,8 @@ class ApplicationScreens extends StatelessWidget {
 
           if (state.currentStep == 0) {
             return Scaffold(
-              backgroundColor: AppColors.current.lightYellow,
-              body: const SafeArea(child: PetApplicationBody()),
+              backgroundColor: AppColors.current.white,
+              body: PetApplication(),
             );
           }
 

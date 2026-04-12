@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/data/network/constants.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 
 class PetBrowseCard extends StatelessWidget {

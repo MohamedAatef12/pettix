@@ -57,7 +57,7 @@ class _AdoptBottomBar extends StatelessWidget {
         ],
       ),
       child: ElevatedButton.icon(
-        onPressed: () => context.push(AppRoutes.applications),
+        onPressed: () => context.push(AppRoutes.applications, extra: pet.id),
         icon: const Icon(Icons.pets_rounded, size: 20),
         label: const Text('Apply to Adopt'),
         style: ElevatedButton.styleFrom(

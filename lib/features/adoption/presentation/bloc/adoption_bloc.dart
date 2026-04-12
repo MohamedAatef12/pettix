@@ -22,6 +22,7 @@ class AdoptionBloc extends Bloc<AdoptionEvent, AdoptionState> {
 
   AdoptionBloc(this._getAdoptionOptionsUseCase, this._submitAdoptionFormUseCase)
     : super(const AdoptionState()) {
+    on<SetPetId>((event, emit) => emit(state.copyWith(petId: event.petId)));
     on<FetchAdoptionOptions>(_onFetchAdoptionOptions);
     on<UpdateFullName>(
       (event, emit) => emit(state.copyWith(fullName: event.fullName)),
@@ -147,6 +148,7 @@ class AdoptionBloc extends Bloc<AdoptionEvent, AdoptionState> {
 
     // Construct request from state
     final request = AdoptionFormRequestModel(
+      petId: state.petId ?? 0,
       fullName: state.fullName,
       email: state.email,
       phoneNumber: state.phoneNumber,

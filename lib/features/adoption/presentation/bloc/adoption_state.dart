@@ -20,6 +20,7 @@ class AdoptionState extends Equatable {
   final int currentStep;
 
   // Form Fields
+  final int? petId;
   final String fullName;
   final String email;
   final String phoneNumber;
@@ -37,6 +38,7 @@ class AdoptionState extends Equatable {
     this.errorMessage,
     this.formData,
     this.currentStep = 0,
+    this.petId,
     this.fullName = '',
     this.email = '',
     this.phoneNumber = '',
@@ -55,6 +57,7 @@ class AdoptionState extends Equatable {
     String? errorMessage,
     AdoptionFormRequestModel? formData,
     int? currentStep,
+    int? petId,
     String? fullName,
     String? email,
     String? phoneNumber,
@@ -72,6 +75,7 @@ class AdoptionState extends Equatable {
       errorMessage: errorMessage,
       formData: formData ?? this.formData,
       currentStep: currentStep ?? this.currentStep,
+      petId: petId ?? this.petId,
       fullName: fullName ?? this.fullName,
       email: email ?? this.email,
       phoneNumber: phoneNumber ?? this.phoneNumber,
@@ -94,6 +98,7 @@ class AdoptionState extends Equatable {
     errorMessage,
     formData,
     currentStep,
+    petId,
     fullName,
     email,
     phoneNumber,

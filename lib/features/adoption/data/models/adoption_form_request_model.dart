@@ -1,4 +1,5 @@
 class AdoptionFormRequestModel {
+  final int petId;
   final String fullName;
   final String email;
   final String phoneNumber;
@@ -11,6 +12,7 @@ class AdoptionFormRequestModel {
   final bool agreesToTerms;
 
   AdoptionFormRequestModel({
+    required this.petId,
     required this.fullName,
     required this.email,
     required this.phoneNumber,
@@ -25,16 +27,17 @@ class AdoptionFormRequestModel {
 
   Map<String, dynamic> toJson() {
     return {
-        'fullName': fullName,
-        'email': email,
-        'phoneNumber': phoneNumber,
+      'petId': petId,
+      'fullName': fullName,
+      'email': email,
+      'phoneNumber': phoneNumber,
       'dateOfBirth': dateOfBirth,
-        'livingSituationId': livingSituationId,
-        'typeOfResidenceId': typeOfResidenceId,
-        'hasOwnedOrCaredForPetBefore': hasOwnedOrCaredForPetBefore,
-        'petType': petType,
-        'hasReadAndUnderstood': hasReadAndUnderstood,
-        'agreesToTerms': agreesToTerms,
+      'livingSituationId': livingSituationId,
+      'typeOfResidenceId': typeOfResidenceId,
+      'hasOwnedOrCaredForPetBefore': hasOwnedOrCaredForPetBefore,
+      'petType': petType,
+      'hasReadAndUnderstood': hasReadAndUnderstood,
+      'agreesToTerms': agreesToTerms,
     };
   }
 }

@@ -11,6 +11,13 @@ class FetchAdoptionOptions extends AdoptionEvent {
   const FetchAdoptionOptions();
 }
 
+class SetPetId extends AdoptionEvent {
+  final int petId;
+  const SetPetId(this.petId);
+  @override
+  List<Object> get props => [petId];
+}
+
 class UpdateFullName extends AdoptionEvent {
   final String fullName;
   const UpdateFullName(this.fullName);
