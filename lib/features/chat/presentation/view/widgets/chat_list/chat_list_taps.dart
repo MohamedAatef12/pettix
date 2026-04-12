@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
-import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -121,10 +119,11 @@ class _ChatListTapsState extends State<ChatListTaps>
                   children: [
                     GestureDetector(
                       onTap: (){
-                        context.pushNamed(
-                          AppRouteNames.chat,
-                          pathParameters: {'index': index.toString()},
-                        ); },
+                        // context.pushNamed(
+                        //   AppRouteNames.chat,
+                        //   pathParameters: {'index': index.toString()},
+                        // ); },
+                      },
                       child: Container(
                         padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 5.w),
                       decoration: BoxDecoration(

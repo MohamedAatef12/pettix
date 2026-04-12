@@ -8,21 +8,20 @@ import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
-import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_event.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_state.dart';
 import 'package:pinput/pinput.dart';
 
 class OTPBody extends StatelessWidget {
-   OTPBody({super.key});
+   const OTPBody({super.key});
   // Use the bloc's OTP controller so the same controller is used across flows
   // (registration and forgot-password).
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<AuthBloc>();
-    final _otpController = bloc.otpForgotController;
+    final otpController = bloc.otpForgotController;
     return SingleChildScrollView(
       child: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
@@ -34,7 +33,7 @@ class OTPBody extends StatelessWidget {
               context.pushNamed('reset_password', extra: {
                 'bloc': bloc,
                 'email': bloc.emailForgotController.text,
-                'otp': _otpController.text,
+                'otp': otpController.text,
               });
               return;
             }
@@ -64,7 +63,7 @@ class OTPBody extends StatelessWidget {
               SizedBox(height: 40.h,),
               Pinput(
                 length: 6,
-                controller: _otpController,
+                controller: otpController,
                 keyboardType: TextInputType.number,
                 defaultPinTheme: PinTheme(
                   width: 60,
@@ -102,7 +101,7 @@ class OTPBody extends StatelessWidget {
               CustomFilledButton(
                 isLoading: isLoading,
                       onPressed: () {
-                        final otp = _otpController.text;
+                        final otp = otpController.text;
                         context.read<AuthBloc>().add(RegisterOtpSubmitted(otp));
                       },
                       text: AppText.verify,

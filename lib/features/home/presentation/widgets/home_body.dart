@@ -90,40 +90,8 @@ class _HomeBodyState extends State<HomeBody> {
               ),
             );
           }
+          return content;
 
-          return Stack(
-            children: [
-              content,
-              Positioned(
-                bottom: 10.h,
-                right: 10.w,
-                child: GestureDetector(
-                  onTap: () {
-                    context.push('/add_post');
-                  },
-                  child: Container(
-                    width: 50.w,
-                    height: 50.h,
-                    decoration: BoxDecoration(
-                      color: AppColors.current.primary,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: SvgPicture.asset(
-                        'assets/icons/add_circle.svg',
-                        width: 24.w,
-                        height: 24.h,
-                        colorFilter: ColorFilter.mode(
-                          AppColors.current.white,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          );
         },
       ),
     );

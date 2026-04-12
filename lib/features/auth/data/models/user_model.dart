@@ -88,6 +88,7 @@ class UserModel extends UserEntity {
     );
   }
 
+@override
   Map<String, dynamic> toJson() => {
     'id': id,
     'email': email,

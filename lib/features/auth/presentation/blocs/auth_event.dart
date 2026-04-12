@@ -1,5 +1,4 @@
 import 'package:pettix/features/auth/domain/entities/login_entity.dart';
-import '../../domain/entities/register_domain_entity.dart';
 
 abstract class AuthEvent {}
 
@@ -53,6 +52,11 @@ class ToggleRememberMe extends AuthEvent {
 class GoogleLoginSubmitted extends AuthEvent {
   final bool rememberMe;
   GoogleLoginSubmitted({required this.rememberMe});
+}
+
+class AppleLoginSubmitted extends AuthEvent {
+  final bool rememberMe;
+  AppleLoginSubmitted({required this.rememberMe});
 }
 
 class VerifyOtpEvent extends AuthEvent {

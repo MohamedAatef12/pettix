@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/features/splash/persentation/bloc/splash_bloc.dart';
-import 'package:pettix/features/splash/persentation/bloc/splash_event.dart';
 import 'package:pettix/features/splash/persentation/bloc/splash_states.dart';
 
 class SplashBody extends StatelessWidget {

@@ -7,14 +7,13 @@ import 'package:pettix/config/router/app_router.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 final router = appRouter();
+
 class MyApp extends StatelessWidget {
   final AppConfig appConfig;
 
   const MyApp({super.key, required this.appConfig});
-
   @override
   Widget build(BuildContext context) {
-
     final isDev = appConfig.envName == 'Development';
     return BlocProvider(
       create: (context) => HomeBloc.fromDI()..add(FetchPostsEvent()),

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:pettix/features/auth/data/models/register/register_model.dart';
 import 'package:pettix/features/auth/data/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'i_cache_manager.dart';
@@ -87,7 +86,7 @@ class CacheManager implements ICacheManager {
 
   @override
   getSavedLogin() async {
-    final rememberMe = await _prefs?.getBool('remember_me');
+    final rememberMe =  _prefs?.getBool('remember_me');
     if (rememberMe != null) {
       return {'remember_me': rememberMe};
     }
