@@ -66,7 +66,7 @@ class ChatBubble extends StatelessWidget {
         decoration: BoxDecoration(
           color: isMe
               ? AppColors.current.primary
-              : AppColors.current.blueGray.withOpacity(0.4),
+              : AppColors.current.blueGray.withValues(alpha: 0.4),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(14.r),
             topRight: Radius.circular(14.r),

@@ -1,100 +1,60 @@
-import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:pettix/core/themes/app_colors.dart';
+import 'package:go_router/go_router.dart';
+import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/features/adoption/presentation/view/adoption_screen.dart';
-import '../../../home/presentation/pages/home_page.dart';
+import 'package:pettix/features/home/presentation/pages/home_page.dart';
+import 'package:pettix/features/profile/presentation/view/profile_screen.dart';
 import '../bloc/bottom_bar_bloc.dart';
 import '../bloc/bottom_bar_events.dart';
 import '../bloc/bottom_bar_states.dart';
+import '../widgets/android_nav_bar.dart';
+import '../widgets/ios_nav_bar.dart';
 
+/// Root scaffold that hosts the bottom navigation and switches pages.
+///
+/// Renders [IosNavBar] on iOS and [AndroidNavBar] on all other platforms
+/// based on [defaultTargetPlatform]. Uses [IndexedStack] to preserve each
+/// page's state across tab switches.
 class BottomNavigationScreen extends StatelessWidget {
   const BottomNavigationScreen({super.key});
+
+  static const _pages = <Widget>[
+    HomePage(),
+    AdoptionScreen(),
+    AdoptionScreen(),
+    ProfileScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => BottomNavigationBloc(),
+      create: (_) => BottomNavigationBloc(),
       child: BlocBuilder<BottomNavigationBloc, BottomNavigationState>(
         builder: (context, state) {
-          Widget page;
-          if (state is HomePageState) {
-            page = const HomePage();}
-          else if (state is AdoptionState) {
-            page = const AdoptionScreen();
-          }
-          else if (state is AdoptionState) {
-            page = const AdoptionScreen();
-          }
-          else if (state is StoreState) {
-            page = const AdoptionScreen();
-          }
-          else if (state is ClinicsState) {
-            page = const AdoptionScreen();
-          }
-            else {
-            page = const HomePage();
-          }
-
+          final isIos = defaultTargetPlatform == TargetPlatform.iOS;
           return Scaffold(
-            body: page,
-            bottomNavigationBar: Theme(
-              data: Theme.of(context).copyWith(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-              ),
-              child: BottomNavigationBar(
-                type: BottomNavigationBarType.fixed,
-                backgroundColor: AppColors.current.primary,
-                selectedItemColor: AppColors.current.white,
-                unselectedItemColor: AppColors.current.white,
-                showUnselectedLabels: false,
-                selectedFontSize: 12.sp,
-                currentIndex: state.index,
-                onTap: (index) {
-                  final bloc = context.read<BottomNavigationBloc>();
-                  bloc.add(NavigateToPage(index));
-                },
-                items: [
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      'assets/icons/home.svg',
-                      height: 30.r,
-                      color: state.index == 0 ? AppColors.current.white : AppColors.current.lightGray,
-                    ),
-                    label: 'Home'.tr(),
-
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      'assets/icons/adoption.svg',
-                      height: 30.r,
-                      color: state.index == 1 ? AppColors.current.white : AppColors.current.lightGray,
-                    ),
-                    label: 'Adoption'.tr(),
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      'assets/icons/store.svg',
-                      height: 30.r,
-                      color: state.index == 2 ? AppColors.current.white : AppColors.current.lightGray,
-                    ),
-                    label: 'Store'.tr(),
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      'assets/icons/clinics.svg',
-                      height: 30.r,
-                      color: state.index == 3 ? AppColors.current.white : AppColors.current.lightGray,
-                    ),
-                    label: 'Clinics'.tr(),
-                  ),
-                ],
-              )
-
+            extendBody: !isIos,
+            body: IndexedStack(
+              index: state.index,
+              children: _pages,
             ),
+            bottomNavigationBar: isIos
+                ? IosNavBar(
+                    currentIndex: state.index,
+                    onTabChanged: (i) => context
+                        .read<BottomNavigationBloc>()
+                        .add(NavigateToPage(i)),
+                    onAddPost: () => context.push(AppRoutes.addPost),
+                  )
+                : AndroidNavBar(
+                    currentIndex: state.index,
+                    onTabChanged: (i) => context
+                        .read<BottomNavigationBloc>()
+                        .add(NavigateToPage(i)),
+                    onAddPost: () => context.push(AppRoutes.addPost),
+                  ),
           );
         },
       ),

@@ -1,17 +1,16 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/data/network/email_auth_service.dart';
-import 'package:pettix/data/network/twilio_service.dart';
-import 'package:pettix/features/auth/data/models/login/google_login_model.dart';
 import 'package:pettix/features/auth/data/models/user_model.dart';
+import 'package:pettix/features/auth/domain/entities/apple_login_entity.dart';
 import 'package:pettix/features/auth/domain/entities/google_login_entity.dart';
 import 'package:pettix/features/auth/domain/entities/register_domain_entity.dart';
 import 'package:pettix/features/auth/domain/entities/user_entity.dart';
+import 'package:pettix/features/auth/domain/usecases/apple_login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/forgot_password.dart';
 import 'package:pettix/features/auth/domain/usecases/google_login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/login_use_case.dart';
@@ -26,6 +25,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final RegisterUseCase registerUseCase;
   final LoginUseCase loginUseCase;
   final GoogleLoginUseCase googleLoginUseCase;
+  final AppleLoginUseCase appleLoginUseCase;
   final EmailAuthService emailAuthService;
   final VerifyOtp verifyOtp;
   final ResendOtpUseCase resendOtpUseCase;
@@ -61,6 +61,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.registerUseCase,
     required this.loginUseCase,
     required this.googleLoginUseCase,
+    required this.appleLoginUseCase,
     required this.emailAuthService,
     required this.verifyOtp,
     required this.resendOtpUseCase,
@@ -100,6 +101,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(LoginRememberMeChanged(rememberMe));
     });
     on<GoogleLoginSubmitted>(_googleLoginSubmitted);
+    on<AppleLoginSubmitted>(_appleLoginSubmitted);
     on<ForgotPasswordEvent>(_forgotPassword);
     on<ResetPasswordEvent>(_resetPassword);
   }
@@ -194,14 +196,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     print('🚀 FCM TOKEN FOR LOGIN: $fcmToken');
     final result = await loginUseCase(event.model.copyWith(fcmToken: fcmToken));
     await result.fold(
-      (failure) async {
-        print('failure message: ${failure.message}');
-        emit(LoginFailure(failure.message));
-      },
-      (loginResponse) async {
-        await DI.find<ICacheManager>().setUserData(
-          UserModel.fromEntity(loginResponse.contact),
-        );
+          (failure) async {
+            debugPrint('failure message: ${failure.message}');
+            emit(LoginFailure(failure.message));} ,
+          (loginResponse) async {
+        await DI.find<ICacheManager>()
+            .setUserData(UserModel.fromEntity(loginResponse.contact));
         await DI.find<ICacheManager>().setToken(loginResponse.token);
         await DI.find<ICacheManager>().setRefreshToken(
           loginResponse.refreshToken.toString(),
@@ -273,8 +273,44 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           emit(GoogleLoginSuccess(loginResponse.user)); // مفيش User entity جديد
         },
       );
-    } catch (e, st) {
+    } catch (e) {
       emit(GoogleLoginFailure(e.toString()));
+    }
+  }
+  Future<void> _appleLoginSubmitted(
+      AppleLoginSubmitted event, Emitter<AuthState> emit) async {
+    emit(AppleLoginLoading());
+    try {
+      // Import is: package:sign_in_with_apple/sign_in_with_apple.dart
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      final idToken = credential.identityToken;
+      if (idToken == null) {
+        emit(AppleLoginFailure('Failed to get Apple identity token'));
+        return;
+      }
+
+      final result = await appleLoginUseCase(AppleLoginEntity(idToken: idToken));
+
+      await result.fold(
+        (failure) async => emit(AppleLoginFailure(failure.message)),
+        (loginResponse) async {
+          await DI.find<ICacheManager>().setToken(loginResponse.token);
+          if (event.rememberMe) {
+            await DI.find<ICacheManager>().saveLogin(true);
+          } else {
+            await DI.find<ICacheManager>().clearLogin();
+          }
+          emit(AppleLoginSuccess(loginResponse.user));
+        },
+      );
+    } catch (e) {
+      emit(AppleLoginFailure(e.toString()));
     }
   }
 

@@ -22,7 +22,7 @@ class RtlAwareIcon extends StatelessWidget {
     
     return Transform(
       alignment: Alignment.center,
-      transform: Matrix4.identity()..scale(-1.0, 1.0),
+      transform: Matrix4.identity()..scaleByDouble(-1.0, 1.0, 1.0, 1.0),
       child: child,
     );
   }

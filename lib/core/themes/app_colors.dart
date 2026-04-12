@@ -22,6 +22,7 @@ class AppColors {
     required this.transparent,
     required this.blueGray,
     required this.brown,
+    required this.gold,
     required MaterialColor swatch,
   });
   Color primary;
@@ -40,6 +41,7 @@ class AppColors {
   Color transparent;
   Color blueGray;
   Color brown;
+  Color gold;
 }
 
 var _defaultLightColors = AppColors(
@@ -70,5 +72,6 @@ var _defaultLightColors = AppColors(
   teal: const Color(0xff13D586),
   transparent: Colors.transparent,
   blueGray: const Color(0xffC0CCDD),
-  brown: const Color(0xffE3D1B5)
+  brown: const Color(0xffE3D1B5),
+  gold: const Color(0xffC8933D)
 );

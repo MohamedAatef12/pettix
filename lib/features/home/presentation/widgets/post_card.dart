@@ -720,7 +720,7 @@ void _openImagesPreview(BuildContext context, List<String> images) {
     context: context,
     barrierDismissible: true,
     barrierLabel: '',
-    barrierColor: Colors.black.withOpacity(0.8),
+    barrierColor: Colors.black.withValues(alpha: 0.8),
     pageBuilder: (_, __, ___) {
       final imageHeight = MediaQuery.of(context).size.height * 0.5;
 
@@ -836,7 +836,7 @@ void _openImagesPreview(BuildContext context, List<String> images) {
 void _openSingleImagePreview(BuildContext context, String image) {
   showDialog(
     context: context,
-    barrierColor: Colors.black.withOpacity(0.8),
+    barrierColor: Colors.black.withValues(alpha: 0.8),
     builder: (_) {
       return Dialog(
         backgroundColor: Colors.transparent,

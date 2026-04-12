@@ -1,4 +1,3 @@
-import 'package:pettix/features/auth/data/models/register/register_model.dart';
 import 'package:pettix/features/auth/domain/entities/user_entity.dart';
 
 abstract class AuthState {}
@@ -50,6 +49,18 @@ class GoogleLoginSuccess extends AuthState {
 class GoogleLoginFailure extends AuthState {
   final String error;
   GoogleLoginFailure(this.error);
+}
+
+class AppleLoginLoading extends AuthState {}
+
+class AppleLoginSuccess extends AuthState {
+  final UserEntity? user;
+  AppleLoginSuccess(this.user);
+}
+
+class AppleLoginFailure extends AuthState {
+  final String error;
+  AppleLoginFailure(this.error);
 }
 
 

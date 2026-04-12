@@ -80,6 +80,7 @@ class CustomTextFormField extends StatelessWidget {
       enabled: enabled,
       decoration: InputDecoration(
         hintText: hintText,
+        hintStyle: TextStyle(color: AppColors.current.lightText),
         labelText: labelText,
         filled: fillColor,
         fillColor: fillColorValue,
@@ -100,11 +101,13 @@ class CustomTextFormField extends StatelessWidget {
         contentPadding: contentPadding ??
             const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
         border: border ?? const OutlineInputBorder(),
-        focusedBorder: focusedBorder ??
+        focusedBorder:
+            focusedBorder ??
             const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.blue),
             ),
-        enabledBorder: enabledBorder ??
+        enabledBorder:
+            enabledBorder ??
             const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.grey),
             ),

@@ -5,14 +5,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/config/env/app_config.dart';
 import 'package:pettix/config/router/app_router.dart';
 final router = appRouter();
+
 class MyApp extends StatelessWidget {
   final AppConfig appConfig;
 
   const MyApp({super.key, required this.appConfig});
-
   @override
   Widget build(BuildContext context) {
-
     final isDev = appConfig.envName == 'Development';
     return ScreenUtilInit(
       designSize: const Size(360, 760),
