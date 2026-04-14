@@ -4,7 +4,7 @@ import 'package:pettix/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_event.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_state.dart';
 import 'package:pettix/features/profile/presentation/widgets/edit_profile_body.dart';
-
+import 'package:pettix/core/themes/app_colors.dart';
 class EditProfileScreen extends StatelessWidget {
   const EditProfileScreen({super.key});
 
@@ -22,7 +22,10 @@ class EditProfileScreen extends StatelessWidget {
       listener: (context, state) {
         context.read<ProfileBloc>().add(InitEditFormEvent());
       },
-      child: const Scaffold(body: SafeArea(child: EditProfileBody())),
+      child: Scaffold(
+        backgroundColor: AppColors.current.lightBlue,
+        body: const SafeArea(child: EditProfileBody()),
+      ),
     );
   }
 }

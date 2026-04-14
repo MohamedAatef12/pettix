@@ -27,34 +27,37 @@ class AvatarPicker extends StatelessWidget {
             child: Stack(
               children: [
                 Container(
-                  padding: EdgeInsets.all(3.w),
+                  padding: EdgeInsets.all(4.w),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [
-                        AppColors.current.gold,
-                        AppColors.current.primary,
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                    color: AppColors.current.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(15),
+                        blurRadius: 20,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                   child: Container(
                     padding: EdgeInsets.all(2.w),
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white,
+                      border: Border.all(
+                        color: AppColors.current.primary.withAlpha(100),
+                        width: 1.5.w,
+                      ),
                     ),
                     child: CircleAvatar(
-                      radius: 52.r,
+                      radius: 46.r,
                       backgroundColor: AppColors.current.lightGray,
                       backgroundImage: image,
                     ),
                   ),
                 ),
                 Positioned(
-                  bottom: 4.h,
-                  right: 4.w,
+                  bottom: 2.h,
+                  right: 2.w,
                   child: Container(
                     width: 28.w,
                     height: 28.w,

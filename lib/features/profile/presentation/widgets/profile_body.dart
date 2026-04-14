@@ -29,9 +29,11 @@ class ProfileBody extends StatelessWidget {
         }
         final profile = state.profile;
         if (profile == null) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator(
+            color: AppColors.current.primary,
+          ));
         }
-        return _ProfileContent(profile: profile);
+        return _ProfileContent( profile: profile);
       },
     );
   }
@@ -77,12 +79,7 @@ class _ProfileContent extends StatelessWidget {
                           label: AppText.fullName,
                           value: profile.nameEn ?? profile.userName,
                         ),
-                        ProfileInfoRow(
-                          icon: Icons.translate_rounded,
-                          label: AppText.nameAr,
-                          value: profile.nameAr ?? '-',
-                          iconColor: const Color(0xFF7A6FD8),
-                        ),
+
                         ProfileInfoRow(
                           icon: Icons.email_outlined,
                           label: AppText.email,

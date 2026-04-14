@@ -32,7 +32,7 @@ class GenderDropdown extends StatelessWidget {
             ),
             prefixIconConstraints: BoxConstraints(minWidth: 52.w),
             filled: true,
-            fillColor: AppColors.current.lightBlue,
+            fillColor: AppColors.current.white,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14.r),
               borderSide: BorderSide.none,

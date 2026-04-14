@@ -6,7 +6,7 @@ import 'package:pettix/features/my_pets/presentation/bloc/my_pets_event.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_event.dart';
 import 'package:pettix/features/profile/presentation/widgets/profile_body.dart';
-
+import 'package:pettix/core/themes/app_colors.dart';
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -23,8 +23,9 @@ class ProfileScreen extends StatelessWidget {
             ..add(const FetchPetOptionsEvent()),
         ),
       ],
-      child: const Scaffold(
-        body: SafeArea(child: ProfileBody()),
+      child: Scaffold(
+        backgroundColor: AppColors.current.lightBlue,
+        body: const SafeArea(child: ProfileBody()),
       ),
     );
   }

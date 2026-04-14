@@ -145,13 +145,7 @@ class EditProfileBody extends StatelessWidget {
                       icon: Icons.person_outline_rounded,
                       iconColor: AppColors.current.primary,
                     ),
-                    SizedBox(height: 12.h),
-                    _FilledField(
-                      controller: bloc.nameArController,
-                      label: AppText.nameAr,
-                      icon: Icons.translate_rounded,
-                      iconColor: const Color(0xFF7A6FD8),
-                    ),
+
                     SizedBox(height: 12.h),
                     _FilledField(
                       controller: bloc.phoneController,
@@ -275,7 +269,7 @@ class _FilledField extends StatelessWidget {
         ),
         prefixIconConstraints: BoxConstraints(minWidth: 52.w),
         filled: true,
-        fillColor: AppColors.current.lightBlue,
+        fillColor: AppColors.current.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14.r),
           borderSide: BorderSide.none,
