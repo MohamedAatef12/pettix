@@ -320,9 +320,12 @@ final List<RouteBase> _adoptionHistoryRoutes = [
     name: AppRouteNames.adoptionFormDetail,
     builder: (context, state) {
       final extra = state.extra as Map<String, dynamic>;
-      return AdoptionFormDetailScreen(
-        form: extra['form'] as AdoptionFormEntity,
-        isOwnerView: extra['isOwnerView'] as bool,
+      return BlocProvider.value(
+        value: extra['bloc'] as AdoptionHistoryBloc,
+        child: AdoptionFormDetailScreen(
+          form: extra['form'] as AdoptionFormEntity,
+          isOwnerView: extra['isOwnerView'] as bool,
+        ),
       );
     },
   ),

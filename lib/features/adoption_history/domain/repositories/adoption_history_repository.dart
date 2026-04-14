@@ -9,4 +9,7 @@ abstract class AdoptionHistoryRepository {
 
   /// Returns all adoption forms submitted by others for the current user's pets.
   Future<Either<Failure, List<AdoptionFormEntity>>> getOwnerForms();
+
+  /// Updates the status of an adoption form.
+  Future<Either<Failure, void>> updateFormStatus(int id, int status);
 }
