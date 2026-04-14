@@ -9,6 +9,7 @@ import 'package:pettix/features/adoption_history/domain/entities/adoption_form_e
 abstract class AdoptionHistoryRemoteDataSource {
   Future<Either<Failure, List<AdoptionFormEntity>>> getClientForms();
   Future<Either<Failure, List<AdoptionFormEntity>>> getOwnerForms();
+  Future<Either<Failure, void>> updateFormStatus(int id, int status);
 }
 
 @LazySingleton(as: AdoptionHistoryRemoteDataSource)
@@ -36,11 +37,24 @@ class AdoptionHistoryRemoteDataSourceImpl
         final list = raw is List ? raw : <dynamic>[];
         return Right(
           list
-              .map((e) =>
-                  AdoptionFormModel.fromJson(e as Map<String, dynamic>))
+              .map((e) => AdoptionFormModel.fromJson(e as Map<String, dynamic>))
               .toList(),
         );
       }
+      return Left(Failure(response.message));
+    } catch (e) {
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateFormStatus(int id, int status) async {
+    try {
+      final response = await _apiService.patch(
+        endPoint: '${Constants.adoptionFormsEndpoint}/$id/status',
+        data: {'status': status},
+      );
+      if (response.success == true) return const Right(null);
       return Left(Failure(response.message));
     } catch (e) {
       return Left(DioFailure.fromDioError(e));

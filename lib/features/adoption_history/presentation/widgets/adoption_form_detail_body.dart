@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pettix/core/enums/app_enums.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/adoption_history/domain/entities/adoption_form_entity.dart';
+import 'package:pettix/features/adoption_history/presentation/bloc/adoption_history_bloc.dart';
+import 'package:pettix/features/adoption_history/presentation/bloc/adoption_history_event.dart';
 import 'package:pettix/features/adoption_history/presentation/widgets/adoption_form_card.dart';
 
 /// Full detail view for a single adoption form.
@@ -33,65 +36,69 @@ class AdoptionFormDetailBody extends StatelessWidget {
                 SizedBox(height: 16.h),
                 _SectionTitle('Applicant'),
                 SizedBox(height: 10.h),
-                _InfoGroup(rows: [
-                  _InfoRow(
-                    icon: Icons.person_outline_rounded,
-                    iconColor: AppColors.current.primary,
-                    label: 'Full Name',
-                    value: form.fullName,
-                  ),
-                  _InfoRow(
-                    icon: Icons.email_outlined,
-                    iconColor: const Color(0xFF5EA8DF),
-                    label: 'Email',
-                    value: form.email,
-                  ),
-                  if (form.phoneNumber != null)
+                _InfoGroup(
+                  rows: [
                     _InfoRow(
-                      icon: Icons.phone_outlined,
-                      iconColor: const Color(0xFF56C590),
-                      label: 'Phone',
-                      value: form.phoneNumber!,
+                      icon: Icons.person_outline_rounded,
+                      iconColor: AppColors.current.primary,
+                      label: 'Full Name',
+                      value: form.fullName,
                     ),
-                  if (form.dateOfBirth != null)
                     _InfoRow(
-                      icon: Icons.cake_outlined,
-                      iconColor: const Color(0xFFE8A838),
-                      label: 'Date of Birth',
-                      value: _formatDate(form.dateOfBirth!),
+                      icon: Icons.email_outlined,
+                      iconColor: const Color(0xFF5EA8DF),
+                      label: 'Email',
+                      value: form.email,
                     ),
-                ]),
+                    if (form.phoneNumber != null)
+                      _InfoRow(
+                        icon: Icons.phone_outlined,
+                        iconColor: const Color(0xFF56C590),
+                        label: 'Phone',
+                        value: form.phoneNumber!,
+                      ),
+                    if (form.dateOfBirth != null)
+                      _InfoRow(
+                        icon: Icons.cake_outlined,
+                        iconColor: const Color(0xFFE8A838),
+                        label: 'Date of Birth',
+                        value: _formatDate(form.dateOfBirth!),
+                      ),
+                  ],
+                ),
                 SizedBox(height: 16.h),
                 _SectionTitle('Living Situation'),
                 SizedBox(height: 10.h),
-                _InfoGroup(rows: [
-                  if (form.livingSituation != null)
+                _InfoGroup(
+                  rows: [
+                    if (form.livingSituation != null)
+                      _InfoRow(
+                        icon: Icons.home_outlined,
+                        iconColor: const Color(0xFF7A6FD8),
+                        label: 'Housing',
+                        value: form.livingSituation!,
+                      ),
+                    if (form.typeOfResidence != null)
+                      _InfoRow(
+                        icon: Icons.vpn_key_outlined,
+                        iconColor: AppColors.current.gold,
+                        label: 'Residence',
+                        value: form.typeOfResidence!,
+                      ),
                     _InfoRow(
-                      icon: Icons.home_outlined,
-                      iconColor: const Color(0xFF7A6FD8),
-                      label: 'Housing',
-                      value: form.livingSituation!,
+                      icon: Icons.pets_rounded,
+                      iconColor: AppColors.current.teal,
+                      label: 'Owned a pet before',
+                      value: form.hasOwnedOrCaredForPetBefore ? 'Yes' : 'No',
                     ),
-                  if (form.typeOfResidence != null)
                     _InfoRow(
-                      icon: Icons.vpn_key_outlined,
-                      iconColor: AppColors.current.gold,
-                      label: 'Residence',
-                      value: form.typeOfResidence!,
+                      icon: Icons.check_circle_outline_rounded,
+                      iconColor: AppColors.current.green,
+                      label: 'Agrees to terms',
+                      value: form.agreesToTerms ? 'Yes' : 'No',
                     ),
-                  _InfoRow(
-                    icon: Icons.pets_rounded,
-                    iconColor: AppColors.current.teal,
-                    label: 'Owned a pet before',
-                    value: form.hasOwnedOrCaredForPetBefore ? 'Yes' : 'No',
-                  ),
-                  _InfoRow(
-                    icon: Icons.check_circle_outline_rounded,
-                    iconColor: AppColors.current.green,
-                    label: 'Agrees to terms',
-                    value: form.agreesToTerms ? 'Yes' : 'No',
-                  ),
-                ]),
+                  ],
+                ),
                 SizedBox(height: 24.h),
                 if (isOwnerView) _ActionButtons(form: form),
                 SizedBox(height: 32.h),
@@ -122,13 +129,7 @@ class _DetailHeader extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.current.primary, const Color(0xFF2A4E8F)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
+      color: AppColors.current.white,
       child: SafeArea(
         bottom: false,
         child: Padding(
@@ -141,7 +142,7 @@ class _DetailHeader extends StatelessWidget {
                 onPressed: () => Navigator.of(context).pop(),
                 icon: Icon(
                   Icons.arrow_back_ios_new_rounded,
-                  color: Colors.white,
+                  color: AppColors.current.text,
                   size: 20.w,
                 ),
               ),
@@ -152,13 +153,16 @@ class _DetailHeader extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.pets_rounded,
-                            color: AppColors.current.gold, size: 16.w),
+                        Icon(
+                          Icons.pets_rounded,
+                          color: AppColors.current.primary,
+                          size: 16.w,
+                        ),
                         SizedBox(width: 6.w),
                         Text(
                           'Form #${form.id}',
                           style: TextStyle(
-                            color: Colors.white.withAlpha(180),
+                            color: AppColors.current.midGray,
                             fontSize: 11.sp,
                             letterSpacing: 1,
                           ),
@@ -169,7 +173,7 @@ class _DetailHeader extends StatelessWidget {
                     Text(
                       form.petName ?? 'Unknown Pet',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.current.text,
                         fontSize: 22.sp,
                         fontWeight: FontWeight.w800,
                       ),
@@ -177,7 +181,9 @@ class _DetailHeader extends StatelessWidget {
                     SizedBox(height: 6.h),
                     Container(
                       padding: EdgeInsets.symmetric(
-                          horizontal: 10.w, vertical: 4.h),
+                        horizontal: 10.w,
+                        vertical: 4.h,
+                      ),
                       decoration: BoxDecoration(
                         color: style.bg,
                         borderRadius: BorderRadius.circular(20.r),
@@ -214,17 +220,15 @@ class _PetInfoCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.current.primary.withAlpha(15),
-            AppColors.current.lightBlue,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppColors.current.white,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-            color: AppColors.current.primary.withAlpha(40), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(10),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -235,8 +239,11 @@ class _PetInfoCard extends StatelessWidget {
               color: AppColors.current.primary.withAlpha(20),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.pets_rounded,
-                color: AppColors.current.primary, size: 24.w),
+            child: Icon(
+              Icons.pets_rounded,
+              color: AppColors.current.primary,
+              size: 24.w,
+            ),
           ),
           SizedBox(width: 12.w),
           Expanded(
@@ -278,8 +285,7 @@ class _SectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(
-            width: 3.w, height: 16.h, color: AppColors.current.primary),
+        Container(width: 3.w, height: 16.h, color: AppColors.current.primary),
         SizedBox(width: 8.w),
         Text(
           text.toUpperCase(),
@@ -317,11 +323,12 @@ class _InfoGroup extends StatelessWidget {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: rows.length,
-        separatorBuilder: (_, __) => Divider(
-          height: 1,
-          indent: 52.w,
-          color: AppColors.current.lightGray,
-        ),
+        separatorBuilder:
+            (_, __) => Divider(
+              height: 1,
+              indent: 52.w,
+              color: AppColors.current.lightGray,
+            ),
         itemBuilder: (_, i) => rows[i],
       ),
     );
@@ -410,18 +417,24 @@ class _ActionButtons extends StatelessWidget {
                 label: 'Accept',
                 icon: Icons.check_circle_outline_rounded,
                 color: AppColors.current.green,
-                onTap: () => _confirmAction(
-                  context,
-                  title: 'Accept Application',
-                  message:
-                      'Are you sure you want to accept the application for ${form.petName}?',
-                  confirm: 'Accept',
-                  confirmColor: AppColors.current.green,
-                  onConfirm: () {
-                    // TODO: call update status endpoint with status=2 (approved)
-                    Navigator.of(context).pop();
-                  },
-                ),
+                onTap:
+                    () => _confirmAction(
+                      context,
+                      title: 'Accept Application',
+                      message:
+                          'Are you sure you want to accept the application for ${form.petName}?',
+                      confirm: 'Accept',
+                      confirmColor: AppColors.current.green,
+                      onConfirm: () {
+                        context.read<AdoptionHistoryBloc>().add(
+                          UpdateFormStatusEvent(
+                            formId: form.id!,
+                            status: AdoptionFormStatus.approved.value,
+                          ),
+                        );
+                        Navigator.of(context).pop();
+                      },
+                    ),
               ),
             ),
             SizedBox(width: 12.w),
@@ -431,18 +444,24 @@ class _ActionButtons extends StatelessWidget {
                 icon: Icons.cancel_outlined,
                 color: AppColors.current.red,
                 outlined: true,
-                onTap: () => _confirmAction(
-                  context,
-                  title: 'Reject Application',
-                  message:
-                      'Are you sure you want to reject the application for ${form.petName}?',
-                  confirm: 'Reject',
-                  confirmColor: AppColors.current.red,
-                  onConfirm: () {
-                    // TODO: call update status endpoint with status=3 (rejected)
-                    Navigator.of(context).pop();
-                  },
-                ),
+                onTap:
+                    () => _confirmAction(
+                      context,
+                      title: 'Reject Application',
+                      message:
+                          'Are you sure you want to reject the application for ${form.petName}?',
+                      confirm: 'Reject',
+                      confirmColor: AppColors.current.red,
+                      onConfirm: () {
+                        context.read<AdoptionHistoryBloc>().add(
+                          UpdateFormStatusEvent(
+                            formId: form.id!,
+                            status: AdoptionFormStatus.rejected.value,
+                          ),
+                        );
+                        Navigator.of(context).pop();
+                      },
+                    ),
               ),
             ),
           ],
@@ -461,36 +480,48 @@ class _ActionButtons extends StatelessWidget {
   }) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.r)),
-        title: Text(title,
-            style: TextStyle(
-                fontSize: 16.sp, fontWeight: FontWeight.w700)),
-        content: Text(message,
-            style: TextStyle(
-                color: AppColors.current.midGray, fontSize: 13.sp)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel',
-                style: TextStyle(color: AppColors.current.midGray)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              onConfirm();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: confirmColor,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.r)),
+      builder:
+          (_) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.r),
             ),
-            child: Text(confirm,
-                style: const TextStyle(color: Colors.white)),
+            title: Text(
+              title,
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
+            ),
+            content: Text(
+              message,
+              style: TextStyle(
+                color: AppColors.current.midGray,
+                fontSize: 13.sp,
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(color: AppColors.current.midGray),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  onConfirm();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: confirmColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                ),
+                child: Text(
+                  confirm,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }
@@ -520,21 +551,21 @@ class _ActionButton extends StatelessWidget {
           color: outlined ? Colors.transparent : color,
           borderRadius: BorderRadius.circular(14.r),
           border: Border.all(color: color, width: 1.5),
-          boxShadow: outlined
-              ? []
-              : [
-                  BoxShadow(
-                    color: color.withAlpha(60),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+          boxShadow:
+              outlined
+                  ? []
+                  : [
+                    BoxShadow(
+                      color: color.withAlpha(60),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon,
-                color: outlined ? color : Colors.white, size: 18.w),
+            Icon(icon, color: outlined ? color : Colors.white, size: 18.w),
             SizedBox(width: 6.w),
             Text(
               label,

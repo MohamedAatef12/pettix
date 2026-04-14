@@ -40,11 +40,11 @@ class AdoptionHistoryState extends Equatable {
 
   @override
   List<Object?> get props => [
-        clientStatus,
-        ownerStatus,
-        clientForms,
-        ownerForms,
-        clientError,
-        ownerError,
-      ];
+    clientStatus,
+    ownerStatus,
+    clientForms,
+    ownerForms,
+    clientError,
+    ownerError,
+  ];
 }

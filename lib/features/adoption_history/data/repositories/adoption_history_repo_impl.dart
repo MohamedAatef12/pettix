@@ -18,4 +18,8 @@ class AdoptionHistoryRepositoryImpl implements AdoptionHistoryRepository {
   @override
   Future<Either<Failure, List<AdoptionFormEntity>>> getOwnerForms() =>
       _remoteDataSource.getOwnerForms();
+
+  @override
+  Future<Either<Failure, void>> updateFormStatus(int id, int status) =>
+      _remoteDataSource.updateFormStatus(id, status);
 }

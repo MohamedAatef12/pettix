@@ -40,20 +40,20 @@ class AdoptionFormEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        fullName,
-        email,
-        phoneNumber,
-        dateOfBirth,
-        livingSituationId,
-        typeOfResidenceId,
-        livingSituation,
-        typeOfResidence,
-        hasOwnedOrCaredForPetBefore,
-        petType,
-        agreesToTerms,
-        petId,
-        petName,
-        status,
-      ];
+    id,
+    fullName,
+    email,
+    phoneNumber,
+    dateOfBirth,
+    livingSituationId,
+    typeOfResidenceId,
+    livingSituation,
+    typeOfResidence,
+    hasOwnedOrCaredForPetBefore,
+    petType,
+    agreesToTerms,
+    petId,
+    petName,
+    status,
+  ];
 }

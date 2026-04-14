@@ -8,16 +8,31 @@ import 'package:pettix/features/adoption_history/domain/entities/adoption_form_e
 ({Color bg, Color text, String label}) adoptionStatusStyle(int statusValue) {
   final status = AdoptionFormStatus.fromValue(statusValue);
   return switch (status) {
-    AdoptionFormStatus.pending =>
-      (bg: const Color(0xFFFFF3CD), text: const Color(0xFF856404), label: 'Pending'),
-    AdoptionFormStatus.approved =>
-      (bg: const Color(0xFFD1FAE5), text: const Color(0xFF065F46), label: 'Approved'),
-    AdoptionFormStatus.rejected =>
-      (bg: const Color(0xFFFFE4E4), text: const Color(0xFF991B1B), label: 'Rejected'),
-    AdoptionFormStatus.cancelled =>
-      (bg: const Color(0xFFF3F4F6), text: const Color(0xFF6B7280), label: 'Cancelled'),
-    null =>
-      (bg: const Color(0xFFF3F4F6), text: const Color(0xFF6B7280), label: 'Unknown'),
+    AdoptionFormStatus.pending => (
+      bg: const Color(0xFFFFF3CD),
+      text: const Color(0xFF856404),
+      label: 'Pending',
+    ),
+    AdoptionFormStatus.approved => (
+      bg: const Color(0xFFD1FAE5),
+      text: const Color(0xFF065F46),
+      label: 'Approved',
+    ),
+    AdoptionFormStatus.rejected => (
+      bg: const Color(0xFFFFE4E4),
+      text: const Color(0xFF991B1B),
+      label: 'Rejected',
+    ),
+    AdoptionFormStatus.cancelled => (
+      bg: const Color(0xFFF3F4F6),
+      text: const Color(0xFF6B7280),
+      label: 'Cancelled',
+    ),
+    null => (
+      bg: const Color(0xFFF3F4F6),
+      text: const Color(0xFF6B7280),
+      label: 'Unknown',
+    ),
   };
 }
 
@@ -84,9 +99,7 @@ class AdoptionFormCard extends StatelessWidget {
                     ),
                     SizedBox(height: 4.h),
                     Text(
-                      isOwnerView
-                          ? 'By: ${form.fullName}'
-                          : form.email,
+                      isOwnerView ? 'By: ${form.fullName}' : form.email,
                       style: TextStyle(
                         color: AppColors.current.midGray,
                         fontSize: 11.sp,
@@ -130,22 +143,16 @@ class _PetIconBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final initials = petName != null && petName!.isNotEmpty
-        ? petName![0].toUpperCase()
-        : '?';
+    final initials =
+        petName != null && petName!.isNotEmpty
+            ? petName![0].toUpperCase()
+            : '?';
 
     return Container(
       width: 56.w,
       height: 80.h,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.current.primary.withAlpha(200),
-            const Color(0xFF2A4E8F),
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
+        color: AppColors.current.primary.withAlpha(20),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(16.r),
           bottomLeft: Radius.circular(16.r),
@@ -154,12 +161,16 @@ class _PetIconBlock extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.pets_rounded, color: Colors.white.withAlpha(180), size: 18.w),
+          Icon(
+            Icons.pets_rounded,
+            color: AppColors.current.primary.withAlpha(180),
+            size: 18.w,
+          ),
           SizedBox(height: 4.h),
           Text(
             initials,
             style: TextStyle(
-              color: Colors.white,
+              color: AppColors.current.primary,
               fontSize: 16.sp,
               fontWeight: FontWeight.w800,
             ),
@@ -203,26 +214,27 @@ class _TagRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: items
-          .map(
-            (tag) => Container(
-              margin: EdgeInsets.only(right: 6.w),
-              padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.h),
-              decoration: BoxDecoration(
-                color: AppColors.current.lightBlue,
-                borderRadius: BorderRadius.circular(6.r),
-              ),
-              child: Text(
-                tag,
-                style: TextStyle(
-                  color: AppColors.current.primary,
-                  fontSize: 9.sp,
-                  fontWeight: FontWeight.w600,
+      children:
+          items
+              .map(
+                (tag) => Container(
+                  margin: EdgeInsets.only(right: 6.w),
+                  padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.h),
+                  decoration: BoxDecoration(
+                    color: AppColors.current.lightBlue,
+                    borderRadius: BorderRadius.circular(6.r),
+                  ),
+                  child: Text(
+                    tag,
+                    style: TextStyle(
+                      color: AppColors.current.primary,
+                      fontSize: 9.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          )
-          .toList(),
+              )
+              .toList(),
     );
   }
 }

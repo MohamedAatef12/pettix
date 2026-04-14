@@ -16,3 +16,14 @@ class FetchClientFormsEvent extends AdoptionHistoryEvent {
 class FetchOwnerFormsEvent extends AdoptionHistoryEvent {
   const FetchOwnerFormsEvent();
 }
+
+/// Updates the status of a specific adoption form.
+class UpdateFormStatusEvent extends AdoptionHistoryEvent {
+  final int formId;
+  final int status;
+
+  const UpdateFormStatusEvent({required this.formId, required this.status});
+
+  @override
+  List<Object?> get props => [formId, status];
+}
