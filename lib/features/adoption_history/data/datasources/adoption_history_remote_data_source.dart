@@ -52,7 +52,7 @@ class AdoptionHistoryRemoteDataSourceImpl
     try {
       final response = await _apiService.patch(
         endPoint: '${Constants.adoptionFormsEndpoint}/$id/status',
-        queryParameters: {'status': status},
+        data: {'status': status},
       );
       if (response.success == true) return const Right(null);
       return Left(Failure(response.message));
