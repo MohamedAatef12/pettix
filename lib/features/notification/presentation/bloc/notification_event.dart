@@ -48,3 +48,7 @@ class MarkAsReadEvent extends NotificationEvent {
   @override
   List<Object?> get props => [id];
 }
+
+class FetchAllUnreadCounts extends NotificationEvent {
+  const FetchAllUnreadCounts();
+}

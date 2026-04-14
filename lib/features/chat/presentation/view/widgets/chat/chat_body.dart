@@ -16,7 +16,7 @@ class ChatBody extends StatelessWidget {
           Expanded(
             child: ChatConversation(userIndex: index,),
           ),
-          ChatTextFormField(),
+          ChatTextFormField(conversationId: index),
         ],
       ),
     );

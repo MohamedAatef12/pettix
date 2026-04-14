@@ -66,6 +66,26 @@ import '../../features/auth/domain/usecases/register_usecase.dart' as _i941;
 import '../../features/auth/domain/usecases/resend_otp_usecase.dart' as _i613;
 import '../../features/auth/domain/usecases/reset_password.dart' as _i1066;
 import '../../features/auth/domain/usecases/verify_otp.dart' as _i975;
+import '../../features/chat/data/data_source/chat_remote_data_source.dart'
+    as _i468;
+import '../../features/chat/data/repo/chat_repository_impl.dart' as _i328;
+import '../../features/chat/domain/repo/chat_repository.dart' as _i1030;
+import '../../features/chat/domain/use_cases/create_private_conversation_use_case.dart'
+    as _i586;
+import '../../features/chat/domain/use_cases/delete_message_use_case.dart'
+    as _i450;
+import '../../features/chat/domain/use_cases/edit_message_use_case.dart'
+    as _i801;
+import '../../features/chat/domain/use_cases/get_conversation_details_use_case.dart'
+    as _i10;
+import '../../features/chat/domain/use_cases/get_conversations_use_case.dart'
+    as _i388;
+import '../../features/chat/domain/use_cases/get_messages_use_case.dart'
+    as _i529;
+import '../../features/chat/domain/use_cases/send_message_use_case.dart'
+    as _i460;
+import '../../features/chat/presentation/bloc/chat_bloc.dart' as _i65;
+import '../../features/chat/presentation/bloc/chat_list_bloc.dart' as _i2;
 import '../../features/home/data/repo/home_repo_impl.dart' as _i1024;
 import '../../features/home/data/sources/local/local_data_source.dart' as _i526;
 import '../../features/home/data/sources/local/local_data_source_impl.dart'
@@ -165,6 +185,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1050.MyPetsRemoteDataSource>(
       () => _i1050.MyPetsRemoteDataSourceImpl(gh<_i655.ApiService>()),
     );
+    gh.lazySingleton<_i468.ChatRemoteDataSource>(
+      () => _i468.ChatRemoteDataSourceImpl(gh<_i655.ApiService>()),
+    );
     gh.lazySingleton<_i934.NotificationRemoteDataSource>(
       () => _i934.NotificationRemoteDataSourceImpl(gh<_i655.ApiService>()),
     );
@@ -186,6 +209,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i588.NotificationRepo>(
       () =>
           _i933.NotificationRepoImpl(gh<_i934.NotificationRemoteDataSource>()),
+    );
+    gh.lazySingleton<_i1030.ChatRepository>(
+      () => _i328.ChatRepositoryImpl(gh<_i468.ChatRemoteDataSource>()),
     );
     gh.factory<_i787.AuthRepository>(
       () => _i152.AuthRepositoryImpl(gh<_i865.AuthRemoteDataSource>()),
@@ -230,7 +256,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i221.AdoptionHistoryRemoteDataSource>(
       () => _i221.AdoptionHistoryRemoteDataSourceImpl(gh<_i655.ApiService>()),
     );
-    gh.factory<_i29.NotificationBloc>(
+    gh.lazySingleton<_i29.NotificationBloc>(
       () => _i29.NotificationBloc(
         gh<_i571.GetNotificationsUseCase>(),
         gh<_i475.MarkAllNotificationsAsReadUseCase>(),
@@ -286,6 +312,27 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i1025.GetPagedPetsUseCase>(
       () => _i1025.GetPagedPetsUseCase(gh<_i838.AdoptionBrowseRepository>()),
     );
+    gh.lazySingleton<_i586.CreatePrivateConversationUseCase>(
+      () => _i586.CreatePrivateConversationUseCase(gh<_i1030.ChatRepository>()),
+    );
+    gh.lazySingleton<_i450.DeleteMessageUseCase>(
+      () => _i450.DeleteMessageUseCase(gh<_i1030.ChatRepository>()),
+    );
+    gh.lazySingleton<_i801.EditMessageUseCase>(
+      () => _i801.EditMessageUseCase(gh<_i1030.ChatRepository>()),
+    );
+    gh.lazySingleton<_i388.GetConversationsUseCase>(
+      () => _i388.GetConversationsUseCase(gh<_i1030.ChatRepository>()),
+    );
+    gh.lazySingleton<_i10.GetConversationDetailsUseCase>(
+      () => _i10.GetConversationDetailsUseCase(gh<_i1030.ChatRepository>()),
+    );
+    gh.lazySingleton<_i529.GetMessagesUseCase>(
+      () => _i529.GetMessagesUseCase(gh<_i1030.ChatRepository>()),
+    );
+    gh.lazySingleton<_i460.SendMessageUseCase>(
+      () => _i460.SendMessageUseCase(gh<_i1030.ChatRepository>()),
+    );
     gh.factory<_i756.GetAdoptionOptionsUseCase>(
       () => _i756.GetAdoptionOptionsUseCase(gh<_i133.AdoptionRepository>()),
     );
@@ -311,6 +358,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i478.UpdateProfileUseCase>(),
         gh<_i694.ICacheManager>(),
       ),
+    );
+    gh.factory<_i2.ChatListBloc>(
+      () => _i2.ChatListBloc(gh<_i388.GetConversationsUseCase>()),
     );
     gh.factory<_i1029.AdoptionBrowseBloc>(
       () => _i1029.AdoptionBrowseBloc(
@@ -392,6 +442,14 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i118.GetUserDataUseCase>(
       () => _i118.GetUserDataUseCase(gh<_i986.HomeDomainRepository>()),
+    );
+    gh.factory<_i65.ChatBloc>(
+      () => _i65.ChatBloc(
+        gh<_i529.GetMessagesUseCase>(),
+        gh<_i460.SendMessageUseCase>(),
+        gh<_i801.EditMessageUseCase>(),
+        gh<_i450.DeleteMessageUseCase>(),
+      ),
     );
     return this;
   }

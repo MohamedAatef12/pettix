@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/features/chat/presentation/bloc/chat_list_bloc.dart';
+import 'package:pettix/features/chat/presentation/bloc/chat_list_state.dart';
+import 'package:pettix/features/chat/domain/entity/conversation_entity.dart';
 
 class ChatListTaps extends StatefulWidget {
   const ChatListTaps({super.key});
@@ -107,128 +113,120 @@ class _ChatListTapsState extends State<ChatListTaps>
 
         SizedBox(height: 12.h),
 
-        // 🔹 Tab content
         Expanded(
-          child: TabBarView(
-            controller: _tabController,
-            children: [
-              // 🟢 All Chats
-              ListView.builder(
-                itemCount: 8,
-                itemBuilder: (context, index) => Column(
+          child: BlocBuilder<ChatListBloc, ChatListState>(
+            builder: (context, state) {
+              if (state is ChatListLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is ChatListError) {
+                return Center(child: Text(state.message, style: TextStyle(color: Colors.red)));
+              } else if (state is ChatListSuccess) {
+                final allConversations = state.conversations;
+                // Currently returning same list for both tabs just to render it. You can filter them based on groups vs individuals if available.
+                return TabBarView(
+                  controller: _tabController,
                   children: [
-                    GestureDetector(
-                      onTap: (){
-                        // context.pushNamed(
-                        //   AppRouteNames.chat,
-                        //   pathParameters: {'index': index.toString()},
-                        // ); },
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 5.w),
-                      decoration: BoxDecoration(
-                        color: AppColors.current.white,
-                        borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(
-                          color: AppColors.current.blueGray,
-                        ),
-                      ),
-                      child:Padding(
-                        padding: PaddingConstants.small,
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 35.r,
-                              backgroundColor:AppColors.current.transparent,
-                              backgroundImage: const AssetImage(
-                                'assets/images/profile_photo.png',
-                              ),
-                            ),
-                            SizedBox(width: 8.w,),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('User $index',
-                                  style: AppTextStyles.appbar,
-                                  ),
-                                  SizedBox(height: 3.h,),
-                                  Row(
-                                    children: [
-                                      Text('Latest message...'),
-                                      Spacer(),
-                                      Text('2:30 PM',),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      ),
-                    ),
-                    SizedBox(height: 10.h,),
+                    _buildConversationList(allConversations),
+                    _buildConversationList(allConversations.where((c) => c.type == 'group').toList()),
                   ],
-                ),
-              ),
-
-              // 🟢 Groups
-              ListView.builder(
-                itemCount: 4,
-                itemBuilder: (context, index) => Column(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 5.w),
-                      decoration: BoxDecoration(
-                        color: AppColors.current.white,
-                        borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(
-                          color: AppColors.current.blueGray,
-                        ),
-                      ),
-                      child:Padding(
-                        padding: PaddingConstants.small,
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 35.r,
-                              backgroundColor:AppColors.current.transparent,
-                              backgroundImage: const AssetImage(
-                                'assets/images/profile_photo.png',
-                              ),
-                            ),
-                            SizedBox(width: 8.w,),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('User $index',
-                                    style: AppTextStyles.appbar,
-                                  ),
-                                  SizedBox(height: 3.h,),
-                                  Row(
-                                    children: [
-                                      Text('Latest message...'),
-                                      Spacer(),
-                                      Text('2:30 PM',),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 10.h,),
-                  ],
-                ),
-              ),
-            ],
+                );
+              }
+              return const SizedBox();
+            },
           ),
         ),
       ],
     );
   }
+
+  Widget _buildConversationList(List<ConversationEntity> conversations) {
+    if (conversations.isEmpty) {
+      return Center(child: Text('No conversations found', style: AppTextStyles.description));
+    }
+    return ListView.builder(
+      itemCount: conversations.length,
+      padding: EdgeInsets.symmetric(vertical: 10.h),
+      itemBuilder: (context, index) {
+        final conversation = conversations[index];
+        // Assuming we take the first member other than self or just first member for display
+        final displayMember = conversation.members.isNotEmpty ? conversation.members.first.user : null;
+        return Column(
+          children: [
+            GestureDetector(
+              onTap: () {
+                // Navigate to ChatPage with conversation details
+                // You can update this based on your routing params. Assumed passing conversation id.
+                context.pushNamed(
+                  AppRouteNames.chat,
+                  pathParameters: {'index': conversation.id.toString()},
+                );
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 5.w),
+                decoration: BoxDecoration(
+                  color: AppColors.current.white,
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: AppColors.current.blueGray,
+                  ),
+                ),
+                child: Padding(
+                  padding: PaddingConstants.small,
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 35.r,
+                        backgroundColor: AppColors.current.transparent,
+                        // Fallback image if avatar is missing
+                        backgroundImage: displayMember?.avatar != null && displayMember!.avatar.isNotEmpty 
+                            ? NetworkImage(displayMember.avatar) as ImageProvider
+                            : const AssetImage('assets/images/profile_photo.png'),
+                      ),
+                      SizedBox(width: 8.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              displayMember?.displayName ?? 'Conversation ${conversation.id}',
+                              style: AppTextStyles.appbar,
+                            ),
+                            SizedBox(height: 3.h),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    conversation.lastMessage?.content ?? 'No messages yet...',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                SizedBox(width: 8.w),
+                                if (conversation.lastMessage != null) 
+                                Text(
+                                  _formatDate(conversation.lastMessage!.sentAt),
+                                  style: TextStyle(fontSize: 12.sp, color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 10.h),
+          ],
+        );
+      },
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    // Basic formatting, e.g., 2:30 PM
+    return "${date.hour}:${date.minute.toString().padLeft(2, '0')}";
+  }
+
 }
