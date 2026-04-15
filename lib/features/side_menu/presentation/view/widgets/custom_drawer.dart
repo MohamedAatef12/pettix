@@ -61,13 +61,19 @@ class CustomDrawer extends StatelessWidget {
                     icon: Icons.article_rounded,
                     label: AppText.myPosts,
                     color: const Color(0xFF3AAFA9),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      context.push(AppRoutes.userPosts, extra: user?.id);
+                    },
                   ),
                   _TileSvg(
                     path: 'assets/icons/save_post.svg',
                     label: AppText.savedPosts,
                     color: const Color(0xFFE8A838),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      context.push(AppRoutes.savedPosts);
+                    },
                   ),
                   _Section(AppText.adoptionPets),
                   _Tile(

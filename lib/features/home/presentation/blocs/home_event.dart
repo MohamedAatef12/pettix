@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
+import 'package:pettix/features/home/domain/entities/post_sync_update.dart';
 import '../../domain/entities/comments_entity.dart';
 import '../../domain/entities/post_entity.dart';
 
@@ -10,6 +11,15 @@ abstract class HomeEvent extends Equatable {
 }
 
 class FetchPostsEvent extends HomeEvent {}
+
+class GetUserPostsEvent extends HomeEvent {
+
+  GetUserPostsEvent();
+  @override
+  List<Object?> get props => [];
+}
+
+class GetSavedPostsEvent extends HomeEvent {}
 
 class AddPostEvent extends HomeEvent {
   final PostEntity post;
@@ -162,6 +172,13 @@ class UnSavePostEvent extends HomeEvent{
   UnSavePostEvent(this.postId);
   @override
   List<Object?> get props => [postId];
+}
+
+class SynchronizePostUpdateEvent extends HomeEvent {
+  final PostSyncUpdate update;
+  SynchronizePostUpdateEvent(this.update);
+  @override
+  List<Object?> get props => [update];
 }
 
 class LoadMorePostsEvent extends HomeEvent {}

@@ -40,9 +40,57 @@ class RemoteDataSourceImpl implements RemoteDataSource {
       }
 
       final resultData = response.result as Map<String, dynamic>? ?? {};
+      if (resultData['data'] != null && (resultData['data'] as List).isNotEmpty) {
+        print('🔍 [DEBUG] First Post JSON keys: ${(resultData['data'] as List).first.keys.toList()}');
+        print('🔍 [DEBUG] First Post JSON: ${(resultData['data'] as List).first}');
+      }
       return Right(PaginatedPostsModel.fromJson(resultData));
     } catch (e) {
       log('Error fetching posts: $e');
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<PostModel>>> getUserPosts() async {
+    final userToken = await DI.find<ICacheManager>().getToken();
+    if (userToken == null) return Left(Failure("User is not authenticated"));
+    try {
+      final response = await apiService.getList(
+        endPoint: Constants.userPostsEndpoint,
+        headers: {'Authorization': 'Bearer $userToken'},
+      );
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
+
+      final data = response.result as List? ?? [];
+      final posts = data.map((e) => PostModel.fromJson(e as Map<String, dynamic>)).toList();
+      return Right(posts);
+    } catch (e) {
+      log('Error fetching user posts: $e');
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<PostModel>>> getSavedPosts() async {
+    final userToken = await DI.find<ICacheManager>().getToken();
+    if (userToken == null) return Left(Failure("User is not authenticated"));
+    try {
+      final response = await apiService.getList(
+        endPoint: Constants.mySavedPostsEndpoint,
+        headers: {'Authorization': 'Bearer $userToken'},
+      );
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
+
+      final data = response.result as List? ?? [];
+      final posts = data.map((e) => PostModel.fromJson(e as Map<String, dynamic>)).toList();
+      return Right(posts);
+    } catch (e) {
+      log('Error fetching saved posts: $e');
       return Left(DioFailure.fromDioError(e));
     }
   }

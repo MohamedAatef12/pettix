@@ -16,8 +16,9 @@ class NotificationPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.current.lightGray,
-      body: BlocProvider(
-        create: (context) => DI.find<NotificationBloc>()
+      body: BlocProvider.value(
+        value: DI.find<NotificationBloc>()
+          ..add(const FetchAllUnreadCounts())
           ..add(GetNotificationsEvent(notificationTypeId: NotificationType.timeline.value)),
         child: SafeArea(
           child: Column(
