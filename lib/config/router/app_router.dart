@@ -236,7 +236,22 @@ final List<RouteBase> _socialRoutes = [
     builder: (context, state) {
       final index = int.tryParse(state.pathParameters['index'] ?? '0') ?? 0;
       final isUserId = state.uri.queryParameters['isUserId'] == 'true';
-      return ChatPage(index: index, isUserId: isUserId);
+      
+      String? initialName;
+      String? initialAvatar;
+      
+      final extra = state.extra;
+      if (extra is Map<String, dynamic>) {
+        initialName = extra['name'] as String?;
+        initialAvatar = extra['avatar'] as String?;
+      }
+
+      return ChatPage(
+        index: index, 
+        isUserId: isUserId,
+        initialName: initialName,
+        initialAvatar: initialAvatar,
+      );
     },
   ),
   GoRoute(

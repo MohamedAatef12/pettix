@@ -15,16 +15,28 @@ class ChatListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.current.lightBlue,
       body: BlocProvider(
         create: (context) => DI.find<ChatListBloc>()..add(const GetConversationsEvent()),
-        child: SafeArea(
-          child: Column(
-            children: [
-              ChatAppBar(text: 'Messages',),
-              SizedBox(height: 10.h,),
-              Expanded(child: ChatListBody()),
-            ],
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                AppColors.current.white,
+                AppColors.current.lightBlue.withValues(alpha: 0.5),
+                AppColors.current.lightBlue,
+              ],
+            ),
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                ChatAppBar(text: 'Messages'),
+                SizedBox(height: 10.h),
+                Expanded(child: ChatListBody()),
+              ],
+            ),
           ),
         ),
       ),

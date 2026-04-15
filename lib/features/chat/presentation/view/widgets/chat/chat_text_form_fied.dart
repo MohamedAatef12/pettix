@@ -53,24 +53,6 @@ class _ChatTextFormFieldState extends State<ChatTextFormField> {
         children: [
           SizedBox(width: 15.w),
           SvgPicture.asset(
-            'assets/icons/mic.svg',
-            width: 20.w,
-            height: 20.h,
-            colorFilter: ColorFilter.mode(
-              AppColors.current.gray,
-              BlendMode.srcIn,
-            ),
-          ),
-          SizedBox(
-            height: 24.h, // set divider height manually
-            child: VerticalDivider(
-              color: AppColors.current.gray.withValues(alpha: 0.4),
-              thickness: 0.8,
-              width: 20.w, // adds spacing around the line
-            ),
-          ),
-
-          SvgPicture.asset(
             'assets/icons/pencil.svg',
             width: 20.w,
             height: 20.h,
@@ -122,4 +104,4 @@ class _ChatTextFormFieldState extends State<ChatTextFormField> {
       ),
     );
   }
-}
+}

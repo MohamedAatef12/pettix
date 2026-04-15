@@ -7,6 +7,8 @@ import 'package:pettix/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:pettix/features/chat/presentation/bloc/chat_event.dart';
 import 'package:pettix/features/chat/presentation/bloc/chat_state.dart';
 
+import 'package:pettix/core/shimmers/chat_body_shimmer.dart';
+
 class ChatConversation extends StatefulWidget {
   final int userIndex;
   const ChatConversation({super.key, required this.userIndex});

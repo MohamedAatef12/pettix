@@ -15,18 +15,44 @@ class ChatListBody extends StatelessWidget {
       padding: PaddingConstants.horizontalMedium,
       child: Column(
         children: [
-          CustomTextFormField(
-            fillColor: true,
-            fillColorValue: AppColors.current.lightGray,
-            hintText: 'Search',
-            border: InputBorder.none, // ⬅️ مفيش border أساسي
-            enabledBorder: InputBorder.none, // ⬅️ مفيش border لما يبقى enabled
-            focusedBorder: InputBorder.none,
-            leading: SvgPicture.asset('assets/icons/search_grey.svg'),
-            suffixIcon: SvgPicture.asset('assets/icons/filter.svg'),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 2.h),
+            decoration: BoxDecoration(
+              color: AppColors.current.white.withValues(alpha: 0.8),
+              borderRadius: BorderRadius.circular(18.r),
+              border: Border.all(color: AppColors.current.white, width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 15,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: CustomTextFormField(
+              fillColor: true,
+              fillColorValue: Colors.transparent,
+              hintText: 'Search conversations...',
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              leading: Padding(
+                padding: EdgeInsets.only(right: 8.w),
+                child: SvgPicture.asset(
+                  'assets/icons/search_grey.svg',
+                  width: 16.w,
+                  colorFilter: ColorFilter.mode(AppColors.current.gray, BlendMode.srcIn),
+                ),
+              ),
+              suffixIcon: SvgPicture.asset(
+                'assets/icons/filter.svg',
+                width: 18.w,
+                colorFilter: ColorFilter.mode(AppColors.current.primary, BlendMode.srcIn),
+              ),
+            ),
           ),
-          SizedBox(height: 15.h,),
-          Expanded(child: ChatListTaps())
+          SizedBox(height: 24.h),
+          const Expanded(child: ChatListTaps())
         ],
       ),
     );
