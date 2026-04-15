@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
+import 'package:pettix/features/home/domain/entities/post_sync_update.dart';
 import 'package:pettix/data/network/failure.dart';
 import 'package:pettix/features/auth/domain/entities/user_entity.dart';
 import 'package:pettix/features/home/data/models/author_model.dart';
@@ -20,8 +22,13 @@ import 'package:pettix/features/notification/data/data_sources/notification_remo
 
 import 'package:pettix/features/home/domain/entities/paginated_posts.dart';
 
-@Injectable(as: HomeDomainRepository)
+@LazySingleton(as: HomeDomainRepository)
 class HomeRepositoryImpl implements HomeDomainRepository {
+  final _postUpdateController = StreamController<PostSyncUpdate>.broadcast();
+
+  @override
+  Stream<PostSyncUpdate> get postUpdates => _postUpdateController.stream;
+
   final RemoteDataSource remoteDataSource;
   final GetUserLocalDataSource homeLocalDataSource;
   final NotificationRemoteDataSource notificationRemoteDataSource;
@@ -54,6 +61,24 @@ class HomeRepositoryImpl implements HomeDomainRepository {
   }
 
   @override
+  Future<Either<Failure, List<PostEntity>>> getUserPosts(int contactId) async {
+    final result = await remoteDataSource.getUserPosts(contactId);
+    return result.fold(
+      (failure) => Left(failure),
+      (models) => Right(models.map((m) => m.toEntity()).toList()),
+    );
+  }
+
+  @override
+  Future<Either<Failure, List<PostEntity>>> getSavedPosts() async {
+    final result = await remoteDataSource.getSavedPosts();
+    return result.fold(
+      (failure) => Left(failure),
+      (models) => Right(models.map((m) => m.toEntity()).toList()),
+    );
+  }
+
+  @override
   Future<Either<Failure, PostEntity>> getPostById(int id) async {
     final result = await remoteDataSource.getPostById(id);
     return result.fold(
@@ -70,7 +95,14 @@ class HomeRepositoryImpl implements HomeDomainRepository {
 
   @override
   Future<Either<Failure, void>> deletePost(int id) async {
-    return remoteDataSource.deletePost(id);
+    final result = await remoteDataSource.deletePost(id);
+    return result.fold(
+      (failure) => Left(failure),
+      (success) {
+        _postUpdateController.add(PostSyncUpdate(postId: id, type: PostSyncUpdateType.deletePost));
+        return const Right(null);
+      },
+    );
   }
 
   @override
@@ -117,6 +149,7 @@ class HomeRepositoryImpl implements HomeDomainRepository {
     return result.fold(
       (failure) => Left(failure),
       (success) {
+        _postUpdateController.add(PostSyncUpdate(postId: postId, type: PostSyncUpdateType.addComment));
         if (creatorId != null) {
           final currentUser = homeLocalDataSource.getUserData();
           final isReply = parentCommentId != null;
@@ -168,6 +201,7 @@ class HomeRepositoryImpl implements HomeDomainRepository {
     return result.fold(
       (failure) => Left(failure),
       (success) {
+        _postUpdateController.add(PostSyncUpdate(postId: postId, type: PostSyncUpdateType.like));
         if (creatorId != null) {
           final currentUser = homeLocalDataSource.getUserData();
         }
@@ -199,7 +233,13 @@ class HomeRepositoryImpl implements HomeDomainRepository {
   @override
   Future<Either<Failure, void>> unlikePost(int postId) async {
     final result = await remoteDataSource.unlikePost(postId);
-    return result.fold((failure) => Left(failure), (success) => Right(null));
+    return result.fold(
+      (failure) => Left(failure),
+      (success) {
+        _postUpdateController.add(PostSyncUpdate(postId: postId, type: PostSyncUpdateType.unlike));
+        return const Right(null);
+      },
+    );
   }
 
   @override
@@ -359,11 +399,23 @@ class HomeRepositoryImpl implements HomeDomainRepository {
   @override
   Future<Either<Failure, void>> savePost(int postId) async {
     final result = await remoteDataSource.savePost(postId);
-    return result.fold((failure) => Left(failure), (success) => Right(null));
+    return result.fold(
+      (failure) => Left(failure),
+      (success) {
+        _postUpdateController.add(PostSyncUpdate(postId: postId, type: PostSyncUpdateType.save));
+        return const Right(null);
+      },
+    );
   }
   @override
   Future<Either<Failure, void>> unSavePost(int postId) async {
     final result = await remoteDataSource.unSavePost(postId);
-    return result.fold((failure) => Left(failure), (success) => Right(null));
+    return result.fold(
+      (failure) => Left(failure),
+      (success) {
+        _postUpdateController.add(PostSyncUpdate(postId: postId, type: PostSyncUpdateType.unsave));
+        return const Right(null);
+      },
+    );
   }
 }

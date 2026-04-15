@@ -22,6 +22,8 @@ class AppRoutes {
   static const String addPost = '/add_post';
   static const String comments = '/comments';
   static const String notifications = '/notifications';
+  static const String userPosts = '/user_posts';
+  static const String savedPosts = '/saved_posts';
 
   // ── Social ────────────────────────────────────────────────────────────────
   static const String chat = '/chat';
@@ -87,6 +89,8 @@ class AppRouteNames {
   static const String addPost = 'add_post';
   static const String comments = 'comments';
   static const String notifications = 'notifications';
+  static const String userPosts = 'user_posts';
+  static const String savedPosts = 'saved_posts';
 
   // ── Social ────────────────────────────────────────────────────────────────
   static const String chat = 'chat';

@@ -48,6 +48,53 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   }
 
   @override
+  Future<Either<Failure, List<PostModel>>> getUserPosts(int contactId) async {
+    final userToken = await DI.find<ICacheManager>().getToken();
+    if (userToken == null) return Left(Failure("User is not authenticated"));
+    try {
+      final response = await apiService.getList(
+        endPoint: Constants.userPostsEndpoint,
+        headers: {'Authorization': 'Bearer $userToken'},
+        queryParameters: {
+          'contactId': contactId,
+        },
+      );
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
+
+      final data = response.result as List? ?? [];
+      final posts = data.map((e) => PostModel.fromJson(e as Map<String, dynamic>)).toList();
+      return Right(posts);
+    } catch (e) {
+      log('Error fetching user posts: $e');
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<PostModel>>> getSavedPosts() async {
+    final userToken = await DI.find<ICacheManager>().getToken();
+    if (userToken == null) return Left(Failure("User is not authenticated"));
+    try {
+      final response = await apiService.getList(
+        endPoint: Constants.mySavedPostsEndpoint,
+        headers: {'Authorization': 'Bearer $userToken'},
+      );
+      if (!response.success) {
+        return Left(Failure(response.message));
+      }
+
+      final data = response.result as List? ?? [];
+      final posts = data.map((e) => PostModel.fromJson(e as Map<String, dynamic>)).toList();
+      return Right(posts);
+    } catch (e) {
+      log('Error fetching saved posts: $e');
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
+
+  @override
   Future<Either<Failure, PostModel>> getPostById(int id) async {
     final userToken = await DI.find<ICacheManager>().getToken();
     if (userToken == null) return Left(Failure("User is not authenticated"));

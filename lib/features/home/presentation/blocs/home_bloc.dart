@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:pettix/config/di/di.dart';
 import 'package:pettix/features/home/data/models/author_model.dart';
 import 'package:pettix/features/home/domain/entities/comments_entity.dart';
 import 'package:pettix/features/home/domain/entities/post_entity.dart';
+import 'package:pettix/features/home/domain/entities/post_sync_update.dart';
 import 'package:pettix/features/home/domain/usecases/add_comment.dart';
 import 'package:pettix/features/home/domain/usecases/add_comment_like.dart';
 import 'package:pettix/features/home/domain/usecases/add_post.dart';
@@ -25,6 +27,8 @@ import 'package:pettix/features/home/domain/usecases/like_post.dart';
 import 'package:pettix/features/home/domain/usecases/save_post_usecase.dart';
 import 'package:pettix/features/home/domain/usecases/unlike_comment.dart';
 import 'package:pettix/features/home/domain/usecases/unsave_post_usecase.dart';
+import 'package:pettix/features/home/domain/usecases/get_user_posts.dart';
+import 'package:pettix/features/home/domain/usecases/get_saved_posts.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 import 'package:pettix/features/home/presentation/blocs/home_state.dart';
 
@@ -47,6 +51,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final AddReportUseCase addReportUseCase;
   final SavePostUseCase savePostUseCase;
   final UnSavePostUseCase unSavePostUseCase;
+  final GetUserPostsUseCase getUserPostsUseCase;
+  final GetSavedPostsUseCase getSavedPostsUseCase;
+  StreamSubscription? _postSyncSubscription;
   final Set<int> throttledPostIds = {};
   final Set<int> loadedBottomSheetPostIds = {};
   final TextEditingController commentTextController = TextEditingController();
@@ -75,6 +82,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       addReportUseCase: getIt<AddReportUseCase>(),
       savePostUseCase: getIt<SavePostUseCase>(),
       unSavePostUseCase: getIt<UnSavePostUseCase>(),
+      getUserPostsUseCase: getIt<GetUserPostsUseCase>(),
+      getSavedPostsUseCase: getIt<GetSavedPostsUseCase>(),
     );
   }
 
@@ -97,8 +106,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required this.addReportUseCase,
     required this.savePostUseCase,
     required this.unSavePostUseCase,
+    required this.getUserPostsUseCase,
+    required this.getSavedPostsUseCase,
   }) : super(const HomeState()) {
     on<FetchPostsEvent>(_onFetchPosts);
+    on<GetUserPostsEvent>(_onGetUserPosts);
+    on<GetSavedPostsEvent>(_onGetSavedPosts);
     on<AddPostEvent>(_onAddPost);
     on<DeletePostEvent>(_onDeletePost);
     on<FetchPostsCommentsEvent>(_onFetchPostsComments);
@@ -157,6 +170,94 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<GetReportReasonsEvent>(_onGetReportReasons);
     on<GetReportedPostsEvent>(_onGetReportedPosts);
     on<LoadMorePostsEvent>(_onLoadMorePosts);
+    on<SynchronizePostUpdateEvent>(_onSynchronizePostUpdate);
+
+    _postSyncSubscription = getPostsUseCase.repository.postUpdates.listen((update) {
+      add(SynchronizePostUpdateEvent(update));
+    });
+  }
+
+  @override
+  Future<void> close() {
+    _postSyncSubscription?.cancel();
+    return super.close();
+  }
+
+  Future<void> _onSynchronizePostUpdate(
+    SynchronizePostUpdateEvent event,
+    Emitter<HomeState> emit,
+  ) async {
+    final update = event.update;
+    final postId = update.postId;
+
+    // 1. Update lists of IDs
+    final likedPostIds = List<int>.from(state.likedPostIds);
+    final savedPostIds = List<int>.from(state.savedPostIds);
+    final postLikesCount = Map<int, int>.from(state.postLikesCount);
+    final postCommentsCount = Map<int, int>.from(state.postCommentsCount);
+
+    bool stateChanged = false;
+
+    switch (update.type) {
+      case PostSyncUpdateType.like:
+        if (!likedPostIds.contains(postId)) {
+          likedPostIds.add(postId);
+          postLikesCount[postId] = (postLikesCount[postId] ?? 0) + 1;
+          stateChanged = true;
+        }
+        break;
+      case PostSyncUpdateType.unlike:
+        if (likedPostIds.contains(postId)) {
+          likedPostIds.remove(postId);
+          postLikesCount[postId] = ((postLikesCount[postId] ?? 1) - 1).clamp(0, double.infinity).toInt();
+          stateChanged = true;
+        }
+        break;
+      case PostSyncUpdateType.save:
+        if (!savedPostIds.contains(postId)) {
+          savedPostIds.add(postId);
+          stateChanged = true;
+        }
+        break;
+      case PostSyncUpdateType.unsave:
+        if (savedPostIds.contains(postId)) {
+          savedPostIds.remove(postId);
+          stateChanged = true;
+        }
+        break;
+      case PostSyncUpdateType.addComment:
+        postCommentsCount[postId] = (postCommentsCount[postId] ?? 0) + 1;
+        stateChanged = true;
+        break;
+      case PostSyncUpdateType.deletePost:
+        final newPosts = state.posts.where((p) => p.id != postId).toList();
+        if (newPosts.length != state.posts.length) {
+          emit(state.copyWith(posts: newPosts));
+        }
+        return; // Early return as we updated posts directly
+    }
+
+    if (stateChanged) {
+      // 2. Update the PostEntity objects in the list to trigger UI update
+      final updatedPosts = state.posts.map((post) {
+        if (post.id == postId) {
+          return post.copyWith(
+            isSaved: savedPostIds.contains(postId),
+            // Note: counts are handled by the maps in HomeState, 
+            // but we update the entity too for consistency if needed.
+          );
+        }
+        return post;
+      }).toList();
+
+      emit(state.copyWith(
+        likedPostIds: likedPostIds,
+        savedPostIds: savedPostIds,
+        postLikesCount: postLikesCount,
+        postCommentsCount: postCommentsCount,
+        posts: updatedPosts,
+      ));
+    }
   }
 
   Future<void> _getPostCommentsCount(
@@ -215,6 +316,19 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     FetchPostsEvent event,
     Emitter<HomeState> emit,
   ) async {
+    if (state.postFetchType == PostFetchType.userPosts) {
+      final userResult = await getUserDataUseCase.call();
+      int? contactId;
+      userResult.fold((_) {}, (user) => contactId = user.id);
+      if (contactId != null) {
+        add(GetUserPostsEvent(contactId!));
+      }
+      return;
+    } else if (state.postFetchType == PostFetchType.savedPosts) {
+      add(GetSavedPostsEvent());
+      return;
+    }
+
     emit(state.copyWith(
       isPostsLoading: true,
       error: null,
@@ -271,10 +385,128 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
   }
 
+  Future<void> _onGetUserPosts(
+    GetUserPostsEvent event,
+    Emitter<HomeState> emit,
+  ) async {
+    emit(state.copyWith(
+      isPostsLoading: true,
+      error: null,
+      postFetchType: PostFetchType.userPosts,
+    ));
+
+    final result = await getUserPostsUseCase.call(event.contactId);
+    final userResult = await getUserDataUseCase.call();
+
+    int? currentUserId;
+    userResult.fold((_) {}, (user) => currentUserId = user.id);
+
+    await result.fold(
+      (failure) async {
+        emit(state.copyWith(isPostsLoading: false, error: failure.message));
+      },
+      (posts) async {
+        final postLikesMap = <int, int>{};
+        final postCommentsMap = <int, int>{};
+        final likedPostIds = <int>[];
+        final savedPostIds = <int>[];
+
+        await Future.wait(
+          posts.map((post) async {
+            postLikesMap[post.id] = post.likes.length;
+            postCommentsMap[post.id] = post.totalComments;
+
+            if (currentUserId != null &&
+                post.likes.any((like) => like.author.id == currentUserId)) {
+              likedPostIds.add(post.id);
+            }
+            if (post.isSaved) {
+              savedPostIds.add(post.id);
+            }
+          }),
+        );
+
+        final sortedPosts = List<PostEntity>.from(posts)
+          ..sort((a, b) => b.creationDate.compareTo(a.creationDate));
+
+        emit(
+          state.copyWith(
+            posts: sortedPosts,
+            postLikesCount: postLikesMap,
+            postCommentsCount: postCommentsMap,
+            likedPostIds: likedPostIds,
+            savedPostIds: savedPostIds,
+            isPostsLoading: false,
+            error: null,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onGetSavedPosts(
+    GetSavedPostsEvent event,
+    Emitter<HomeState> emit,
+  ) async {
+    emit(state.copyWith(
+      isPostsLoading: true,
+      error: null,
+      postFetchType: PostFetchType.savedPosts,
+    ));
+
+    final result = await getSavedPostsUseCase.call();
+    final userResult = await getUserDataUseCase.call();
+
+    int? currentUserId;
+    userResult.fold((_) {}, (user) => currentUserId = user.id);
+
+    await result.fold(
+      (failure) async {
+        emit(state.copyWith(isPostsLoading: false, error: failure.message));
+      },
+      (posts) async {
+        final postLikesMap = <int, int>{};
+        final postCommentsMap = <int, int>{};
+        final likedPostIds = <int>[];
+        final savedPostIds = <int>[];
+
+        await Future.wait(
+          posts.map((post) async {
+            postLikesMap[post.id] = post.likes.length;
+            postCommentsMap[post.id] = post.totalComments;
+
+            if (currentUserId != null &&
+                post.likes.any((like) => like.author.id == currentUserId)) {
+              likedPostIds.add(post.id);
+            }
+            // Add explicitly to savedPostIds since these are guaranteed saved posts
+            savedPostIds.add(post.id);
+          }),
+        );
+
+        final sortedPosts = List<PostEntity>.from(posts)
+          ..sort((a, b) => b.creationDate.compareTo(a.creationDate));
+
+        emit(
+          state.copyWith(
+            posts: sortedPosts,
+            postLikesCount: postLikesMap,
+            postCommentsCount: postCommentsMap,
+            likedPostIds: likedPostIds,
+            savedPostIds: savedPostIds,
+            isPostsLoading: false,
+            error: null,
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> _onLoadMorePosts(
     LoadMorePostsEvent event,
     Emitter<HomeState> emit,
   ) async {
+    if (state.postFetchType != PostFetchType.timeline) return;
     // Don't load if already loading more or if reached the end
     if (state.isMorePostsLoading || state.posts.length >= state.totalCount) {
       return;

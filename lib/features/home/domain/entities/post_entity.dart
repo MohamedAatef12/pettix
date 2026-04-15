@@ -44,4 +44,33 @@ class PostEntity extends Equatable {
     isSaved,
     totalComments,
   ];
+
+  PostEntity copyWith({
+    int? id,
+    String? content,
+    String? creationDate,
+    String? modifyDate,
+    AuthorEntity? author,
+    List<CommentEntity>? comments,
+    List<LikesEntity>? likes,
+    List<String>? images,
+    int? statusId,
+    bool? isSaved,
+    int? totalComments,
+  }) {
+    return PostEntity(
+      id: id ?? this.id,
+      content: content ?? this.content,
+      creationDate: creationDate ?? this.creationDate,
+      modifyDate: modifyDate ?? this.modifyDate,
+      author: author ?? this.author,
+      comments: comments ?? this.comments,
+      likes: likes ?? this.likes,
+      images: images ?? this.images,
+      statusId: statusId ?? this.statusId,
+      isSaved: isSaved ?? this.isSaved,
+      totalComments: totalComments ?? this.totalComments,
+    );
+  }
 }
+
