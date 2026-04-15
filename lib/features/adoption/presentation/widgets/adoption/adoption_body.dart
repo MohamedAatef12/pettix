@@ -76,47 +76,48 @@ class _AdoptionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: false,
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 20.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.pets_rounded, color: AppColors.current.gold, size: 20.w),
-                SizedBoxConstants.horizontalSmall,
-                Text(
-                  'PETTIX ADOPTION',
-                  style: TextStyle(
-                    color: AppColors.current.gold,
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 2,
-                  ),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.current.white,
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(30.r),
+          bottomRight: Radius.circular(30.r),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 15,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(10.w, 10.h, 20.w, 10.h),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                'Find Your Pet Partner',
+                style: TextStyle(
+                  color: AppColors.current.primary,
+                  fontSize: 24.sp,
+                  fontWeight: FontWeight.w900,
+                  height: 1.1,
+                  letterSpacing: -1,
                 ),
-              ],
-            ),
-            SizedBox(height: 6.h),
-            Text(
-              'Find Your Fur-ever\nFriend',
-              style: TextStyle(
-                color: AppColors.current.text,
-                fontSize: 22.sp,
-                fontWeight: FontWeight.w800,
-                height: 1.2,
               ),
-            ),
-            SizedBox(height: 16.h),
-            Row(
-              children: [
-                Expanded(child: _SearchField(controller: searchController)),
-                SizedBox(width: 10.w),
-                const _FilterButton(),
-              ],
-            ),
-          ],
+              SizedBox(height: 18.h),
+              Row(
+                children: [
+                  Expanded(child: _SearchField(controller: searchController)),
+                  SizedBox(width: 12.w),
+                  const _FilterButton(),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -241,44 +242,60 @@ class _CategoryFilterSliver extends StatelessWidget {
       builder: (context, state) {
         if (state.categories.isEmpty) return const SliverToBoxAdapter();
         return SliverToBoxAdapter(
-          child: SizedBox(
-            height: 44.h,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
-              children: [
-                _CategoryChip(
-                  label: 'All',
-                  selected: state.selectedCategoryId == null,
-                  onTap: () => context
-                      .read<AdoptionBrowseBloc>()
-                      .add(const FilterByCategoryEvent(null)),
-                ),
-                ...state.categories.map(
-                  (cat) => _CategoryChip(
-                    label: cat.name,
-                    selected: state.selectedCategoryId == cat.id,
+          child: Padding(
+            padding: EdgeInsets.only(top: 16.h),
+            child: SizedBox(
+              height: 50.h,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 4.h),
+                children: [
+                  _CategoryChip(
+                    label: 'All Pets',
+                    icon: Icons.grid_view_rounded,
+                    selected: state.selectedCategoryId == null,
                     onTap: () => context
                         .read<AdoptionBrowseBloc>()
-                        .add(FilterByCategoryEvent(cat.id)),
+                        .add(const FilterByCategoryEvent(null)),
                   ),
-                ),
-              ],
+                  ...state.categories.map(
+                    (cat) => _CategoryChip(
+                      label: cat.name,
+                      icon: _getIconForCategory(cat.name),
+                      selected: state.selectedCategoryId == cat.id,
+                      onTap: () => context
+                          .read<AdoptionBrowseBloc>()
+                          .add(FilterByCategoryEvent(cat.id)),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
       },
     );
   }
+
+  IconData _getIconForCategory(String name) {
+    final lower = name.toLowerCase();
+    if (lower.contains('dog')) return Icons.pets_rounded;
+    if (lower.contains('cat')) return Icons.auto_awesome_rounded;
+    if (lower.contains('bird')) return Icons.flutter_dash_rounded;
+    return Icons.pets_rounded;
+  }
 }
 
 class _CategoryChip extends StatelessWidget {
   final String label;
+  final IconData icon;
   final bool selected;
   final VoidCallback onTap;
 
   const _CategoryChip({
     required this.label,
+    required this.icon,
     required this.selected,
     required this.onTap,
   });
@@ -288,29 +305,46 @@ class _CategoryChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        margin: EdgeInsets.only(right: 8.w),
-        padding: EdgeInsets.symmetric(horizontal: 14.w),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        margin: EdgeInsets.only(right: 12.w),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
         decoration: BoxDecoration(
-          color: selected
-              ? AppColors.current.primary
-              : AppColors.current.lightBlue,
-          borderRadius: BorderRadius.circular(20.r),
-          border: Border.all(
-            color: selected
-                ? AppColors.current.primary
-                : AppColors.current.lightGray,
-          ),
+          color: selected ? AppColors.current.primary : AppColors.current.white,
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: [
+            if (selected)
+              BoxShadow(
+                color: AppColors.current.primary.withValues(alpha: 0.3),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              )
+            else
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+          ],
         ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              color: selected ? AppColors.current.white : AppColors.current.text,
-              fontSize: 12.sp,
-              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 16.sp,
+              color: selected ? AppColors.current.white : AppColors.current.primary,
             ),
-          ),
+            SizedBox(width: 8.w),
+            Text(
+              label,
+              style: TextStyle(
+                color: selected ? AppColors.current.white : AppColors.current.text,
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
         ),
       ),
     );

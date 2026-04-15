@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/core/enums/app_enums.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -32,8 +34,6 @@ class AdoptionFormDetailBody extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _PetInfoCard(form: form),
-                SizedBox(height: 16.h),
                 _SectionTitle('Applicant'),
                 SizedBox(height: 10.h),
                 _InfoGroup(
@@ -100,6 +100,7 @@ class AdoptionFormDetailBody extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 24.h),
+                _MessageButton(form: form, isOwnerView: isOwnerView),
                 if (isOwnerView) _ActionButtons(form: form),
                 SizedBox(height: 32.h),
               ],
@@ -129,71 +130,84 @@ class _DetailHeader extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      color: AppColors.current.white,
+      decoration: BoxDecoration(
+        color: AppColors.current.white,
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(30.r),
+          bottomRight: Radius.circular(30.r),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(8),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: EdgeInsets.fromLTRB(8.w, 8.h, 20.w, 20.h),
+          padding: EdgeInsets.fromLTRB(4.w, 4.h, 4.w, 15.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Back button
-              IconButton(
-                onPressed: () => Navigator.of(context).pop(),
-                icon: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: AppColors.current.text,
-                  size: 20.w,
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(left: 12.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              SizedBox(
+                height: 30.h,
+                width: double.infinity,
+                child: Stack(
                   children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.pets_rounded,
-                          color: AppColors.current.primary,
-                          size: 16.w,
+                    // Back button on the far left
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: AppColors.current.text,
+                          size: 20.w,
                         ),
-                        SizedBox(width: 6.w),
-                        Text(
-                          'Form #${form.id}',
+                      ),
+                    ),
+                    // Perfectly centered Pet Name
+                    Align(
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 80.w),
+                        child: Text(
+                          form.petName ?? 'Unknown Pet',
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: AppColors.current.midGray,
-                            fontSize: 11.sp,
-                            letterSpacing: 1,
+                            color: AppColors.current.text,
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
-                      ],
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      form.petName ?? 'Unknown Pet',
-                      style: TextStyle(
-                        color: AppColors.current.text,
-                        fontSize: 22.sp,
-                        fontWeight: FontWeight.w800,
                       ),
                     ),
-                    SizedBox(height: 6.h),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10.w,
-                        vertical: 4.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: style.bg,
-                        borderRadius: BorderRadius.circular(20.r),
-                      ),
-                      child: Text(
-                        style.label,
-                        style: TextStyle(
-                          color: style.text,
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.w700,
+                    // Status Badge on the far right
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 16.w),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10.w,
+                            vertical: 5.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: style.bg,
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          child: Text(
+                            style.label,
+                            style: TextStyle(
+                              color: style.text,
+                              fontSize: 10.sp,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -203,73 +217,6 @@ class _DetailHeader extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-// ─── Pet info card ────────────────────────────────────────────────────────────
-
-class _PetInfoCard extends StatelessWidget {
-  final AdoptionFormEntity form;
-
-  const _PetInfoCard({required this.form});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: AppColors.current.white,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(10),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48.w,
-            height: 48.w,
-            decoration: BoxDecoration(
-              color: AppColors.current.primary.withAlpha(20),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.pets_rounded,
-              color: AppColors.current.primary,
-              size: 24.w,
-            ),
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  form.petName ?? 'Unknown Pet',
-                  style: TextStyle(
-                    color: AppColors.current.text,
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                if (form.petId != null)
-                  Text(
-                    'Pet ID: ${form.petId}',
-                    style: TextStyle(
-                      color: AppColors.current.midGray,
-                      fontSize: 11.sp,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -478,50 +425,117 @@ class _ActionButtons extends StatelessWidget {
     required Color confirmColor,
     required VoidCallback onConfirm,
   }) {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder:
-          (_) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.r),
-            ),
-            title: Text(
-              title,
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
-            ),
-            content: Text(
-              message,
-              style: TextStyle(
-                color: AppColors.current.midGray,
-                fontSize: 13.sp,
+      barrierDismissible: true,
+      barrierLabel: '',
+      barrierColor: Colors.black54,
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
+      transitionBuilder: (context, anim1, anim2, child) {
+        final curveValue = Curves.easeInOutBack.transform(anim1.value);
+        return Transform.scale(
+          scale: curveValue,
+          child: Opacity(
+            opacity: anim1.value,
+            child: Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24.r),
               ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(
-                  'Cancel',
-                  style: TextStyle(color: AppColors.current.midGray),
+              child: Padding(
+                padding: EdgeInsets.all(24.w),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(16.w),
+                      decoration: BoxDecoration(
+                        color: confirmColor.withAlpha(20),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        confirm == 'Accept'
+                            ? Icons.check_circle_rounded
+                            : Icons.cancel_rounded,
+                        color: confirmColor,
+                        size: 48.w,
+                      ),
+                    ),
+                    SizedBox(height: 20.h),
+                    Text(
+                      title,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.current.text,
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+                    Text(
+                      message,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppColors.current.midGray,
+                        fontSize: 14.sp,
+                        height: 1.5,
+                      ),
+                    ),
+                    SizedBox(height: 24.h),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 12.h),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                            ),
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                color: AppColors.current.midGray,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              onConfirm();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: confirmColor,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              padding: EdgeInsets.symmetric(vertical: 12.h),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                            ),
+                            child: Text(
+                              confirm,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14.sp,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  onConfirm();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: confirmColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                ),
-                child: Text(
-                  confirm,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
+            ),
           ),
+        );
+      },
     );
   }
 }
@@ -577,6 +591,32 @@ class _ActionButton extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _MessageButton extends StatelessWidget {
+  final AdoptionFormEntity form;
+  final bool isOwnerView;
+
+  const _MessageButton({required this.form, required this.isOwnerView});
+
+  @override
+  Widget build(BuildContext context) {
+    final targetId = isOwnerView ? form.clientContactId : form.ownerContactId;
+
+    if (targetId == null || targetId == 0) return const SizedBox.shrink();
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: 24.h),
+      child: _ActionButton(
+        label: isOwnerView ? 'Message Applicant' : 'Message Owner',
+        icon: Icons.chat_bubble_outline_rounded,
+        color: AppColors.current.primary,
+        onTap: () {
+          context.pushNamed(AppRouteNames.chat, pathParameters: {'index': targetId.toString()});
+        },
       ),
     );
   }

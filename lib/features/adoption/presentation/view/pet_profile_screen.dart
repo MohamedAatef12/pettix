@@ -21,7 +21,7 @@ class PetProfileScreen extends StatelessWidget {
         title: Text(pet.name, style: AppTextStyles.appbar),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: AppColors.current.text),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.current.text),
           onPressed: () => context.pop(),
         ),
       ),

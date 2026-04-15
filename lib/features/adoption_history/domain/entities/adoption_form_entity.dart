@@ -19,6 +19,8 @@ class AdoptionFormEntity extends Equatable {
 
   /// Maps to [AdoptionFormStatus] enum values: 1=pending, 2=approved, 3=rejected, 4=cancelled.
   final int status;
+  final int? clientContactId;
+  final int? ownerContactId;
 
   const AdoptionFormEntity({
     required this.id,
@@ -36,6 +38,8 @@ class AdoptionFormEntity extends Equatable {
     this.petId,
     this.petName,
     required this.status,
+    this.clientContactId,
+    this.ownerContactId,
   });
 
   @override
@@ -55,5 +59,7 @@ class AdoptionFormEntity extends Equatable {
     petId,
     petName,
     status,
+    clientContactId,
+    ownerContactId,
   ];
 }

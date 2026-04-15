@@ -93,7 +93,7 @@ class ApplicationScreens extends StatelessWidget {
       elevation: 0,
       scrolledUnderElevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios),
+        icon: const Icon(Icons.arrow_back_ios_new_rounded),
         onPressed: () => Navigator.pop(context),
       ),
     );
@@ -263,8 +263,8 @@ class _BackButton extends StatelessWidget {
           border: Border.all(color: AppColors.current.primary, width: 1.5),
         ),
         child: Icon(
-          Icons.arrow_back_ios_rounded,
-          color: AppColors.current.primary,
+          Icons.arrow_back_ios_new_rounded,
+          color: AppColors.current.text,
           size: 18.w,
         ),
       ),

@@ -43,9 +43,16 @@ class _FilterSheetState extends State<_FilterSheet> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.current.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(30.r)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 20,
+            offset: const Offset(0, -5),
+          ),
+        ],
       ),
-      padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 32.h),
+      padding: EdgeInsets.fromLTRB(24.w, 12.h, 24.w, 32.h),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,15 +60,15 @@ class _FilterSheetState extends State<_FilterSheet> {
           // Handle
           Center(
             child: Container(
-              width: 40.w,
-              height: 4.h,
+              width: 50.w,
+              height: 5.h,
               decoration: BoxDecoration(
                 color: AppColors.current.lightGray,
-                borderRadius: BorderRadius.circular(2.r),
+                borderRadius: BorderRadius.circular(10.r),
               ),
             ),
           ),
-          SizedBox(height: 20.h),
+          SizedBox(height: 24.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -69,12 +76,13 @@ class _FilterSheetState extends State<_FilterSheet> {
                 'Filter & Sort',
                 style: TextStyle(
                   color: AppColors.current.text,
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.5,
                 ),
               ),
-              TextButton(
-                onPressed: () {
+              GestureDetector(
+                onTap: () {
                   setState(() {
                     _genderId = null;
                     _sortBy = null;
@@ -82,51 +90,56 @@ class _FilterSheetState extends State<_FilterSheet> {
                   });
                 },
                 child: Text(
-                  'Reset',
+                  'Reset All',
                   style: TextStyle(
                     color: AppColors.current.primary,
-                    fontSize: 13.sp,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 16.h),
-          _SectionLabel('Gender'),
-          SizedBox(height: 8.h),
+          SizedBox(height: 28.h),
+          _SectionLabel('GENDER'),
+          SizedBox(height: 12.h),
           _GenderChips(
             selected: _genderId,
             onSelected: (id) => setState(() => _genderId = id),
           ),
-          SizedBox(height: 20.h),
-          _SectionLabel('Sort By'),
-          SizedBox(height: 8.h),
+          SizedBox(height: 28.h),
+          _SectionLabel('SORT BY'),
+          SizedBox(height: 12.h),
           _SortChips(
             selected: _sortBy,
             onSelected: (s) => setState(() => _sortBy = s),
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: 20.h),
           _OrderToggle(
             descending: _descending,
             onToggle: (v) => setState(() => _descending = v),
           ),
-          SizedBox(height: 24.h),
+          SizedBox(height: 32.h),
           SizedBox(
             width: double.infinity,
-            height: 48.h,
+            height: 54.h,
             child: ElevatedButton(
               onPressed: _apply,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.current.primary,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14.r)),
+                  borderRadius: BorderRadius.circular(16.r),
+                ),
                 elevation: 0,
+                shadowColor: AppColors.current.primary.withValues(alpha: 0.3),
               ),
               child: Text(
                 'Apply Filters',
-                style:
-                    TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w700),
+                style: TextStyle(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
           ),

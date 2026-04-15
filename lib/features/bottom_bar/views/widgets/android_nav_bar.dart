@@ -30,18 +30,18 @@ class AndroidNavBar extends StatelessWidget {
   static const _selectedIcons = <IconData>[
     Iconsax.home4,
     Iconsax.pet4,
-    Iconsax.shopping_bag4,
-    Iconsax.hospital4,
+    // Iconsax.shopping_bag4,
+    // Iconsax.hospital4,
   ];
 
   static const _unselectedIcons = <IconData>[
     Iconsax.home,
     Iconsax.pet,
-    Iconsax.shopping_bag,
-    Iconsax.hospital,
+    // Iconsax.shopping_bag,
+    // Iconsax.hospital,
   ];
 
-  static const _labels = ['Home', 'Adopt', 'Store', 'Clinics'];
+  static const _labels = ['Home', 'Adopt'];
 
   @override
   Widget build(BuildContext context) {

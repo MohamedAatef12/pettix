@@ -12,12 +12,19 @@ import '../bloc/adoption_event.dart';
 import '../bloc/adoption_state.dart';
 
 class AdoptionFormScreen extends StatelessWidget {
-  const AdoptionFormScreen({super.key});
+  final int? petId;
+  const AdoptionFormScreen({super.key, this.petId});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<AdoptionBloc>()..add(FetchAdoptionOptions()),
+      create: (context) {
+        final bloc = getIt<AdoptionBloc>()..add(const FetchAdoptionOptions());
+        if (petId != null) {
+          bloc.add(SetPetId(petId!));
+        }
+        return bloc;
+      },
       child: const AdoptionFormView(),
     );
   }
@@ -93,15 +100,33 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
         return;
       }
 
+      final bloc = context.read<AdoptionBloc>();
+      bloc.add(UpdateFullName(_fullNameController.text));
+      bloc.add(UpdateEmail(_emailController.text));
+      bloc.add(UpdatePhoneNumber(_phoneNumberController.text));
+      bloc.add(UpdateDateOfBirth(_dateOfBirthController.text));
+      bloc.add(UpdatePetType(_petTypeController.text));
+      bloc.add(UpdateLivingSituation(_selectedLivingSituationId!));
+      bloc.add(UpdateResidenceType(_selectedResidenceTypeId!));
+      bloc.add(UpdateHasOwnedPet(_hasOwnedPetBefore));
+      bloc.add(ToggleAgreement(_hasReadAndUnderstood));
+      bloc.add(ToggleTermsAcceptance(_agreesToTerms));
 
-      context.read<AdoptionBloc>().add(SubmitAdoptionForm());
+      bloc.add(const SubmitAdoptionForm());
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Adoption Application')),
+      appBar: AppBar(
+        title: const Text('Adoption Application'),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.current.text),
+          onPressed: () => context.pop(),
+        ),
+      ),
       body: BlocConsumer<AdoptionBloc, AdoptionState>(
         listener: (context, state) {
           if (state.status == AdoptionStatus.success) {

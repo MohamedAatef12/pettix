@@ -59,36 +59,37 @@ class AdoptionFormCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 6.h),
+        margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
         decoration: BoxDecoration(
           color: AppColors.current.white,
-          borderRadius: BorderRadius.circular(16.r),
+          borderRadius: BorderRadius.circular(20.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(12),
-              blurRadius: 14,
-              offset: const Offset(0, 3),
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
             ),
           ],
         ),
-        child: Row(
-          children: [
-            _PetIconBlock(petName: form.petName),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
+        child: Padding(
+          padding: EdgeInsets.all(12.w),
+          child: Row(
+            children: [
+              _AvatarBlock(petName: form.petName),
+              SizedBox(width: 14.w),
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
                           child: Text(
                             form.petName ?? 'Pet #${form.petId ?? '—'}',
                             style: TextStyle(
                               color: AppColors.current.text,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 16.sp,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -98,48 +99,58 @@ class AdoptionFormCard extends StatelessWidget {
                       ],
                     ),
                     SizedBox(height: 4.h),
-                    Text(
-                      isOwnerView ? 'By: ${form.fullName}' : form.email,
-                      style: TextStyle(
-                        color: AppColors.current.midGray,
-                        fontSize: 11.sp,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    Row(
+                      children: [
+                        Icon(
+                          isOwnerView ? Icons.person_outline_rounded : Icons.email_outlined,
+                          size: 14.sp,
+                          color: AppColors.current.midGray,
+                        ),
+                        SizedBox(width: 4.w),
+                        Expanded(
+                          child: Text(
+                            isOwnerView ? 'By: ${form.fullName}' : form.email,
+                            style: TextStyle(
+                              color: AppColors.current.midGray,
+                              fontSize: 12.sp,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
-                    if (form.livingSituation != null) ...[
-                      SizedBox(height: 6.h),
+                    if (form.livingSituation != null || form.typeOfResidence != null) ...[
+                      SizedBox(height: 10.h),
                       _TagRow(
                         items: [
-                          form.livingSituation!,
+                          if (form.livingSituation != null)
+                            (label: form.livingSituation!, icon: Icons.home_work_outlined),
                           if (form.typeOfResidence != null)
-                            form.typeOfResidence!,
+                            (label: form.typeOfResidence!, icon: Icons.location_city_outlined),
                         ],
                       ),
                     ],
                   ],
                 ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(right: 14.w),
-              child: Icon(
+              Icon(
                 Icons.chevron_right_rounded,
                 color: AppColors.current.blueGray,
-                size: 20.w,
+                size: 24.w,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _PetIconBlock extends StatelessWidget {
+class _AvatarBlock extends StatelessWidget {
   final String? petName;
 
-  const _PetIconBlock({this.petName});
+  const _AvatarBlock({this.petName});
 
   @override
   Widget build(BuildContext context) {
@@ -149,33 +160,44 @@ class _PetIconBlock extends StatelessWidget {
             : '?';
 
     return Container(
-      width: 56.w,
-      height: 80.h,
+      width: 64.w,
+      height: 64.w,
       decoration: BoxDecoration(
-        color: AppColors.current.primary.withAlpha(20),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(16.r),
-          bottomLeft: Radius.circular(16.r),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.current.primary.withOpacity(0.8),
+            AppColors.current.primary,
+          ],
         ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.pets_rounded,
-            color: AppColors.current.primary.withAlpha(180),
-            size: 18.w,
-          ),
-          SizedBox(height: 4.h),
-          Text(
-            initials,
-            style: TextStyle(
-              color: AppColors.current.primary,
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w800,
-            ),
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.current.primary.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
         ],
+      ),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.pets_rounded,
+              color: AppColors.current.white.withOpacity(0.6),
+              size: 16.sp,
+            ),
+            Text(
+              initials,
+              style: TextStyle(
+                color: AppColors.current.white,
+                fontSize: 20.sp,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -189,17 +211,20 @@ class _StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
       decoration: BoxDecoration(
         color: style.bg,
         borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(
+          color: style.text.withOpacity(0.1),
+          width: 1,
+        ),
       ),
       child: Text(
         style.label,
         style: TextStyle(
           color: style.text,
           fontSize: 10.sp,
-          fontWeight: FontWeight.w700,
         ),
       ),
     );
@@ -207,34 +232,47 @@ class _StatusBadge extends StatelessWidget {
 }
 
 class _TagRow extends StatelessWidget {
-  final List<String> items;
+  final List<({String label, IconData icon})> items;
 
   const _TagRow({required this.items});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children:
-          items
-              .map(
-                (tag) => Container(
-                  margin: EdgeInsets.only(right: 6.w),
-                  padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.h),
-                  decoration: BoxDecoration(
-                    color: AppColors.current.lightBlue,
-                    borderRadius: BorderRadius.circular(6.r),
-                  ),
-                  child: Text(
-                    tag,
-                    style: TextStyle(
-                      color: AppColors.current.primary,
-                      fontSize: 9.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: items
+            .map(
+              (item) => Container(
+                margin: EdgeInsets.only(right: 8.w),
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: AppColors.current.lightBlue,
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
-              )
-              .toList(),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      item.icon,
+                      size: 12.sp,
+                      color: AppColors.current.primary,
+                    ),
+                    SizedBox(width: 4.w),
+                    Text(
+                      item.label,
+                      style: TextStyle(
+                        color: AppColors.current.primary,
+                        fontSize: 10.sp,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+            .toList(),
+      ),
     );
   }
 }
+

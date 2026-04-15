@@ -19,6 +19,8 @@ class AdoptionFormModel extends AdoptionFormEntity {
     super.petId,
     super.petName,
     required super.status,
+    super.clientContactId,
+    super.ownerContactId,
   });
 
   factory AdoptionFormModel.fromJson(Map<String, dynamic> json) {
@@ -47,6 +49,8 @@ class AdoptionFormModel extends AdoptionFormEntity {
       petId: json['petId'] as int?,
       petName: json['petName'] as String?,
       status: json['status'] as int? ?? 1,
+      clientContactId: json['clientContactId'] as int?,
+      ownerContactId: json['ownerContactId'] as int?,
     );
   }
 }

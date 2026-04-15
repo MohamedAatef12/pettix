@@ -777,7 +777,7 @@ void _openImagesPreview(BuildContext context, List<String> images) {
                         IconButton(
                           icon: RtlAwareIcon(
                             child: const Icon(
-                              Icons.arrow_back_ios_rounded,
+                              Icons.arrow_back_ios_new_rounded,
                               color: Colors.white,
                               size: 26,
                             ),

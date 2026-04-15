@@ -17,20 +17,16 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.current.lightBlue,
       drawer: const CustomDrawer(),
-      body: SafeArea
-      (bottom: false,
-        child: BlocProvider(
-          create: (context) => HomeBloc.fromDI()
-            ..add(
-              FetchPostsEvent(),
-            ),
-          child: Column(
-            children: [
-              HomeAppBar(),
-              SizedBox(height: 10.h),
-              HomeBody(),
-            ],
-          ))),
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            HomeAppBar(),
+            SizedBox(height: 10.h),
+            HomeBody(),
+          ],
+        ),
+      ),
     );
   }
 }
