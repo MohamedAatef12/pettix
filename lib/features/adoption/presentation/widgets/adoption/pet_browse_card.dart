@@ -18,128 +18,116 @@ class PetBrowseCard extends StatelessWidget {
     final imageUrl = pet.imageUrls.firstOrNull;
     final fullUrl = imageUrl != null && imageUrl.isNotEmpty ? imageUrl : null;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.current.white,
-        borderRadius: BorderRadius.circular(20.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(12),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ── Photo ──────────────────────────────────────────────
-          Expanded(
-            child: Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(20.r),
-                  ),
-                  child:
-                      fullUrl != null
-                          ? Image.network(
-                            fullUrl,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => _PhotoPlaceholder(),
-                          )
-                          : _PhotoPlaceholder(),
-                ),
-                // Gender badge
-                if (pet.genderName != null)
-                  Positioned(
-                    top: 8.h,
-                    right: 8.w,
-                    child: _GenderBadge(gender: pet.genderName!),
-                  ),
-              ],
+    return GestureDetector(
+      onTap: onViewProfile,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.current.white,
+          borderRadius: BorderRadius.circular(24.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
             ),
-          ),
-          // ── Info ───────────────────────────────────────────────
-          Padding(
-            padding: EdgeInsets.fromLTRB(12.w, 10.h, 12.w, 4.h),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  pet.name,
-                  style: TextStyle(
-                    color: AppColors.current.text,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 3.h),
-                Row(
-                  children: [
-                    if (pet.categoryName != null) ...[
-                      Icon(
-                        Icons.pets_rounded,
-                        color: AppColors.current.primary,
-                        size: 11.w,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Photo ──────────────────────────────────────────────
+            Expanded(
+              flex: 5,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Positioned.fill(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(24.r),
                       ),
-                      SizedBox(width: 3.w),
-                      Flexible(
-                        child: Text(
-                          pet.categoryName!,
-                          style: TextStyle(
-                            color: AppColors.current.midGray,
-                            fontSize: 11.sp,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                    if (pet.age != null) ...[
-                      SizedBox(width: 6.w),
-                      Text(
-                        '· ${pet.age}y',
-                        style: TextStyle(
-                          color: AppColors.current.midGray,
-                          fontSize: 11.sp,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-                SizedBox(height: 8.h),
-                // View Profile button
-                SizedBox(
-                  width: double.infinity,
-                  height: 32.h,
-                  child: ElevatedButton(
-                    onPressed: onViewProfile,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.current.primary,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                      padding: EdgeInsets.zero,
+                      child: fullUrl != null
+                          ? Image.network(
+                              fullUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => _PhotoPlaceholder(),
+                            )
+                          : _PhotoPlaceholder(),
                     ),
-                    child: Text(
-                      'View Profile',
+                  ),
+                  // Gender badge
+                  if (pet.genderName != null)
+                    Positioned(
+                      top: 12.h,
+                      right: 12.w,
+                      child: _GenderBadge(gender: pet.genderName!),
+                    ),
+                ],
+              ),
+            ),
+            // ── Info ───────────────────────────────────────────────
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      pet.name ?? 'Unknown',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 11.sp,
+                        color: AppColors.current.text,
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                  ),
+                    SizedBox(height: 2.h),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Hero(
+                            tag: 'cat_${pet.id}',
+                            child: Text(
+                              pet.categoryName ?? 'Unknown',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: AppColors.current.primary,
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '•',
+                          style: TextStyle(
+                            color: AppColors.current.blueGray,
+                            fontSize: 12.sp,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          pet.age != null ? '${pet.age} yrs' : 'Age unknown',
+                          maxLines: 1,
+                          style: TextStyle(
+                            color: AppColors.current.blueGray,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                SizedBox(height: 10.h),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

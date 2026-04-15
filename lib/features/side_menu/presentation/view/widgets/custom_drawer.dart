@@ -86,18 +86,7 @@ class CustomDrawer extends StatelessWidget {
                     color: const Color(0xFF5EA8DF),
                     onTap: () {},
                   ),
-                  _Tile(
-                    icon: Icons.location_on_rounded,
-                    label: AppText.myAddresses,
-                    color: const Color(0xFFEA6060),
-                    onTap: () {},
-                  ),
-                  _Tile(
-                    icon: Icons.credit_card_rounded,
-                    label: AppText.paymentMethods,
-                    color: const Color(0xFF56C590),
-                    onTap: () {},
-                  ),
+               
                   _TileSvg(
                     path: 'assets/icons/refund.svg',
                     label: AppText.refundsReturns,
@@ -122,7 +111,10 @@ class CustomDrawer extends StatelessWidget {
                     path: 'assets/icons/settings.png',
                     label: AppText.settings,
                     color: AppColors.current.gray,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      context.push(AppRoutes.settings);
+                    },
                   ),
                   _Tile(
                     icon: Icons.help_outline_rounded,
@@ -150,6 +142,9 @@ class CustomDrawer extends StatelessWidget {
                     ),
                   ),
                   const _LogoutTile(),
+                  SizedBox(
+                    height: 70.h,
+                  ),
                 ],
               ),
             ),

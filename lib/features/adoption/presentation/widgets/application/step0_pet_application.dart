@@ -114,7 +114,7 @@ class _HeroSection extends StatelessWidget {
               width: 40.w,
               height: 40.w,
               child: Icon(
-                Icons.arrow_back_ios_rounded,
+                Icons.arrow_back_ios_new_rounded,
                 color: AppColors.current.text,
                 size: 18.w,
               ),

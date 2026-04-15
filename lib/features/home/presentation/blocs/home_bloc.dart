@@ -400,17 +400,34 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     Emitter<HomeState> emit,
   ) async {
     final text = postTextController.text.trim();
-
     if (text.isEmpty && state.selectedImages.isEmpty) return;
 
-    emit(state.copyWith(isAddPostLoading: true));
-
+    // 1. Prepare data and emit uploading state + success state to navigate back immediately
     final userResult = await getUserDataUseCase.call();
+    
     await userResult.fold(
       (failure) async {
-        emit(state.copyWith(isAddPostLoading: false, error: failure.message));
+        emit(state.copyWith(error: failure.message));
       },
       (user) async {
+        final imagePaths = state.selectedImages.map((file) => file.path).toList();
+        final selectedImagesCopy = List<File>.from(state.selectedImages);
+        final contentCopy = text;
+
+        // Reset local input state
+        postTextController.clear();
+        
+        // Emit states to trigger background UI in Home and navigation back from AddPost
+        emit(state.copyWith(
+          isUploadingPost: true,
+          isPostAdded: true, // This triggers the navigation back
+          selectedImages: [],
+        ));
+        
+        // Reset navigation flag immediately after emission
+        emit(state.copyWith(isPostAdded: false));
+
+        // 2. Perform background upload
         final author = AuthorModel(
           id: user.id,
           nameEn: user.userName,
@@ -424,13 +441,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           statusId: user.statusId,
           age: user.age,
         );
-        final imagePaths =
-            state.selectedImages.map((file) => file.path).toList();
 
         final post = PostEntity(
           id: 0,
           author: author,
-          content: text,
+          content: contentCopy,
           images: imagePaths,
           creationDate: DateTime.now().add(const Duration(hours: 2)).toString(),
           comments: [],
@@ -440,21 +455,25 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         );
 
         final result = await addPostUseCase.call(post);
+        
         result.fold(
           (failure) {
-            emit(
-              state.copyWith(isAddPostLoading: false, error: failure.message),
-            );
+            emit(state.copyWith(
+              isUploadingPost: false,
+              isPostUploadError: true,
+              error: failure.message,
+            ));
+            emit(state.copyWith(isPostUploadError: false));
           },
           (_) {
-            postTextController.clear();
-            emit(
-              state.copyWith(
-                isAddPostLoading: false,
-                isPostAdded: true,
-                selectedImages: [],
-              ),
-            );
+            // Prepend the new post to the list for a silent update
+            final updatedPosts = [post, ...state.posts];
+            emit(state.copyWith(
+              isUploadingPost: false,
+              isPostUploadSuccess: true,
+              posts: updatedPosts,
+            ));
+            emit(state.copyWith(isPostUploadSuccess: false));
           },
         );
       },

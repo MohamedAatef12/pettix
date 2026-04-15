@@ -24,37 +24,23 @@ import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/widgets/add_post_body.dart';
 
 class AddPostPage extends StatelessWidget {
-  const AddPostPage({super.key});
+  final HomeBloc? bloc;
+  const AddPostPage({super.key, this.bloc});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.current.lightGray,
       body: SafeArea(
-        child: BlocProvider<HomeBloc>(
-          create:
-              (context) => HomeBloc(
-                getPostsUseCase: getIt<GetPostsUseCase>(),
-                addPostUseCase: getIt<AddPostUseCase>(),
-                deletePostUseCase: getIt<DeletePostUseCase>(),
-                addCommentUseCase: getIt<AddCommentUseCase>(),
-                getCommentsIdUseCase: getIt<GetPostCommentsUseCase>(),
-                getPostsLikesUseCase: getIt<GetPostLikesUseCase>(),
-                unlikePostUseCase: getIt<UnLikePostUseCase>(),
-                likePostUseCase: getIt<LikePostUseCase>(),
-                getUserDataUseCase: getIt<GetUserDataUseCase>(),
-                getPostCommentsCountUseCase: getIt<GetPostCommentsCountsUseCase>(),
-                getCommentsLike: getIt<GetCommentLikesUseCase>(),
-                likeCommentUseCase: getIt<LikeCommentUseCase>(),
-                unLikeCommentUseCase: getIt<UnLikeCommentUseCase>(),
-                getReportedPostsUseCase: getIt<GetReportedPostsUseCase>(),
-                getReportReasonsUseCase: getIt<GetReportReasonsUseCase>(),
-                addReportUseCase: getIt<AddReportUseCase>(),
-                savePostUseCase: getIt<SavePostUseCase>(),
-                unSavePostUseCase: getIt<UnSavePostUseCase>()
+        child: bloc != null
+            ? BlocProvider.value(
+                value: bloc!,
+                child: const AddPostBody(),
+              )
+            : BlocProvider<HomeBloc>(
+                create: (context) => HomeBloc.fromDI(),
+                child: const AddPostBody(),
               ),
-          child: AddPostBody(),
-        ),
       ),
     );
   }

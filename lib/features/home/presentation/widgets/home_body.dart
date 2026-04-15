@@ -47,54 +47,104 @@ class _HomeBodyState extends State<HomeBody> {
     return Expanded(
       child: BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) {
-          Widget content;
-
-          if (state.isPostsLoading) {
-            content = const Center(child: HomeShimmer());
-          } else if (state.error != null && state.posts.isEmpty) {
-            content = Center(
-              child: CircleAvatar(
-                backgroundColor: AppColors.current.lightGray,
-                radius: 100.r,
-                child: Icon(
-                  Icons.cloud_off_outlined,
-                  color: AppColors.current.primary,
-                  size: 50.w,
+          return Column(
+            children: [
+              if (state.isUploadingPost)
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                  padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.current.white,
+                    borderRadius: BorderRadius.circular(12.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            'Uploading your post...',
+                            style: TextStyle(
+                              color: AppColors.current.text,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14.sp,
+                            ),
+                          ),
+                          const Spacer(),
+                        ],
+                      ),
+                      SizedBox(height: 8.h),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4.r),
+                        child: LinearProgressIndicator(
+                          minHeight: 4.h,
+                          backgroundColor: AppColors.current.lightGray,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColors.current.primary),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+              Expanded(
+                child: _buildContent(state),
               ),
-            );
-          } else {
-            content = RefreshIndicator(
-              onRefresh: () async {
-                context.read<HomeBloc>().add(FetchPostsEvent());
-              },
-              child: NotificationListener<ScrollNotification>(
-                onNotification: _onScrollNotification,
-                child: ListView.builder(
-                  key: const PageStorageKey('posts_list'),
-                  controller: _scrollController,
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: state.isMorePostsLoading
-                      ? state.posts.length + 1
-                      : state.posts.length,
-                  itemBuilder: (context, index) {
-                    if (index >= state.posts.length) {
-                      return HomeShimmer();
-                    }
-                    return Padding(
-                      padding: PaddingConstants.verticalSmall,
-                      child: PostCard(post: state.posts[index]),
-                    );
-                  },
-                ),
-              ),
-            );
-          }
-          return content;
-
+            ],
+          );
         },
       ),
     );
+  }
+
+  Widget _buildContent(HomeState state) {
+    if (state.isPostsLoading) {
+      return const Center(child: HomeShimmer());
+    } else if (state.error != null && state.posts.isEmpty) {
+      return Center(
+        child: CircleAvatar(
+          backgroundColor: AppColors.current.lightGray,
+          radius: 100.r,
+          child: Icon(
+            Icons.cloud_off_outlined,
+            color: AppColors.current.primary,
+            size: 50.w,
+          ),
+        ),
+      );
+    } else {
+      return RefreshIndicator(
+        onRefresh: () async {
+          context.read<HomeBloc>().add(FetchPostsEvent());
+        },
+        child: NotificationListener<ScrollNotification>(
+          onNotification: _onScrollNotification,
+          child: ListView.builder(
+            key: const PageStorageKey('posts_list'),
+            controller: _scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemCount: state.isMorePostsLoading
+                ? state.posts.length + 1
+                : state.posts.length,
+            itemBuilder: (context, index) {
+              if (index >= state.posts.length) {
+                return HomeShimmer();
+              }
+              return Padding(
+                padding: PaddingConstants.verticalSmall,
+                child: PostCard(post: state.posts[index]),
+              );
+            },
+          ),
+        ),
+      );
+    }
   }
 }
 

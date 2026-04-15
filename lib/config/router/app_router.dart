@@ -13,6 +13,7 @@ import '../../features/profile/presentation/bloc/profile_bloc.dart';
 import '../../features/profile/presentation/bloc/profile_event.dart';
 import '../../features/profile/presentation/view/edit_profile_screen.dart';
 import '../../features/profile/presentation/view/profile_screen.dart';
+import '../../features/profile/presentation/view/settings_screen.dart';
 import '../../features/help_support/presentation/view/help_support_page.dart';
 import '../../features/help_support/presentation/view/faq_page.dart';
 import '../../features/help_support/presentation/view/contact_support_page.dart';
@@ -153,7 +154,7 @@ final List<RouteBase> _homeRoutes = [
   GoRoute(
     path: AppRoutes.addPost,
     name: AppRouteNames.addPost,
-    builder: (context, state) => const AddPostPage(),
+    builder: (context, state) => AddPostPage(bloc: state.extra as HomeBloc?),
   ),
   GoRoute(
     path: AppRoutes.notifications,
@@ -278,6 +279,11 @@ final List<RouteBase> _profileRoutes = [
         child: const EditProfileScreen(),
       );
     },
+  ),
+  GoRoute(
+    path: AppRoutes.settings,
+    name: AppRouteNames.settings,
+    builder: (context, state) => const SettingsScreen(),
   ),
 ];
 

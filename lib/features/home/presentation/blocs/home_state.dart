@@ -27,6 +27,9 @@ class HomeState extends Equatable {
   final bool isCommentsLoading;
   final bool isLikesLoading;
   final bool isPostAdded;
+  final bool isUploadingPost;
+  final bool isPostUploadSuccess;
+  final bool isPostUploadError;
   final String? error;
   final int pageIndex;
   final int totalCount;
@@ -53,6 +56,9 @@ class HomeState extends Equatable {
     this.isCommentsLoading = false,
     this.isLikesLoading = false,
     this.isPostAdded = false,
+    this.isUploadingPost = false,
+    this.isPostUploadSuccess = false,
+    this.isPostUploadError = false,
     this.error,
     this.pageIndex = 1,
     this.totalCount = 0,
@@ -65,7 +71,7 @@ class HomeState extends Equatable {
     this.reports = const [],
     this.isReportLoading = false,
     this.postId = 0,
-    this.isSaved = false
+    this.isSaved = false,
   });
 
   HomeState copyWith({
@@ -82,6 +88,9 @@ class HomeState extends Equatable {
     bool? isCommentsLoading,
     bool? isLikesLoading,
     bool? isPostAdded,
+    bool? isUploadingPost,
+    bool? isPostUploadSuccess,
+    bool? isPostUploadError,
     String? error,
     int? pageIndex,
     int? totalCount,
@@ -112,6 +121,9 @@ class HomeState extends Equatable {
       isCommentsLoading: isCommentsLoading ?? this.isCommentsLoading,
       isLikesLoading: isLikesLoading ?? this.isLikesLoading,
       isPostAdded: isPostAdded ?? this.isPostAdded,
+      isUploadingPost: isUploadingPost ?? this.isUploadingPost,
+      isPostUploadSuccess: isPostUploadSuccess ?? this.isPostUploadSuccess,
+      isPostUploadError: isPostUploadError ?? this.isPostUploadError,
       error: error,
       pageIndex: pageIndex ?? this.pageIndex,
       totalCount: totalCount ?? this.totalCount,
@@ -145,6 +157,9 @@ class HomeState extends Equatable {
     isCommentsLoading,
     isLikesLoading,
     isPostAdded,
+    isUploadingPost,
+    isPostUploadSuccess,
+    isPostUploadError,
     error,
     pageIndex,
     totalCount,
