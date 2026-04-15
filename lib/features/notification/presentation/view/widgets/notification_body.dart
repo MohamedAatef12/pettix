@@ -92,6 +92,7 @@ class NotificationBody extends StatelessWidget {
                           icon: _getIconForType(type),
                           index: tabIndex,
                           currentIndex: state.currentIndex,
+                          unreadCount: state.unreadCountsByType[type.value] ?? 0,
                           onTap: () {
                             context.read<NotificationBloc>().add(ChangeNotificationTab(tabIndex));
                             context.read<NotificationBloc>().add(GetNotificationsEvent(

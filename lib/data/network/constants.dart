@@ -1,7 +1,7 @@
 class Constants {
   // ── Base URL ──────────────────────────────────────────────────────────────
   // static const String baseUrl = 'https://pettix-production.up.railway.app';
-  static const String baseUrl = 'https://7ead-81-10-3-82.ngrok-free.app';
+  static const String baseUrl = 'https://1aff-81-10-3-82.ngrok-free.app';
 
   // ── Authentication ────────────────────────────────────────────────────────
   static const String loginEndpoint = '/api/Security/Authentication/login';
@@ -18,12 +18,14 @@ class Constants {
   //// Posts 
   static const String getPostByIdEndpoint = '/api/Timeline/Posts';
   static const String postsEndpoint = '/api/Timeline/Posts/paged';
+  static const String userPostsEndpoint = '/api/Timeline/Posts/user-posts';
   static const String addPostsEndpoint = '/api/Timeline/Posts';
   static const String postLikesEndpoint = '/api/Timeline/PostLikes';
   static const String postUnLikesEndpoint = '/api/Timeline/PostLikes';
   static const String getPostLikes = '/api/Timeline/PostLikes/post';
   static const String savePostEndpoint = '/api/Timeline/PostSave';
   static const String unSavePostEndpoint = '/api/Timeline/PostSave';
+  static const String mySavedPostsEndpoint = '/api/Timeline/PostSave/my-saved-posts';
 
   //// Comments
   static const String commentsEndpoint = '/api/Timeline/Comments/param';

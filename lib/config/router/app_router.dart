@@ -48,6 +48,8 @@ import '../../features/chat/presentation/view/pages/chat_page.dart';
 import '../../features/home/presentation/pages/add_post_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/home/presentation/pages/home_search.dart';
+import '../../features/home/presentation/pages/saved_posts_page.dart';
+import '../../features/home/presentation/pages/user_posts_page.dart';
 import '../../features/on_boarding/presentation/view/on_boarding_screen.dart';
 import '../../features/select_language/presentation/view/select_language_screen.dart';
 import '../../features/splash/persentation/view/splash_screen.dart';
@@ -211,6 +213,19 @@ final List<RouteBase> _homeRoutes = [
         ),
       );
     },
+  ),
+  GoRoute(
+    path: AppRoutes.userPosts,
+    name: AppRouteNames.userPosts,
+    builder: (context, state) {
+      final contactId = state.extra as int? ?? 0;
+      return UserPostsPage(contactId: contactId);
+    },
+  ),
+  GoRoute(
+    path: AppRoutes.savedPosts,
+    name: AppRouteNames.savedPosts,
+    builder: (context, state) => const SavedPostsPage(),
   ),
 ];
 

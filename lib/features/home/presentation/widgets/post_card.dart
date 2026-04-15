@@ -541,7 +541,7 @@ class PostCard extends StatelessWidget {
                   final isLiked = state.likedPostIds.contains(post.id);
                   final isSaved = state.savedPostIds.contains(post.id);
                   final likesCount =
-                      state.postLikesCount[post.id] ?? post.likes.length;
+                      state.postLikesCount[post.id] ?? post.totalLikes;
 
                   return Row(
                     children: [

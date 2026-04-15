@@ -10,6 +10,9 @@ import '../../domain/entities/post_entity.dart';
 // Sentinel used by copyWith to allow explicitly passing `null` for nullable fields
 const _copyWithSentinel = Object();
 
+enum PostFetchType { timeline, userPosts, savedPosts }
+
+
 class HomeState extends Equatable {
   final List<PostEntity> posts;
   final List<CommentEntity> comments;
@@ -41,6 +44,7 @@ class HomeState extends Equatable {
   final bool isReportLoading;
   final int postId;
   final bool isSaved;
+  final PostFetchType postFetchType;
   const HomeState({
     this.posts = const [],
     this.comments = const [],
@@ -72,6 +76,7 @@ class HomeState extends Equatable {
     this.isReportLoading = false,
     this.postId = 0,
     this.isSaved = false,
+    this.postFetchType = PostFetchType.timeline,
   });
 
   HomeState copyWith({
@@ -105,7 +110,8 @@ class HomeState extends Equatable {
     List<ReportEntity>? reports,
     bool? isReportLoading,
     int? postId,
-    bool? isSaved
+    bool? isSaved,
+    PostFetchType? postFetchType,
   }) {
     return HomeState(
       posts: posts ?? this.posts,
@@ -137,8 +143,9 @@ class HomeState extends Equatable {
       reportReasons: reportReasons ?? this.reportReasons,
       reports: reports ?? this.reports,
       isReportLoading: isReportLoading ?? this.isReportLoading,
-        postId: postId ?? this.postId,
-        isSaved: isSaved ?? this.isSaved
+      postId: postId ?? this.postId,
+      isSaved: isSaved ?? this.isSaved,
+      postFetchType: postFetchType ?? this.postFetchType,
     );
   }
 
@@ -173,6 +180,7 @@ class HomeState extends Equatable {
     reports,
     isReportLoading,
     postId,
-    isSaved
+    isSaved,
+    postFetchType,
   ];
 }
