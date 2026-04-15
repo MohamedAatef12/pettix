@@ -305,7 +305,7 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i450.DeleteMessageUseCase>(),
       ),
     );
-    gh.factory<_i986.HomeDomainRepository>(
+    gh.lazySingleton<_i986.HomeDomainRepository>(
       () => _i1024.HomeRepositoryImpl(
         gh<_i1055.RemoteDataSource>(),
         gh<_i526.GetUserLocalDataSource>(),

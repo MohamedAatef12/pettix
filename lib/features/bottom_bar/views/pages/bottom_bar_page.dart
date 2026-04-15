@@ -39,9 +39,8 @@ class BottomNavigationScreen extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => BottomNavigationBloc()),
-        BlocProvider(
-          create: (_) => HomeBloc.fromDI()..add(FetchPostsEvent()),
-        ),
+        BlocProvider(create: (_) => HomeBloc.fromDI()..add(FetchPostsEvent()),),
+        BlocProvider.value(value: DI.find<NotificationBloc>()..add(const FetchAllUnreadCounts())),
       ],
       child: MultiBlocListener(
         listeners: [
