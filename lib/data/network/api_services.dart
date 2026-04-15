@@ -101,7 +101,7 @@ class ApiService {
 
   Future<ResponseModel> put({
     required String endPoint,
-    Map<String, dynamic>? data,
+    dynamic data,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? queryParameters,
   }) async {

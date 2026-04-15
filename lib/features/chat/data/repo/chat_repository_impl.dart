@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pettix/data/network/failure.dart';
 
@@ -98,14 +99,12 @@ class ChatRepositoryImpl implements ChatRepository {
     try {
       // In a real scenario, you probably send more data, but going with basic text for now
       // Or maybe the API expects 'content' or 'text'
-      // We try sending multiple possible keys to see which one the backend accepts
-      final Map<String, dynamic> body = {
-        'messageText': content,
-        'content': content,
-        'text': content,
-        'message': content,
-      };
-      final response = await _remoteDataSource.sendMessage(conversationId, body);
+      // Based on API documentation: MessageText, MessageType in multipart/form-data
+      final FormData formData = FormData.fromMap({
+        'MessageText': content,
+        'MessageType': 'text',
+      });
+      final response = await _remoteDataSource.sendMessage(conversationId, formData);
 
       if (response.success && response.result != null) {
         final message = MessageModel.fromJson(response.result as Map<String, dynamic>);
@@ -128,7 +127,11 @@ class ChatRepositoryImpl implements ChatRepository {
   @override
   Future<Either<Failure, MessageEntity>> editMessage(int messageId, String content) async {
     try {
-      final response = await _remoteDataSource.editMessage(messageId, {'content': content});
+      final FormData formData = FormData.fromMap({
+        'MessageText': content,
+        'MessageType': 'text',
+      });
+      final response = await _remoteDataSource.editMessage(messageId, formData);
 
       if (response.success && response.result != null) {
         final message = MessageModel.fromJson(response.result as Map<String, dynamic>);

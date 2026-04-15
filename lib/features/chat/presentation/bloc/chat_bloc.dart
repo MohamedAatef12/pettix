@@ -103,7 +103,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         errorMessage: failure.message,
       )),
       (messages) {
-        final newMessages = event.isRefresh ? messages : [...state.messages, ...messages];
+        // The API returns oldest-first, so we reverse it to maintain a newest-first list in state.
+        // This works with our reverse: true ListView to show newest at the bottom.
+        final newestFirst = messages.reversed.toList();
+        final newMessages = event.isRefresh ? newestFirst : [...state.messages, ...newestFirst];
+        
         emit(state.copyWith(
           status: ChatStatus.success,
           messages: newMessages,
