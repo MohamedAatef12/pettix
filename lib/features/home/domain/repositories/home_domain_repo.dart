@@ -18,7 +18,7 @@ abstract class HomeDomainRepository {
   // Posts
   Stream<PostSyncUpdate> get postUpdates;
   Future<Either<Failure, PaginatedPosts>> getPosts({int pageIndex = 1, int pageSize = 10});
-  Future<Either<Failure, List<PostEntity>>> getUserPosts(int contactId);
+  Future<Either<Failure, List<PostEntity>>> getUserPosts();
   Future<Either<Failure, List<PostEntity>>> getSavedPosts();
   Future<Either<Failure, PostEntity>> getPostById(int id);
   Future<Either<Failure, void>> addPost(PostEntity post);

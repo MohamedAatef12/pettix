@@ -10,7 +10,7 @@ class GetUserPostsUseCase {
 
   GetUserPostsUseCase(this.repository);
 
-  Future<Either<Failure, List<PostEntity>>> call(int contactId) {
-    return repository.getUserPosts(contactId);
+  Future<Either<Failure, List<PostEntity>>> call() {
+    return repository.getUserPosts();
   }
 }

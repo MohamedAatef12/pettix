@@ -33,7 +33,7 @@ class UserPostsPage extends StatelessWidget {
         bottom: false,
         child: BlocProvider(
           create: (context) => HomeBloc.fromDI()
-            ..add(GetUserPostsEvent(contactId)),
+            ..add(GetUserPostsEvent()),
           child: Column(
             children: [
               SizedBox(height: 10.h),

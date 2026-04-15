@@ -13,10 +13,10 @@ abstract class HomeEvent extends Equatable {
 class FetchPostsEvent extends HomeEvent {}
 
 class GetUserPostsEvent extends HomeEvent {
-  final int contactId;
-  GetUserPostsEvent(this.contactId);
+
+  GetUserPostsEvent();
   @override
-  List<Object?> get props => [contactId];
+  List<Object?> get props => [];
 }
 
 class GetSavedPostsEvent extends HomeEvent {}

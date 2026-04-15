@@ -19,7 +19,9 @@ class PostModel extends PostEntity {
     required super.images,
     required super.statusId,
     required super.isSaved,
+    required super.isLiked,
     required super.totalComments,
+    required super.totalLikes,
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) {
@@ -57,7 +59,9 @@ class PostModel extends PostEntity {
           [],
       statusId: json['statusId'],
       isSaved: json['isSaved'],
+      isLiked: json['isLiked'] ?? false,
       totalComments: json['totalComments'] is int ? json['totalComments'] : int.tryParse(json['totalComments']?.toString() ?? '0') ?? 0,
+      totalLikes: json['totalLikes'] is int ? json['totalLikes'] : int.tryParse(json['totalLikes']?.toString() ?? '0') ?? 0,
     );
   }
 
@@ -108,7 +112,9 @@ class PostModel extends PostEntity {
       "images": encodedImages,
       "statusId":statusId,
       "isSaved": isSaved,
+      "isLiked": isLiked,
       "totalComments": totalComments,
+      "totalLikes": totalLikes,
     };
   }
   PostModel.fromEntity(PostEntity postEntity)
@@ -123,7 +129,9 @@ class PostModel extends PostEntity {
     images: postEntity.images,
     statusId: postEntity.statusId,
     isSaved:  postEntity.isSaved,
+    isLiked: postEntity.isLiked,
     totalComments: postEntity.totalComments,
+    totalLikes: postEntity.totalLikes,
   );
 
   PostEntity toEntity() => PostEntity(
@@ -137,6 +145,8 @@ class PostModel extends PostEntity {
     images: images,
     statusId: statusId,
     isSaved: isSaved,
+    isLiked: isLiked,
     totalComments: totalComments,
+    totalLikes: totalLikes,
   );
 }

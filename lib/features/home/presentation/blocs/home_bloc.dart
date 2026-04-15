@@ -321,7 +321,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       int? contactId;
       userResult.fold((_) {}, (user) => contactId = user.id);
       if (contactId != null) {
-        add(GetUserPostsEvent(contactId!));
+        add(GetUserPostsEvent());
       }
       return;
     } else if (state.postFetchType == PostFetchType.savedPosts) {
@@ -354,12 +354,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
         await Future.wait(
           posts.map((post) async {
-            postLikesMap[post.id] = post.likes.length;
+            postLikesMap[post.id] = post.totalLikes;
 
             postCommentsMap[post.id] = post.totalComments;
 
-            if (currentUserId != null &&
-                post.likes.any((like) => like.author.id == currentUserId)) {
+            if (post.isLiked || (currentUserId != null &&
+                post.likes.any((like) => like.author.id == currentUserId))) {
               likedPostIds.add(post.id);
             }
             if (post.isSaved) {
@@ -395,7 +395,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       postFetchType: PostFetchType.userPosts,
     ));
 
-    final result = await getUserPostsUseCase.call(event.contactId);
+    final result = await getUserPostsUseCase.call();
     final userResult = await getUserDataUseCase.call();
 
     int? currentUserId;
@@ -413,11 +413,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
         await Future.wait(
           posts.map((post) async {
-            postLikesMap[post.id] = post.likes.length;
+            postLikesMap[post.id] = post.totalLikes;
             postCommentsMap[post.id] = post.totalComments;
 
-            if (currentUserId != null &&
-                post.likes.any((like) => like.author.id == currentUserId)) {
+            if (post.isLiked || (currentUserId != null &&
+                post.likes.any((like) => like.author.id == currentUserId))) {
               likedPostIds.add(post.id);
             }
             if (post.isSaved) {
@@ -472,11 +472,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
         await Future.wait(
           posts.map((post) async {
-            postLikesMap[post.id] = post.likes.length;
+            postLikesMap[post.id] = post.totalLikes;
             postCommentsMap[post.id] = post.totalComments;
 
-            if (currentUserId != null &&
-                post.likes.any((like) => like.author.id == currentUserId)) {
+            if (post.isLiked || (currentUserId != null &&
+                post.likes.any((like) => like.author.id == currentUserId))) {
               likedPostIds.add(post.id);
             }
             // Add explicitly to savedPostIds since these are guaranteed saved posts
@@ -534,12 +534,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
         await Future.wait(
           newPosts.map((post) async {
-            postLikesMap[post.id] = post.likes.length;
+            postLikesMap[post.id] = post.totalLikes;
 
             postCommentsMap[post.id] = post.totalComments;
 
-            if (currentUserId != null &&
-                post.likes.any((like) => like.author.id == currentUserId)) {
+            if (post.isLiked || (currentUserId != null &&
+                post.likes.any((like) => like.author.id == currentUserId))) {
               likedPostIds.add(post.id);
             }
             if (post.isSaved) {
@@ -987,9 +987,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   Future<void> _onLikePost(AddLikeEvent event, Emitter<HomeState> emit) async {
-    if (throttledPostIds.contains(event.postId)) return;
-    throttledPostIds.add(event.postId);
-
     final currentCount = state.postLikesCount[event.postId] ?? 0;
     final updatedLiked = List<int>.from(state.likedPostIds)..add(event.postId);
 
@@ -1012,11 +1009,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         await result.fold((failure) async => _revertLike(event.postId, emit), (
           _,
         ) async {
-          add(FetchPostsLikesEvent(event.postId));
+          // Success: The repository already broadcasted PostSyncUpdateType.like
+          // so we don't need to do anything here if we updated optimistically.
         });
       });
-    } finally {
-      throttledPostIds.remove(event.postId);
+    } catch (e) {
+      _revertLike(event.postId, emit);
     }
   }
 
@@ -1024,9 +1022,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     DeleteLikeEvent event,
     Emitter<HomeState> emit,
   ) async {
-    if (throttledPostIds.contains(event.postId)) return;
-    throttledPostIds.add(event.postId);
-
     final currentCount = state.postLikesCount[event.postId] ?? 1;
     final updatedLiked = List<int>.from(state.likedPostIds)
       ..remove(event.postId);
@@ -1049,11 +1044,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         final result = await unlikePostUseCase.call(event.postId);
         await result.fold(
           (failure) async => _revertUnlike(event.postId, emit, error: failure.message),
-          (_) async => add(FetchPostsLikesEvent(event.postId)),
+          (_) async {
+            // Success: The repository already broadcasted PostSyncUpdateType.unlike
+          },
         );
       });
-    } finally {
-      throttledPostIds.remove(event.postId);
+    } catch (e) {
+      _revertUnlike(event.postId, emit);
     }
   }
 

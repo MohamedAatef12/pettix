@@ -40,6 +40,10 @@ class RemoteDataSourceImpl implements RemoteDataSource {
       }
 
       final resultData = response.result as Map<String, dynamic>? ?? {};
+      if (resultData['data'] != null && (resultData['data'] as List).isNotEmpty) {
+        print('🔍 [DEBUG] First Post JSON keys: ${(resultData['data'] as List).first.keys.toList()}');
+        print('🔍 [DEBUG] First Post JSON: ${(resultData['data'] as List).first}');
+      }
       return Right(PaginatedPostsModel.fromJson(resultData));
     } catch (e) {
       log('Error fetching posts: $e');
@@ -48,16 +52,13 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   }
 
   @override
-  Future<Either<Failure, List<PostModel>>> getUserPosts(int contactId) async {
+  Future<Either<Failure, List<PostModel>>> getUserPosts() async {
     final userToken = await DI.find<ICacheManager>().getToken();
     if (userToken == null) return Left(Failure("User is not authenticated"));
     try {
       final response = await apiService.getList(
         endPoint: Constants.userPostsEndpoint,
         headers: {'Authorization': 'Bearer $userToken'},
-        queryParameters: {
-          'contactId': contactId,
-        },
       );
       if (!response.success) {
         return Left(Failure(response.message));

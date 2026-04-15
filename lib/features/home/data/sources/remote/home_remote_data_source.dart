@@ -10,7 +10,7 @@ import '../../models/post_model.dart';
 abstract class RemoteDataSource {
   // Posts
   Future<Either<Failure, PaginatedPostsModel>> getPosts({int pageIndex = 1, int pageSize = 10});
-  Future<Either<Failure, List<PostModel>>> getUserPosts(int contactId);
+  Future<Either<Failure, List<PostModel>>> getUserPosts();
   Future<Either<Failure, List<PostModel>>> getSavedPosts();
   Future<Either<Failure, PostModel>> getPostById(int id);
   Future<Either<Failure, void>> addPost(PostModel post);

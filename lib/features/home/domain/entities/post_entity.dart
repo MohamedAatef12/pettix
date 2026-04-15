@@ -15,7 +15,9 @@ class PostEntity extends Equatable {
   final List<String> images;
   final int statusId;
   final bool isSaved;
+  final bool isLiked;
   final int totalComments;
+  final int totalLikes;
   const PostEntity({
     required this.id,
     required this.content,
@@ -27,7 +29,9 @@ class PostEntity extends Equatable {
     required this.images,
     required this.statusId,
     required this.isSaved,
+    this.isLiked = false,
     this.totalComments = 0,
+    this.totalLikes = 0,
   });
 
   @override
@@ -42,7 +46,9 @@ class PostEntity extends Equatable {
     images,
     statusId,
     isSaved,
+    isLiked,
     totalComments,
+    totalLikes,
   ];
 
   PostEntity copyWith({
@@ -56,7 +62,9 @@ class PostEntity extends Equatable {
     List<String>? images,
     int? statusId,
     bool? isSaved,
+    bool? isLiked,
     int? totalComments,
+    int? totalLikes,
   }) {
     return PostEntity(
       id: id ?? this.id,
@@ -69,7 +77,9 @@ class PostEntity extends Equatable {
       images: images ?? this.images,
       statusId: statusId ?? this.statusId,
       isSaved: isSaved ?? this.isSaved,
+      isLiked: isLiked ?? this.isLiked,
       totalComments: totalComments ?? this.totalComments,
+      totalLikes: totalLikes ?? this.totalLikes,
     );
   }
 }
