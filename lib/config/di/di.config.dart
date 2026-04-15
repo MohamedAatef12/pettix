@@ -297,15 +297,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i894.ProfileRepository>(
       () => _i988.ProfileRepositoryImpl(gh<_i847.ProfileRemoteDataSource>()),
     );
-    gh.factory<_i65.ChatBloc>(
-      () => _i65.ChatBloc(
-        gh<_i529.GetMessagesUseCase>(),
-        gh<_i460.SendMessageUseCase>(),
-        gh<_i801.EditMessageUseCase>(),
-        gh<_i450.DeleteMessageUseCase>(),
-      ),
-    );
-    gh.factory<_i986.HomeDomainRepository>(
+    gh.lazySingleton<_i986.HomeDomainRepository>(
       () => _i1024.HomeRepositoryImpl(
         gh<_i1055.RemoteDataSource>(),
         gh<_i526.GetUserLocalDataSource>(),
@@ -334,9 +326,6 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i684.UpdateAdoptionFormStatusUseCase(
         gh<_i947.AdoptionHistoryRepository>(),
       ),
-    );
-    gh.factory<_i2.ChatListBloc>(
-      () => _i2.ChatListBloc(gh<_i388.GetConversationsUseCase>()),
     );
     gh.factory<_i829.AddCommentUseCase>(
       () => _i829.AddCommentUseCase(gh<_i986.HomeDomainRepository>()),
@@ -454,6 +443,12 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i982.GetPetOptionsUseCase>(),
       ),
     );
+    gh.factory<_i2.ChatListBloc>(
+      () => _i2.ChatListBloc(
+        gh<_i388.GetConversationsUseCase>(),
+        gh<_i118.GetUserDataUseCase>(),
+      ),
+    );
     gh.factory<_i469.ProfileBloc>(
       () => _i469.ProfileBloc(
         gh<_i965.GetProfileUseCase>(),
@@ -465,6 +460,17 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i943.AdoptionBloc(
         gh<_i756.GetAdoptionOptionsUseCase>(),
         gh<_i843.SubmitAdoptionFormUseCase>(),
+      ),
+    );
+    gh.factory<_i65.ChatBloc>(
+      () => _i65.ChatBloc(
+        gh<_i529.GetMessagesUseCase>(),
+        gh<_i460.SendMessageUseCase>(),
+        gh<_i801.EditMessageUseCase>(),
+        gh<_i450.DeleteMessageUseCase>(),
+        gh<_i586.CreatePrivateConversationUseCase>(),
+        gh<_i10.GetConversationDetailsUseCase>(),
+        gh<_i118.GetUserDataUseCase>(),
       ),
     );
     return this;

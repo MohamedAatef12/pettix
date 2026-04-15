@@ -235,7 +235,8 @@ final List<RouteBase> _socialRoutes = [
     name: AppRouteNames.chat,
     builder: (context, state) {
       final index = int.tryParse(state.pathParameters['index'] ?? '0') ?? 0;
-      return ChatPage(index: index);
+      final isUserId = state.uri.queryParameters['isUserId'] == 'true';
+      return ChatPage(index: index, isUserId: isUserId);
     },
   ),
   GoRoute(

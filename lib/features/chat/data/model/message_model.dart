@@ -17,11 +17,11 @@ class MessageModel extends MessageEntity {
     return MessageModel(
       id: json['id'] ?? 0,
       conversationId: json['conversationId'] ?? 0,
-      senderId: json['senderId'] ?? 0,
-      content: json['content'] ?? '',
-      sentAt: json['sentAt'] != null ? DateTime.tryParse(json['sentAt']) ?? DateTime.now() : DateTime.now(),
-      editedAt: json['editedAt'] != null ? DateTime.tryParse(json['editedAt']) : null,
-      isDeleted: json['isDeleted'] ?? false,
+      senderId: json['senderUserId'] ?? json['senderId'] ?? 0,
+      content: json['messageText'] ?? json['content'] ?? '',
+      sentAt: DateTime.tryParse(json['createdAt'] ?? json['sentAt'] ?? '') ?? DateTime.now(),
+      editedAt: json['updatedAt'] != null ? DateTime.tryParse(json['updatedAt']) : (json['editedAt'] != null ? DateTime.tryParse(json['editedAt']) : null),
+      isDeleted: json['deleted'] ?? json['isDeleted'] ?? false,
       sender: json['sender'] != null ? ChatUserModel.fromJson(json['sender']) : null,
     );
   }

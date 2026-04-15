@@ -1,9 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:pettix/features/chat/domain/use_cases/get_messages_use_case.dart';
+import 'package:pettix/features/chat/domain/use_cases/send_message_use_case.dart';
+import 'package:pettix/features/home/domain/usecases/get_user_cached%20_data.dart';
 import '../../domain/use_cases/delete_message_use_case.dart';
 import '../../domain/use_cases/edit_message_use_case.dart';
-import '../../domain/use_cases/get_messages_use_case.dart';
-import '../../domain/use_cases/send_message_use_case.dart';
+import '../../domain/use_cases/create_private_conversation_use_case.dart';
+import '../../domain/use_cases/get_conversation_details_use_case.dart';
 import 'chat_event.dart';
 import 'chat_state.dart';
 
@@ -13,6 +16,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final SendMessageUseCase _sendMessageUseCase;
   final EditMessageUseCase _editMessageUseCase;
   final DeleteMessageUseCase _deleteMessageUseCase;
+  final CreatePrivateConversationUseCase _createPrivateConversationUseCase;
+  final GetConversationDetailsUseCase _getConversationDetailsUseCase;
+  final GetUserDataUseCase _getUserDataUseCase;
 
   static const int _pageSize = 20;
 
@@ -21,11 +27,58 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     this._sendMessageUseCase,
     this._editMessageUseCase,
     this._deleteMessageUseCase,
+    this._createPrivateConversationUseCase,
+    this._getConversationDetailsUseCase,
+    this._getUserDataUseCase,
   ) : super(const ChatState()) {
+    on<InitializeChatEvent>(_onInitializeChat);
     on<GetMessagesEvent>(_onGetMessages);
     on<SendMessageEvent>(_onSendMessage);
     on<EditMessageEvent>(_onEditMessage);
     on<DeleteMessageEvent>(_onDeleteMessage);
+  }
+
+  Future<void> _onInitializeChat(InitializeChatEvent event, Emitter<ChatState> emit) async {
+    emit(state.copyWith(status: ChatStatus.loading, conversationId: event.conversationId));
+
+    // Fetch user info for isMe check
+    final userResult = await _getUserDataUseCase();
+    int? currentUserId;
+    userResult.fold((_) {}, (user) => currentUserId = user.id);
+    emit(state.copyWith(currentUserId: currentUserId));
+
+    int? finalConvId = event.conversationId;
+
+    if (finalConvId == null && event.otherUserId != null) {
+      final result = await _createPrivateConversationUseCase(event.otherUserId!);
+      
+      final res = result.fold(
+        (failure) {
+          emit(state.copyWith(status: ChatStatus.error, errorMessage: failure.message));
+          return null;
+        },
+        (conversation) {
+          emit(state.copyWith(conversationId: conversation.id, conversation: conversation));
+          return conversation.id;
+        },
+      );
+      
+      if (res == null) return;
+      finalConvId = res;
+    } else if (finalConvId != null) {
+      // Fetch conversation details if we have an ID
+      final result = await _getConversationDetailsUseCase(finalConvId);
+      result.fold(
+        (_) {},
+        (conversation) => emit(state.copyWith(conversation: conversation)),
+      );
+    }
+
+    if (finalConvId != null) {
+      add(GetMessagesEvent(finalConvId, isRefresh: true));
+    } else {
+      emit(state.copyWith(status: ChatStatus.error, errorMessage: 'No conversation or user ID provided'));
+    }
   }
 
   Future<void> _onGetMessages(GetMessagesEvent event, Emitter<ChatState> emit) async {

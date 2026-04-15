@@ -615,7 +615,11 @@ class _MessageButton extends StatelessWidget {
         icon: Icons.chat_bubble_outline_rounded,
         color: AppColors.current.primary,
         onTap: () {
-          context.pushNamed(AppRouteNames.chat, pathParameters: {'index': targetId.toString()});
+          context.pushNamed(
+            AppRouteNames.chat,
+            pathParameters: {'index': targetId.toString()},
+            queryParameters: {'isUserId': 'true'},
+          );
         },
       ),
     );

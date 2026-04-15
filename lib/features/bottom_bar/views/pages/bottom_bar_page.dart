@@ -42,6 +42,9 @@ class BottomNavigationScreen extends StatelessWidget {
         BlocProvider(
           create: (_) => HomeBloc.fromDI()..add(FetchPostsEvent()),
         ),
+        BlocProvider.value(
+          value: DI.find<NotificationBloc>()..add(const FetchAllUnreadCounts()),
+        ),
       ],
       child: MultiBlocListener(
         listeners: [
@@ -81,6 +84,7 @@ class BottomNavigationScreen extends StatelessWidget {
                           .add(NavigateToPage(i)),
                       onAddPost: () => context.push(AppRoutes.addPost,
                           extra: context.read<HomeBloc>()),
+                      onChatList: () => context.push(AppRoutes.chatList),
                     )
                   : AndroidNavBar(
                       currentIndex: state.index,
@@ -89,6 +93,7 @@ class BottomNavigationScreen extends StatelessWidget {
                           .add(NavigateToPage(i)),
                       onAddPost: () => context.push(AppRoutes.addPost,
                           extra: context.read<HomeBloc>()),
+                      onChatList: () => context.push(AppRoutes.chatList),
                     ),
             );
           },

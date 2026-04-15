@@ -21,11 +21,15 @@ class IosNavBar extends StatelessWidget {
   /// Called when the user taps the add-post button.
   final VoidCallback onAddPost;
 
+  /// Called when the user taps the chat button.
+  final VoidCallback? onChatList;
+
   const IosNavBar({
     super.key,
     required this.currentIndex,
     required this.onTabChanged,
     required this.onAddPost,
+    this.onChatList,
   });
 
   static const _selectedIcons = <IconData>[
@@ -77,6 +81,8 @@ class IosNavBar extends StatelessWidget {
                       ),
                     ),
                   ),
+                  if (currentIndex == 1 && onChatList != null)
+                    _IosChatButton(onTap: onChatList!),
                   _IosAddButton(onTap: onAddPost),
                 ],
               ),
@@ -175,6 +181,36 @@ class _IosAddButton extends StatelessWidget {
           child: Icon(
             Iconsax.add,
             color: AppColors.current.white,
+            size: 18.r,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Circular chat button for the iOS bar.
+class _IosChatButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _IosChatButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(left: 4.w),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 36.r,
+          height: 36.r,
+          decoration: BoxDecoration(
+            color: AppColors.current.blueGray.withValues(alpha: 0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Iconsax.messages,
+            color: AppColors.current.primary,
             size: 18.r,
           ),
         ),

@@ -126,8 +126,8 @@ class _ChatListTapsState extends State<ChatListTaps>
                 return TabBarView(
                   controller: _tabController,
                   children: [
-                    _buildConversationList(allConversations),
-                    _buildConversationList(allConversations.where((c) => c.type == 'group').toList()),
+                    _buildConversationList(allConversations, state.currentUserId),
+                    _buildConversationList(allConversations.where((c) => c.type == 'group').toList(), state.currentUserId),
                   ],
                 );
               }
@@ -139,7 +139,7 @@ class _ChatListTapsState extends State<ChatListTaps>
     );
   }
 
-  Widget _buildConversationList(List<ConversationEntity> conversations) {
+  Widget _buildConversationList(List<ConversationEntity> conversations, int? currentUserId) {
     if (conversations.isEmpty) {
       return Center(child: Text('No conversations found', style: AppTextStyles.description));
     }
@@ -148,8 +148,10 @@ class _ChatListTapsState extends State<ChatListTaps>
       padding: EdgeInsets.symmetric(vertical: 10.h),
       itemBuilder: (context, index) {
         final conversation = conversations[index];
-        // Assuming we take the first member other than self or just first member for display
-        final displayMember = conversation.members.isNotEmpty ? conversation.members.first.user : null;
+        // Filter out current user to find the other participant
+        final otherMember = conversation.members.where((m) => m.user.id != currentUserId).firstOrNull ?? 
+                          (conversation.members.isNotEmpty ? conversation.members.first : null);
+        final displayMember = otherMember?.user;
         return Column(
           children: [
             GestureDetector(

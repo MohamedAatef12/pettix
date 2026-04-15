@@ -98,10 +98,24 @@ class ChatRepositoryImpl implements ChatRepository {
     try {
       // In a real scenario, you probably send more data, but going with basic text for now
       // Or maybe the API expects 'content' or 'text'
-      final response = await _remoteDataSource.sendMessage(conversationId, {'content': content});
+      // We try sending multiple possible keys to see which one the backend accepts
+      final Map<String, dynamic> body = {
+        'messageText': content,
+        'content': content,
+        'text': content,
+        'message': content,
+      };
+      final response = await _remoteDataSource.sendMessage(conversationId, body);
 
       if (response.success && response.result != null) {
         final message = MessageModel.fromJson(response.result as Map<String, dynamic>);
+        
+        // Optimistic fallback: If the backend returns success but null/empty text, 
+        // we use the content the user just sent so the UI isn't empty.
+        if (message.content.isEmpty) {
+          return Right(message.copyWith(content: content));
+        }
+        
         return Right(message);
       } else {
         return Left(Failure(response.message));

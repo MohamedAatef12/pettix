@@ -29,7 +29,9 @@ class _ChatConversationState extends State<ChatConversation> {
     if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 50) {
       final state = context.read<ChatBloc>().state;
       if (state.hasMore && state.status != ChatStatus.paginating && state.status != ChatStatus.loading) {
-        context.read<ChatBloc>().add(GetMessagesEvent(widget.userIndex));
+        if (state.conversationId != null) {
+          context.read<ChatBloc>().add(GetMessagesEvent(state.conversationId!));
+        }
       }
     }
   }
@@ -56,14 +58,22 @@ class _ChatConversationState extends State<ChatConversation> {
           controller: _scrollController,
           itemCount: messages.length + 1 + (state.status == ChatStatus.paginating ? 1 : 0),
           padding: EdgeInsets.only(bottom: 16.h),
-          // We usually reverse the list for chat, but based on your previous items logic:
-          // We might need to handle reverse=true, or just build standard. Assuming index 0 is top.
+          reverse: true,
           itemBuilder: (context, index) {
-            if (index == 0) {
+            // Profile card at the end of the history (top of the scroll view)
+            if (index == messages.length) {
+              // Identify the "Other Member" to show in the profile card
+              final otherMember = state.conversation?.members.where((m) => m.user.id != state.currentUserId).firstOrNull ?? 
+                                (state.conversation?.members.isNotEmpty == true ? state.conversation?.members.first : null);
+              
               return Column(
                 children: [
-                  ProfileCard(index: widget.userIndex),
-                  SizedBox(height: 10.h),
+                   ProfileCard(
+                     index: widget.userIndex,
+                     name: otherMember?.user.displayName,
+                     avatarUrl: otherMember?.user.avatar,
+                   ),
+                   SizedBox(height: 10.h),
                 ],
               );
             }
@@ -75,16 +85,13 @@ class _ChatConversationState extends State<ChatConversation> {
               );
             }
 
-            final msg = messages[index - 1];
-            // Assuming `senderId` matches your current user ID logic for `isMe`. 
-            // In a real app you'd compare msg.senderId == currentUserId.
-            // Using a dummy check for now or assuming isMe if senderId != the other user id.
-            final isMe = msg.senderId != widget.userIndex; // Or whatever logic you use
+            final msg = messages[index];
+            final isMe = msg.senderId == state.currentUserId;
 
             return ChatBubble(
               text: msg.content,
               isMe: isMe,
-              seen: false, // Update logic when seen property is fully mapped if available
+              seen: false, 
             );
           },
         );

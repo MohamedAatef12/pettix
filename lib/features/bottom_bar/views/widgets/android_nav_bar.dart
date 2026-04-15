@@ -20,11 +20,15 @@ class AndroidNavBar extends StatelessWidget {
   /// Called when the user taps the add-post button.
   final VoidCallback onAddPost;
 
+  /// Called when the user taps the chat button.
+  final VoidCallback? onChatList;
+
   const AndroidNavBar({
     super.key,
     required this.currentIndex,
     required this.onTabChanged,
     required this.onAddPost,
+    this.onChatList,
   });
 
   static const _selectedIcons = <IconData>[
@@ -73,6 +77,8 @@ class AndroidNavBar extends StatelessWidget {
               onTap: () => onTabChanged(i),
             ),
           ),
+          if (currentIndex == 1 && onChatList != null)
+            _AndroidChatButton(onTap: onChatList!),
           _AndroidAddButton(onTap: onAddPost),
         ],
       ),
@@ -187,6 +193,34 @@ class _AndroidAddButton extends StatelessWidget {
         child: Icon(
           Iconsax.add,
           color: AppColors.current.white,
+          size: 22.r,
+        ),
+      ),
+    );
+  }
+}
+
+/// Circular chat button for the Android floating bar.
+class _AndroidChatButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _AndroidChatButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 44.r,
+        height: 44.r,
+        margin: EdgeInsets.only(right: 8.w),
+        decoration: BoxDecoration(
+          color: AppColors.current.blueGray.withValues(alpha: 0.1),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          Iconsax.messages,
+          color: AppColors.current.primary,
           size: 22.r,
         ),
       ),

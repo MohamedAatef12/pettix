@@ -14,11 +14,12 @@ class ChatListLoading extends ChatListState {}
 
 class ChatListSuccess extends ChatListState {
   final List<ConversationEntity> conversations;
+  final int? currentUserId;
 
-  const ChatListSuccess(this.conversations);
+  const ChatListSuccess(this.conversations, {this.currentUserId});
 
   @override
-  List<Object?> get props => [conversations];
+  List<Object?> get props => [conversations, currentUserId];
 }
 
 class ChatListError extends ChatListState {
