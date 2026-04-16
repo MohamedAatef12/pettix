@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/sized_box.dart';
+import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import '../../bloc/adoption_bloc.dart';
 import '../../bloc/adoption_event.dart';
@@ -33,7 +35,7 @@ class Step4Agreements extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 16.h),
+            SizedBoxConstants.verticalSmall,
             // ── Agreement block ──────────────────────────────────────────
             _SectionCard(
               title: 'I Agree to:',
@@ -50,7 +52,7 @@ class Step4Agreements extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 24.h),
+            SizedBoxConstants.verticalMedium,
             // ── Checkboxes ───────────────────────────────────────────────
             _CheckCard(
               value: state.agreed,
@@ -101,10 +103,8 @@ class _SectionCard extends StatelessWidget {
               SizedBox(width: 8.w),
               Text(
                 title,
-                style: TextStyle(
+                style: AppTextStyles.description.copyWith(
                   fontWeight: FontWeight.w700,
-                  fontSize: 14.sp,
-                  color: AppColors.current.text,
                 ),
               ),
             ],
@@ -143,8 +143,7 @@ class _AgreementPoint extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: TextStyle(
-                fontSize: 13.sp,
+              style: AppTextStyles.smallDescription.copyWith(
                 height: 1.55,
                 color: AppColors.current.lightText,
               ),
@@ -175,14 +174,14 @@ class _CheckCard extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
         decoration: BoxDecoration(
-          color: value
-              ? AppColors.current.primary.withValues(alpha: 0.07)
-              : AppColors.current.white,
+          color:
+              value
+                  ? AppColors.current.primary.withValues(alpha: 0.07)
+                  : AppColors.current.white,
           borderRadius: BorderRadius.circular(12.r),
           border: Border.all(
-            color: value
-                ? AppColors.current.primary
-                : AppColors.current.lightGray,
+            color:
+                value ? AppColors.current.primary : AppColors.current.lightGray,
             width: value ? 1.8 : 1.2,
           ),
         ),
@@ -197,28 +196,32 @@ class _CheckCard extends StatelessWidget {
                     value ? AppColors.current.primary : AppColors.current.white,
                 borderRadius: BorderRadius.circular(6.r),
                 border: Border.all(
-                  color: value
-                      ? AppColors.current.primary
-                      : AppColors.current.lightGray,
+                  color:
+                      value
+                          ? AppColors.current.primary
+                          : AppColors.current.lightGray,
                   width: 1.5,
                 ),
               ),
-              child: value
-                  ? Icon(Icons.check_rounded,
-                      size: 14.w, color: AppColors.current.white)
-                  : null,
+              child:
+                  value
+                      ? Icon(
+                        Icons.check_rounded,
+                        size: 14.w,
+                        color: AppColors.current.white,
+                      )
+                      : null,
             ),
             SizedBox(width: 12.w),
             Expanded(
               child: Text(
                 label,
-                style: TextStyle(
-                  fontSize: 13.sp,
-                  color: value
-                      ? AppColors.current.text
-                      : AppColors.current.lightText,
-                  fontWeight:
-                      value ? FontWeight.w600 : FontWeight.w400,
+                style: AppTextStyles.smallDescription.copyWith(
+                  color:
+                      value
+                          ? AppColors.current.text
+                          : AppColors.current.lightText,
+                  fontWeight: value ? FontWeight.w600 : FontWeight.w400,
                   height: 1.4,
                 ),
               ),

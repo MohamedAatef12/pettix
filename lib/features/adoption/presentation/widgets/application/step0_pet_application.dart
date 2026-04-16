@@ -19,7 +19,7 @@ class PetApplication extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       padding: EdgeInsets.zero,
       children: [
-        _HeroSection(),
+        const _HeroSection(),
         SizedBoxConstants.verticalLarge,
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -36,8 +36,7 @@ class PetApplication extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Text(
             'To ensure the right choice, we\'ll ask you a few questions about your living situation and experience.',
-            style: TextStyle(
-              fontSize: 15.sp,
+            style: AppTextStyles.description.copyWith(
               color: AppColors.current.lightText,
               height: 1.6,
             ),
@@ -79,8 +78,7 @@ class PetApplication extends StatelessWidget {
             onPressed: () => context.read<AdoptionBloc>().add(NextStep()),
             heightFactor: 0.06,
             backgroundColor: AppColors.current.primary,
-            textStyle: TextStyle(
-              fontSize: 16.sp,
+            textStyle: AppTextStyles.description.copyWith(
               fontWeight: FontWeight.w600,
               color: AppColors.current.white,
             ),
@@ -93,6 +91,8 @@ class PetApplication extends StatelessWidget {
 }
 
 class _HeroSection extends StatelessWidget {
+  const _HeroSection();
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -109,7 +109,6 @@ class _HeroSection extends StatelessWidget {
             onTap: () => context.pop(),
             highlightColor: Colors.transparent,
             splashColor: Colors.transparent,
-            
             child: SizedBox(
               width: 40.w,
               height: 40.w,
@@ -151,8 +150,7 @@ class _ExpectationItem extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: TextStyle(
-                fontSize: 14.sp,
+              style: AppTextStyles.smallDescription.copyWith(
                 color: AppColors.current.lightText,
               ),
             ),

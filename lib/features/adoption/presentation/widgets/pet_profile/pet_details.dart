@@ -28,7 +28,7 @@ class PetDetails extends StatelessWidget {
               Expanded(
                 child: Text(
                   pet.name,
-                  style: AppTextStyles.title.copyWith(
+                  style: AppTextStyles.bodyTitle.copyWith(
                     fontSize: 20.sp,
                     color: AppColors.current.text,
                   ),
@@ -66,16 +66,16 @@ class _StatusBadge extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: available
-            ? AppColors.current.green.withValues(alpha: 0.12)
-            : AppColors.current.yellow.withValues(alpha: 0.12),
+        color:
+            available
+                ? AppColors.current.green.withValues(alpha: 0.12)
+                : AppColors.current.yellow.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(20.r),
       ),
       child: Text(
         available ? 'Available' : 'Pending',
-        style: TextStyle(
+        style: AppTextStyles.smallDescription.copyWith(
           color: available ? AppColors.current.green : AppColors.current.yellow,
-          fontSize: 11.sp,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -94,16 +94,16 @@ class _Chip extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: isCode
-            ? AppColors.current.primary.withValues(alpha: 0.1)
-            : AppColors.current.lightBlue,
+        color:
+            isCode
+                ? AppColors.current.primary.withValues(alpha: 0.1)
+                : AppColors.current.lightBlue,
         borderRadius: BorderRadius.circular(20.r),
       ),
       child: Text(
         label,
-        style: TextStyle(
+        style: AppTextStyles.smallDescription.copyWith(
           color: isCode ? AppColors.current.primary : AppColors.current.text,
-          fontSize: 12.sp,
           fontWeight: FontWeight.w500,
         ),
       ),

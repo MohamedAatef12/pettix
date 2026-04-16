@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/sized_box.dart';
+import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import '../../../../config/di/di.dart';
@@ -31,16 +32,19 @@ class ApplicationScreens extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<AdoptionBloc>()
-        ..add(const ResetForm())
-        ..add(SetPetId(petId))
-        ..add(FetchAdoptionOptions()),
+      create:
+          (context) =>
+              getIt<AdoptionBloc>()
+                ..add(const ResetForm())
+                ..add(SetPetId(petId))
+                ..add(FetchAdoptionOptions()),
       child: BlocConsumer<AdoptionBloc, AdoptionState>(
         listener: (context, state) {
           final msg = state.errorMessage;
           if (msg != null && msg.isNotEmpty) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(msg)));
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(msg)));
           }
         },
         builder: (context, state) {
@@ -58,7 +62,7 @@ class ApplicationScreens extends StatelessWidget {
           if (state.currentStep == 0) {
             return Scaffold(
               backgroundColor: AppColors.current.white,
-              body: PetApplication(),
+              body: const PetApplication(),
             );
           }
 
@@ -85,7 +89,10 @@ class ApplicationScreens extends StatelessWidget {
     return AppBar(
       title: Text(
         'Adopt a Pet',
-        style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
+        style: AppTextStyles.description.copyWith(
+          fontSize: 18.sp,
+          fontWeight: FontWeight.w600,
+        ),
       ),
       centerTitle: true,
       backgroundColor: AppColors.current.white,
@@ -100,7 +107,7 @@ class ApplicationScreens extends StatelessWidget {
   }
 }
 
-// ─── Step header (title + progress) ──────────────────────────────────────────
+// ─── Step header (title + progress) ───────────────────────────────────────────
 
 class _StepHeader extends StatelessWidget {
   final AdoptionState state;
@@ -118,16 +125,14 @@ class _StepHeader extends StatelessWidget {
           if (!isReview) ...[
             Text(
               'Step ${state.currentStep} of 4',
-              style: TextStyle(
+              style: AppTextStyles.smallDescription.copyWith(
                 color: AppColors.current.midGray,
-                fontSize: 12.sp,
               ),
             ),
             SizedBoxConstants.verticalSmall,
             Text(
               ApplicationScreens._stepTitles[state.currentStep - 1],
-              style: TextStyle(
-                color: AppColors.current.text,
+              style: AppTextStyles.description.copyWith(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w700,
               ),
@@ -137,8 +142,7 @@ class _StepHeader extends StatelessWidget {
           ] else
             Text(
               'Review Your Application',
-              style: TextStyle(
-                color: AppColors.current.text,
+              style: AppTextStyles.description.copyWith(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w700,
               ),
@@ -162,12 +166,15 @@ class _ProgressBar extends StatelessWidget {
         tween: Tween<double>(begin: 0.0, end: step / 4),
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOut,
-        builder: (context, value, _) => LinearProgressIndicator(
-          value: value,
-          backgroundColor: AppColors.current.lightGray,
-          valueColor: AlwaysStoppedAnimation<Color>(AppColors.current.primary),
-          minHeight: 6,
-        ),
+        builder:
+            (context, value, _) => LinearProgressIndicator(
+              value: value,
+              backgroundColor: AppColors.current.lightGray,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                AppColors.current.primary,
+              ),
+              minHeight: 6,
+            ),
       ),
     );
   }
@@ -232,7 +239,7 @@ class _BottomNav extends StatelessWidget {
                 size: 22,
               ),
               hasTrailing: true,
-              textStyle: TextStyle(
+              textStyle: AppTextStyles.description.copyWith(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w600,
                 color: AppColors.current.white,

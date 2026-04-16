@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/sized_box.dart';
+import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import '../../bloc/adoption_bloc.dart';
@@ -19,13 +21,12 @@ class StepReviewApplication extends StatelessWidget {
           children: [
             Text(
               'Almost there! Review your information before submitting.',
-              style: TextStyle(
-                fontSize: 13.sp,
+              style: AppTextStyles.smallDescription.copyWith(
                 color: AppColors.current.midGray,
                 height: 1.5,
               ),
             ),
-            SizedBox(height: 20.h),
+            SizedBoxConstants.verticalMedium,
             _ReviewCard(
               title: 'Personal Information',
               icon: Icons.person_outline_rounded,
@@ -64,22 +65,19 @@ class StepReviewApplication extends StatelessWidget {
                   value: state.hasOwnedPetBefore == true ? 'Yes' : 'No',
                 ),
                 if (state.hasOwnedPetBefore == true)
-                  _ReviewRow(
-                    label: 'Type of pet',
-                    value: state.petType ?? '—',
-                  ),
+                  _ReviewRow(label: 'Type of pet', value: state.petType ?? '—'),
               ],
             ),
-            SizedBox(height: 28.h),
+            SizedBoxConstants.verticalLarge,
             CustomFilledButton(
-              onPressed: () => context
-                  .read<AdoptionBloc>()
-                  .add(const SubmitAdoptionForm()),
+              onPressed:
+                  () => context.read<AdoptionBloc>().add(
+                    const SubmitAdoptionForm(),
+                  ),
               text: 'Submit Application',
               heightFactor: 0.065,
               backgroundColor: AppColors.current.primary,
-              textStyle: TextStyle(
-                fontSize: 16.sp,
+              textStyle: AppTextStyles.description.copyWith(
                 fontWeight: FontWeight.w700,
                 color: AppColors.current.white,
               ),
@@ -146,23 +144,24 @@ class _ReviewCard extends StatelessWidget {
                     color: AppColors.current.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
-                  child: Icon(icon,
-                      size: 16.w, color: AppColors.current.primary),
+                  child: Icon(
+                    icon,
+                    size: 16.w,
+                    color: AppColors.current.primary,
+                  ),
                 ),
                 SizedBox(width: 10.w),
                 Expanded(
                   child: Text(
                     title,
-                    style: TextStyle(
-                      fontSize: 14.sp,
+                    style: AppTextStyles.description.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: AppColors.current.text,
                     ),
                   ),
                 ),
                 IconButton(
-                  onPressed: () =>
-                      context.read<AdoptionBloc>().add(JumpToStep(step)),
+                  onPressed:
+                      () => context.read<AdoptionBloc>().add(JumpToStep(step)),
                   icon: Icon(
                     Icons.edit_outlined,
                     size: 18.w,
@@ -181,37 +180,38 @@ class _ReviewCard extends StatelessWidget {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
             child: Column(
-              children: rows
-                  .map((r) => Padding(
-                        padding: EdgeInsets.only(bottom: 8.h),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              width: 110.w,
-                              child: Text(
-                                r.label,
-                                style: TextStyle(
-                                  fontSize: 12.sp,
-                                  color: AppColors.current.midGray,
-                                  fontWeight: FontWeight.w500,
+              children:
+                  rows
+                      .map(
+                        (r) => Padding(
+                          padding: EdgeInsets.only(bottom: 8.h),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: 110.w,
+                                child: Text(
+                                  r.label,
+                                  style: AppTextStyles.smallDescription
+                                      .copyWith(
+                                        color: AppColors.current.midGray,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                 ),
                               ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                r.value.isEmpty ? '—' : r.value,
-                                style: TextStyle(
-                                  fontSize: 13.sp,
-                                  color: AppColors.current.text,
-                                  fontWeight: FontWeight.w600,
+                              Expanded(
+                                child: Text(
+                                  r.value.isEmpty ? '—' : r.value,
+                                  style: AppTextStyles.description.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ))
-                  .toList(),
+                      )
+                      .toList(),
             ),
           ),
         ],

@@ -18,6 +18,11 @@ class AdoptionBrowseState extends Equatable {
   final String? sortBy;
   final bool sortDescending;
 
+  // Draft filter state (used by filter sheet before applying)
+  final int? draftGenderId;
+  final String? draftSortBy;
+  final bool draftSortDescending;
+
   // Lookup data for filter chips
   final List<LookupEntity> categories;
 
@@ -34,6 +39,9 @@ class AdoptionBrowseState extends Equatable {
     this.selectedGenderId,
     this.sortBy,
     this.sortDescending = false,
+    this.draftGenderId,
+    this.draftSortBy,
+    this.draftSortDescending = false,
     this.categories = const [],
     this.errorMessage,
   });
@@ -55,6 +63,9 @@ class AdoptionBrowseState extends Equatable {
     int? selectedGenderId,
     String? sortBy,
     bool? sortDescending,
+    int? draftGenderId,
+    String? draftSortBy,
+    bool? draftSortDescending,
     List<LookupEntity>? categories,
     String? errorMessage,
     bool clearCategory = false,
@@ -70,11 +81,16 @@ class AdoptionBrowseState extends Equatable {
       hasMore: hasMore ?? this.hasMore,
       searchQuery: clearSearch ? null : (searchQuery ?? this.searchQuery),
       selectedCategoryId:
-          clearCategory ? null : (selectedCategoryId ?? this.selectedCategoryId),
+          clearCategory
+              ? null
+              : (selectedCategoryId ?? this.selectedCategoryId),
       selectedGenderId:
           clearGender ? null : (selectedGenderId ?? this.selectedGenderId),
       sortBy: clearSort ? null : (sortBy ?? this.sortBy),
       sortDescending: sortDescending ?? this.sortDescending,
+      draftGenderId: draftGenderId ?? this.draftGenderId,
+      draftSortBy: draftSortBy ?? this.draftSortBy,
+      draftSortDescending: draftSortDescending ?? this.draftSortDescending,
       categories: categories ?? this.categories,
       errorMessage: errorMessage,
     );
@@ -82,17 +98,20 @@ class AdoptionBrowseState extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        pets,
-        totalCount,
-        currentPage,
-        hasMore,
-        searchQuery,
-        selectedCategoryId,
-        selectedGenderId,
-        sortBy,
-        sortDescending,
-        categories,
-        errorMessage,
-      ];
+    status,
+    pets,
+    totalCount,
+    currentPage,
+    hasMore,
+    searchQuery,
+    selectedCategoryId,
+    selectedGenderId,
+    sortBy,
+    sortDescending,
+    draftGenderId,
+    draftSortBy,
+    draftSortDescending,
+    categories,
+    errorMessage,
+  ];
 }

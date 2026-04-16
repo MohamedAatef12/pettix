@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:pettix/core/constants/sized_box.dart';
+import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/adoption/presentation/widgets/pet_profile/pet_description.dart';
 import 'package:pettix/features/adoption/presentation/widgets/pet_profile/pet_details.dart';
 import 'package:pettix/features/adoption/presentation/widgets/pet_profile/pet_medical_history.dart';
 import 'package:pettix/features/adoption/presentation/widgets/pet_profile/pet_photos.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/config/router/routes.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/utils/custom_button.dart';
 
 class PetBody extends StatelessWidget {
   final PetEntity pet;
@@ -56,18 +58,17 @@ class _AdoptBottomBar extends StatelessWidget {
           ),
         ],
       ),
-      child: ElevatedButton.icon(
+      child: CustomFilledButton(
+        text: 'Apply to Adopt',
         onPressed: () => context.push(AppRoutes.applications, extra: pet.id),
-        icon: const Icon(Icons.pets_rounded, size: 20),
-        label: const Text('Apply to Adopt'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.current.primary,
-          foregroundColor: AppColors.current.white,
-          minimumSize: Size(double.infinity, 50.h),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14.r),
-          ),
-          textStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+        hasLeading: true,
+        leading: const Icon(Icons.pets_rounded, size: 20, color: Colors.white),
+        widthFactor: 1.0,
+        heightFactor: 0.065,
+        backgroundColor: AppColors.current.primary,
+        textStyle: AppTextStyles.button.copyWith(
+          color: AppColors.current.white,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );

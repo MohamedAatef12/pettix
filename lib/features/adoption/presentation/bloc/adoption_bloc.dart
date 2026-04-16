@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:intl/intl.dart';
 import '../../data/models/adoption_form_request_model.dart';
 import '../../domain/usecases/get_adoption_options_usecase.dart';
 import '../../domain/usecases/submit_adoption_form_usecase.dart';
@@ -34,6 +35,11 @@ class AdoptionBloc extends Bloc<AdoptionEvent, AdoptionState> {
     on<UpdateDateOfBirth>(
       (event, emit) => emit(state.copyWith(dateOfBirth: event.dateOfBirth)),
     );
+    on<SelectDateOfBirth>((event, emit) {
+      final fmt = DateFormat('yyyy-MM-dd').format(event.date);
+      dobController.text = fmt;
+      emit(state.copyWith(dateOfBirth: fmt));
+    });
     on<UpdateLivingSituation>(
       (event, emit) =>
           emit(state.copyWith(selectedLivingSituationId: event.id)),

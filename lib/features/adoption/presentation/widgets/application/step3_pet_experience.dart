@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/sized_box.dart';
+import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 import '../../bloc/adoption_bloc.dart';
@@ -21,11 +23,11 @@ class Step3PetExperience extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 "Have you owned or cared for a pet before?",
-                style: TextStyle(fontSize: 16),
+                style: AppTextStyles.description,
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -36,7 +38,7 @@ class Step3PetExperience extends StatelessWidget {
                       onSelected: () => bloc.add(const UpdateHasOwnedPet(true)),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBoxConstants.horizontalSmall,
                   Expanded(
                     child: CustomChoiceChip(
                       label: "No",
@@ -48,12 +50,9 @@ class Step3PetExperience extends StatelessWidget {
                 ],
               ),
               if (state.hasOwnedPetBefore == true) ...[
-                const SizedBox(height: 30),
-                const Text(
-                  "If yes, what type?",
-                  style: TextStyle(fontSize: 16),
-                ),
-                const SizedBox(height: 12),
+                SizedBoxConstants.verticalLarge,
+                Text("If yes, what type?", style: AppTextStyles.description),
+                SizedBox(height: 12.h),
                 CustomTextFormField(
                   controller: bloc.petTypeController,
                   onChanged: (val) => bloc.add(UpdatePetType(val)),
@@ -61,21 +60,21 @@ class Step3PetExperience extends StatelessWidget {
                   fillColor: true,
                   fillColorValue: AppColors.current.white,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12.r),
                     borderSide: BorderSide(
                       color: AppColors.current.lightGray,
                       width: 1.w,
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12.r),
                     borderSide: BorderSide(
                       color: AppColors.current.lightGray,
                       width: 1.w,
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12.r),
                     borderSide: BorderSide(
                       color: AppColors.current.lightGray,
                       width: 1.w,

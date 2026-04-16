@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 
@@ -46,13 +47,15 @@ class PetBrowseCard extends StatelessWidget {
                       borderRadius: BorderRadius.vertical(
                         top: Radius.circular(24.r),
                       ),
-                      child: fullUrl != null
-                          ? Image.network(
-                              fullUrl,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => _PhotoPlaceholder(),
-                            )
-                          : _PhotoPlaceholder(),
+                      child:
+                          fullUrl != null
+                              ? Image.network(
+                                fullUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder:
+                                    (_, __, ___) => const _PhotoPlaceholder(),
+                              )
+                              : const _PhotoPlaceholder(),
                     ),
                   ),
                   // Gender badge
@@ -75,12 +78,10 @@ class PetBrowseCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      pet.name ?? 'Unknown',
+                      pet.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: AppColors.current.text,
-                        fontSize: 16.sp,
+                      style: AppTextStyles.description.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -94,9 +95,8 @@ class PetBrowseCard extends StatelessWidget {
                               pet.categoryName ?? 'Unknown',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
+                              style: AppTextStyles.smallDescription.copyWith(
                                 color: AppColors.current.primary,
-                                fontSize: 13.sp,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -114,9 +114,8 @@ class PetBrowseCard extends StatelessWidget {
                         Text(
                           pet.age != null ? '${pet.age} yrs' : 'Age unknown',
                           maxLines: 1,
-                          style: TextStyle(
+                          style: AppTextStyles.smallDescription.copyWith(
                             color: AppColors.current.blueGray,
-                            fontSize: 12.sp,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -134,6 +133,8 @@ class PetBrowseCard extends StatelessWidget {
 }
 
 class _PhotoPlaceholder extends StatelessWidget {
+  const _PhotoPlaceholder();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -174,9 +175,8 @@ class _GenderBadge extends StatelessWidget {
           SizedBox(width: 2.w),
           Text(
             gender,
-            style: TextStyle(
+            style: AppTextStyles.smallDescription.copyWith(
               color: Colors.white,
-              fontSize: 9.sp,
               fontWeight: FontWeight.w700,
             ),
           ),

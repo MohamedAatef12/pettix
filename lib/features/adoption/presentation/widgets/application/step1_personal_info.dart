@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:pettix/core/constants/sized_box.dart';
+import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import '../../bloc/adoption_bloc.dart';
 import '../../bloc/adoption_event.dart';
@@ -27,7 +29,7 @@ class Step1PersonalInfo extends StatelessWidget {
             hint: 'Your full name',
             keyboardType: TextInputType.name,
           ),
-          SizedBox(height: 20.h),
+          SizedBoxConstants.verticalMedium,
           _FieldLabel(label: 'Email Address', icon: Icons.email_outlined),
           SizedBox(height: 8.h),
           _AdoptionField(
@@ -36,7 +38,7 @@ class Step1PersonalInfo extends StatelessWidget {
             hint: 'you@example.com',
             keyboardType: TextInputType.emailAddress,
           ),
-          SizedBox(height: 20.h),
+          SizedBoxConstants.verticalMedium,
           _FieldLabel(label: 'Phone Number', icon: Icons.phone_outlined),
           SizedBox(height: 8.h),
           _AdoptionField(
@@ -45,7 +47,7 @@ class Step1PersonalInfo extends StatelessWidget {
             hint: '+1 234 567 890',
             keyboardType: TextInputType.phone,
           ),
-          SizedBox(height: 20.h),
+          SizedBoxConstants.verticalMedium,
           _FieldLabel(label: 'Date of Birth', icon: Icons.cake_outlined),
           SizedBox(height: 8.h),
           _AdoptionField(
@@ -76,58 +78,59 @@ class Step1PersonalInfo extends StatelessWidget {
 
     showCupertinoModalPopup(
       context: context,
-      builder: (_) => Container(
-        height: 320.h,
-        decoration: BoxDecoration(
-          color: AppColors.current.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-        ),
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Select Date of Birth',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15.sp,
-                      color: AppColors.current.text,
-                    ),
+      builder:
+          (_) => Container(
+            height: 320.h,
+            decoration: BoxDecoration(
+              color: AppColors.current.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 12.h,
                   ),
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Text(
-                      'Done',
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        color: AppColors.current.primary,
-                        fontWeight: FontWeight.w600,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Select Date of Birth',
+                        style: AppTextStyles.description.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Text(
+                          'Done',
+                          style: AppTextStyles.description.copyWith(
+                            color: AppColors.current.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                Divider(height: 1, color: AppColors.current.lightGray),
+                Expanded(
+                  child: CupertinoDatePicker(
+                    mode: CupertinoDatePickerMode.date,
+                    initialDateTime: selected,
+                    maximumDate: DateTime.now(),
+                    minimumDate: DateTime(1900),
+                    onDateTimeChanged: (val) {
+                      final fmt = DateFormat('yyyy-MM-dd').format(val);
+                      bloc.dobController.text = fmt;
+                      bloc.add(UpdateDateOfBirth(fmt));
+                    },
+                  ),
+                ),
+              ],
             ),
-            Divider(height: 1, color: AppColors.current.lightGray),
-            Expanded(
-              child: CupertinoDatePicker(
-                mode: CupertinoDatePickerMode.date,
-                initialDateTime: selected,
-                maximumDate: DateTime.now(),
-                minimumDate: DateTime(1900),
-                onDateTimeChanged: (val) {
-                  final fmt = DateFormat('yyyy-MM-dd').format(val);
-                  bloc.dobController.text = fmt;
-                  bloc.add(UpdateDateOfBirth(fmt));
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 }
@@ -146,10 +149,8 @@ class _FieldLabel extends StatelessWidget {
         SizedBox(width: 6.w),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 13.sp,
+          style: AppTextStyles.description.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.current.text,
           ),
         ),
       ],
@@ -193,10 +194,12 @@ class _AdoptionField extends StatelessWidget {
       readOnly: readOnly,
       onTap: onTap,
       keyboardType: keyboardType,
-      style: TextStyle(fontSize: 14.sp, color: AppColors.current.text),
+      style: AppTextStyles.description.copyWith(color: AppColors.current.text),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(fontSize: 14.sp, color: AppColors.current.midGray),
+        hintStyle: AppTextStyles.description.copyWith(
+          color: AppColors.current.midGray,
+        ),
         filled: true,
         fillColor: AppColors.current.white,
         border: border,

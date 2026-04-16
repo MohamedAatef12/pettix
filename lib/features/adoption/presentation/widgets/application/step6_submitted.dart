@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/sized_box.dart';
+import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 
@@ -20,11 +22,11 @@ class StepSubmitted extends StatelessWidget {
       child: Column(
         children: [
           const Spacer(flex: 2),
-          _SuccessIcon(),
-          SizedBox(height: 28.h),
+          const _SuccessIcon(),
+          SizedBoxConstants.verticalMedium,
           Text(
             'Application Submitted!',
-            style: TextStyle(
+            style: AppTextStyles.title.copyWith(
               fontSize: 22.sp,
               fontWeight: FontWeight.w800,
               color: AppColors.current.text,
@@ -34,14 +36,13 @@ class StepSubmitted extends StatelessWidget {
           SizedBox(height: 10.h),
           Text(
             'Thank you! The owner will review your application and may contact you via chat.',
-            style: TextStyle(
-              fontSize: 14.sp,
+            style: AppTextStyles.description.copyWith(
               color: AppColors.current.lightText,
               height: 1.6,
             ),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: 32.h),
+          SizedBoxConstants.verticalLarge,
           _InfoCard(
             icon: Icons.schedule_rounded,
             iconColor: AppColors.current.gold,
@@ -55,8 +56,7 @@ class StepSubmitted extends StatelessWidget {
             text: 'View My Application',
             heightFactor: 0.065,
             backgroundColor: AppColors.current.primary,
-            textStyle: TextStyle(
-              fontSize: 16.sp,
+            textStyle: AppTextStyles.description.copyWith(
               fontWeight: FontWeight.w700,
               color: AppColors.current.white,
             ),
@@ -74,8 +74,7 @@ class StepSubmitted extends StatelessWidget {
               ),
               child: Text(
                 'Browse More Pets',
-                style: TextStyle(
-                  fontSize: 15.sp,
+                style: AppTextStyles.description.copyWith(
                   fontWeight: FontWeight.w600,
                   color: AppColors.current.primary,
                 ),
@@ -89,6 +88,8 @@ class StepSubmitted extends StatelessWidget {
 }
 
 class _SuccessIcon extends StatelessWidget {
+  const _SuccessIcon();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -160,8 +161,7 @@ class _InfoCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
-                    fontSize: 13.sp,
+                  style: AppTextStyles.smallDescription.copyWith(
                     fontWeight: FontWeight.w700,
                     color: AppColors.current.text,
                   ),
@@ -169,10 +169,9 @@ class _InfoCard extends StatelessWidget {
                 SizedBox(height: 4.h),
                 Text(
                   text,
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    color: AppColors.current.lightText,
+                  style: AppTextStyles.smallDescription.copyWith(
                     height: 1.5,
+                    color: AppColors.current.lightText,
                   ),
                 ),
               ],

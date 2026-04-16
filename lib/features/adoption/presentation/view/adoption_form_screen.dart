@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+import 'package:pettix/core/constants/sized_box.dart';
+import 'package:pettix/core/constants/text_styles.dart';
+import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/utils/custom_button.dart';
+import 'package:pettix/core/utils/custom_text_form_field.dart';
 import '../../../../config/di/di.dart';
-import '../../../../core/themes/app_colors.dart';
-import '../../../../core/utils/custom_text_form_field.dart';
 import '../../domain/entities/adoption_options_entity.dart';
 import '../bloc/adoption_bloc.dart';
 import '../bloc/adoption_event.dart';
@@ -30,40 +32,37 @@ class AdoptionFormScreen extends StatelessWidget {
   }
 }
 
-class AdoptionFormView extends StatefulWidget {
+class AdoptionFormView extends StatelessWidget {
   const AdoptionFormView({super.key});
 
-  @override
-  State<AdoptionFormView> createState() => _AdoptionFormViewState();
-}
+  void _submitForm(BuildContext context, AdoptionBloc bloc) {
+    if (bloc.state.fullName.isEmpty ||
+        bloc.state.email.isEmpty ||
+        bloc.state.phoneNumber.isEmpty ||
+        bloc.state.dateOfBirth.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all required fields')),
+      );
+      return;
+    }
+    if (bloc.state.selectedLivingSituationId == null ||
+        bloc.state.selectedResidenceTypeId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select all options')),
+      );
+      return;
+    }
+    if (!bloc.state.agreed || !bloc.state.termsAccepted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please agree to terms')));
+      return;
+    }
 
-class _AdoptionFormViewState extends State<AdoptionFormView> {
-  final _formKey = GlobalKey<FormState>();
-  final _fullNameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _phoneNumberController = TextEditingController();
-  final _dateOfBirthController = TextEditingController();
-  final _petTypeController = TextEditingController();
-
-  int? _selectedLivingSituationId;
-  int? _selectedResidenceTypeId;
-  bool _hasOwnedPetBefore = false;
-  bool _hasReadAndUnderstood = false;
-  bool _agreesToTerms = false;
-
-  DateTime? _selectedDate;
-
-  @override
-  void dispose() {
-    _fullNameController.dispose();
-    _emailController.dispose();
-    _phoneNumberController.dispose();
-    _dateOfBirthController.dispose();
-    _petTypeController.dispose();
-    super.dispose();
+    bloc.add(const SubmitAdoptionForm());
   }
 
-  Future<void> _selectDate(BuildContext context) async {
+  Future<void> _pickDate(BuildContext context, AdoptionBloc bloc) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -71,59 +70,22 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
       lastDate: DateTime.now(),
     );
     if (picked != null) {
-      setState(() {
-        _selectedDate = picked;
-        _dateOfBirthController.text = DateFormat('yyyy-MM-dd').format(picked);
-      });
-    }
-  }
-
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      if (_selectedLivingSituationId == null ||
-          _selectedResidenceTypeId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select all options')),
-        );
-        return;
-      }
-      if (!_hasReadAndUnderstood || !_agreesToTerms) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Please agree to terms')));
-        return;
-      }
-      if (_selectedDate == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select Date of Birth')),
-        );
-        return;
-      }
-
-      final bloc = context.read<AdoptionBloc>();
-      bloc.add(UpdateFullName(_fullNameController.text));
-      bloc.add(UpdateEmail(_emailController.text));
-      bloc.add(UpdatePhoneNumber(_phoneNumberController.text));
-      bloc.add(UpdateDateOfBirth(_dateOfBirthController.text));
-      bloc.add(UpdatePetType(_petTypeController.text));
-      bloc.add(UpdateLivingSituation(_selectedLivingSituationId!));
-      bloc.add(UpdateResidenceType(_selectedResidenceTypeId!));
-      bloc.add(UpdateHasOwnedPet(_hasOwnedPetBefore));
-      bloc.add(ToggleAgreement(_hasReadAndUnderstood));
-      bloc.add(ToggleTermsAcceptance(_agreesToTerms));
-
-      bloc.add(const SubmitAdoptionForm());
+      bloc.add(SelectDateOfBirth(picked));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final bloc = context.read<AdoptionBloc>();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Adoption Application'),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.current.text),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: AppColors.current.text,
+          ),
           onPressed: () => context.pop(),
         ),
       ),
@@ -158,9 +120,16 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
           if (state.options != null) {
             return Stack(
               children: [
-                _buildForm(context, state.options!),
+                AdoptionFormContent(
+                  options: state.options!,
+                  onSubmit: () => _submitForm(context, bloc),
+                  onPickDate: () => _pickDate(context, bloc),
+                ),
                 if (state.status == AdoptionStatus.submitting)
-                  const Center(child: CircularProgressIndicator()),
+                  Container(
+                    color: Colors.black26,
+                    child: const Center(child: CircularProgressIndicator()),
+                  ),
               ],
             );
           }
@@ -176,122 +145,199 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
       ),
     );
   }
+}
 
-  Widget _buildForm(BuildContext context, AdoptionOptionsEntity options) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CustomTextFormField(
-              controller: _fullNameController,
-              hintText: 'Full Name',
-              validator: (value) => value!.isEmpty ? 'Required' : null,
-            ),
-            SizedBox(height: 10.h),
-            CustomTextFormField(
-              controller: _emailController,
-              hintText: 'Email',
-              validator: (value) => value!.isEmpty ? 'Required' : null,
-            ),
-            SizedBox(height: 10.h),
-            CustomTextFormField(
-              controller: _phoneNumberController,
-              hintText: 'Phone Number',
-              validator: (value) => value!.isEmpty ? 'Required' : null,
-            ),
-            SizedBox(height: 10.h),
-            InkWell(
-              onTap: () => _selectDate(context),
-              child: IgnorePointer(
-                child: CustomTextFormField(
-                  controller: _dateOfBirthController,
-                  hintText: 'Date of Birth',
-                  validator: (value) => value!.isEmpty ? 'Required' : null,
-                ),
+class AdoptionFormContent extends StatelessWidget {
+  final AdoptionOptionsEntity options;
+  final VoidCallback onSubmit;
+  final VoidCallback onPickDate;
+
+  const AdoptionFormContent({
+    super.key,
+    required this.options,
+    required this.onSubmit,
+    required this.onPickDate,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AdoptionBloc, AdoptionState>(
+      builder: (context, state) {
+        return SingleChildScrollView(
+          padding: EdgeInsets.all(16.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomTextFormField(
+                controller: context.read<AdoptionBloc>().fullNameController,
+                hintText: 'Full Name',
+                validator: (v) => v!.isEmpty ? 'Required' : null,
               ),
-            ),
-            SizedBox(height: 10.h),
-            CustomTextFormField(
-              controller: _petTypeController,
-              hintText: 'Pet Type',
-              validator: (value) => value!.isEmpty ? 'Required' : null,
-            ),
-            SizedBox(height: 10.h),
-            DropdownButtonFormField<int>(
-              initialValue: _selectedLivingSituationId,
-              hint: const Text('Living Situation'),
-              items:
-                  options.livingSituations.map((e) {
-                    return DropdownMenuItem(value: e.id, child: Text(e.name));
-                  }).toList(),
-              onChanged:
-                  (val) => setState(() => _selectedLivingSituationId = val),
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                filled: true,
-                fillColor: AppColors.current.lightGray,
+              SizedBoxConstants.verticalSmall,
+              CustomTextFormField(
+                controller: context.read<AdoptionBloc>().emailController,
+                hintText: 'Email',
+                validator: (v) => v!.isEmpty ? 'Required' : null,
               ),
-            ),
-            SizedBox(height: 10.h),
-            DropdownButtonFormField<int>(
-              initialValue: _selectedResidenceTypeId,
-              hint: const Text('Residence Type'),
-              items:
-                  options.residenceTypes.map((e) {
-                    return DropdownMenuItem(value: e.id, child: Text(e.name));
-                  }).toList(),
-              onChanged:
-                  (val) => setState(() => _selectedResidenceTypeId = val),
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                filled: true,
-                fillColor: AppColors.current.lightGray,
+              SizedBoxConstants.verticalSmall,
+              CustomTextFormField(
+                controller: context.read<AdoptionBloc>().phoneNumberController,
+                hintText: 'Phone Number',
+                validator: (v) => v!.isEmpty ? 'Required' : null,
               ),
-            ),
-            SizedBox(height: 20.h),
-            SwitchListTile(
-              title: const Text('Has owned or cared for pet before?'),
-              value: _hasOwnedPetBefore,
-              onChanged: (val) => setState(() => _hasOwnedPetBefore = val),
-            ),
-            CheckboxListTile(
-              title: const Text('I have read and understood everything'),
-              value: _hasReadAndUnderstood,
-              onChanged: (val) => setState(() => _hasReadAndUnderstood = val!),
-            ),
-            CheckboxListTile(
-              title: const Text('I agree to the terms'),
-              value: _agreesToTerms,
-              onChanged: (val) => setState(() => _agreesToTerms = val!),
-            ),
-            SizedBox(height: 20.h),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _submitForm,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.current.primary,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+              SizedBoxConstants.verticalSmall,
+              InkWell(
+                onTap: onPickDate,
+                child: IgnorePointer(
+                  child: CustomTextFormField(
+                    controller: context.read<AdoptionBloc>().dobController,
+                    hintText: 'Date of Birth',
+                    validator: (v) => v!.isEmpty ? 'Required' : null,
                   ),
                 ),
-                child: const Text(
-                  'Submit Application',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+              SizedBoxConstants.verticalSmall,
+              CustomTextFormField(
+                controller: context.read<AdoptionBloc>().petTypeController,
+                hintText: 'Pet Type',
+                validator: (v) => v!.isEmpty ? 'Required' : null,
+              ),
+              SizedBoxConstants.verticalSmall,
+              _DropdownField(
+                label: 'Living Situation',
+                value: state.selectedLivingSituationId,
+                items: options.livingSituations,
+                onChanged:
+                    (val) => context.read<AdoptionBloc>().add(
+                      UpdateLivingSituation(val!),
+                    ),
+              ),
+              SizedBoxConstants.verticalSmall,
+              _DropdownField(
+                label: 'Residence Type',
+                value: state.selectedResidenceTypeId,
+                items: options.residenceTypes,
+                onChanged:
+                    (val) => context.read<AdoptionBloc>().add(
+                      UpdateResidenceType(val!),
+                    ),
+              ),
+              SizedBoxConstants.verticalMedium,
+              _ToggleRow(
+                label: 'Has owned or cared for pet before?',
+                value: state.hasOwnedPetBefore ?? false,
+                onChanged:
+                    (v) =>
+                        context.read<AdoptionBloc>().add(UpdateHasOwnedPet(v!)),
+              ),
+              _CheckRow(
+                label: 'I have read and understood everything',
+                value: state.agreed,
+                onChanged:
+                    (v) => context.read<AdoptionBloc>().add(ToggleAgreement(v!)),
+              ),
+              _CheckRow(
+                label: 'I agree to the terms',
+                value: state.termsAccepted,
+                onChanged:
+                    (v) => context.read<AdoptionBloc>().add(
+                      ToggleTermsAcceptance(v!),
+                    ),
+              ),
+              SizedBoxConstants.verticalMedium,
+              CustomFilledButton(
+                onPressed: onSubmit,
+                text: 'Submit Application',
+                widthFactor: 1.0,
+                heightFactor: 0.065,
+                backgroundColor: AppColors.current.primary,
+                textStyle: AppTextStyles.button.copyWith(
+                  color: AppColors.current.white,
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _DropdownField extends StatelessWidget {
+  final String label;
+  final int? value;
+  final List<dynamic> items;
+  final ValueChanged<int?> onChanged;
+
+  const _DropdownField({
+    required this.label,
+    required this.value,
+    required this.items,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField<int>(
+      initialValue: value,
+      hint: Text(label),
+      items:
+          items
+              .map(
+                (e) => DropdownMenuItem<int>(
+                  value: e.id as int,
+                  child: Text(e.name),
+                ),
+              )
+              .toList(),
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15.r)),
+        filled: true,
+        fillColor: AppColors.current.lightGray,
       ),
+    );
+  }
+}
+
+class _ToggleRow extends StatelessWidget {
+  final String label;
+  final bool value;
+  final ValueChanged<bool?> onChanged;
+
+  const _ToggleRow({
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SwitchListTile(
+      title: Text(label),
+      value: value,
+      onChanged: onChanged,
+    );
+  }
+}
+
+class _CheckRow extends StatelessWidget {
+  final String label;
+  final bool value;
+  final ValueChanged<bool?> onChanged;
+
+  const _CheckRow({
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return CheckboxListTile(
+      title: Text(label),
+      value: value,
+      onChanged: onChanged,
     );
   }
 }

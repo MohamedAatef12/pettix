@@ -114,3 +114,10 @@ class JumpToStep extends AdoptionEvent {
   @override
   List<Object> get props => [step];
 }
+
+class SelectDateOfBirth extends AdoptionEvent {
+  final DateTime date;
+  const SelectDateOfBirth(this.date);
+  @override
+  List<Object> get props => [date];
+}

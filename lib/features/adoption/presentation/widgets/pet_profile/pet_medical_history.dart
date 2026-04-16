@@ -36,9 +36,10 @@ class PetMedicalHistory extends StatelessWidget {
           Wrap(
             spacing: 8.w,
             runSpacing: 8.h,
-            children: pet.vaccinations
-                .map((v) => _VaccinationChip(name: v.name))
-                .toList(),
+            children:
+                pet.vaccinations
+                    .map((v) => _VaccinationChip(name: v.name))
+                    .toList(),
           ),
         ],
       ),
@@ -59,18 +60,21 @@ class _VaccinationChip extends StatelessWidget {
         color: AppColors.current.green.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
-            color: AppColors.current.green.withValues(alpha: 0.3)),
+          color: AppColors.current.green.withValues(alpha: 0.3),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.check_circle_rounded,
-              size: 14.w, color: AppColors.current.green),
+          Icon(
+            Icons.check_circle_rounded,
+            size: 14.w,
+            color: AppColors.current.green,
+          ),
           SizedBox(width: 4.w),
           Text(
             name,
-            style: TextStyle(
-              fontSize: 12.sp,
+            style: AppTextStyles.smallDescription.copyWith(
               color: AppColors.current.green,
               fontWeight: FontWeight.w500,
             ),

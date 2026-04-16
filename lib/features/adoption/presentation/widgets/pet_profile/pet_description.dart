@@ -40,8 +40,7 @@ class PetDescription extends StatelessWidget {
             SizedBoxConstants.verticalSmall,
             Text(
               pet.description!,
-              style: TextStyle(
-                fontSize: 14.sp,
+              style: AppTextStyles.description.copyWith(
                 color: AppColors.current.lightText,
                 height: 1.6,
               ),
@@ -51,8 +50,7 @@ class PetDescription extends StatelessWidget {
             SizedBoxConstants.verticalSmall,
             Text(
               pet.details!,
-              style: TextStyle(
-                fontSize: 14.sp,
+              style: AppTextStyles.description.copyWith(
                 color: AppColors.current.lightText,
                 height: 1.6,
               ),
@@ -61,12 +59,17 @@ class PetDescription extends StatelessWidget {
           SizedBoxConstants.verticalMedium,
           OutlinedButton.icon(
             onPressed: () {},
-            icon: Icon(Icons.chat_bubble_outline_rounded,
-                size: 16.w, color: AppColors.current.primary),
+            icon: Icon(
+              Icons.chat_bubble_outline_rounded,
+              size: 16.w,
+              color: AppColors.current.primary,
+            ),
             label: Text(
               'Message Owner',
               style: TextStyle(
-                  fontSize: 14.sp, color: AppColors.current.primary),
+                fontSize: 14.sp,
+                color: AppColors.current.primary,
+              ),
             ),
             style: OutlinedButton.styleFrom(
               minimumSize: Size(double.infinity, 44.h),

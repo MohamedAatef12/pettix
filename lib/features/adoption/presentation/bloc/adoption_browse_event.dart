@@ -63,3 +63,28 @@ class SortPetsEvent extends AdoptionBrowseEvent {
 class ResetFiltersEvent extends AdoptionBrowseEvent {
   const ResetFiltersEvent();
 }
+
+/// Set draft filter values (used by filter sheet UI before applying).
+class SetDraftFilters extends AdoptionBrowseEvent {
+  final int? genderId;
+  final String? sortBy;
+  final bool? descending;
+  const SetDraftFilters({this.genderId, this.sortBy, this.descending});
+  @override
+  List<Object?> get props => [genderId, sortBy, descending];
+}
+
+/// Reset draft values to null.
+class ResetDraftFilters extends AdoptionBrowseEvent {
+  const ResetDraftFilters();
+}
+
+/// Apply draft filters — commits draft values and reloads data.
+class ApplyDraftFilters extends AdoptionBrowseEvent {
+  const ApplyDraftFilters();
+}
+
+/// Open filter sheet — initializes draft values from active filters.
+class OpenFilterSheet extends AdoptionBrowseEvent {
+  const OpenFilterSheet();
+}
