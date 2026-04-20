@@ -20,6 +20,7 @@ import 'package:pettix/features/auth/domain/usecases/reset_password.dart';
 import 'package:pettix/features/auth/domain/usecases/verify_otp.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_event.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_state.dart';
+import 'package:pettix/core/services/signalr_service.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final RegisterUseCase registerUseCase;
@@ -57,6 +58,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final newPasswordForgotController = TextEditingController();
   final confirmNewPasswordForgotController = TextEditingController();
   final forgotFormKey = GlobalKey<FormState>();
+  final SignalRService signalRService;
+
   AuthBloc({
     required this.registerUseCase,
     required this.loginUseCase,
@@ -67,6 +70,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.resendOtpUseCase,
     required this.forgotPasswordUseCase,
     required this.resetPasswordUseCase,
+    required this.signalRService,
   }) : super(AuthInitial()) {
     // Register events
     on<RegisterStepOneSubmitted>(_registerStepOne);
@@ -217,6 +221,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           await DI.find<ICacheManager>().clearLogin();
         }
 
+        signalRService.start();
+
         emit(LoginSuccess(loginResponse.contact));
       },
     );
@@ -270,6 +276,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             await DI.find<ICacheManager>().clearLogin();
           }
 
+          signalRService.start();
+
           emit(GoogleLoginSuccess(loginResponse.user)); // مفيش User entity جديد
         },
       );
@@ -306,6 +314,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           } else {
             await DI.find<ICacheManager>().clearLogin();
           }
+          
+          signalRService.start();
+
           emit(AppleLoginSuccess(loginResponse.user));
         },
       );

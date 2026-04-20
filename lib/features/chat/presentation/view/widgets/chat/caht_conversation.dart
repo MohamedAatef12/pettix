@@ -7,6 +7,9 @@ import 'package:pettix/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:pettix/features/chat/presentation/bloc/chat_event.dart';
 import 'package:pettix/features/chat/presentation/bloc/chat_state.dart';
 
+import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:pettix/features/chat/domain/entity/message_entity.dart';
 import 'package:pettix/core/shimmers/chat_body_shimmer.dart';
 
 class ChatConversation extends StatefulWidget {
@@ -93,7 +96,8 @@ class _ChatConversationState extends State<ChatConversation> {
             return ChatBubble(
               text: msg.content,
               isMe: isMe,
-              seen: false, 
+              isSending: msg.isSending,
+              imageUrl: msg.imageUrl,
             );
           },
         );
@@ -105,72 +109,232 @@ class _ChatConversationState extends State<ChatConversation> {
 
 class ChatBubble extends StatelessWidget {
   final String text;
+  final String? imageUrl;
   final bool isMe;
-  final bool seen;
+  final bool isSending;
 
   const ChatBubble({
     super.key,
     required this.text,
     required this.isMe,
-    this.seen = false,
+    this.isSending = false,
+    this.imageUrl,
   });
 
   @override
   Widget build(BuildContext context) {
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: EdgeInsets.symmetric(vertical: 6.h, horizontal: 12.w),
-        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
-        constraints: BoxConstraints(maxWidth: 260.w),
-        decoration: BoxDecoration(
-          color: isMe
-              ? AppColors.current.primary
-              : AppColors.current.blueGray.withValues(alpha: 0.4),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(14.r),
-            topRight: Radius.circular(14.r),
-            bottomLeft: isMe ? Radius.circular(14.r) : Radius.circular(0),
-            bottomRight: isMe ? Radius.circular(0) : Radius.circular(14.r),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Container(
+            margin: EdgeInsets.symmetric(vertical: 6.h, horizontal: 12.w),
+            padding: imageUrl != null ? EdgeInsets.all(4.r) : EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+            constraints: BoxConstraints(maxWidth: 260.w),
+            decoration: BoxDecoration(
+              color: isMe
+                  ? AppColors.current.primary
+                  : AppColors.current.blueGray.withValues(alpha: 0.4),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(14.r),
+                topRight: Radius.circular(14.r),
+                bottomLeft: isMe ? Radius.circular(14.r) : Radius.circular(0),
+                bottomRight: isMe ? Radius.circular(0) : Radius.circular(14.r),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (imageUrl != null)
+                  GestureDetector(
+                    onTap: () => _openImagePreview(context, imageUrl!),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12.r),
+                      child: _buildImage(imageUrl!),
+                    ),
+                  ),
+                if (text.isNotEmpty)
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: imageUrl != null ? 8.w : 4.w,
+                      vertical: imageUrl != null ? 6.h : 2.h,
+                    ),
+                    child: Text(
+                      text,
+                      style: TextStyle(
+                        color: isMe ? Colors.white : AppColors.current.text,
+                        fontSize: 14.sp,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
-        ),
-        child: Stack(
-          children: [
+          if (isMe && isSending) SizedBox(width: 8.w),
+          if (isMe && isSending)
             Padding(
-              padding: EdgeInsets.only(right: 30.w, bottom: 6.h),
-              child: Text(
-                text,
-                style: TextStyle(
-                  color: isMe ? Colors.white : AppColors.current.text,
-                  fontSize: 14.sp,
+              padding: EdgeInsets.only(bottom: 8.h),
+              child: SizedBox(
+                width: 12.w,
+                height: 12.w,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    AppColors.current.primary,
+                  ),
                 ),
               ),
             ),
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    seen
-                        ? Icons.done_all
-                        : Icons.done,
-                    size: 16.w,
-                    color: isMe
-                        ? (seen
-                        ? Colors.blueAccent
-                        : Colors.white70)
-                        : (seen
-                        ? Colors.blueAccent
-                        : Colors.grey),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+        ],
       ),
     );
+  }
+
+  Widget _buildImage(String path) {
+    if (path.startsWith('http') || path.startsWith('https')) {
+      debugPrint('💬 ChatBubble loading image: $path');
+      return CachedNetworkImage(
+        imageUrl: path,
+        cacheKey: path,
+        httpHeaders: const {
+          'ngrok-skip-browser-warning': 'true',
+          'User-Agent': 'Mozilla/5.0',
+        },
+        width: 200.w,
+        height: 150.h,
+        fit: BoxFit.cover,
+        errorWidget: (_, __, error) {
+          debugPrint('❌ Chat image load error: $error');
+          return Container(
+            width: 200.w,
+            height: 150.h,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: const Center(
+              child: Icon(Icons.broken_image_outlined, size: 40, color: Colors.grey),
+            ),
+          );
+        },
+      );
+    } else {
+      // Local path for optimistic UI
+      return Image.file(
+        File(path),
+        width: 200.w,
+        height: 150.h,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Container(
+          width: 200.w,
+          height: 150.h,
+          decoration: BoxDecoration(
+            color: Colors.grey[300],
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          child: const Center(
+            child: Icon(Icons.image_not_supported, size: 40, color: Colors.grey),
+          ),
+        ),
+      );
+    }
+  }
+
+  void _openImagePreview(BuildContext context, String path) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Close',
+      barrierColor: Colors.black.withValues(alpha: 0.92),
+      transitionDuration: const Duration(milliseconds: 250),
+      transitionBuilder: (_, animation, __, child) {
+        return FadeTransition(
+          opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.88, end: 1.0).animate(
+              CurvedAnimation(parent: animation, curve: Curves.easeOut),
+            ),
+            child: child,
+          ),
+        );
+      },
+      pageBuilder: (dialogContext, _, __) {
+        return GestureDetector(
+          onTap: () => Navigator.of(dialogContext).pop(),
+          behavior: HitTestBehavior.opaque,
+          child: SafeArea(
+            child: Stack(
+              children: [
+                Center(
+                  child: GestureDetector(
+                    onTap: () {}, // Prevent dismissal when tapping the image
+                    child: Hero(
+                      tag: 'chat_image_$path',
+                      child: InteractiveViewer(
+                        minScale: 0.8,
+                        maxScale: 4.0,
+                        child: _buildPreviewImage(path),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 16.h,
+                  right: 16.w,
+                  child: GestureDetector(
+                    onTap: () => Navigator.of(dialogContext).pop(),
+                    child: Container(
+                      padding: EdgeInsets.all(8.r),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.5),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.close, color: Colors.white, size: 24),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPreviewImage(String path) {
+    if (path.startsWith('http') || path.startsWith('https')) {
+      return CachedNetworkImage(
+        imageUrl: path,
+        cacheKey: path,
+        httpHeaders: const {
+          'ngrok-skip-browser-warning': 'true',
+          'User-Agent': 'Mozilla/5.0',
+        },
+        fit: BoxFit.contain,
+        placeholder: (_, __) => const SizedBox(
+          width: 60,
+          height: 60,
+          child: Center(child: CircularProgressIndicator(color: Colors.white70)),
+        ),
+        errorWidget: (_, __, ___) => const Icon(
+          Icons.broken_image_outlined,
+          size: 80,
+          color: Colors.white54,
+        ),
+      );
+    } else {
+      return Image.file(
+        File(path),
+        fit: BoxFit.contain,
+        errorBuilder: (_, __, ___) => const Icon(
+          Icons.image_not_supported,
+          size: 80,
+          color: Colors.white54,
+        ),
+      );
+    }
   }
 }

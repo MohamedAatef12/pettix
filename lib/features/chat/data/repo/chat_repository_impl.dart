@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pettix/data/network/failure.dart';
+import 'package:pettix/features/chat/data/data_source/chat_local_data_source.dart';
 
 import '../../domain/entity/conversation_entity.dart';
 import '../../domain/entity/message_entity.dart';
@@ -13,8 +14,9 @@ import '../model/message_model.dart';
 @LazySingleton(as: ChatRepository)
 class ChatRepositoryImpl implements ChatRepository {
   final ChatRemoteDataSource _remoteDataSource;
+  final ChatLocalDataSource _localDataSource;
 
-  ChatRepositoryImpl(this._remoteDataSource);
+  ChatRepositoryImpl(this._remoteDataSource, this._localDataSource);
 
   @override
   Future<Either<Failure, List<ConversationEntity>>> getConversations() async {
@@ -23,14 +25,38 @@ class ChatRepositoryImpl implements ChatRepository {
 
       if (response.success && response.result != null) {
         final List<dynamic> dataList = response.result as List<dynamic>;
-        final List<ConversationEntity> conversations =
+        final List<ConversationModel> conversations =
             dataList.map((e) => ConversationModel.fromJson(e as Map<String, dynamic>)).toList();
+        
+        // Save to cache
+        await _localDataSource.saveConversations(conversations);
+        
         return Right(conversations);
       } else {
         return Left(Failure(response.message));
       }
     } catch (e) {
       return Left(DioFailure.fromDioError(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<ConversationEntity>>> getCachedConversations() async {
+    try {
+      final conversations = await _localDataSource.getConversations();
+      return Right(conversations);
+    } catch (e) {
+      return Left(Failure('Failed to load cached conversations: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, ConversationEntity?>> findCachedConversationByUserId(int userId) async {
+    try {
+      final conversation = await _localDataSource.findConversationByUserId(userId);
+      return Right(conversation);
+    } catch (e) {
+      return Left(Failure('Failed to find cached conversation: $e'));
     }
   }
 
@@ -71,10 +97,8 @@ class ChatRepositoryImpl implements ChatRepository {
     try {
       final response = await _remoteDataSource.getMessages(conversationId, skip, take);
 
-      // Assuming paginated response might have 'items' or similar, but normalizing in API service usually returns the list in result.
       if (response.success && response.result != null) {
         List<dynamic> dataList;
-        // Handle if response is wrapped in pagination object or direct list
         if (response.result is List) {
            dataList = response.result as List<dynamic>;
         } else if (response.result is Map && (response.result as Map).containsKey('items')) {
@@ -83,8 +107,14 @@ class ChatRepositoryImpl implements ChatRepository {
            dataList = [];
         }
 
-        final List<MessageEntity> messages =
+        final List<MessageModel> messages =
             dataList.map((e) => MessageModel.fromJson(e as Map<String, dynamic>)).toList();
+        
+        // Save to cache (only if it's the first page/refresh)
+        if (skip == 0) {
+          await _localDataSource.saveMessages(conversationId, messages);
+        }
+        
         return Right(messages);
       } else {
         return Left(Failure(response.message));
@@ -95,25 +125,45 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
-  Future<Either<Failure, MessageEntity>> sendMessage(int conversationId, String content) async {
+  Future<Either<Failure, List<MessageEntity>>> getCachedMessages(int conversationId) async {
     try {
-      // In a real scenario, you probably send more data, but going with basic text for now
-      // Or maybe the API expects 'content' or 'text'
-      // Based on API documentation: MessageText, MessageType in multipart/form-data
-      final FormData formData = FormData.fromMap({
+      final messages = await _localDataSource.getMessages(conversationId);
+      return Right(messages);
+    } catch (e) {
+      return Left(Failure('Failed to load cached messages: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, MessageEntity>> sendMessage(int conversationId, String content, {String? imagePath}) async {
+    try {
+      final Map<String, dynamic> data = {
         'MessageText': content,
-        'MessageType': 'text',
-      });
+      };
+
+      if (imagePath != null) {
+        data['MessageType'] = 'image';
+        data['Attachment'] = await MultipartFile.fromFile(
+          imagePath,
+          filename: imagePath.split('/').last,
+        );
+      } else {
+        data['MessageType'] = 'text';
+      }
+
+      final FormData formData = FormData.fromMap(data);
+
       final response = await _remoteDataSource.sendMessage(conversationId, formData);
 
       if (response.success && response.result != null) {
-        final message = MessageModel.fromJson(response.result as Map<String, dynamic>);
+        var message = MessageModel.fromJson(response.result as Map<String, dynamic>);
         
-        // Optimistic fallback: If the backend returns success but null/empty text, 
-        // we use the content the user just sent so the UI isn't empty.
         if (message.content.isEmpty) {
-          return Right(message.copyWith(content: content));
+          message = message.copyWith(content: content) as MessageModel;
         }
+
+        // Save to cache
+        await _localDataSource.appendMessage(conversationId, message);
         
         return Right(message);
       } else {

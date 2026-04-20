@@ -57,10 +57,7 @@ class ChatAppBar extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        GestureDetector(
-          onTap: () {},
-          child: Image.asset('assets/icons/settings.png'),
-        ),
+
         SizedBox(width: 15.w,),
       ],
     );

@@ -11,6 +11,8 @@ import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/data/network/constants.dart';
 import 'package:pettix/features/auth/data/models/user_model.dart';
+import 'package:pettix/core/services/signalr_service.dart';
+import 'package:pettix/features/chat/data/data_source/chat_local_data_source.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -502,8 +504,9 @@ class _LogoutTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () async {
-        final cache = DI.find<ICacheManager>();
-        cache.logout();
+        DI.find<SignalRService>().stop();
+        DI.find<ICacheManager>().logout();
+        await DI.find<ChatLocalDataSource>().clearCache();
         await GoogleSignIn().signOut();
         if (context.mounted) context.pushReplacement('/login');
       },

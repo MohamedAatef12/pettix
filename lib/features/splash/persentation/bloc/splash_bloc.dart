@@ -4,6 +4,7 @@ import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/data/caching/shared_prefs_helper.dart';
 import 'package:pettix/features/splash/persentation/bloc/splash_event.dart';
 import 'package:pettix/features/splash/persentation/bloc/splash_states.dart';
+import 'package:pettix/core/services/signalr_service.dart';
 
 class SplashBloc extends Bloc<SplashEvent, SplashState> {
   SplashBloc() : super(SplashInitial()) {
@@ -16,6 +17,7 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
       final isLoggedIn = await cache.isLoggedIn();
       final isFirstOpen = SharedPrefsHelper.getBool('isFirstOpen') ?? true;
       if (isLoggedIn && isRemembered) {
+        DI.find<SignalRService>().start();
         emit(SplashNavigateToHome());
       } else if(isLoggedIn && !isRemembered) {
         emit(SplashNavigateToLogin());

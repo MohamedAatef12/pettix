@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
+import 'package:pettix/features/chat/presentation/bloc/chat_list_bloc.dart';
+import 'package:pettix/features/chat/presentation/bloc/chat_list_event.dart';
 import 'package:pettix/features/chat/presentation/view/widgets/chat_list/chat_list_taps.dart';
 
 class ChatListBody extends StatelessWidget {
@@ -36,6 +39,9 @@ class ChatListBody extends StatelessWidget {
               border: InputBorder.none,
               enabledBorder: InputBorder.none,
               focusedBorder: InputBorder.none,
+              onChanged: (value) {
+                context.read<ChatListBloc>().add(SearchConversationsEvent(value));
+              },
               leading: Padding(
                 padding: EdgeInsets.only(right: 8.w),
                 child: SvgPicture.asset(
@@ -44,11 +50,7 @@ class ChatListBody extends StatelessWidget {
                   colorFilter: ColorFilter.mode(AppColors.current.gray, BlendMode.srcIn),
                 ),
               ),
-              suffixIcon: SvgPicture.asset(
-                'assets/icons/filter.svg',
-                width: 18.w,
-                colorFilter: ColorFilter.mode(AppColors.current.primary, BlendMode.srcIn),
-              ),
+
             ),
           ),
           SizedBox(height: 24.h),

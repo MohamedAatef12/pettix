@@ -32,11 +32,13 @@ class ChatListTaps extends StatelessWidget {
             ),
           );
         } else if (state is ChatListSuccess) {
-          final conversations = state.conversations;
+          final conversations = state.filteredConversations;
           if (conversations.isEmpty) {
             return Center(
               child: Text(
-                'No conversations found',
+                state.searchQuery.isEmpty 
+                    ? 'No conversations found' 
+                    : 'No results for "${state.searchQuery}"',
                 style: AppTextStyles.description,
               ),
             );
@@ -73,7 +75,7 @@ class _ConversationCard extends StatelessWidget {
     final otherMember = conversation.members.where((m) => m.user.id != currentUserId).firstOrNull ??
         (conversation.members.isNotEmpty ? conversation.members.first : null);
     final displayMember = otherMember?.user;
-
+ 
     return Padding(
       padding: EdgeInsets.only(bottom: 12.h),
       child: GestureDetector(
@@ -142,9 +144,7 @@ class _ConversationCard extends StatelessWidget {
                           child: Text(
                             displayMember?.displayName ?? 'Conversation ${conversation.id}',
                             style: AppTextStyles.bold.copyWith(
-                              color: _isUnread(conversation, currentUserId) 
-                                  ? AppColors.current.primary 
-                                  : AppColors.current.text,
+                              color: AppColors.current.text,
                               fontSize: 15.sp,
                             ),
                             maxLines: 1,
@@ -156,53 +156,20 @@ class _ConversationCard extends StatelessWidget {
                             _formatDate(conversation.lastMessage!.sentAt),
                             style: TextStyle(
                               fontSize: 10.sp,
-                              fontWeight: _isUnread(conversation, currentUserId) 
-                                  ? FontWeight.w600 
-                                  : FontWeight.normal,
-                              color: _isUnread(conversation, currentUserId) 
-                                  ? AppColors.current.primary 
-                                  : AppColors.current.gray,
+                              color: AppColors.current.gray,
                             ),
                           ),
                       ],
                     ),
                     SizedBox(height: 6.h),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            conversation.lastMessage?.content ?? 'No messages yet...',
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: _isUnread(conversation, currentUserId) 
-                                  ? FontWeight.w500 
-                                  : FontWeight.normal,
-                              color: _isUnread(conversation, currentUserId) 
-                                  ? AppColors.current.text.withValues(alpha: 0.8)
-                                  : AppColors.current.lightText,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        if (_isUnread(conversation, currentUserId))
-                          Container(
-                            width: 10.r,
-                            height: 10.r,
-                            margin: EdgeInsets.only(left: 8.w),
-                            decoration: BoxDecoration(
-                              color: AppColors.current.primary,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.current.primary.withValues(alpha: 0.4),
-                                  blurRadius: 6,
-                                  spreadRadius: 1,
-                                ),
-                              ],
-                            ),
-                          ),
-                      ],
+                    Text(
+                      conversation.lastMessage?.content ?? 'No messages yet...',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: AppColors.current.lightText,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -212,20 +179,6 @@ class _ConversationCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  bool _isUnread(ConversationEntity conversation, int? currentUserId) {
-    if (conversation.lastMessage == null || currentUserId == null) return false;
-    
-    // If I sent the last message, don't show an unread dot
-    if (conversation.lastMessage!.senderId == currentUserId) return false;
-    
-    // Find my member record to check lastReadMessageId
-    final myMember = conversation.members.where((m) => m.userId == currentUserId).firstOrNull;
-    if (myMember == null) return false;
-
-    // Show dot if the last message ID is greater than what I've read
-    return conversation.lastMessage!.id > (myMember.lastReadMessageId ?? 0);
   }
 
   String _formatDate(DateTime date) {

@@ -14,6 +14,7 @@ import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:talker_flutter/talker_flutter.dart' as _i207;
 
+import '../../core/services/signalr_service.dart' as _i797;
 import '../../data/caching/i_cache_manager.dart' as _i694;
 import '../../data/network/api_services.dart' as _i655;
 import '../../data/network/dio_factory.dart' as _i719;
@@ -68,6 +69,8 @@ import '../../features/auth/domain/usecases/register_usecase.dart' as _i941;
 import '../../features/auth/domain/usecases/resend_otp_usecase.dart' as _i613;
 import '../../features/auth/domain/usecases/reset_password.dart' as _i1066;
 import '../../features/auth/domain/usecases/verify_otp.dart' as _i975;
+import '../../features/chat/data/data_source/chat_local_data_source.dart'
+    as _i617;
 import '../../features/chat/data/data_source/chat_remote_data_source.dart'
     as _i468;
 import '../../features/chat/data/repo/chat_repository_impl.dart' as _i328;
@@ -78,6 +81,12 @@ import '../../features/chat/domain/use_cases/delete_message_use_case.dart'
     as _i450;
 import '../../features/chat/domain/use_cases/edit_message_use_case.dart'
     as _i801;
+import '../../features/chat/domain/use_cases/find_cached_conversation_use_case.dart'
+    as _i992;
+import '../../features/chat/domain/use_cases/get_cached_conversations_use_case.dart'
+    as _i39;
+import '../../features/chat/domain/use_cases/get_cached_messages_use_case.dart'
+    as _i671;
 import '../../features/chat/domain/use_cases/get_conversation_details_use_case.dart'
     as _i10;
 import '../../features/chat/domain/use_cases/get_conversations_use_case.dart'
@@ -177,6 +186,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i719.DioFactory>(() => registerModule.dioFactory);
     gh.lazySingleton<_i694.ICacheManager>(() => registerModule.cacheManager);
     gh.lazySingleton<_i1.EmailAuthService>(() => _i1.EmailAuthService());
+    gh.lazySingleton<_i617.ChatLocalDataSource>(
+      () => _i617.ChatLocalDataSourceImpl(),
+    );
     gh.lazySingleton<_i361.Dio>(
       () => registerModule.dio(gh<_i719.DioFactory>(), gh<_i207.Talker>()),
     );
@@ -210,6 +222,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i956.AdoptionRemoteDataSource>(
       () => _i956.AdoptionRemoteDataSourceImpl(gh<_i655.ApiService>()),
     );
+    gh.lazySingleton<_i797.SignalRService>(
+      () => _i797.SignalRService(
+        gh<_i694.ICacheManager>(),
+        gh<_i207.Talker>(),
+        gh<_i617.ChatLocalDataSource>(),
+      ),
+      dispose: (i) => i.dispose(),
+    );
     gh.factory<_i578.AddPetUseCase>(
       () => _i578.AddPetUseCase(gh<_i835.MyPetsRepository>()),
     );
@@ -239,12 +259,15 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i694.ICacheManager>(),
       ),
     );
-    gh.lazySingleton<_i1030.ChatRepository>(
-      () => _i328.ChatRepositoryImpl(gh<_i468.ChatRemoteDataSource>()),
-    );
     gh.lazySingleton<_i588.NotificationRepo>(
       () =>
           _i933.NotificationRepoImpl(gh<_i934.NotificationRemoteDataSource>()),
+    );
+    gh.lazySingleton<_i1030.ChatRepository>(
+      () => _i328.ChatRepositoryImpl(
+        gh<_i468.ChatRemoteDataSource>(),
+        gh<_i617.ChatLocalDataSource>(),
+      ),
     );
     gh.lazySingleton<_i586.CreatePrivateConversationUseCase>(
       () => _i586.CreatePrivateConversationUseCase(gh<_i1030.ChatRepository>()),
@@ -254,6 +277,15 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i801.EditMessageUseCase>(
       () => _i801.EditMessageUseCase(gh<_i1030.ChatRepository>()),
+    );
+    gh.lazySingleton<_i992.FindCachedConversationUseCase>(
+      () => _i992.FindCachedConversationUseCase(gh<_i1030.ChatRepository>()),
+    );
+    gh.lazySingleton<_i39.GetCachedConversationsUseCase>(
+      () => _i39.GetCachedConversationsUseCase(gh<_i1030.ChatRepository>()),
+    );
+    gh.lazySingleton<_i671.GetCachedMessagesUseCase>(
+      () => _i671.GetCachedMessagesUseCase(gh<_i1030.ChatRepository>()),
     );
     gh.lazySingleton<_i10.GetConversationDetailsUseCase>(
       () => _i10.GetConversationDetailsUseCase(gh<_i1030.ChatRepository>()),
@@ -409,6 +441,20 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i478.UpdateProfileUseCase>(
       () => _i478.UpdateProfileUseCase(gh<_i894.ProfileRepository>()),
     );
+    gh.factory<_i65.ChatBloc>(
+      () => _i65.ChatBloc(
+        gh<_i529.GetMessagesUseCase>(),
+        gh<_i671.GetCachedMessagesUseCase>(),
+        gh<_i992.FindCachedConversationUseCase>(),
+        gh<_i460.SendMessageUseCase>(),
+        gh<_i801.EditMessageUseCase>(),
+        gh<_i450.DeleteMessageUseCase>(),
+        gh<_i586.CreatePrivateConversationUseCase>(),
+        gh<_i10.GetConversationDetailsUseCase>(),
+        gh<_i118.GetUserDataUseCase>(),
+        gh<_i797.SignalRService>(),
+      ),
+    );
     gh.factory<_i109.AdoptionHistoryBloc>(
       () => _i109.AdoptionHistoryBloc(
         gh<_i823.GetClientFormsUseCase>(),
@@ -443,12 +489,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i982.GetPetOptionsUseCase>(),
       ),
     );
-    gh.factory<_i2.ChatListBloc>(
-      () => _i2.ChatListBloc(
-        gh<_i388.GetConversationsUseCase>(),
-        gh<_i118.GetUserDataUseCase>(),
-      ),
-    );
     gh.factory<_i469.ProfileBloc>(
       () => _i469.ProfileBloc(
         gh<_i965.GetProfileUseCase>(),
@@ -462,15 +502,12 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i843.SubmitAdoptionFormUseCase>(),
       ),
     );
-    gh.factory<_i65.ChatBloc>(
-      () => _i65.ChatBloc(
-        gh<_i529.GetMessagesUseCase>(),
-        gh<_i460.SendMessageUseCase>(),
-        gh<_i801.EditMessageUseCase>(),
-        gh<_i450.DeleteMessageUseCase>(),
-        gh<_i586.CreatePrivateConversationUseCase>(),
-        gh<_i10.GetConversationDetailsUseCase>(),
+    gh.factory<_i2.ChatListBloc>(
+      () => _i2.ChatListBloc(
+        gh<_i388.GetConversationsUseCase>(),
+        gh<_i39.GetCachedConversationsUseCase>(),
         gh<_i118.GetUserDataUseCase>(),
+        gh<_i797.SignalRService>(),
       ),
     );
     return this;
