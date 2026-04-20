@@ -59,31 +59,39 @@ class _ChatConversationState extends State<ChatConversation> {
 
         final messages = state.messages;
 
+        final isPaginating = state.status == ChatStatus.paginating;
+
         return ListView.builder(
           controller: _scrollController,
-          itemCount: messages.length + 1 + (state.status == ChatStatus.paginating ? 1 : 0),
+          // slots: messages + optional spinner + profile card (always last = always top)
+          itemCount: messages.length + (isPaginating ? 1 : 0) + 1,
           padding: EdgeInsets.only(bottom: 16.h),
           reverse: true,
           itemBuilder: (context, index) {
-            // Profile card at the end of the history (top of the scroll view)
-            if (index == messages.length) {
-              // Identify the "Other Member" to show in the profile card
-              final otherMember = state.conversation?.members.where((m) => m.user.id != state.currentUserId).firstOrNull ?? 
-                                (state.conversation?.members.isNotEmpty == true ? state.conversation?.members.first : null);
-              
+            final totalSlots = messages.length + (isPaginating ? 1 : 0);
+
+            // Profile card is always the very last slot → stays pinned at the top
+            if (index == totalSlots) {
+              final otherMember = state.conversation?.members
+                      .where((m) => m.user.id != state.currentUserId)
+                      .firstOrNull ??
+                  (state.conversation?.members.isNotEmpty == true
+                      ? state.conversation?.members.first
+                      : null);
               return Column(
                 children: [
-                   ProfileCard(
-                     index: widget.userIndex,
-                     name: otherMember?.user.displayName,
-                     avatarUrl: otherMember?.user.avatar,
-                   ),
-                   SizedBox(height: 10.h),
+                  ProfileCard(
+                    index: widget.userIndex,
+                    name: otherMember?.user.displayName,
+                    avatarUrl: otherMember?.user.avatar,
+                  ),
+                  SizedBox(height: 10.h),
                 ],
               );
             }
 
-            if (index > messages.length) {
+            // Pagination spinner sits just above the oldest message, below the card
+            if (isPaginating && index == messages.length) {
               return const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Center(child: CircularProgressIndicator()),

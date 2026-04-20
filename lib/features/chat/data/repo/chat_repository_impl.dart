@@ -61,6 +61,16 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
+  Future<Either<Failure, ConversationEntity?>> getCachedConversationById(int id) async {
+    try {
+      final conversation = await _localDataSource.getConversationById(id);
+      return Right(conversation);
+    } catch (e) {
+      return Left(Failure('Failed to get cached conversation by ID: $e'));
+    }
+  }
+
+  @override
   Future<Either<Failure, ConversationEntity>> getConversationDetails(int id) async {
     try {
       final response = await _remoteDataSource.getConversationDetails(id);
@@ -110,9 +120,12 @@ class ChatRepositoryImpl implements ChatRepository {
         final List<MessageModel> messages =
             dataList.map((e) => MessageModel.fromJson(e as Map<String, dynamic>)).toList();
         
-        // Save to cache (only if it's the first page/refresh)
         if (skip == 0) {
+          // First page / refresh: overwrite cache with the latest batch
           await _localDataSource.saveMessages(conversationId, messages);
+        } else {
+          // Subsequent pages (older history): merge without erasing recent messages
+          await _localDataSource.mergeMessages(conversationId, messages);
         }
         
         return Right(messages);

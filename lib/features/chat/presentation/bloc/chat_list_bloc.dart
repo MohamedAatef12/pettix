@@ -115,16 +115,18 @@ class ChatListBloc extends Bloc<ChatListEvent, ChatListState> {
       (conversations) {
         if (conversations.isNotEmpty) {
           final sorted = _sortConversations(conversations);
+          // Show cached data immediately, but signal we're still syncing
           emit(ChatListSuccess(
             allConversations: sorted,
             filteredConversations: sorted,
             currentUserId: currentUserId,
+            isRefreshing: true, // background fetch is about to start
           ));
         }
       },
     );
 
-    // 2. Then fetch from remote (only show loading if cache was empty)
+    // 2. Only show full shimmer if cache was empty
     if (state is! ChatListSuccess) {
       emit(ChatListLoading());
     }
@@ -133,7 +135,10 @@ class ChatListBloc extends Bloc<ChatListEvent, ChatListState> {
 
     result.fold(
       (failure) {
-        if (state is! ChatListSuccess) {
+        if (state is ChatListSuccess) {
+          // Clear banner; keep cached data visible
+          emit((state as ChatListSuccess).copyWith(isRefreshing: false));
+        } else {
           emit(ChatListError(failure.message));
         }
       },
@@ -143,12 +148,18 @@ class ChatListBloc extends Bloc<ChatListEvent, ChatListState> {
           allConversations: sorted,
           filteredConversations: sorted,
           currentUserId: currentUserId,
+          isRefreshing: false,
         ));
       },
     );
 }
 
   Future<void> _onRefreshConversations(RefreshConversationsEvent event, Emitter<ChatListState> emit) async {
+    // Signal that a background refresh is in progress (shows banner, not shimmer)
+    if (state is ChatListSuccess) {
+      emit((state as ChatListSuccess).copyWith(isRefreshing: true));
+    }
+
     final result = await _getConversationsUseCase();
     
     int? currentUserId;
@@ -161,8 +172,10 @@ class ChatListBloc extends Bloc<ChatListEvent, ChatListState> {
 
     result.fold(
       (failure) {
-        // Only emit error if we don't have data already
-        if (state is! ChatListSuccess) {
+        // Clear refreshing flag; only emit error if we don't have data already
+        if (state is ChatListSuccess) {
+          emit((state as ChatListSuccess).copyWith(isRefreshing: false));
+        } else {
           emit(ChatListError(failure.message));
         }
       },
@@ -181,12 +194,14 @@ class ChatListBloc extends Bloc<ChatListEvent, ChatListState> {
                       .firstOrNull;
                   return otherMemberName?.contains(currentState.searchQuery.toLowerCase()) ?? false;
                }).toList(),
+            isRefreshing: false,
           ));
         } else {
           emit(ChatListSuccess(
             allConversations: sorted,
             filteredConversations: sorted,
             currentUserId: currentUserId,
+            isRefreshing: false,
           ));
         }
       },

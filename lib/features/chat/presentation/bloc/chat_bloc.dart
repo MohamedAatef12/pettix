@@ -13,6 +13,7 @@ import '../../domain/use_cases/get_messages_use_case.dart';
 import '../../domain/use_cases/get_cached_messages_use_case.dart';
 import '../../domain/use_cases/find_cached_conversation_use_case.dart';
 import '../../domain/use_cases/get_conversation_details_use_case.dart';
+import '../../domain/use_cases/get_cached_conversation_by_id_use_case.dart';
 import 'chat_event.dart';
 import 'chat_state.dart';
 
@@ -26,6 +27,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final DeleteMessageUseCase _deleteMessageUseCase;
   final CreatePrivateConversationUseCase _createPrivateConversationUseCase;
   final GetConversationDetailsUseCase _getConversationDetailsUseCase;
+  final GetCachedConversationByIdUseCase _getCachedConversationByIdUseCase;
   final GetUserDataUseCase _getUserDataUseCase;
   final SignalRService _signalRService;
 
@@ -43,6 +45,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     this._deleteMessageUseCase,
     this._createPrivateConversationUseCase,
     this._getConversationDetailsUseCase,
+    this._getCachedConversationByIdUseCase,
     this._getUserDataUseCase,
     this._signalRService,
   ) : super(const ChatState(
@@ -70,6 +73,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     emit(state.copyWith(currentUserId: currentUserId));
 
     int? finalConvId = event.conversationId;
+    bool messagesPreLoaded = false; // tracks if GetMessagesEvent was already dispatched
 
     // 2. If we only have otherUserId, try to find the cached conversation ID first
     if (finalConvId == null && event.otherUserId != null) {
@@ -80,11 +84,13 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           emit(state.copyWith(conversation: convo, conversationId: finalConvId));
           // Pre-load cached messages immediately while remote initialization happens
           add(GetMessagesEvent(finalConvId!, isRefresh: true));
+          messagesPreLoaded = true;
         }
       });
     } else if (finalConvId != null) {
-       // Pre-load cached messages immediately if we have the ID
+       // Pre-load cached messages (cache-first) immediately
        add(GetMessagesEvent(finalConvId!, isRefresh: true));
+       messagesPreLoaded = true;
     }
 
     // 3. Perform remote initialization
@@ -102,11 +108,23 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         },
       );
     } else if (finalConvId != null) {
-      final result = await _getConversationDetailsUseCase(finalConvId!);
-      result.fold(
-        (_) {},
-        (conversation) => emit(state.copyWith(conversation: conversation)),
-      );
+      // Look up cached conversation details first to skip API call if possible
+      bool skippedRemoteConv = false;
+      final cachedConvResult = await _getCachedConversationByIdUseCase(finalConvId!);
+      cachedConvResult.fold((_) {}, (convo) {
+        if (convo != null) {
+           emit(state.copyWith(conversation: convo));
+           skippedRemoteConv = true; // We got the details from cache, skip the remote endpoint
+        }
+      });
+
+      if (!skippedRemoteConv) {
+         final result = await _getConversationDetailsUseCase(finalConvId!);
+         result.fold(
+           (_) {},
+           (conversation) => emit(state.copyWith(conversation: conversation)),
+         );
+      }
     }
 
     // 4. Setup SignalR and fetch messages (if not already fetched by GetMessagesEvent)
@@ -123,8 +141,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         add(OnMessageDeletedEvent(messageId));
       });
 
-      // Standard remote fetch (if messages list is still empty or we need update)
-      if (state.messages.isEmpty) {
+      // Only dispatch if not already pre-loaded (avoids the double API call)
+      if (!messagesPreLoaded) {
         add(GetMessagesEvent(finalConvId!, isRefresh: true));
       }
     } else if (event.otherUserId == null) {
@@ -140,23 +158,29 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         (_) {},
         (messages) {
           if (messages.isNotEmpty) {
+            // Cache stores newest-first (appendMessage inserts at 0),
+            // ensure sorted newest→oldest so index 0 = bottom of reversed list
+            final sorted = List<MessageEntity>.from(messages)
+              ..sort((a, b) => b.sentAt.compareTo(a.sentAt));
             emit(state.copyWith(
               status: ChatStatus.success,
-              messages: messages,
+              messages: sorted,
               hasMore: true,
             ));
           }
         },
       );
 
-      // 2. Then proceed to fetch from remote (only show loading if cache was empty)
+      // 2. Only show full spinner if cache gave us nothing
       if (state.messages.isEmpty) {
         emit(state.copyWith(status: ChatStatus.loading, hasMore: true));
       }
+      // If we have cache data, stay in success state — remote data will silently update
     } else {
       if (!state.hasMore || state.status == ChatStatus.paginating) return;
       emit(state.copyWith(status: ChatStatus.paginating));
     }
+
 
     final skip = event.isRefresh ? 0 : state.messages.length;
 

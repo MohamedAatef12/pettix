@@ -9,7 +9,10 @@ abstract class ChatLocalDataSource {
   Future<void> saveConversations(List<ConversationModel> conversations);
   Future<List<ConversationModel>> getConversations();
   Future<ConversationModel?> findConversationByUserId(int userId);
+  Future<ConversationModel?> getConversationById(int id);
   Future<void> saveMessages(int conversationId, List<MessageModel> messages);
+  /// Merges a paginated batch of older messages into the existing cache.
+  Future<void> mergeMessages(int conversationId, List<MessageModel> messages);
   Future<void> appendMessage(int conversationId, MessageModel message);
   Future<List<MessageModel>> getMessages(int conversationId);
   Future<void> clearCache();
@@ -76,10 +79,50 @@ class ChatLocalDataSourceImpl implements ChatLocalDataSource {
   }
 
   @override
+  Future<ConversationModel?> getConversationById(int id) async {
+    final box = await _getConvBox();
+    final data = box.get(id);
+    if (data != null && data is String) {
+      return ConversationModel.fromJson(jsonDecode(data));
+    }
+    return null;
+  }
+
+  @override
   Future<void> saveMessages(int conversationId, List<MessageModel> messages) async {
     final box = await _getMsgBox();
     final List<String> data = messages.map((m) => jsonEncode(m.toJson())).toList();
     await box.put(conversationId, data);
+  }
+
+  /// Merges older (paginated) messages into the cache without disturbing recent ones.
+  /// Deduplicates by message ID and keeps a max of 500 messages.
+  @override
+  Future<void> mergeMessages(int conversationId, List<MessageModel> messages) async {
+    final box = await _getMsgBox();
+    final List<dynamic>? existing = box.get(conversationId);
+    final List<String> current = existing?.cast<String>() ?? [];
+
+    // Collect existing IDs for deduplication
+    final existingIds = <int>{};
+    for (final e in current) {
+      try {
+        final id = jsonDecode(e)['id'] as int?;
+        if (id != null) existingIds.add(id);
+      } catch (_) {}
+    }
+
+    // Append only genuinely new older messages
+    final toAdd = messages
+        .where((m) => m.id != 0 && !existingIds.contains(m.id))
+        .map((m) => jsonEncode(m.toJson()))
+        .toList();
+
+    final merged = [...current, ...toAdd];
+
+    // Cap at 500 to avoid unbounded growth
+    final capped = merged.length > 500 ? merged.sublist(0, 500) : merged;
+    await box.put(conversationId, capped);
   }
 
   @override
@@ -101,9 +144,9 @@ class ChatLocalDataSourceImpl implements ChatLocalDataSource {
     }
 
     updated.insert(0, messageJson);
-    
-    if (updated.length > 100) {
-      updated.removeRange(100, updated.length);
+
+    if (updated.length > 500) {
+      updated.removeRange(500, updated.length);
     }
     
     await box.put(conversationId, updated);

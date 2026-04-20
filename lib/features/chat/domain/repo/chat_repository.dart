@@ -7,6 +7,7 @@ abstract class ChatRepository {
   Future<Either<Failure, List<ConversationEntity>>> getConversations();
   Future<Either<Failure, List<ConversationEntity>>> getCachedConversations();
   Future<Either<Failure, ConversationEntity?>> findCachedConversationByUserId(int userId);
+  Future<Either<Failure, ConversationEntity?>> getCachedConversationById(int id);
 
   Future<Either<Failure, ConversationEntity>> getConversationDetails(int id);
 

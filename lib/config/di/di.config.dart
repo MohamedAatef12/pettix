@@ -83,6 +83,8 @@ import '../../features/chat/domain/use_cases/edit_message_use_case.dart'
     as _i801;
 import '../../features/chat/domain/use_cases/find_cached_conversation_use_case.dart'
     as _i992;
+import '../../features/chat/domain/use_cases/get_cached_conversation_by_id_use_case.dart'
+    as _i225;
 import '../../features/chat/domain/use_cases/get_cached_conversations_use_case.dart'
     as _i39;
 import '../../features/chat/domain/use_cases/get_cached_messages_use_case.dart'
@@ -281,6 +283,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i992.FindCachedConversationUseCase>(
       () => _i992.FindCachedConversationUseCase(gh<_i1030.ChatRepository>()),
     );
+    gh.lazySingleton<_i225.GetCachedConversationByIdUseCase>(
+      () => _i225.GetCachedConversationByIdUseCase(gh<_i1030.ChatRepository>()),
+    );
     gh.lazySingleton<_i39.GetCachedConversationsUseCase>(
       () => _i39.GetCachedConversationsUseCase(gh<_i1030.ChatRepository>()),
     );
@@ -441,20 +446,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i478.UpdateProfileUseCase>(
       () => _i478.UpdateProfileUseCase(gh<_i894.ProfileRepository>()),
     );
-    gh.factory<_i65.ChatBloc>(
-      () => _i65.ChatBloc(
-        gh<_i529.GetMessagesUseCase>(),
-        gh<_i671.GetCachedMessagesUseCase>(),
-        gh<_i992.FindCachedConversationUseCase>(),
-        gh<_i460.SendMessageUseCase>(),
-        gh<_i801.EditMessageUseCase>(),
-        gh<_i450.DeleteMessageUseCase>(),
-        gh<_i586.CreatePrivateConversationUseCase>(),
-        gh<_i10.GetConversationDetailsUseCase>(),
-        gh<_i118.GetUserDataUseCase>(),
-        gh<_i797.SignalRService>(),
-      ),
-    );
     gh.factory<_i109.AdoptionHistoryBloc>(
       () => _i109.AdoptionHistoryBloc(
         gh<_i823.GetClientFormsUseCase>(),
@@ -506,6 +497,21 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i2.ChatListBloc(
         gh<_i388.GetConversationsUseCase>(),
         gh<_i39.GetCachedConversationsUseCase>(),
+        gh<_i118.GetUserDataUseCase>(),
+        gh<_i797.SignalRService>(),
+      ),
+    );
+    gh.factory<_i65.ChatBloc>(
+      () => _i65.ChatBloc(
+        gh<_i529.GetMessagesUseCase>(),
+        gh<_i671.GetCachedMessagesUseCase>(),
+        gh<_i992.FindCachedConversationUseCase>(),
+        gh<_i460.SendMessageUseCase>(),
+        gh<_i801.EditMessageUseCase>(),
+        gh<_i450.DeleteMessageUseCase>(),
+        gh<_i586.CreatePrivateConversationUseCase>(),
+        gh<_i10.GetConversationDetailsUseCase>(),
+        gh<_i225.GetCachedConversationByIdUseCase>(),
         gh<_i118.GetUserDataUseCase>(),
         gh<_i797.SignalRService>(),
       ),
