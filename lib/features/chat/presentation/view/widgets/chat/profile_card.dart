@@ -1,3 +1,4 @@
+import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/padding.dart';
@@ -7,7 +8,9 @@ import 'package:pettix/core/utils/custom_button.dart';
 
 class ProfileCard extends StatelessWidget {
   final int index;
-  const ProfileCard({super.key, required this.index});
+  final String? name;
+  final String? avatarUrl;
+  const ProfileCard({super.key, required this.index, this.name, this.avatarUrl});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -26,13 +29,28 @@ class ProfileCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Image.asset('assets/images/dog.png',fit: BoxFit.fill,
-            width: double.infinity,
+            // User avatar or default dog image
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8.r),
+                child: AppCachedImage(
+                  imageUrl: avatarUrl ?? '',
+                  height: 120.h,
+                  width: double.infinity,
+                  errorWidget: Image.asset(
+                    'assets/images/dog.png',
+                    fit: BoxFit.fill,
+                    width: double.infinity,
+                  ),
+                ),
+              ),
             ),
             SizedBox(height: 10.h),
             Text(
-              'User $index',
-              style: AppTextStyles.bold
+              name ?? 'User $index',
+              style: AppTextStyles.bold,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             Text(
               'Subbran animal league Energtic and loves walks',

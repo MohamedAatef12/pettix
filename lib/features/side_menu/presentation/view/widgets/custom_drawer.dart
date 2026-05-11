@@ -1,3 +1,4 @@
+import 'package:pettix/core/widgets/app_profile_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -11,6 +12,8 @@ import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/data/network/constants.dart';
 import 'package:pettix/features/auth/data/models/user_model.dart';
+import 'package:pettix/core/services/signalr_service.dart';
+import 'package:pettix/features/chat/data/data_source/chat_local_data_source.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -188,7 +191,7 @@ class _DrawerHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              _Avatar(url: user?.avatar),
+              _Avatar(url: user?.avatar ?? user?.image, id: user?.id),
               SizedBox(width: 14.w),
               Expanded(child: _UserInfo(user: user)),
               IconButton(
@@ -238,7 +241,8 @@ class _DrawerHeader extends StatelessWidget {
 
 class _Avatar extends StatelessWidget {
   final String? url;
-  const _Avatar({this.url});
+  final int? id;
+  const _Avatar({this.url, this.id});
 
   @override
   Widget build(BuildContext context) {
@@ -254,14 +258,11 @@ class _Avatar extends StatelessWidget {
           ),
         ],
       ),
-      child: CircleAvatar(
+      child: AppProfileImage(
+        imageUrl: url,
         radius: 28.r,
+        heroTag: id != null ? 'user_avatar_$id' : null,
         backgroundColor: AppColors.current.lightGray,
-        backgroundImage:
-            url != null
-                ? NetworkImage("${Constants.baseUrl}/${url!}")
-                : const AssetImage('assets/images/no_user.png')
-                    as ImageProvider,
       ),
     );
   }
@@ -502,8 +503,9 @@ class _LogoutTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () async {
-        final cache = DI.find<ICacheManager>();
-        cache.logout();
+        DI.find<SignalRService>().stop();
+        DI.find<ICacheManager>().logout();
+        await DI.find<ChatLocalDataSource>().clearCache();
         await GoogleSignIn().signOut();
         if (context.mounted) context.pushReplacement('/login');
       },

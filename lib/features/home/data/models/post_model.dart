@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'dart:io';
 import 'package:path/path.dart' as p;
+import 'package:pettix/data/network/constants.dart';
 import '../../domain/entities/post_entity.dart';
 import 'author_model.dart';
 import 'comments_model.dart';
@@ -53,10 +55,7 @@ class PostModel extends PostEntity {
           ?.map((e) => LikesModel.fromJson(e as Map<String, dynamic>))
           .toList() ??
           [],
-      images: (json['images'] as List<dynamic>?)
-          ?.map((e) => e.toString())
-          .toList() ??
-          [],
+      images: _parseImages(json['images'] as List<dynamic>?),
       statusId: json['statusId'],
       isSaved: json['isSaved'],
       isLiked: json['isLiked'] ?? false,
@@ -65,6 +64,42 @@ class PostModel extends PostEntity {
     );
   }
 
+  /// Normalizes the raw image list from the API into usable URLs.
+  ///
+  /// The backend can return three different formats:
+  ///  1. A proper `https://` URL  → kept as-is.
+  ///  2. A malformed data-URL like `data:image/png;base64,Resources/PostsUploads/file.jpg`
+  ///     → extracted path is appended to [Constants.baseUrl].
+  ///  3. A real base64 data-URL  → kept as-is.
+  static List<String> _parseImages(List<dynamic>? rawList) {
+    if (rawList == null) return [];
+
+    final result = <String>[];
+    for (final item in rawList) {
+      final raw = item.toString().trim();
+      if (raw.isEmpty) continue;
+
+      if (raw.startsWith('http')) {
+        // ✅ Already a proper URL
+        result.add(raw);
+      } else if (raw.startsWith('data:image') && raw.contains('Resources/')) {
+        // ⚠️ Malformed: "data:image/png;base64,Resources/PostsUploads/xyz.jpg"
+        // Extract the relative path and build a real URL.
+        final pathPart = raw.split(',').last.trim();
+        final cleanPath = pathPart.startsWith('/') ? pathPart.substring(1) : pathPart;
+        final properUrl = '${Constants.baseUrl}/$cleanPath';
+        debugPrint('🔧 [PostModel] Fixed malformed image URL → $properUrl');
+        result.add(properUrl);
+      } else if (raw.startsWith('data:image')) {
+        // ✅ Real base64 image data
+        result.add(raw);
+      } else {
+        // Unknown format – log and skip
+        debugPrint('⚠️ [PostModel] Unknown image format, skipping: ${raw.length > 80 ? raw.substring(0, 80) : raw}');
+      }
+    }
+    return result;
+  }
 
   Future<Map<String, dynamic>> toJson() async {
     List<Map<String, dynamic>> encodedImages = [];

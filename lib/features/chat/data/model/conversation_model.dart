@@ -1,3 +1,6 @@
+import 'package:pettix/features/chat/domain/entity/member_entity.dart';
+import 'package:pettix/features/chat/domain/entity/message_entity.dart';
+
 import '../../domain/entity/conversation_entity.dart';
 import 'member_model.dart';
 import 'message_model.dart';
@@ -29,5 +32,22 @@ class ConversationModel extends ConversationEntity {
       'members': members.map((e) => (e as MemberModel).toJson()).toList(),
       if (lastMessage != null) 'lastMessage': (lastMessage as MessageModel).toJson(),
     };
+  }
+
+  @override
+  ConversationModel copyWith({
+    int? id,
+    String? type,
+    DateTime? createdAt,
+    List<MemberEntity>? members,
+    MessageEntity? lastMessage,
+  }) {
+    return ConversationModel(
+      id: id ?? this.id,
+      type: type ?? this.type,
+      createdAt: createdAt ?? this.createdAt,
+      members: members ?? this.members,
+      lastMessage: lastMessage ?? this.lastMessage,
+    );
   }
 }

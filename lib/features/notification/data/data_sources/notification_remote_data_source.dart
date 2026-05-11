@@ -30,8 +30,6 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
     required int pageSize,
     int? notificationTypeId,
   }) async {
-    final userToken = await DI.find<ICacheManager>().getToken();
-
     final queryParams = {
       'PageIndex': pageIndex < 1 ? 1 : pageIndex,
       'PageSize': pageSize,
@@ -43,8 +41,6 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
     final response = await _apiService.get(
       endPoint: Constants.notificationSearchEndpoint,
       queryParameters: queryParams,
-      headers:
-      userToken != null ? {'Authorization': 'Bearer $userToken'} : null,
     );
 
     return NotificationResponse(
@@ -64,13 +60,9 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   Future<NotificationResponse> markAllAsRead({
     required int notificationTypeId,
   }) async {
-    final userToken = await DI.find<ICacheManager>().getToken();
-
     final response = await _apiService.put(
       endPoint: Constants.readAllNotificationsEndpoint,
       queryParameters: {'notificationTypeId': notificationTypeId},
-      headers:
-      userToken != null ? {'Authorization': 'Bearer $userToken'} : null,
     );
 
     return NotificationResponse(
@@ -88,15 +80,11 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
 
   @override
   Future<NotificationResponse> markAsRead({required int id}) async {
-    final userToken = await DI.find<ICacheManager>().getToken();
-
     final response = await _apiService.put(
       endPoint: Constants.readSingleNotificationEndpoint.replaceAll(
         'param',
         id.toString(),
       ),
-      headers:
-      userToken != null ? {'Authorization': 'Bearer $userToken'} : null,
     );
 
     return NotificationResponse(

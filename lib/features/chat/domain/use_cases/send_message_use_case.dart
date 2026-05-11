@@ -10,7 +10,7 @@ class SendMessageUseCase {
 
   const SendMessageUseCase(this._repository);
 
-  Future<Either<Failure, MessageEntity>> call({required int conversationId, required String content}) {
-    return _repository.sendMessage(conversationId, content);
+  Future<Either<Failure, MessageEntity>> call({required int conversationId, required String content, String? imagePath}) {
+    return _repository.sendMessage(conversationId, content, imagePath: imagePath);
   }
 }

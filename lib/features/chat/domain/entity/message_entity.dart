@@ -9,7 +9,9 @@ class MessageEntity extends Equatable {
   final DateTime sentAt;
   final DateTime? editedAt;
   final bool isDeleted;
+  final bool isSending;
   final ChatUserEntity? sender;
+  final String? imageUrl;
 
   const MessageEntity({
     required this.id,
@@ -19,7 +21,9 @@ class MessageEntity extends Equatable {
     required this.sentAt,
     this.editedAt,
     this.isDeleted = false,
+    this.isSending = false,
     this.sender,
+    this.imageUrl,
   });
 
   MessageEntity copyWith({
@@ -30,7 +34,9 @@ class MessageEntity extends Equatable {
     DateTime? sentAt,
     DateTime? editedAt,
     bool? isDeleted,
+    bool? isSending,
     ChatUserEntity? sender,
+    String? imageUrl,
   }) {
     return MessageEntity(
       id: id ?? this.id,
@@ -40,10 +46,12 @@ class MessageEntity extends Equatable {
       sentAt: sentAt ?? this.sentAt,
       editedAt: editedAt ?? this.editedAt,
       isDeleted: isDeleted ?? this.isDeleted,
+      isSending: isSending ?? this.isSending,
       sender: sender ?? this.sender,
+      imageUrl: imageUrl ?? this.imageUrl,
     );
   }
 
   @override
-  List<Object?> get props => [id, conversationId, senderId, content, sentAt, editedAt, isDeleted, sender];
+  List<Object?> get props => [id, conversationId, senderId, content, sentAt, editedAt, isDeleted, isSending, sender, imageUrl];
 }

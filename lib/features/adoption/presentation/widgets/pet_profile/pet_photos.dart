@@ -1,4 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -30,13 +30,13 @@ class PetGallery extends StatelessWidget {
   Widget _singleImage(BuildContext context, String url) {
     return GestureDetector(
       onTap: () => _openFullscreen(context, url),
-      child: CachedNetworkImage(
+      child: AppCachedImage(
         imageUrl: url,
         height: 280.h,
         width: double.infinity,
         fit: BoxFit.cover,
-        placeholder: (_, __) => _shimmer(),
-        errorWidget: (_, __, ___) => _placeholder(),
+        heroTag: 'pet_image_${pet.id}',
+        errorWidget: _placeholder(),
       ),
     );
   }
@@ -63,11 +63,11 @@ class PetGallery extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(8.r),
-                child: CachedNetworkImage(
+                child: AppCachedImage(
                   imageUrl: shown[i],
                   fit: BoxFit.cover,
-                  placeholder: (_, __) => _shimmer(),
-                  errorWidget: (_, __, ___) => _placeholder(),
+                  heroTag: i == 0 ? 'pet_image_${pet.id}' : null,
+                  errorWidget: _placeholder(),
                 ),
               ),
               if (isLast)
@@ -114,7 +114,7 @@ class PetGallery extends StatelessWidget {
           ),
           body: Center(
             child: InteractiveViewer(
-              child: CachedNetworkImage(imageUrl: url),
+              child: AppCachedImage(imageUrl: url, fit: BoxFit.contain),
             ),
           ),
         ),

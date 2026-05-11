@@ -54,23 +54,57 @@ import '../../features/on_boarding/presentation/view/on_boarding_screen.dart';
 import '../../features/select_language/presentation/view/select_language_screen.dart';
 import '../../features/splash/persentation/view/splash_screen.dart';
 
-// ── Route Sections ──────────────────────────────────────────────────────────
+import 'package:flutter/material.dart';
+
+// ── Transition Helper ────────────────────────────────────────────────────────
+
+CustomTransitionPage<T> _customTransition<T>({
+  required GoRouterState state,
+  required Widget child,
+}) {
+  return CustomTransitionPage<T>(
+    key: state.pageKey,
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return FadeTransition(
+        opacity: animation,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0.02, 0),
+            end: Offset.zero,
+          ).animate(animation),
+          child: child,
+        ),
+      );
+    },
+    transitionDuration: const Duration(milliseconds: 300),
+  );
+}
 
 final List<RouteBase> _coreRoutes = [
   GoRoute(
     path: AppRoutes.splash,
     name: AppRouteNames.splash,
-    builder: (context, state) => const SplashScreen(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const SplashScreen(),
+    ),
   ),
   GoRoute(
     path: AppRoutes.selectLanguage,
     name: AppRouteNames.selectLanguage,
-    builder: (context, state) => const SelectLanguageScreen(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const SelectLanguageScreen(),
+    ),
   ),
   GoRoute(
     path: AppRoutes.onBoarding,
     name: AppRouteNames.onBoarding,
-    builder: (context, state) => const OnBoardingScreen(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const OnBoardingScreen(),
+    ),
   ),
 ];
 
@@ -78,12 +112,18 @@ final List<RouteBase> _authRoutes = [
   GoRoute(
     path: AppRoutes.login,
     name: AppRouteNames.login,
-    builder: (context, state) => const LoginScreen(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const LoginScreen(),
+    ),
   ),
   GoRoute(
     path: AppRoutes.signUp,
     name: AppRouteNames.signUp,
-    builder: (context, state) => const RegisterScreen(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const RegisterScreen(),
+    ),
   ),
   GoRoute(
     path: AppRoutes.setPassword,
@@ -141,77 +181,94 @@ final List<RouteBase> _homeRoutes = [
   GoRoute(
     path: AppRoutes.bottomNav,
     name: AppRouteNames.bottomNav,
-    builder: (context, state) => const BottomNavigationScreen(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const BottomNavigationScreen(),
+    ),
   ),
   GoRoute(
     path: AppRoutes.home,
     name: AppRouteNames.home,
-    builder: (context, state) => const HomePage(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const HomePage(),
+    ),
   ),
   GoRoute(
     path: AppRoutes.homeSearch,
     name: AppRouteNames.homeSearch,
-    builder: (context, state) => const HomeSearch(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const HomeSearch(),
+    ),
   ),
   GoRoute(
     path: AppRoutes.addPost,
     name: AppRouteNames.addPost,
-    builder: (context, state) => AddPostPage(bloc: state.extra as HomeBloc?),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: AddPostPage(bloc: state.extra as HomeBloc?),
+    ),
   ),
   GoRoute(
     path: AppRoutes.notifications,
     name: AppRouteNames.notifications,
-    builder: (_, __) => const NotificationPage(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const NotificationPage(),
+    ),
   ),
   GoRoute(
     path: AppRoutes.comments,
-    builder: (context, state) {
+    pageBuilder: (context, state) {
       final extra = state.extra;
+      Widget child;
       if (extra is Map<String, dynamic>) {
         final post = extra['post'] as PostEntity;
         final bloc = extra['bloc'] as HomeBloc;
-        return BlocProvider.value(
+        child = BlocProvider.value(
           value: bloc,
           child: CommentsPage(postId: post.id.toString(), post: post),
         );
-      }
-      if (extra is PostEntity) {
-        return BlocProvider(
+      } else if (extra is PostEntity) {
+        child = BlocProvider(
           create: (context) => HomeBloc.fromDI(),
           child: CommentsPage(postId: extra.id.toString(), post: extra),
         );
-      }
-      final int postId =
-          extra is int ? extra : int.tryParse(extra?.toString() ?? '') ?? 0;
-      return BlocProvider(
-        create: (context) => HomeBloc.fromDI(),
-        child: CommentsPage(
-          postId: postId.toString(),
-          post: PostEntity(
-            id: postId,
-            content: '',
-            creationDate: '',
-            author: const AuthorEntity(
-              id: 0,
-              nameAr: '',
-              nameEn: '',
-              avatar: '',
-              email: '',
-              phone: '',
-              genderId: 0,
-              genderName: '',
-              contactTypeId: 0,
+      } else {
+        final int postId =
+            extra is int ? extra : int.tryParse(extra?.toString() ?? '') ?? 0;
+        child = BlocProvider(
+          create: (context) => HomeBloc.fromDI(),
+          child: CommentsPage(
+            postId: postId.toString(),
+            post: PostEntity(
+              id: postId,
+              content: '',
+              creationDate: '',
+              author: const AuthorEntity(
+                id: 0,
+                nameAr: '',
+                nameEn: '',
+                avatar: '',
+                email: '',
+                phone: '',
+                genderId: 0,
+                genderName: '',
+                contactTypeId: 0,
+                statusId: 0,
+                age: 0,
+              ),
+              comments: const [],
+              likes: const [],
+              images: const [],
               statusId: 0,
-              age: 0,
+              isSaved: false,
             ),
-            comments: const [],
-            likes: const [],
-            images: const [],
-            statusId: 0,
-            isSaved: false,
           ),
-        ),
-      );
+        );
+      }
+      return _customTransition(state: state, child: child);
     },
   ),
   GoRoute(
@@ -233,15 +290,37 @@ final List<RouteBase> _socialRoutes = [
   GoRoute(
     path: '${AppRoutes.chat}/:index',
     name: AppRouteNames.chat,
-    builder: (context, state) {
+    pageBuilder: (context, state) {
       final index = int.tryParse(state.pathParameters['index'] ?? '0') ?? 0;
-      return ChatPage(index: index);
+      final isUserId = state.uri.queryParameters['isUserId'] == 'true';
+      
+      String? initialName;
+      String? initialAvatar;
+      
+      final extra = state.extra;
+      if (extra is Map<String, dynamic>) {
+        initialName = extra['name'] as String?;
+        initialAvatar = extra['avatar'] as String?;
+      }
+
+      return _customTransition(
+        state: state,
+        child: ChatPage(
+          index: index, 
+          isUserId: isUserId,
+          initialName: initialName,
+          initialAvatar: initialAvatar,
+        ),
+      );
     },
   ),
   GoRoute(
     path: AppRoutes.chatList,
     name: AppRouteNames.chatList,
-    builder: (context, state) => const ChatListPage(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const ChatListPage(),
+    ),
   ),
 ];
 
@@ -249,20 +328,28 @@ final List<RouteBase> _adoptionRoutes = [
   GoRoute(
     path: AppRoutes.adoption,
     name: AppRouteNames.adoption,
-    builder: (context, state) => const AdoptionScreen(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const AdoptionScreen(),
+    ),
   ),
   GoRoute(
     path: AppRoutes.petProfile,
     name: AppRouteNames.petProfile,
-    builder:
-        (context, state) => PetProfileScreen(pet: state.extra as PetEntity),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: PetProfileScreen(pet: state.extra as PetEntity),
+    ),
   ),
   GoRoute(
     path: AppRoutes.applications,
     name: AppRouteNames.applications,
-    builder: (context, state) {
+    pageBuilder: (context, state) {
       final petId = state.extra as int? ?? 0;
-      return ApplicationScreens(petId: petId);
+      return _customTransition(
+        state: state,
+        child: ApplicationScreens(petId: petId),
+      );
     },
   ),
 ];
@@ -271,34 +358,42 @@ final List<RouteBase> _profileRoutes = [
   GoRoute(
     path: AppRoutes.profile,
     name: AppRouteNames.profile,
-    builder:
-        (context, state) => BlocProvider(
-          create: (_) => DI.find<ProfileBloc>(),
-          child: const ProfileScreen(),
-        ),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: BlocProvider(
+        create: (_) => DI.find<ProfileBloc>(),
+        child: const ProfileScreen(),
+      ),
+    ),
   ),
   GoRoute(
     path: AppRoutes.editProfile,
     name: AppRouteNames.editProfile,
-    builder: (context, state) {
+    pageBuilder: (context, state) {
       final existingBloc =
           state.extra is ProfileBloc ? state.extra as ProfileBloc : null;
+      Widget child;
       if (existingBloc != null) {
-        return BlocProvider.value(
+        child = BlocProvider.value(
           value: existingBloc,
           child: const EditProfileScreen(),
         );
+      } else {
+        child = BlocProvider(
+          create: (_) => DI.find<ProfileBloc>()..add(FetchProfileEvent()),
+          child: const EditProfileScreen(),
+        );
       }
-      return BlocProvider(
-        create: (_) => DI.find<ProfileBloc>()..add(FetchProfileEvent()),
-        child: const EditProfileScreen(),
-      );
+      return _customTransition(state: state, child: child);
     },
   ),
   GoRoute(
     path: AppRoutes.settings,
     name: AppRouteNames.settings,
-    builder: (context, state) => const SettingsScreen(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const SettingsScreen(),
+    ),
   ),
 ];
 
@@ -306,19 +401,22 @@ final List<RouteBase> _myPetsRoutes = [
   GoRoute(
     path: AppRoutes.addPet,
     name: AppRouteNames.addPet,
-    builder: (context, state) {
+    pageBuilder: (context, state) {
       final existingBloc =
           state.extra is MyPetsBloc ? state.extra as MyPetsBloc : null;
+      Widget child;
       if (existingBloc != null) {
-        return BlocProvider.value(
+        child = BlocProvider.value(
           value: existingBloc,
           child: const AddPetScreen(),
         );
+      } else {
+        child = BlocProvider(
+          create: (_) => DI.find<MyPetsBloc>()..add(const FetchPetOptionsEvent()),
+          child: const AddPetScreen(),
+        );
       }
-      return BlocProvider(
-        create: (_) => DI.find<MyPetsBloc>()..add(const FetchPetOptionsEvent()),
-        child: const AddPetScreen(),
-      );
+      return _customTransition(state: state, child: child);
     },
   ),
 ];
@@ -327,25 +425,28 @@ final List<RouteBase> _adoptionHistoryRoutes = [
   GoRoute(
     path: AppRoutes.adoptionHistory,
     name: AppRouteNames.adoptionHistory,
-    builder:
-        (context, state) => BlocProvider(
-          create:
-              (_) =>
-                  DI.find<AdoptionHistoryBloc>()
-                    ..add(const FetchClientFormsEvent()),
-          child: const AdoptionHistoryScreen(),
-        ),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: BlocProvider(
+        create: (_) => DI.find<AdoptionHistoryBloc>()
+          ..add(const FetchClientFormsEvent()),
+        child: const AdoptionHistoryScreen(),
+      ),
+    ),
   ),
   GoRoute(
     path: AppRoutes.adoptionFormDetail,
     name: AppRouteNames.adoptionFormDetail,
-    builder: (context, state) {
+    pageBuilder: (context, state) {
       final extra = state.extra as Map<String, dynamic>;
-      return BlocProvider.value(
-        value: extra['bloc'] as AdoptionHistoryBloc,
-        child: AdoptionFormDetailScreen(
-          form: extra['form'] as AdoptionFormEntity,
-          isOwnerView: extra['isOwnerView'] as bool,
+      return _customTransition(
+        state: state,
+        child: BlocProvider.value(
+          value: extra['bloc'] as AdoptionHistoryBloc,
+          child: AdoptionFormDetailScreen(
+            form: extra['form'] as AdoptionFormEntity,
+            isOwnerView: extra['isOwnerView'] as bool,
+          ),
         ),
       );
     },
@@ -356,27 +457,42 @@ final List<RouteBase> _supportRoutes = [
   GoRoute(
     path: AppRoutes.helpSupport,
     name: AppRouteNames.helpSupport,
-    builder: (_, __) => const HelpSupportPage(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const HelpSupportPage(),
+    ),
   ),
   GoRoute(
     path: AppRoutes.faq,
     name: AppRouteNames.faq,
-    builder: (_, __) => const FaqPage(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const FaqPage(),
+    ),
   ),
   GoRoute(
     path: AppRoutes.contactSupport,
     name: AppRouteNames.contactSupport,
-    builder: (_, __) => const ContactSupportPage(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const ContactSupportPage(),
+    ),
   ),
   GoRoute(
     path: AppRoutes.reportProblem,
     name: AppRouteNames.reportProblem,
-    builder: (_, __) => const ReportProblemPage(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const ReportProblemPage(),
+    ),
   ),
   GoRoute(
     path: AppRoutes.sendFeedback,
     name: AppRouteNames.sendFeedback,
-    builder: (_, __) => const SendFeedbackPage(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const SendFeedbackPage(),
+    ),
   ),
 ];
 
@@ -384,27 +500,42 @@ final List<RouteBase> _legalRoutes = [
   GoRoute(
     path: AppRoutes.legal,
     name: AppRouteNames.legal,
-    builder: (_, __) => const LegalPage(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const LegalPage(),
+    ),
   ),
   GoRoute(
     path: AppRoutes.aboutPettix,
     name: AppRouteNames.aboutPettix,
-    builder: (_, __) => const AboutPettixPage(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const AboutPettixPage(),
+    ),
   ),
   GoRoute(
     path: AppRoutes.privacyPolicy,
     name: AppRouteNames.privacyPolicy,
-    builder: (_, __) => const PrivacyPolicyPage(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const PrivacyPolicyPage(),
+    ),
   ),
   GoRoute(
     path: AppRoutes.termsConditions,
     name: AppRouteNames.termsConditions,
-    builder: (_, __) => const TermsConditionsPage(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const TermsConditionsPage(),
+    ),
   ),
   GoRoute(
     path: AppRoutes.refundPolicy,
     name: AppRouteNames.refundPolicy,
-    builder: (_, __) => const RefundPolicyPage(),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: const RefundPolicyPage(),
+    ),
   ),
 ];
 

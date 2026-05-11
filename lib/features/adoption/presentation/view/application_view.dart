@@ -1,3 +1,4 @@
+import 'package:pettix/core/widgets/app_page_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -183,9 +184,7 @@ class _StepContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (state.status == AdoptionStatus.loading) {
-      return Center(
-        child: CircularProgressIndicator(color: AppColors.current.primary),
-      );
+      return const AppPageShimmer();
     }
 
     final index = (state.currentStep - 1).clamp(0, 4);

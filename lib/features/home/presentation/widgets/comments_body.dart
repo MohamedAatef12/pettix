@@ -1,3 +1,4 @@
+import 'package:pettix/core/widgets/app_profile_image.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -137,26 +138,9 @@ class CommentsBody extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CachedNetworkImage(
-              imageUrl: comment.author.avatar ?? '',
-              imageBuilder:
-                  (context, imageProvider) => CircleAvatar(
-                    radius: isReply ? 18.r : 30.r,
-                    backgroundImage: imageProvider,
-                    backgroundColor: AppColors.current.lightGray,
-                  ),
-              placeholder:
-                  (context, url) => CircleAvatar(
-                    radius: isReply ? 18.r : 30.r,
-                    backgroundColor: AppColors.current.lightGray,
-                  ),
-              errorWidget:
-                  (context, url, error) => CircleAvatar(
-                    radius: isReply ? 18.r : 30.r,
-                    backgroundImage: const AssetImage(
-                      'assets/images/no_user.png',
-                    ),
-                  ),
+            AppProfileImage(
+              imageUrl: comment.author.avatar,
+              radius: isReply ? 18.r : 30.r,
             ),
             SizedBox(width: isReply ? 6.w : 10.w),
             Expanded(

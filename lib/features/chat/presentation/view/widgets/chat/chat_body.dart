@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pettix/core/constants/padding.dart';
+import 'package:pettix/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:pettix/features/chat/presentation/bloc/chat_state.dart';
 import 'package:pettix/features/chat/presentation/view/widgets/chat/caht_conversation.dart';
 import 'package:pettix/features/chat/presentation/view/widgets/chat/chat_text_form_fied.dart';
 
@@ -9,16 +12,21 @@ class ChatBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: PaddingConstants.medium,
-      child: Column(
-        children: [
-          Expanded(
-            child: ChatConversation(userIndex: index,),
+    return BlocBuilder<ChatBloc, ChatState>(
+      builder: (context, state) {
+        return Padding(
+          padding: PaddingConstants.medium,
+          child: Column(
+            children: [
+              Expanded(
+                child: ChatConversation(userIndex: index,),
+              ),
+              if (state.conversationId != null)
+                ChatTextFormField(conversationId: state.conversationId!),
+            ],
           ),
-          ChatTextFormField(conversationId: index),
-        ],
-      ),
+        );
+      },
     );
   }
 }

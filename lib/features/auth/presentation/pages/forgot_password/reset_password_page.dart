@@ -15,6 +15,7 @@ import 'package:pettix/features/auth/domain/usecases/verify_otp.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:pettix/features/auth/presentation/widgets/forgot_password/reset_password_body.dart';
 import 'package:pettix/core/widgets/rtl_aware_icon.dart';
+import 'package:pettix/core/services/signalr_service.dart';
 
 class ResetPassword extends StatelessWidget {
   final String email;
@@ -50,6 +51,7 @@ class ResetPassword extends StatelessWidget {
           resendOtpUseCase: getIt<ResendOtpUseCase>(),
           forgotPasswordUseCase: getIt<ForgotPasswordUseCase>(),
           resetPasswordUseCase: getIt<ResetPasswordUseCase>(),
+          signalRService: getIt<SignalRService>(),
         ),
         child: ResetPasswordBody(
           email: email,

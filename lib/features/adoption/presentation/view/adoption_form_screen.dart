@@ -1,3 +1,4 @@
+import 'package:pettix/core/widgets/app_page_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -152,7 +153,7 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
         },
         builder: (context, state) {
           if (state.status == AdoptionStatus.loading) {
-            return const Center(child: CircularProgressIndicator());
+            return const AppPageShimmer();
           }
 
           if (state.options != null) {

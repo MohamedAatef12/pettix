@@ -7,6 +7,11 @@ import 'package:pettix/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:pettix/features/chat/presentation/bloc/chat_event.dart';
 import 'package:pettix/features/chat/presentation/bloc/chat_state.dart';
 
+import 'package:pettix/features/chat/presentation/view/widgets/updating_banner.dart';
+import 'dart:io';
+import 'package:pettix/core/widgets/app_cached_image.dart';
+import 'package:pettix/core/shimmers/chat_body_shimmer.dart';
+
 class ChatConversation extends StatefulWidget {
   final int userIndex;
   const ChatConversation({super.key, required this.userIndex});
@@ -29,7 +34,9 @@ class _ChatConversationState extends State<ChatConversation> {
     if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 50) {
       final state = context.read<ChatBloc>().state;
       if (state.hasMore && state.status != ChatStatus.paginating && state.status != ChatStatus.loading) {
-        context.read<ChatBloc>().add(GetMessagesEvent(widget.userIndex));
+        if (state.conversationId != null) {
+          context.read<ChatBloc>().add(GetMessagesEvent(state.conversationId!));
+        }
       }
     }
   }
@@ -44,49 +51,75 @@ class _ChatConversationState extends State<ChatConversation> {
   Widget build(BuildContext context) {
     return BlocBuilder<ChatBloc, ChatState>(
       builder: (context, state) {
-        if (state.status == ChatStatus.loading) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (state.status == ChatStatus.error) {
+
+        if (state.status == ChatStatus.loading && state.messages.isEmpty) {
+          return const Center(child: UpdatingBanner());
+        } else if (state.status == ChatStatus.error && state.messages.isEmpty) {
           return Center(child: Text(state.errorMessage, style: const TextStyle(color: Colors.red)));
         }
 
         final messages = state.messages;
+        final isPaginating = state.status == ChatStatus.paginating;
 
-        return ListView.builder(
-          controller: _scrollController,
-          itemCount: messages.length + 1 + (state.status == ChatStatus.paginating ? 1 : 0),
-          padding: EdgeInsets.only(bottom: 16.h),
-          // We usually reverse the list for chat, but based on your previous items logic:
-          // We might need to handle reverse=true, or just build standard. Assuming index 0 is top.
+        return Stack(
+          children: [
+            ListView.builder(
+              controller: _scrollController,
+              // slots: messages + optional spinner + profile card (always last = always top)
+              itemCount: messages.length + (isPaginating ? 1 : 0) + 1,
+              padding: EdgeInsets.only(bottom: 16.h),
+              reverse: true,
           itemBuilder: (context, index) {
-            if (index == 0) {
+            final totalSlots = messages.length + (isPaginating ? 1 : 0);
+
+            // Profile card is always the very last slot → stays pinned at the top
+            if (index == totalSlots) {
+              final otherMember = state.conversation?.members
+                      .where((m) => m.user.id != state.currentUserId)
+                      .firstOrNull ??
+                  (state.conversation?.members.isNotEmpty == true
+                      ? state.conversation?.members.first
+                      : null);
               return Column(
                 children: [
-                  ProfileCard(index: widget.userIndex),
+                  ProfileCard(
+                    index: widget.userIndex,
+                    name: otherMember?.user.displayName,
+                    avatarUrl: otherMember?.user.avatar,
+                  ),
                   SizedBox(height: 10.h),
                 ],
               );
             }
 
-            if (index > messages.length) {
+            // Pagination spinner sits just above the oldest message, below the card
+            if (isPaginating && index == messages.length) {
               return const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Center(child: CircularProgressIndicator()),
               );
             }
 
-            final msg = messages[index - 1];
-            // Assuming `senderId` matches your current user ID logic for `isMe`. 
-            // In a real app you'd compare msg.senderId == currentUserId.
-            // Using a dummy check for now or assuming isMe if senderId != the other user id.
-            final isMe = msg.senderId != widget.userIndex; // Or whatever logic you use
+            final msg = messages[index];
+            final isMe = msg.senderId == state.currentUserId;
 
             return ChatBubble(
               text: msg.content,
               isMe: isMe,
-              seen: false, // Update logic when seen property is fully mapped if available
+              isSending: msg.isSending,
+              imageUrl: msg.imageUrl,
             );
           },
+            ),
+            if (state.status == ChatStatus.loading)
+              Align(
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: EdgeInsets.only(top: 12.h),
+                  child: const UpdatingBanner(),
+                ),
+              ),
+          ],
         );
       },
     );
@@ -96,72 +129,159 @@ class _ChatConversationState extends State<ChatConversation> {
 
 class ChatBubble extends StatelessWidget {
   final String text;
+  final String? imageUrl;
   final bool isMe;
-  final bool seen;
+  final bool isSending;
 
   const ChatBubble({
     super.key,
     required this.text,
     required this.isMe,
-    this.seen = false,
+    this.isSending = false,
+    this.imageUrl,
   });
 
   @override
   Widget build(BuildContext context) {
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: EdgeInsets.symmetric(vertical: 6.h, horizontal: 12.w),
-        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
-        constraints: BoxConstraints(maxWidth: 260.w),
-        decoration: BoxDecoration(
-          color: isMe
-              ? AppColors.current.primary
-              : AppColors.current.blueGray.withValues(alpha: 0.4),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(14.r),
-            topRight: Radius.circular(14.r),
-            bottomLeft: isMe ? Radius.circular(14.r) : Radius.circular(0),
-            bottomRight: isMe ? Radius.circular(0) : Radius.circular(14.r),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Container(
+            margin: EdgeInsets.symmetric(vertical: 6.h, horizontal: 12.w),
+            padding: imageUrl != null ? EdgeInsets.all(4.r) : EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+            constraints: BoxConstraints(maxWidth: 260.w),
+            decoration: BoxDecoration(
+              color: isMe
+                  ? AppColors.current.primary
+                  : AppColors.current.blueGray.withValues(alpha: 0.4),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(14.r),
+                topRight: Radius.circular(14.r),
+                bottomLeft: isMe ? Radius.circular(14.r) : Radius.circular(0),
+                bottomRight: isMe ? Radius.circular(0) : Radius.circular(14.r),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (imageUrl != null)
+                  GestureDetector(
+                    onTap: () => _openImagePreview(context, imageUrl!),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12.r),
+                      child: AppCachedImage(
+                        imageUrl: imageUrl!,
+                        width: 200.w,
+                        height: 150.h,
+                      ),
+                    ),
+                  ),
+                if (text.isNotEmpty)
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: imageUrl != null ? 8.w : 4.w,
+                      vertical: imageUrl != null ? 6.h : 2.h,
+                    ),
+                    child: Text(
+                      text,
+                      style: TextStyle(
+                        color: isMe ? Colors.white : AppColors.current.text,
+                        fontSize: 14.sp,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
-        ),
-        child: Stack(
-          children: [
+          if (isMe && isSending) SizedBox(width: 8.w),
+          if (isMe && isSending)
             Padding(
-              padding: EdgeInsets.only(right: 30.w, bottom: 6.h),
-              child: Text(
-                text,
-                style: TextStyle(
-                  color: isMe ? Colors.white : AppColors.current.text,
-                  fontSize: 14.sp,
+              padding: EdgeInsets.only(bottom: 8.h),
+              child: SizedBox(
+                width: 12.w,
+                height: 12.w,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    AppColors.current.primary,
+                  ),
                 ),
               ),
             ),
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    seen
-                        ? Icons.done_all
-                        : Icons.done,
-                    size: 16.w,
-                    color: isMe
-                        ? (seen
-                        ? Colors.blueAccent
-                        : Colors.white70)
-                        : (seen
-                        ? Colors.blueAccent
-                        : Colors.grey),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }
+
+
+
+  void _openImagePreview(BuildContext context, String path) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Close',
+      barrierColor: Colors.black.withValues(alpha: 0.92),
+      transitionDuration: const Duration(milliseconds: 250),
+      transitionBuilder: (_, animation, __, child) {
+        return FadeTransition(
+          opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.88, end: 1.0).animate(
+              CurvedAnimation(parent: animation, curve: Curves.easeOut),
+            ),
+            child: child,
+          ),
+        );
+      },
+      pageBuilder: (dialogContext, _, __) {
+        return GestureDetector(
+          onTap: () => Navigator.of(dialogContext).pop(),
+          behavior: HitTestBehavior.opaque,
+          child: SafeArea(
+            child: Stack(
+              children: [
+                Center(
+                  child: GestureDetector(
+                    onTap: () {}, // Prevent dismissal when tapping the image
+                    child: Hero(
+                      tag: 'chat_image_$path',
+                      child: InteractiveViewer(
+                        minScale: 0.8,
+                        maxScale: 4.0,
+                        child: AppCachedImage(
+                          imageUrl: path,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 16.h,
+                  right: 16.w,
+                  child: GestureDetector(
+                    onTap: () => Navigator.of(dialogContext).pop(),
+                    child: Container(
+                      padding: EdgeInsets.all(8.r),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.5),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.close, color: Colors.white, size: 24),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+
 }

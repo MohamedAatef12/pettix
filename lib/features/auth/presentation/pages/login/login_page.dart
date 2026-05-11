@@ -13,6 +13,7 @@ import 'package:pettix/features/auth/domain/usecases/reset_password.dart';
 import 'package:pettix/features/auth/domain/usecases/verify_otp.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:pettix/features/auth/presentation/widgets/login/login_body.dart';
+import 'package:pettix/core/services/signalr_service.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -32,6 +33,7 @@ class LoginScreen extends StatelessWidget {
               resendOtpUseCase: getIt<ResendOtpUseCase>(),
               forgotPasswordUseCase: getIt<ForgotPasswordUseCase>(),
               resetPasswordUseCase: getIt<ResetPasswordUseCase>(),
+              signalRService: getIt<SignalRService>(),
             ),
           child: LoginBody()))
     );

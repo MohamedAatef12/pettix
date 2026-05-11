@@ -8,22 +8,59 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:pettix/features/chat/presentation/bloc/chat_event.dart';
+import 'package:pettix/features/chat/presentation/bloc/chat_state.dart';
 
 class ChatPage extends StatelessWidget {
   final int index;
-  const ChatPage({super.key, required this.index});
+  final bool isUserId;
+  final String? initialName;
+  final String? initialAvatar;
+
+  const ChatPage({
+    super.key,
+    required this.index,
+    this.isUserId = false,
+    this.initialName,
+    this.initialAvatar,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.current.lightBlue,
       body: BlocProvider(
-        create: (context) => DI.find<ChatBloc>()..add(GetMessagesEvent(index, isRefresh: true)),
+        create: (context) => DI.find<ChatBloc>()
+          ..add(isUserId
+              ? InitializeChatEvent(otherUserId: index)
+              : InitializeChatEvent(conversationId: index)),
         child: SafeArea(
           child: Column(
             children: [
-              ChatAppBar(text: 'User $index',),
+              BlocBuilder<ChatBloc, ChatState>(
+                builder: (context, state) {
+                  // Identify the "Other Member" to show in the header
+                  final otherMember = state.conversation?.members
+                      .where((m) => m.user.id != state.currentUserId)
+                      .firstOrNull ??
+                      (state.conversation?.members.isNotEmpty == true
+                          ? state.conversation?.members.first
+                          : null);
+
+                  final title = initialName ??
+                      otherMember?.user.displayName ??
+                      (state.conversation != null ? 'Chat' : 'Loading...');
+                  
+                  final avatarUrl = initialAvatar ?? otherMember?.user.avatar;
+
+                  return ChatAppBar(
+                    text: title,
+                    avatarUrl: avatarUrl,
+                    conversationId: state.conversation?.id, // Hero uses ID for sync
+                  );
+                },
+              ),
               SizedBox(height: 10.h),
-              Expanded(child: ChatBody(index: index,)),
+              Expanded(child: ChatBody(index: index)),
             ],
           ),
         ),

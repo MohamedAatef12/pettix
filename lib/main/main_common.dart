@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:pettix/config/env/app_config.dart';
 import 'package:pettix/core/services/notification_service.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/data/caching/shared_prefs_helper.dart';
+import 'package:pettix/features/chat/data/data_source/chat_local_data_source.dart';
 import 'package:talker_bloc_logger/talker_bloc_logger_observer.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
@@ -16,6 +18,7 @@ import 'my_app.dart';
 
 Future<void> mainCommon(AppConfig config) async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
   await EasyLocalization.ensureInitialized();
   await Firebase.initializeApp();
   
@@ -38,6 +41,9 @@ Future<void> mainCommon(AppConfig config) async {
   // Get the cache instance and initialize it
   final cache = DI.find<ICacheManager>();
   await cache.init();
+  
+  // Initialize Chat Cache boxes
+  await DI.find<ChatLocalDataSource>().init();
   
   // Initialize Push Notifications
   await NotificationService.initialize();

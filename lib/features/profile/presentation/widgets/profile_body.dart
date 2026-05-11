@@ -1,3 +1,4 @@
+import 'package:pettix/features/profile/presentation/widgets/profile_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -22,16 +23,14 @@ class ProfileBody extends StatelessWidget {
       builder: (context, state) {
         if (state.status == ProfileStatus.loading ||
             state.status == ProfileStatus.initial) {
-          return const Center(child: CircularProgressIndicator());
+          return const ProfileShimmer();
         }
         if (state.status == ProfileStatus.error) {
           return Center(child: Text(state.errorMessage ?? AppText.error));
         }
         final profile = state.profile;
         if (profile == null) {
-          return Center(child: CircularProgressIndicator(
-            color: AppColors.current.primary,
-          ));
+          return const ProfileShimmer();
         }
         return _ProfileContent( profile: profile);
       },

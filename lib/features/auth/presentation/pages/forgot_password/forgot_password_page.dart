@@ -23,6 +23,7 @@ import 'package:pettix/features/auth/domain/usecases/verify_otp.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_event.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_state.dart';
+import 'package:pettix/core/services/signalr_service.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
   const ForgotPasswordPage({super.key});
@@ -46,6 +47,7 @@ class ForgotPasswordPage extends StatelessWidget {
           resendOtpUseCase: getIt<ResendOtpUseCase>(),
           forgotPasswordUseCase: getIt<ForgotPasswordUseCase>(),
           resetPasswordUseCase: getIt<ResetPasswordUseCase>(),
+          signalRService: getIt<SignalRService>(),
         ),
         child: Builder(
           builder: (context) {

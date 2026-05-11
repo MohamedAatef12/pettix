@@ -21,6 +21,11 @@ class TokenInterceptor extends Interceptor {
       options.headers['Authorization'] = 'Bearer $token';
     }
 
+    // Remove Content-Type for GET/DELETE if specified in extra
+    if (options.extra['remove_content_type'] == true) {
+      options.headers.remove('Content-Type');
+    }
+
     handler.next(options);
   }
 

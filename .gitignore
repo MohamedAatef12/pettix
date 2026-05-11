@@ -48,3 +48,13 @@ app.*.map.json
 android/key.properties
 *.jks
 *.keystore
+
+# AI
+.qwen/
+.claude/
+.gemini/
+.cursor/
+
+# Docs
+*.md
+*.txt
