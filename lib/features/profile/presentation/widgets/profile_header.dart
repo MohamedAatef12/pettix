@@ -1,3 +1,4 @@
+import 'package:pettix/core/widgets/app_profile_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -62,13 +63,11 @@ class ProfileHeader extends StatelessWidget {
                     width: 1.5.w,
                   ),
                 ),
-                child: CircleAvatar(
+                child: AppProfileImage(
+                  imageUrl: profile.avatar,
                   radius: 46.r,
+                  heroTag: 'user_avatar_${profile.id}',
                   backgroundColor: AppColors.current.lightGray,
-                  backgroundImage: profile.avatar != null
-                      ? NetworkImage(profile.avatar!)
-                      : const AssetImage('assets/images/no_user.png')
-                          as ImageProvider,
                 ),
               ),
             ),

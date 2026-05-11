@@ -7,9 +7,9 @@ import 'package:pettix/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:pettix/features/chat/presentation/bloc/chat_event.dart';
 import 'package:pettix/features/chat/presentation/bloc/chat_state.dart';
 
+import 'package:pettix/features/chat/presentation/view/widgets/updating_banner.dart';
 import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:pettix/features/chat/domain/entity/message_entity.dart';
+import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:pettix/core/shimmers/chat_body_shimmer.dart';
 
 class ChatConversation extends StatefulWidget {
@@ -51,22 +51,24 @@ class _ChatConversationState extends State<ChatConversation> {
   Widget build(BuildContext context) {
     return BlocBuilder<ChatBloc, ChatState>(
       builder: (context, state) {
-        if (state.status == ChatStatus.loading) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (state.status == ChatStatus.error) {
+
+        if (state.status == ChatStatus.loading && state.messages.isEmpty) {
+          return const Center(child: UpdatingBanner());
+        } else if (state.status == ChatStatus.error && state.messages.isEmpty) {
           return Center(child: Text(state.errorMessage, style: const TextStyle(color: Colors.red)));
         }
 
         final messages = state.messages;
-
         final isPaginating = state.status == ChatStatus.paginating;
 
-        return ListView.builder(
-          controller: _scrollController,
-          // slots: messages + optional spinner + profile card (always last = always top)
-          itemCount: messages.length + (isPaginating ? 1 : 0) + 1,
-          padding: EdgeInsets.only(bottom: 16.h),
-          reverse: true,
+        return Stack(
+          children: [
+            ListView.builder(
+              controller: _scrollController,
+              // slots: messages + optional spinner + profile card (always last = always top)
+              itemCount: messages.length + (isPaginating ? 1 : 0) + 1,
+              padding: EdgeInsets.only(bottom: 16.h),
+              reverse: true,
           itemBuilder: (context, index) {
             final totalSlots = messages.length + (isPaginating ? 1 : 0);
 
@@ -108,6 +110,16 @@ class _ChatConversationState extends State<ChatConversation> {
               imageUrl: msg.imageUrl,
             );
           },
+            ),
+            if (state.status == ChatStatus.loading)
+              Align(
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: EdgeInsets.only(top: 12.h),
+                  child: const UpdatingBanner(),
+                ),
+              ),
+          ],
         );
       },
     );
@@ -161,7 +173,11 @@ class ChatBubble extends StatelessWidget {
                     onTap: () => _openImagePreview(context, imageUrl!),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12.r),
-                      child: _buildImage(imageUrl!),
+                      child: AppCachedImage(
+                        imageUrl: imageUrl!,
+                        width: 200.w,
+                        height: 150.h,
+                      ),
                     ),
                   ),
                 if (text.isNotEmpty)
@@ -201,55 +217,7 @@ class ChatBubble extends StatelessWidget {
     );
   }
 
-  Widget _buildImage(String path) {
-    if (path.startsWith('http') || path.startsWith('https')) {
-      debugPrint('💬 ChatBubble loading image: $path');
-      return CachedNetworkImage(
-        imageUrl: path,
-        cacheKey: path,
-        httpHeaders: const {
-          'ngrok-skip-browser-warning': 'true',
-          'User-Agent': 'Mozilla/5.0',
-        },
-        width: 200.w,
-        height: 150.h,
-        fit: BoxFit.cover,
-        errorWidget: (_, __, error) {
-          debugPrint('❌ Chat image load error: $error');
-          return Container(
-            width: 200.w,
-            height: 150.h,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: const Center(
-              child: Icon(Icons.broken_image_outlined, size: 40, color: Colors.grey),
-            ),
-          );
-        },
-      );
-    } else {
-      // Local path for optimistic UI
-      return Image.file(
-        File(path),
-        width: 200.w,
-        height: 150.h,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => Container(
-          width: 200.w,
-          height: 150.h,
-          decoration: BoxDecoration(
-            color: Colors.grey[300],
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          child: const Center(
-            child: Icon(Icons.image_not_supported, size: 40, color: Colors.grey),
-          ),
-        ),
-      );
-    }
-  }
+
 
   void _openImagePreview(BuildContext context, String path) {
     showGeneralDialog(
@@ -284,7 +252,10 @@ class ChatBubble extends StatelessWidget {
                       child: InteractiveViewer(
                         minScale: 0.8,
                         maxScale: 4.0,
-                        child: _buildPreviewImage(path),
+                        child: AppCachedImage(
+                          imageUrl: path,
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
                   ),
@@ -312,37 +283,5 @@ class ChatBubble extends StatelessWidget {
     );
   }
 
-  Widget _buildPreviewImage(String path) {
-    if (path.startsWith('http') || path.startsWith('https')) {
-      return CachedNetworkImage(
-        imageUrl: path,
-        cacheKey: path,
-        httpHeaders: const {
-          'ngrok-skip-browser-warning': 'true',
-          'User-Agent': 'Mozilla/5.0',
-        },
-        fit: BoxFit.contain,
-        placeholder: (_, __) => const SizedBox(
-          width: 60,
-          height: 60,
-          child: Center(child: CircularProgressIndicator(color: Colors.white70)),
-        ),
-        errorWidget: (_, __, ___) => const Icon(
-          Icons.broken_image_outlined,
-          size: 80,
-          color: Colors.white54,
-        ),
-      );
-    } else {
-      return Image.file(
-        File(path),
-        fit: BoxFit.contain,
-        errorBuilder: (_, __, ___) => const Icon(
-          Icons.image_not_supported,
-          size: 80,
-          color: Colors.white54,
-        ),
-      );
-    }
-  }
+
 }

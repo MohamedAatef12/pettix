@@ -1,3 +1,4 @@
+import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -101,14 +102,12 @@ class _PetAvatar extends StatelessWidget {
         border: Border.all(color: Colors.white.withAlpha(100), width: 2),
       ),
       child: ClipOval(
-        child:
-            imageUrl != null && imageUrl!.isNotEmpty
-                ? Image.network(
-                  '${Constants.baseUrl}/$imageUrl',
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _PawPlaceholder(),
-                )
-                : _PawPlaceholder(),
+        child: AppCachedImage(
+          imageUrl: imageUrl ?? '',
+          fit: BoxFit.cover,
+          errorWidget: _PawPlaceholder(),
+          backgroundColor: Colors.transparent,
+        ),
       ),
     );
   }

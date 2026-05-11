@@ -1,3 +1,4 @@
+import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -46,13 +47,12 @@ class PetBrowseCard extends StatelessWidget {
                       borderRadius: BorderRadius.vertical(
                         top: Radius.circular(24.r),
                       ),
-                      child: fullUrl != null
-                          ? Image.network(
-                              fullUrl,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => _PhotoPlaceholder(),
-                            )
-                          : _PhotoPlaceholder(),
+                      child: AppCachedImage(
+                        imageUrl: fullUrl ?? '',
+                        fit: BoxFit.cover,
+                        heroTag: 'pet_image_${pet.id}',
+                        errorWidget: _PhotoPlaceholder(),
+                      ),
                     ),
                   ),
                   // Gender badge

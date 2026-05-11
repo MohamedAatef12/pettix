@@ -1,3 +1,4 @@
+import 'package:pettix/features/profile/presentation/widgets/profile_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -73,7 +74,7 @@ class EditProfileBody extends StatelessWidget {
         final bloc = context.read<ProfileBloc>();
         final profile = state.profile;
         if (profile == null) {
-          return const Center(child: CircularProgressIndicator());
+          return const ProfileShimmer();
         }
 
         final isUpdating = state.status == ProfileStatus.updating;

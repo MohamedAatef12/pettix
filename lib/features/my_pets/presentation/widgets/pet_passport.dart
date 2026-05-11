@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/text_styles.dart';
@@ -264,15 +265,11 @@ class _PassportFrontBody extends StatelessWidget {
             ],
           ),
           child: ClipOval(
-            child:
-                imageUrl != null && imageUrl.isNotEmpty
-                    ? Image.network(
-                      '${Constants.baseUrl}/$imageUrl',
-                      fit: BoxFit.cover,
-                      errorBuilder:
-                          (_, __, ___) => _PhotoPlaceholder(size: 120.w),
-                    )
-                    : _PhotoPlaceholder(size: 120.w),
+            child: AppCachedImage(
+              imageUrl: imageUrl ?? '',
+              fit: BoxFit.cover,
+              errorWidget: _PhotoPlaceholder(size: 120.w),
+            ),
           ),
         ),
         SizedBox(height: 16.h),
@@ -520,15 +517,11 @@ class _BackHeader extends StatelessWidget {
               border: Border.all(color: Colors.white.withAlpha(100), width: 2),
             ),
             child: ClipOval(
-              child:
-                  pet.imageUrls.firstOrNull != null
-                      ? Image.network(
-                        pet.imageUrls.first,
-                        fit: BoxFit.cover,
-                        errorBuilder:
-                            (_, __, ___) => _PhotoPlaceholder(size: 36.w),
-                      )
-                      : _PhotoPlaceholder(size: 36.w),
+              child: AppCachedImage(
+                imageUrl: pet.imageUrls.firstOrNull ?? '',
+                fit: BoxFit.cover,
+                errorWidget: _PhotoPlaceholder(size: 36.w),
+              ),
             ),
           ),
           SizedBox(width: 10.w),

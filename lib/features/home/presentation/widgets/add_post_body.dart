@@ -1,3 +1,5 @@
+import 'package:pettix/core/widgets/app_cached_image.dart';
+import 'package:pettix/core/widgets/app_profile_image.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,6 +17,7 @@ import 'package:pettix/data/network/constants.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 import 'package:pettix/features/home/presentation/blocs/home_state.dart';
+import 'package:pettix/features/auth/data/models/user_model.dart';
 
 class AddPostBody extends StatelessWidget {
   const AddPostBody({super.key});
@@ -176,7 +179,7 @@ class _Header extends StatelessWidget {
 // ─── User Info Component ─────────────────────────────────────────────────────
 
 class _UserHeader extends StatelessWidget {
-  final userData; // Using dynamic for brevity as per existing code context
+  final UserModel? userData;
 
   const _UserHeader({this.userData});
 
@@ -190,14 +193,9 @@ class _UserHeader extends StatelessWidget {
             shape: BoxShape.circle,
             border: Border.all(color: AppColors.current.primary, width: 1.5),
           ),
-          child: CircleAvatar(
+          child: AppProfileImage(
             radius: 22.r,
-            backgroundColor: AppColors.current.lightGray,
-            backgroundImage:
-                userData?.avatar != null
-                    ? NetworkImage("${Constants.baseUrl}/${userData!.avatar}")
-                    : const AssetImage('assets/images/no_user.png')
-                        as ImageProvider,
+            imageUrl: userData?.avatar ?? userData?.image,
           ),
         ),
         SizedBox(width: 12.w),
@@ -271,7 +269,10 @@ class _ImagePreviewGrid extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(16.r),
-              child: Image.file(images[index], fit: BoxFit.cover),
+              child: AppCachedImage(
+                imageUrl: images[index].path,
+                fit: BoxFit.cover,
+              ),
             ),
             Positioned(
               top: 8,

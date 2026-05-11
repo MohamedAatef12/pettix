@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_profile_image.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_event.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_state.dart';
@@ -15,12 +17,6 @@ class AvatarPicker extends StatelessWidget {
     return BlocBuilder<ProfileBloc, ProfileState>(
       buildWhen: (prev, curr) => prev.pickedAvatarBytes != curr.pickedAvatarBytes,
       builder: (context, state) {
-        final ImageProvider image = state.pickedAvatarBytes != null
-            ? MemoryImage(state.pickedAvatarBytes!)
-            : currentAvatarUrl != null
-                ? NetworkImage(currentAvatarUrl!) as ImageProvider
-                : const AssetImage('assets/images/no_user.png');
-
         return Center(
           child: GestureDetector(
             onTap: () => context.read<ProfileBloc>().add(PickAvatarEvent()),
@@ -48,10 +44,12 @@ class AvatarPicker extends StatelessWidget {
                         width: 1.5.w,
                       ),
                     ),
-                    child: CircleAvatar(
+                    child: AppProfileImage(
+                      imageUrl: state.pickedAvatarBytes != null
+                          ? 'data:image/png;base64,${base64Encode(state.pickedAvatarBytes!)}'
+                          : currentAvatarUrl,
                       radius: 46.r,
                       backgroundColor: AppColors.current.lightGray,
-                      backgroundImage: image,
                     ),
                   ),
                 ),

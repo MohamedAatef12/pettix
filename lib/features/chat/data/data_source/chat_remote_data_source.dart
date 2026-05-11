@@ -21,16 +21,10 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
 
   ChatRemoteDataSourceImpl(this._apiService);
 
-  Future<Map<String, dynamic>> _getHeaders() async {
-    final userToken = await DI.find<ICacheManager>().getToken();
-    return userToken != null ? {'Authorization': 'Bearer $userToken'} : {};
-  }
-
   @override
   Future<ResponseModel> getConversations() async {
     return await _apiService.get(
       endPoint: '/api/chat/conversations',
-      headers: await _getHeaders(),
     );
   }
 
@@ -38,7 +32,6 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   Future<ResponseModel> getConversationDetails(int id) async {
     return await _apiService.get(
       endPoint: '/api/chat/conversations/$id',
-      headers: await _getHeaders(),
     );
   }
 
@@ -47,7 +40,6 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     return await _apiService.post(
       endPoint: '/api/chat/conversations/private',
       data: body,
-      headers: await _getHeaders(),
     );
   }
 
@@ -56,7 +48,6 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     return await _apiService.get(
       endPoint: '/api/chat/messages/$conversationId',
       queryParameters: {'skip': skip, 'take': take},
-      headers: await _getHeaders(),
     );
   }
 
@@ -65,7 +56,6 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     return await _apiService.post(
       endPoint: '/api/chat/messages/$conversationId',
       formData: formData,
-      headers: await _getHeaders(),
     );
   }
 
@@ -73,8 +63,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   Future<ResponseModel> editMessage(int messageId, FormData formData) async {
     return await _apiService.put(
       endPoint: '/api/chat/messages/$messageId',
-      data: formData as dynamic, // ApiService.put usually doesn't have formData param, check it
-      headers: await _getHeaders(),
+      data: formData as dynamic,
     );
   }
 
@@ -82,7 +71,6 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   Future<ResponseModel> deleteMessage(int messageId) async {
     return await _apiService.delete(
       endPoint: '/api/chat/messages/$messageId',
-      headers: await _getHeaders(),
     );
   }
 }

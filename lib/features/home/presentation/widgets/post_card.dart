@@ -1,6 +1,7 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
+import 'package:pettix/core/widgets/app_cached_image.dart';
+import 'package:pettix/core/widgets/app_profile_image.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,7 @@ import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/shimmers/report_shimmer.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/rtl_aware_icon.dart';
-import 'package:pettix/data/network/constants.dart';
+
 import 'package:pettix/features/home/domain/entities/post_entity.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
@@ -49,15 +50,10 @@ class PostCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  CircleAvatar(
+                  AppProfileImage(
+                    imageUrl: post.author.avatar,
                     radius: 30,
-                    backgroundColor: AppColors.current.blueGray,
-                    backgroundImage:
-                        (post.author.avatar != null &&
-                                post.author.avatar!.isNotEmpty)
-                            ? NetworkImage(post.author.avatar!)
-                            : const AssetImage('assets/images/no_user.png')
-                                as ImageProvider,
+                    heroTag: 'user_avatar_${post.author.id}',
                   ),
                   SizedBox(width: 10.w),
                   Column(
@@ -382,9 +378,8 @@ class PostCard extends StatelessWidget {
                                   ),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(15.r),
-                                    child: _buildImage(
-                                      context,
-                                      image,
+                                    child: AppCachedImage(
+                                      imageUrl: image,
                                       height: 200.h,
                                     ),
                                   ),
@@ -408,11 +403,11 @@ class PostCard extends StatelessWidget {
                                     context,
                                     validImages[0],
                                   ),
-                              child: _buildImage(
-                                context,
-                                imagesToShow[0],
-                                height: 300.h,
-                              ),
+                                child: AppCachedImage(
+                                  imageUrl: imagesToShow[0],
+                                  height: 300.h,
+                                  heroTag: 'post_image_${post.id}_0',
+                                ),
                             ),
                           ),
                           SizedBox(height: 8.h),
@@ -459,10 +454,10 @@ class PostCard extends StatelessWidget {
                                                         BorderRadius.circular(
                                                           15.r,
                                                         ),
-                                                    child: _buildImage(
-                                                      context,
-                                                      image,
+                                                    child: AppCachedImage(
+                                                      imageUrl: image,
                                                       height: 100.h,
+                                                      heroTag: 'post_image_${post.id}_$actualIndex',
                                                     ),
                                                   ),
                                                   if (isLastWithMore)
@@ -648,70 +643,7 @@ String _formatCreationDate(String rawDate) {
   }
 }
 
-Widget _buildImage(BuildContext context, String image, {double? height}) {
-  debugPrint(
-    '🖼️ Building image: ${image.substring(0, image.length > 100 ? 100 : image.length)}...',
-  );
 
-  // Handle malformed data URLs from backend (e.g., "data:image/png;base64,Resources/PostsUploads/file.jpg")
-  if (image.startsWith('data:image') && image.contains('Resources/')) {
-    // Extract the file path and construct proper URL
-    final filePath = image.split(',').last;
-    final properUrl = '${Constants.baseUrl}/$filePath';
-    debugPrint('✅ Converted malformed URL to: $properUrl');
-    return CachedNetworkImage(
-      imageUrl:
-      properUrl,
-      height: height,
-      width: double.infinity,
-      fit: BoxFit.fill,
-      errorWidget: (context, error, stackTrace) {
-        debugPrint('❌ Image load error for $properUrl: $error');
-        return _errorImage(height);
-      },
-    );
-  } else if (image.startsWith('http')) {
-    return CachedNetworkImage(
-     imageUrl:  image,
-      height: height,
-      width: double.infinity,
-      fit: BoxFit.fill,
-      errorWidget: (_, __, ___) => _errorImage(height),
-    );
-  } else if (image.startsWith('data:image')) {
-    try {
-      final base64String = image.split(',').last;
-      final bytes = base64Decode(base64String);
-      return Image.memory(
-        bytes,
-        height: height,
-        width: double.infinity,
-        fit: BoxFit.fill,
-        errorBuilder: (_, __, ___) => _errorImage(height),
-      );
-    } catch (_) {
-      return _errorImage(height);
-    }
-  } else if (File(image).existsSync()) {
-    return Image.file(
-      File(image),
-      height: height,
-      width: double.infinity,
-      fit: BoxFit.fill,
-      errorBuilder: (_, __, ___) => _errorImage(height),
-    );
-  } else {
-    return _errorImage(height);
-  }
-}
-
-Widget _errorImage([double? height]) {
-  return Container(
-    color: AppColors.current.lightGray,
-    height: height ?? 200.h,
-    child: const Icon(Icons.broken_image),
-  );
-}
 
 void _openImagesPreview(BuildContext context, List<String> images) {
   final controller = PageController(initialPage: 0);
@@ -755,9 +687,8 @@ void _openImagesPreview(BuildContext context, List<String> images) {
                                     horizontal: 10.0,
                                   ),
                                   child: InteractiveViewer(
-                                    child: _buildImage(
-                                      context,
-                                      images[index],
+                                    child: AppCachedImage(
+                                      imageUrl: images[index],
                                       height: imageHeight,
                                     ),
                                   ),
@@ -843,9 +774,8 @@ void _openSingleImagePreview(BuildContext context, String image) {
         insetPadding: EdgeInsets.all(12.r),
         child: ClipRRect(
           child: InteractiveViewer(
-            child: _buildImage(
-              context,
-              image,
+            child: AppCachedImage(
+              imageUrl: image,
               height:
                   MediaQuery.of(context).size.height *
                   0.5, // نفس ارتفاع الصور الكاملة

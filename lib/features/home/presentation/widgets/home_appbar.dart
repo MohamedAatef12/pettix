@@ -17,6 +17,8 @@ import 'package:pettix/data/network/constants.dart';
 import 'package:pettix/features/notification/presentation/bloc/notification_bloc.dart';
 import 'package:pettix/features/notification/presentation/bloc/notification_state.dart';
 
+import 'package:pettix/core/widgets/app_profile_image.dart';
+
 class HomeAppBar extends StatelessWidget {
   const HomeAppBar({super.key});
 
@@ -29,30 +31,10 @@ class HomeAppBar extends StatelessWidget {
         children: [
           GestureDetector(
             onTap: () => Scaffold.of(context).openDrawer(),
-            child: CachedNetworkImage(
-              imageUrl: user?.avatar ?? '',
-              imageBuilder:
-                  (context, imageProvider) => ClipOval(
-                    child: _buildImage(
-                      context,
-                      user?.avatar ?? '',
-                      height: 54.r,
-                      width: 54.r,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-              placeholder:
-                  (context, url) => CircleAvatar(
-                    radius: 30.r,
-                    backgroundColor: AppColors.current.lightGray,
-                  ),
-              errorWidget:
-                  (context, url, error) => CircleAvatar(
-                    radius: 30.r,
-                    backgroundImage: const AssetImage(
-                      'assets/images/no_user.png',
-                    ),
-                  ),
+            child: AppProfileImage(
+              imageUrl: user?.avatar ?? user?.image,
+              radius: 27.r,
+              heroTag: 'user_avatar_${user?.id}',
             ),
           ),
           SizedBox(width: 10.w),
@@ -60,19 +42,7 @@ class HomeAppBar extends StatelessWidget {
             width: 120.w,
             child: Text(user!.userName, style: AppTextStyles.bold),
           ),
-
-          Spacer(),
-          GestureDetector(
-            onTap: () {
-              context.push('/home_search');
-            },
-            child: CircleAvatar(
-              radius: 20.r,
-              backgroundColor: AppColors.current.white,
-              child: Icon(Iconsax.search_normal_1, size: 20.r, color: AppColors.current.text),
-            ),
-          ),
-          SizedBox(width: 10.w),
+          const Spacer(),
           GestureDetector(
             onTap: () {
               context.push('/notifications');
@@ -85,7 +55,8 @@ class HomeAppBar extends StatelessWidget {
                     CircleAvatar(
                       radius: 20.r,
                       backgroundColor: AppColors.current.white,
-                      child: Icon(Iconsax.notification_bing, size: 20.r, color: AppColors.current.text),
+                      child: Icon(Iconsax.notification_bing,
+                          size: 20.r, color: AppColors.current.text),
                     ),
                     if (state.totalUnreadCount > 0)
                       Positioned(
@@ -98,17 +69,8 @@ class HomeAppBar extends StatelessWidget {
                             shape: BoxShape.circle,
                           ),
                           constraints: BoxConstraints(
-                            minWidth: 16.w,
-                            minHeight: 16.w,
-                          ),
-                          child: Text(
-                            state.totalUnreadCount.toString(),
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
+                            minWidth:10.w,
+                            minHeight: 10.h,
                           ),
                         ),
                       ),
@@ -121,137 +83,4 @@ class HomeAppBar extends StatelessWidget {
       ),
     );
   }
-}
-Widget _buildImage(
-    BuildContext context,
-    String image, {
-      double? height,
-      double? width,
-      BoxFit fit = BoxFit.fill,
-    }) {
-  debugPrint(
-    '🖼️ Building image: ${image.substring(0, image.length > 100 ? 100 : image.length)}...',
-  );
-
-  if (image.isEmpty) return _errorImage(image, height, width);
-
-  if (image.startsWith('data:image') && image.contains('Resources/')) {
-    final filePath = image.split(',').last;
-    final properUrl = '${Constants.baseUrl}/$filePath';
-    debugPrint('✅ Converted malformed URL to: $properUrl');
-    return CachedNetworkImage(
-      imageUrl: properUrl,
-      height: height,
-      width: width ?? double.infinity,
-      fit: fit,
-      placeholder:
-          (context, url) => Container(
-        height: height,
-        width: width ?? double.infinity,
-        color: AppColors.current.lightGray,
-      ),
-      errorWidget: (context, url, error) {
-        debugPrint('❌ Image load error for $properUrl: $error');
-        return _errorImage(image, height, width);
-      },
-    );
-  } else if (image.startsWith('http')) {
-    String finalUrl = image.trim();
-    if (finalUrl.contains('ui-avatars.com')) {
-      if (!finalUrl.contains('format=')) {
-        finalUrl += finalUrl.contains('?') ? '&format=png' : '?format=png';
-      }
-
-      finalUrl = Uri.encodeFull(finalUrl).replaceAll('%20', '+');
-    }
-
-    debugPrint('🌐 Final network URL: $finalUrl');
-
-    return CachedNetworkImage(
-      imageUrl: finalUrl,
-      height: height,
-      width: width ?? double.infinity,
-      fit: fit,
-      placeholder:
-          (context, url) => Container(
-        height: height,
-        width: width ?? double.infinity,
-        color: AppColors.current.lightGray,
-        child: const Center(child: CircularProgressIndicator()),
-      ),
-      errorWidget: (context, url, error) {
-        debugPrint('❌ Image load error for $finalUrl: $error');
-        return _errorImage(image, height, width);
-      },
-    );
-  } else if (image.startsWith('data:image')) {
-    try {
-      final base64String = image.split(',').last;
-      final bytes = base64Decode(base64String);
-      return Image.memory(
-        bytes,
-        height: height,
-        width: width ?? double.infinity,
-        fit: fit,
-        errorBuilder: (_, __, ___) => _errorImage(image, height, width),
-      );
-    } catch (_) {
-      return _errorImage(image, height, width);
-    }
-  } else if (File(image).existsSync()) {
-    return Image.file(
-      File(image),
-      height: height,
-      width: width ?? double.infinity,
-      fit: fit,
-      errorBuilder: (_, __, ___) => _errorImage(image, height, width),
-    );
-  } else if (image.isNotEmpty) {
-    final prefixedUrl =
-    image.startsWith('/')
-        ? '${Constants.baseUrl}$image'
-        : '${Constants.baseUrl}/$image';
-    debugPrint('🔗 Attempting to load prefixed URL: $prefixedUrl');
-    return CachedNetworkImage(
-      imageUrl: prefixedUrl,
-      height: height,
-      width: width ?? double.infinity,
-      fit: fit,
-      placeholder:
-          (context, url) => Container(
-        height: height,
-        width: width ?? double.infinity,
-        color: AppColors.current.lightGray,
-      ),
-      errorWidget: (context, url, error) {
-        debugPrint('❌ Image load error for $prefixedUrl: $error');
-        return _errorImage(image, height, width);
-      },
-    );
-  } else {
-    return _errorImage(image, height, width);
-  }
-}
-
-Widget _errorImage(String image, [double? height, double? width]) {
-  final isUser =
-      image.toLowerCase().contains('user') ||
-          image.toLowerCase().contains('avatar') ||
-          image.isEmpty;
-
-  if (isUser) {
-    return Image.asset(
-      'assets/images/no_user.png',
-      height: height,
-      width: width ?? double.infinity,
-      fit: BoxFit.cover,
-    );
-  }
-
-  return Container(
-    color: AppColors.current.lightGray,
-    height: height ?? 200.h,
-    width: width ?? double.infinity,
-    child: const Icon(Icons.broken_image),
-  );
 }

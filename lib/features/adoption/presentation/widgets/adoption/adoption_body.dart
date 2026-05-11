@@ -1,3 +1,4 @@
+import 'package:pettix/core/widgets/app_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -503,14 +504,53 @@ class _SkeletonGrid extends StatelessWidget {
           childAspectRatio: 0.72,
         ),
         delegate: SliverChildBuilderDelegate(
-          (_, __) => Container(
-            decoration: BoxDecoration(
-              color: AppColors.current.lightGray,
-              borderRadius: BorderRadius.circular(20.r),
-            ),
-          ),
+          (_, __) => const _SkeletonCard(),
           childCount: 6,
         ),
+      ),
+    );
+  }
+}
+
+class _SkeletonCard extends StatelessWidget {
+  const _SkeletonCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.current.white,
+        borderRadius: BorderRadius.circular(24.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Photo placeholder
+          Expanded(
+            flex: 5,
+            child: AppShimmer(
+              width: double.infinity,
+              height: double.infinity,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+            ),
+          ),
+          // Info placeholder
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AppShimmer(width: 80.w, height: 14.h),
+                  SizedBox(height: 6.h),
+                  AppShimmer(width: 120.w, height: 12.h),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/padding.dart';
@@ -32,18 +33,16 @@ class ProfileCard extends StatelessWidget {
             Expanded(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8.r),
-                child: avatarUrl != null && avatarUrl!.isNotEmpty
-                    ? Image.network(
-                        avatarUrl!,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: 120.h,
-                      )
-                    : Image.asset(
-                        'assets/images/dog.png',
-                        fit: BoxFit.fill,
-                        width: double.infinity,
-                      ),
+                child: AppCachedImage(
+                  imageUrl: avatarUrl ?? '',
+                  height: 120.h,
+                  width: double.infinity,
+                  errorWidget: Image.asset(
+                    'assets/images/dog.png',
+                    fit: BoxFit.fill,
+                    width: double.infinity,
+                  ),
+                ),
               ),
             ),
             SizedBox(height: 10.h),

@@ -57,10 +57,6 @@ class AdoptionHistoryRemoteDataSourceImpl
       final response = await _apiService.patch(
         endPoint: '${Constants.adoptionFormsEndpoint}/$id/status',
         data: {'status': status},
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${DI.find<ICacheManager>().getToken()}',
-        },
       );
       if (response.success == true) return const Right(null);
       return Left(Failure(response.message));
