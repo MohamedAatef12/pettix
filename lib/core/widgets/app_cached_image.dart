@@ -137,10 +137,38 @@ class AppCachedImage extends StatelessWidget {
 
   Widget _buildErrorWidget() {
     return Container(
-      color: backgroundColor ?? AppColors.current.lightGray,
+      color: backgroundColor ?? AppColors.current.lightBlue,
       height: height,
       width: width,
-      child: errorWidget ?? const Center(child: Icon(Icons.broken_image)),
+      alignment: Alignment.center,
+      child: errorWidget ?? LayoutBuilder(
+        builder: (context, constraints) {
+          final isSmall = constraints.maxHeight < 80 || constraints.maxWidth < 80;
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.image_not_supported_outlined,
+                color: AppColors.current.midGray.withOpacity(0.5),
+                size: isSmall ? 20.r : 32.r,
+              ),
+              if (!isSmall) ...[
+                SizedBox(height: 8.h),
+                Text(
+                  'Image unavailable',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.current.midGray,
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ],
+          );
+        },
+      ),
     );
   }
 }
