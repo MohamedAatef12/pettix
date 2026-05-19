@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
+import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/auth/presentation/widgets/register/register_form.dart';
 
 class RegisterBody extends StatelessWidget {
@@ -16,9 +17,24 @@ class RegisterBody extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.asset('assets/images/horizontal_logo.png',
-              height: 25.h,width: 100.w,
-              fit: BoxFit.fill,
+            Row(
+              children: [
+                Image.asset(
+                  'assets/images/logo1.png',
+                  height: 30.h,
+                  width: 30.w,
+                  fit: BoxFit.contain,
+                ),
+                SizedBox(width: 8.w),
+                Text(
+                  'Pettix',
+                  style: TextStyle(
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.current.primary,
+                  ),
+                ),
+              ],
             ),
             SizedBox(height: 20.h,),
             Text(AppText.signUp,

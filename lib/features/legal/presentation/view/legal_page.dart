@@ -71,7 +71,26 @@ class LegalPage extends StatelessWidget {
                   Center(
                     child: Column(
                       children: [
-                        Image.asset('assets/images/horizontal_logo.png', height: 22.h),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset(
+                              'assets/images/logo1.png',
+                              height: 25.h,
+                              width: 25.w,
+                              fit: BoxFit.contain,
+                            ),
+                            SizedBox(width: 8.w),
+                            Text(
+                              'Pettix',
+                              style: TextStyle(
+                                fontSize: 24.sp,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.current.primary,
+                              ),
+                            ),
+                          ],
+                        ),
                         SizedBox(height: 8.h),
                         Text(
                           'Version 1.0.0',

@@ -93,6 +93,7 @@ dev_dependencies:
   change_app_package_name: ^1.5.0
   flutter_launcher_icons: ^0.14.3
   flutter_flavorizr: ^2.4.1
+  unused_assets_removal: ^0.0.6
 
 
 
@@ -107,12 +108,12 @@ flavorizr:
         name: "Pettix Dev"
       android:
         applicationId: "com.pettix.up"
-        icon: "assets/images/logo.png"
+        icon: "assets/images/logo1.png"
         firebase:
           config: "config/development/android/google-services.json"
       ios:
         bundleId: "com.pettix.up"
-        icon: "assets/images/logo.png"
+        icon: "assets/images/logo1.png"
         # firebase:
         #   config: "config/development/ios/GoogleService-Info.plist"
     production:
@@ -120,12 +121,12 @@ flavorizr:
         name: "Pettix"
       android:
         applicationId: "com.pettix.up"
-        icon: "assets/images/logo.png"
+        icon: "assets/images/logo1.png"
         firebase:
           config: "config/production/android/google-services.json"
       ios:
         bundleId: "com.pettix.up"
-        icon: "assets/images/logo.png"
+        icon: "assets/images/logo1.png"
         # firebase:
         #   config: "config/production/ios/GoogleService-Info.plist"
 
@@ -140,4 +141,4 @@ flutter:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/images/logo.png"
+  image_path: "assets/images/logo1.png"

@@ -30,7 +30,26 @@ class AboutPettixPage extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        Image.asset('assets/images/horizontal_logo.png', height: 36.h),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset(
+                              'assets/images/logo1.png',
+                              height: 36.h,
+                              width: 36.w,
+                              fit: BoxFit.contain,
+                            ),
+                            SizedBox(width: 8.w),
+                            Text(
+                              'Pettix',
+                              style: TextStyle(
+                                fontSize: 24.sp,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.current.primary,
+                              ),
+                            ),
+                          ],
+                        ),
                         SizedBox(height: 12.h),
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 5.h),
