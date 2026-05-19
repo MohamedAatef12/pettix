@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_request_entity.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_bloc.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_event.dart';
@@ -44,27 +45,11 @@ class AddPetForm extends StatelessWidget {
       listenWhen: (prev, curr) => prev.status != curr.status,
       listener: (context, state) {
         if (state.status == MyPetsStatus.success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Pet added successfully!'),
-              backgroundColor: AppColors.current.green,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.r)),
-            ),
-          );
+          AuthToast.showSuccess(context, 'Pet added successfully!');
           context.pop();
         }
         if (state.status == MyPetsStatus.error) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage ?? 'Something went wrong'),
-              backgroundColor: AppColors.current.red,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.r)),
-            ),
-          );
+          AuthToast.showError(context, state.errorMessage ?? 'Something went wrong');
         }
       },
       builder: (context, state) {

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../../config/di/di.dart';
 import '../../../../core/themes/app_colors.dart';
+import '../../../../core/utils/auth_toast.dart';
 import '../../../../core/utils/custom_text_form_field.dart';
 import '../../domain/entities/adoption_options_entity.dart';
 import '../bloc/adoption_bloc.dart';
@@ -83,21 +84,15 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
     if (_formKey.currentState!.validate()) {
       if (_selectedLivingSituationId == null ||
           _selectedResidenceTypeId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select all options')),
-        );
+        AuthToast.showError(context, 'Please select all options');
         return;
       }
       if (!_hasReadAndUnderstood || !_agreesToTerms) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Please agree to terms')));
+        AuthToast.showError(context, 'Please agree to terms');
         return;
       }
       if (_selectedDate == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select Date of Birth')),
-        );
+        AuthToast.showError(context, 'Please select Date of Birth');
         return;
       }
 
@@ -131,24 +126,12 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
       body: BlocConsumer<AdoptionBloc, AdoptionState>(
         listener: (context, state) {
           if (state.status == AdoptionStatus.success) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Application Submitted Successfully!'),
-              ),
-            );
+            AuthToast.showSuccess(context, 'Application Submitted Successfully!');
             context.pop();
           } else if (state.status == AdoptionStatus.submitError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.errorMessage ?? 'Submission Failed'),
-              ),
-            );
+            AuthToast.showError(context, state.errorMessage ?? 'Submission Failed');
           } else if (state.status == AdoptionStatus.error) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.errorMessage ?? 'Error Loading Options'),
-              ),
-            );
+            AuthToast.showError(context, state.errorMessage ?? 'Error Loading Options');
           }
         },
         builder: (context, state) {

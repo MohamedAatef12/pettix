@@ -14,6 +14,7 @@ import 'package:pettix/features/home/presentation/blocs/home_state.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/features/home/presentation/widgets/comments_body.dart';
 import 'package:pettix/features/home/presentation/widgets/post_card.dart';
+import 'package:pettix/core/utils/auth_toast.dart';
 
 class CommentsPage extends StatefulWidget {
   final PostEntity post;
@@ -217,9 +218,7 @@ class _CommentsPageState extends State<CommentsPage> {
 
     final userResult = await bloc.getUserDataUseCase.call();
     userResult.fold(
-      (failure) => ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(failure.message))),
+      (failure) => AuthToast.showError(context, failure.message),
       (userData) {
         // When replying to someone, the parentCommentId is already handled by the entity.
         // We don't prepend the mention as it's handled by the UI display.

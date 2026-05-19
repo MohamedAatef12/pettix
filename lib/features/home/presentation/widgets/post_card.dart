@@ -14,6 +14,7 @@ import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/shimmers/report_shimmer.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/rtl_aware_icon.dart';
+import 'package:pettix/core/utils/auth_toast.dart';
 
 import 'package:pettix/features/home/domain/entities/post_entity.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
@@ -243,16 +244,9 @@ class PostCard extends StatelessWidget {
                                                                           Navigator.pop(
                                                                             context,
                                                                           ); // close sheet
-                                                                          ScaffoldMessenger.of(
+                                                                          AuthToast.showSuccess(
                                                                             context,
-                                                                          ).showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Text(
-                                                                                'Report sent successfully',
-                                                                              ),
-                                                                              backgroundColor:
-                                                                                  Colors.green,
-                                                                            ),
+                                                                            'Report sent successfully',
                                                                           );
                                                                         }
                                                                       },
@@ -284,18 +278,9 @@ class PostCard extends StatelessWidget {
                                                             Navigator.pop(
                                                               context,
                                                             );
-                                                            ScaffoldMessenger.of(
+                                                            AuthToast.showSuccess(
                                                               context,
-                                                            ).showSnackBar(
-                                                              SnackBar(
-                                                                content: Text(
-                                                                  'Report sent successfully'
-                                                                      .tr(),
-                                                                ),
-                                                                backgroundColor:
-                                                                    Colors
-                                                                        .green,
-                                                              ),
+                                                              'Report sent successfully'.tr(),
                                                             );
                                                           }
                                                         },

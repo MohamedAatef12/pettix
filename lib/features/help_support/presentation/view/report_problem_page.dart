@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 
 class ReportProblemPage extends StatefulWidget {
@@ -42,24 +43,14 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
 
   void _submit() async {
     if (_titleController.text.trim().isEmpty || _descController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: const Text('Please fill in the title and description.'),
-        backgroundColor: AppColors.current.red,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-      ));
+      AuthToast.showError(context, 'Please fill in the title and description.');
       return;
     }
     setState(() => _submitting = true);
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
     setState(() => _submitting = false);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: const Text('Report submitted! Thank you for helping us improve.'),
-      backgroundColor: AppColors.current.green,
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-    ));
+    AuthToast.showSuccess(context, 'Report submitted! Thank you for helping us improve.');
     context.pop();
   }
 
