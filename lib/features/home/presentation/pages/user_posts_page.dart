@@ -32,13 +32,9 @@ class UserPostsPage extends StatelessWidget {
       body: SafeArea(
         bottom: false,
         child: BlocProvider(
-          create: (context) => HomeBloc.fromDI()
-            ..add(GetUserPostsEvent()),
+          create: (context) => HomeBloc.fromDI()..add(GetUserPostsEvent()),
           child: Column(
-            children: [
-              SizedBox(height: 10.h),
-              Expanded(child: HomeBody()),
-            ],
+            children: [SizedBox(height: 10.h), Expanded(child: HomeBody())],
           ),
         ),
       ),

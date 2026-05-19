@@ -40,6 +40,7 @@ class AppRoutes {
 
   // ── Profile ───────────────────────────────────────────────────────────────
   static const String profile = '/profile';
+  static const String userProfile = '/user_profile';
   static const String editProfile = '/edit_profile';
   static const String settings = '/settings';
 
@@ -107,6 +108,7 @@ class AppRouteNames {
 
   // ── Profile ───────────────────────────────────────────────────────────────
   static const String profile = 'profile';
+  static const String userProfile = 'user_profile';
   static const String editProfile = 'edit_profile';
   static const String settings = 'settings';
 

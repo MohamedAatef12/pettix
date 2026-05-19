@@ -13,6 +13,7 @@ import '../../features/profile/presentation/bloc/profile_bloc.dart';
 import '../../features/profile/presentation/bloc/profile_event.dart';
 import '../../features/profile/presentation/view/edit_profile_screen.dart';
 import '../../features/profile/presentation/view/profile_screen.dart';
+import '../../features/profile/presentation/view/user_profile_screen.dart';
 import '../../features/profile/presentation/view/settings_screen.dart';
 import '../../features/help_support/presentation/view/help_support_page.dart';
 import '../../features/help_support/presentation/view/faq_page.dart';
@@ -365,6 +366,17 @@ final List<RouteBase> _profileRoutes = [
         child: const ProfileScreen(),
       ),
     ),
+  ),
+  GoRoute(
+    path: AppRoutes.userProfile,
+    name: AppRouteNames.userProfile,
+    pageBuilder: (context, state) {
+      final contactId = state.extra as int? ?? 0;
+      return _customTransition(
+        state: state,
+        child: UserProfileScreen(contactId: contactId),
+      );
+    },
   ),
   GoRoute(
     path: AppRoutes.editProfile,

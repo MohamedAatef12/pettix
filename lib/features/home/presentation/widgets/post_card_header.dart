@@ -357,9 +357,9 @@ class PostCardHeader extends StatelessWidget {
                   ),
                 );
               },
-          );
-        },
-        child: Container(
+            );
+          },
+          child: Container(
           width: 36.w,
           height: 36.w,
           decoration: BoxDecoration(

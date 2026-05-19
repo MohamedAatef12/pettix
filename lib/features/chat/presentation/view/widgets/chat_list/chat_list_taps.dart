@@ -12,6 +12,7 @@ import 'package:pettix/features/chat/domain/entity/conversation_entity.dart';
 import 'package:pettix/core/shimmers/chat_list_shimmer.dart';
 
 import 'package:pettix/features/chat/presentation/view/widgets/updating_banner.dart';
+import 'package:pettix/core/widgets/app_profile_image.dart';
 
 class ChatListTaps extends StatelessWidget {
   const ChatListTaps({super.key});
@@ -149,13 +150,9 @@ class _ConversationCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  child: CircleAvatar(
+                  child: AppProfileImage(
+                    imageUrl: displayMember?.avatar,
                     radius: 30.r,
-                    backgroundColor: AppColors.current.lightGray,
-                    backgroundImage: displayMember?.avatar != null &&
-                            displayMember!.avatar.isNotEmpty
-                        ? NetworkImage(displayMember.avatar) as ImageProvider
-                        : const AssetImage('assets/images/profile_photo.png'),
                   ),
                 ),
               ),

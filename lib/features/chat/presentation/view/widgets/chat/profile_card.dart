@@ -1,27 +1,33 @@
 import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_button.dart';
+import 'package:pettix/core/widgets/app_profile_image.dart';
 
 class ProfileCard extends StatelessWidget {
   final int index;
   final String? name;
   final String? avatarUrl;
-  const ProfileCard({super.key, required this.index, this.name, this.avatarUrl});
+  const ProfileCard({
+    super.key,
+    required this.index,
+    this.name,
+    this.avatarUrl,
+  });
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 255.h,
+      height: 300.h,
       width: 195.w,
       decoration: BoxDecoration(
-        color:AppColors.current.white,
+        color: AppColors.current.white,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: AppColors.current.lightGray,
-        )
+        border: Border.all(color: AppColors.current.lightGray),
       ),
       child: Padding(
         padding: PaddingConstants.medium,
@@ -31,18 +37,10 @@ class ProfileCard extends StatelessWidget {
           children: [
             // User avatar or default dog image
             Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8.r),
-                child: AppCachedImage(
-                  imageUrl: avatarUrl ?? '',
-                  height: 120.h,
-                  width: double.infinity,
-                  errorWidget: Image.asset(
-                    'assets/images/dog.png',
-                    fit: BoxFit.fill,
-                    width: double.infinity,
-                  ),
-                ),
+              child: AppProfileImage(
+                imageUrl: avatarUrl,
+                radius: 100.r,
+                fit: BoxFit.fill,
               ),
             ),
             SizedBox(height: 10.h),
@@ -56,10 +54,15 @@ class ProfileCard extends StatelessWidget {
               'Subbran animal league Energtic and loves walks',
               style: AppTextStyles.smallDescription,
             ),
-            SizedBox(height: 12.h,),
-            CustomFilledButton(text: 'View Profile', onPressed: (){},
-            backgroundColor: AppColors.current.primary,
-            )
+            SizedBox(height: 12.h),
+            CustomFilledButton(
+              text: 'View Profile',
+              onPressed: () => context.push(
+                AppRoutes.userProfile,
+                extra: index,
+              ),
+              backgroundColor: AppColors.current.primary,
+            ),
           ],
         ),
       ),

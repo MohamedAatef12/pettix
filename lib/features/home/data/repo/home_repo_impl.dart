@@ -42,10 +42,14 @@ class HomeRepositoryImpl implements HomeDomainRepository {
   /// Posts
 
   @override
-  Future<Either<Failure, PaginatedPosts>> getPosts(
-      {int pageIndex = 1, int pageSize = 10}) async {
-    final result =
-        await remoteDataSource.getPosts(pageIndex: pageIndex, pageSize: pageSize);
+  Future<Either<Failure, PaginatedPosts>> getPosts({
+    int pageIndex = 1,
+    int pageSize = 10,
+  }) async {
+    final result = await remoteDataSource.getPosts(
+      pageIndex: pageIndex,
+      pageSize: pageSize,
+    );
 
     return result.fold(
       (failure) => Left(failure),
@@ -96,13 +100,12 @@ class HomeRepositoryImpl implements HomeDomainRepository {
   @override
   Future<Either<Failure, void>> deletePost(int id) async {
     final result = await remoteDataSource.deletePost(id);
-    return result.fold(
-      (failure) => Left(failure),
-      (success) {
-        _postUpdateController.add(PostSyncUpdate(postId: id, type: PostSyncUpdateType.deletePost));
-        return const Right(null);
-      },
-    );
+    return result.fold((failure) => Left(failure), (success) {
+      _postUpdateController.add(
+        PostSyncUpdate(postId: id, type: PostSyncUpdateType.deletePost),
+      );
+      return const Right(null);
+    });
   }
 
   @override
@@ -115,20 +118,13 @@ class HomeRepositoryImpl implements HomeDomainRepository {
 
   @override
   Future<Either<Failure, List<CommentEntity>>> getPostComments(
-      int postId,) async {
+    int postId,
+  ) async {
     final result = await remoteDataSource.getPostComments(postId);
 
     return result.fold(
-          (failure) => Left(failure),
-          (models) =>
-          Right(
-            models
-                .map(
-                  (model) =>
-                  model.toEntity(),
-            )
-                .toList(),
-          ),
+      (failure) => Left(failure),
+      (models) => Right(models.map((model) => model.toEntity()).toList()),
     );
   }
 
@@ -146,17 +142,16 @@ class HomeRepositoryImpl implements HomeDomainRepository {
       parentCommentId,
     );
 
-    return result.fold(
-      (failure) => Left(failure),
-      (success) {
-        _postUpdateController.add(PostSyncUpdate(postId: postId, type: PostSyncUpdateType.addComment));
-        if (creatorId != null) {
-          final currentUser = homeLocalDataSource.getUserData();
-          final isReply = parentCommentId != null;
-        }
-        return const Right(null);
-      },
-    );
+    return result.fold((failure) => Left(failure), (success) {
+      _postUpdateController.add(
+        PostSyncUpdate(postId: postId, type: PostSyncUpdateType.addComment),
+      );
+      if (creatorId != null) {
+        final currentUser = homeLocalDataSource.getUserData();
+        final isReply = parentCommentId != null;
+      }
+      return const Right(null);
+    });
   }
 
   @override
@@ -177,16 +172,8 @@ class HomeRepositoryImpl implements HomeDomainRepository {
     final result = await remoteDataSource.getPostLikes(postId);
 
     return result.fold(
-          (failure) => Left(failure),
-          (likes) =>
-          Right(
-            likes
-                .map(
-                  (like) =>
-                  like.toEntity(),
-            )
-                .toList(),
-          ),
+      (failure) => Left(failure),
+      (likes) => Right(likes.map((like) => like.toEntity()).toList()),
     );
   }
 
@@ -198,48 +185,46 @@ class HomeRepositoryImpl implements HomeDomainRepository {
   }) async {
     final result = await remoteDataSource.likePost(postId, userId);
 
-    return result.fold(
-      (failure) => Left(failure),
-      (success) {
-        _postUpdateController.add(PostSyncUpdate(postId: postId, type: PostSyncUpdateType.like));
-        if (creatorId != null) {
-          final currentUser = homeLocalDataSource.getUserData();
-        }
-        
-        return Right(
-          LikesModel(
-            id: 0,
-            author: AuthorModel(
-              id: userId,
-              nameAr: '',
-              nameEn: '',
-              avatar: '',
-              email: null,
-              phone: null,
-              genderId: null,
-              genderName: null,
-              contactTypeId: 4,
-              statusId: 1,
-              age: null,
-            ),
-            postId: 0,
-            creationDate: DateTime.now().toIso8601String(),
+    return result.fold((failure) => Left(failure), (success) {
+      _postUpdateController.add(
+        PostSyncUpdate(postId: postId, type: PostSyncUpdateType.like),
+      );
+      if (creatorId != null) {
+        final currentUser = homeLocalDataSource.getUserData();
+      }
+
+      return Right(
+        LikesModel(
+          id: 0,
+          author: AuthorModel(
+            id: userId,
+            nameAr: '',
+            nameEn: '',
+            avatar: '',
+            email: null,
+            phone: null,
+            genderId: null,
+            genderName: null,
+            contactTypeId: 4,
+            statusId: 1,
+            age: null,
           ),
-        );
-      },
-    );
+          postId: 0,
+          creationDate: DateTime.now().toIso8601String(),
+        ),
+      );
+    });
   }
 
   @override
   Future<Either<Failure, void>> unlikePost(int postId) async {
     final result = await remoteDataSource.unlikePost(postId);
-    return result.fold(
-      (failure) => Left(failure),
-      (success) {
-        _postUpdateController.add(PostSyncUpdate(postId: postId, type: PostSyncUpdateType.unlike));
-        return const Right(null);
-      },
-    );
+    return result.fold((failure) => Left(failure), (success) {
+      _postUpdateController.add(
+        PostSyncUpdate(postId: postId, type: PostSyncUpdateType.unlike),
+      );
+      return const Right(null);
+    });
   }
 
   @override
@@ -256,8 +241,8 @@ class HomeRepositoryImpl implements HomeDomainRepository {
     try {
       final result = await remoteDataSource.getPostCommentsCount(postId);
       return result.fold(
-            (failure) => Left(failure),
-            (success) => Right(success),
+        (failure) => Left(failure),
+        (success) => Right(success),
       );
     } catch (e) {
       return Left(DioFailure.fromDioError(e));
@@ -266,19 +251,12 @@ class HomeRepositoryImpl implements HomeDomainRepository {
 
   @override
   Future<Either<Failure, List<CommentLikeEntity>>> getCommentLikesCount(
-      int postId,) async {
+    int postId,
+  ) async {
     final result = await remoteDataSource.getCommentsLikesCount(postId);
     return result.fold(
-          (failure) => Left(failure),
-          (models) =>
-          Right(
-            models
-                .map(
-                  (model) =>
-                  model.toEntity(),
-            )
-                .toList(),
-          ),
+      (failure) => Left(failure),
+      (models) => Right(models.map((model) => model.toEntity()).toList()),
     );
   }
 
@@ -288,35 +266,32 @@ class HomeRepositoryImpl implements HomeDomainRepository {
     int? creatorId,
   }) async {
     final result = await remoteDataSource.likeComment(commentId);
-    return result.fold(
-      (failure) => Left(failure),
-      (success) {
-        if (creatorId != null) {
-          final currentUser = homeLocalDataSource.getUserData();
-        }
-        
-        return Right(
-          CommentsLikeModel(
+    return result.fold((failure) => Left(failure), (success) {
+      if (creatorId != null) {
+        final currentUser = homeLocalDataSource.getUserData();
+      }
+
+      return Right(
+        CommentsLikeModel(
+          id: 0,
+          commentId: 0,
+          author: AuthorModel(
             id: 0,
-            commentId: 0,
-            author: AuthorModel(
-              id: 0,
-              nameAr: '',
-              nameEn: '',
-              avatar: '',
-              email: null,
-              phone: null,
-              genderId: null,
-              genderName: null,
-              contactTypeId: 4,
-              statusId: 1,
-              age: null,
-            ),
-            creationDate: DateTime.now().toIso8601String(),
+            nameAr: '',
+            nameEn: '',
+            avatar: '',
+            email: null,
+            phone: null,
+            genderId: null,
+            genderName: null,
+            contactTypeId: 4,
+            statusId: 1,
+            age: null,
           ),
-        );
-      },
-    );
+          creationDate: DateTime.now().toIso8601String(),
+        ),
+      );
+    });
   }
 
   @override
@@ -326,9 +301,11 @@ class HomeRepositoryImpl implements HomeDomainRepository {
   }
 
   @override
-  Future<Either<Failure, void>> reportPost(int postId,
-      int reasonId,
-      String reason,) async {
+  Future<Either<Failure, void>> reportPost(
+    int postId,
+    int reasonId,
+    String reason,
+  ) async {
     final result = await remoteDataSource.reportPost(postId, reasonId, reason);
     return result.fold((failure) => Left(failure), (success) => Right(null));
   }
@@ -337,27 +314,23 @@ class HomeRepositoryImpl implements HomeDomainRepository {
   Future<Either<Failure, List<ReportReasonEntity>>> getReportReasons() async {
     try {
       final result = await remoteDataSource.getReportReasons();
-      return result.fold(
-            (failure) => Left(failure),
-            (success) {
-          try {
-            final reasons = success
-                .map((reason) {
-              if (reason is Map<String, dynamic>) {
-                return ReportReasonEntity(
-                  id: reason['id'] as int,
-                  name: reason['name'] as String,
-                );
-              }
-              throw FormatException('Invalid reason format: $reason');
-            })
-                .toList();
-            return Right(reasons);
-          } catch (e) {
-            return Left(Failure('Failed to parse report reasons: $e'));
-          }
-        },
-      );
+      return result.fold((failure) => Left(failure), (success) {
+        try {
+          final reasons =
+              success.map((reason) {
+                if (reason is Map<String, dynamic>) {
+                  return ReportReasonEntity(
+                    id: reason['id'] as int,
+                    name: reason['name'] as String,
+                  );
+                }
+                throw FormatException('Invalid reason format: $reason');
+              }).toList();
+          return Right(reasons);
+        } catch (e) {
+          return Left(Failure('Failed to parse report reasons: $e'));
+        }
+      });
     } catch (e) {
       return Left(Failure('Error fetching report reasons: $e'));
     }
@@ -367,55 +340,53 @@ class HomeRepositoryImpl implements HomeDomainRepository {
   Future<Either<Failure, List<ReportEntity>>> reportedPosts(int postId) async {
     try {
       final result = await remoteDataSource.reportedPosts(postId);
-      return result.fold(
-            (failure) => Left(failure),
-            (success) {
-          try {
-            final reports = success
-                .map((report) {
-              if (report is Map<String, dynamic>) {
-                return ReportEntity(
-                  id: report['id'] as int,
-                  postId: report['postId'] as int,
-                  author: report['author'],
-                  reasonName: report['reasonName'] as String,
-                  customReason: (report['customReason'] ?? '') as String,
-                  creationDate: DateTime.parse(report['creationDate'] as String),
-                );
-              }
-              throw FormatException('Invalid report format: $report');
-            })
-                .toList();
-            return Right(reports);
-          } catch (e) {
-            return Left(Failure('Failed to parse reported posts: $e'));
-          }
-        },
-      );
+      return result.fold((failure) => Left(failure), (success) {
+        try {
+          final reports =
+              success.map((report) {
+                if (report is Map<String, dynamic>) {
+                  return ReportEntity(
+                    id: report['id'] as int,
+                    postId: report['postId'] as int,
+                    author: report['author'],
+                    reasonName: report['reasonName'] as String,
+                    customReason: (report['customReason'] ?? '') as String,
+                    creationDate: DateTime.parse(
+                      report['creationDate'] as String,
+                    ),
+                  );
+                }
+                throw FormatException('Invalid report format: $report');
+              }).toList();
+          return Right(reports);
+        } catch (e) {
+          return Left(Failure('Failed to parse reported posts: $e'));
+        }
+      });
     } catch (e) {
       return Left(Failure('Error fetching reported posts: $e'));
     }
   }
+
   @override
   Future<Either<Failure, void>> savePost(int postId) async {
     final result = await remoteDataSource.savePost(postId);
-    return result.fold(
-      (failure) => Left(failure),
-      (success) {
-        _postUpdateController.add(PostSyncUpdate(postId: postId, type: PostSyncUpdateType.save));
-        return const Right(null);
-      },
-    );
+    return result.fold((failure) => Left(failure), (success) {
+      _postUpdateController.add(
+        PostSyncUpdate(postId: postId, type: PostSyncUpdateType.save),
+      );
+      return const Right(null);
+    });
   }
+
   @override
   Future<Either<Failure, void>> unSavePost(int postId) async {
     final result = await remoteDataSource.unSavePost(postId);
-    return result.fold(
-      (failure) => Left(failure),
-      (success) {
-        _postUpdateController.add(PostSyncUpdate(postId: postId, type: PostSyncUpdateType.unsave));
-        return const Right(null);
-      },
-    );
+    return result.fold((failure) => Left(failure), (success) {
+      _postUpdateController.add(
+        PostSyncUpdate(postId: postId, type: PostSyncUpdateType.unsave),
+      );
+      return const Right(null);
+    });
   }
 }

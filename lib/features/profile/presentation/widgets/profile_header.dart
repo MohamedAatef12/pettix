@@ -6,8 +6,6 @@ import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/auth/domain/entities/user_entity.dart';
 
-import '../../../../config/router/routes.dart';
-
 class ProfileHeader extends StatelessWidget {
   final UserEntity profile;
   final VoidCallback? onEditTap;

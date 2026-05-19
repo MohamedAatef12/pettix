@@ -13,7 +13,9 @@ import 'package:pettix/features/my_pets/presentation/widgets/pet_id_card.dart';
 /// Horizontal scroll section shown inside the profile screen.
 /// Displays an "Add Pet" card at the start followed by pet ID cards.
 class PetsSection extends StatelessWidget {
-  const PetsSection({super.key});
+  final bool isCurrentUser;
+  final int? userId;
+  const PetsSection({super.key, this.isCurrentUser = true, this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,7 @@ class PetsSection extends StatelessWidget {
           prev.status != curr.status &&
           curr.status == MyPetsStatus.success,
       listener: (context, _) {
-        context.read<MyPetsBloc>().add(const FetchUserPetsEvent());
+        context.read<MyPetsBloc>().add(FetchUserPetsEvent(userId: userId));
       },
       builder: (context, state) {
         if (state.status == MyPetsStatus.loading &&
@@ -36,25 +38,32 @@ class PetsSection extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.zero,
             children: [
-              _AddPetCard(
-                onTap: () => context.push(
-                  AppRoutes.addPet,
-                  extra: context.read<MyPetsBloc>(),
+              if (isCurrentUser)
+                _AddPetCard(
+                  onTap: () => context.push(
+                    AppRoutes.addPet,
+                    extra: context.read<MyPetsBloc>(),
+                  ),
                 ),
-              ),
               ...state.pets.map((pet) {
                 return PetIdCard(
                   pet: pet,
-                  onToggleStatus: (newStatus) => context
-                      .read<MyPetsBloc>()
-                      .add(UpdatePetStatusEvent(petId: pet.id, status: newStatus)),
-                  onDeletePet: () => context
-                      .read<MyPetsBloc>()
-                      .add(DeletePetEvent(pet.id)),
-                  onEditPet: () {
-                    // For now, edit pet doesn't have a specific route or accepts arguments
-                    // Can push to AddPet with args if implemented
-                  },
+                  onToggleStatus: isCurrentUser
+                      ? (newStatus) => context
+                          .read<MyPetsBloc>()
+                          .add(UpdatePetStatusEvent(petId: pet.id, status: newStatus))
+                      : null,
+                  onDeletePet: isCurrentUser
+                      ? () => context
+                          .read<MyPetsBloc>()
+                          .add(DeletePetEvent(pet.id))
+                      : null,
+                  onEditPet: isCurrentUser
+                      ? () {
+                          // For now, edit pet doesn't have a specific route or accepts arguments
+                          // Can push to AddPet with args if implemented
+                        }
+                      : null,
                 );
               }),
             ],
