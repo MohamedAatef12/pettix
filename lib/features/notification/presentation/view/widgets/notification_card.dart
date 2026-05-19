@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:pettix/config/di/di_wrapper.dart';
+import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/date_formatter.dart';
+import 'package:pettix/core/widgets/pettix_loading_dialog.dart';
+import 'package:pettix/features/home/domain/entities/post_entity.dart';
+import 'package:pettix/features/home/domain/usecases/get_post_by_id.dart';
 import 'package:pettix/features/notification/presentation/bloc/notification_bloc.dart';
 import 'package:pettix/features/notification/presentation/bloc/notification_event.dart';
 import '../../../domain/entities/notification_entity.dart';
@@ -76,9 +82,51 @@ class NotificationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         if (!notification.isRead) {
           context.read<NotificationBloc>().add(MarkAsReadEvent(notification.id));
+        }
+
+        final metadataStr = notification.metadata;
+        if (metadataStr != null && metadataStr.isNotEmpty) {
+          try {
+            final Map<String, String> metadataMap = Uri.splitQueryString(metadataStr);
+            final String? type = metadataMap['type'];
+            final String? postId = metadataMap['id'];
+
+            if ((type == 'post' || type == 'comment' || type == 'like') && postId != null) {
+              final int parsedId = int.tryParse(postId) ?? 0;
+              if (parsedId > 0) {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => const PettixLoadingDialog(
+                    message: 'Loading post...',
+                  ),
+                );
+
+                PostEntity? post;
+                try {
+                  final result = await DI.find<GetPostByIdUseCase>().call(parsedId);
+                  result.fold(
+                    (failure) => debugPrint('Failed to fetch post: ${failure.message}'),
+                    (fetchedPost) => post = fetchedPost,
+                  );
+                } catch (e) {
+                  debugPrint('Error fetching post by id: $e');
+                }
+
+                if (context.mounted) {
+                  Navigator.of(context).pop(); // dismiss loading dialog
+                  if (post != null) {
+                    context.push(AppRoutes.comments, extra: post);
+                  }
+                }
+              }
+            }
+          } catch (e) {
+            debugPrint('Error handling notification tap navigation: $e');
+          }
         }
       },
       child: AnimatedContainer(
