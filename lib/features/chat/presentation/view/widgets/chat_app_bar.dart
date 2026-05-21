@@ -31,7 +31,7 @@ class ChatAppBar extends StatelessWidget {
         SizedBox(width: 8.w),
         if (avatarUrl != null && conversationId != null)
           Hero(
-            tag: 'conversation_avatar_${conversationId}',
+            tag: 'conversation_avatar_$conversationId',
             child: Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,

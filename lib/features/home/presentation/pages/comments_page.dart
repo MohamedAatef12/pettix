@@ -63,7 +63,7 @@ class _CommentsPageState extends State<CommentsPage> {
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(1.h),
           child: Container(
-            color: AppColors.current.lightGray.withOpacity(0.5),
+            color: AppColors.current.lightGray.withValues(alpha: 0.5),
             height: 1.h,
           ),
         ),
@@ -91,7 +91,7 @@ class _CommentsPageState extends State<CommentsPage> {
                   color: AppColors.current.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
+                      color: Colors.black.withValues(alpha: 0.06),
                       blurRadius: 12,
                       offset: const Offset(0, -3),
                     ),
@@ -111,7 +111,7 @@ class _CommentsPageState extends State<CommentsPage> {
                             vertical: 5.h,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.current.primary.withOpacity(0.12),
+                            color: AppColors.current.primary.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(15.r),
                           ),
                           child: Row(
@@ -121,9 +121,7 @@ class _CommentsPageState extends State<CommentsPage> {
                                 'Replying to ',
                                 style: AppTextStyles.description.copyWith(
                                   fontSize: 11.sp,
-                                  color: AppColors.current.text.withOpacity(
-                                    0.6,
-                                  ),
+                                  color: AppColors.current.text.withValues(alpha: 0.6),
                                 ),
                               ),
                               Text(
@@ -173,9 +171,7 @@ class _CommentsPageState extends State<CommentsPage> {
                                   fontSize: 13.sp,
                                 ),
                                 filled: true,
-                                fillColor: AppColors.current.gray.withOpacity(
-                                  0.08,
-                                ),
+                                fillColor: AppColors.current.gray.withValues(alpha: 0.08),
                                 contentPadding: EdgeInsets.symmetric(
                                   horizontal: 16.w,
                                   vertical: 10.h,

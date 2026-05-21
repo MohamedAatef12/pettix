@@ -93,7 +93,6 @@ class PetGallery extends StatelessWidget {
     );
   }
 
-  Widget _shimmer() => Container(color: AppColors.current.lightGray);
 
   Widget _placeholder() => Container(
         height: 280.h,

@@ -3,7 +3,6 @@ import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pettix/core/models/response_model.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
-import 'constants.dart';
 
 @lazySingleton
 class ApiService {
@@ -36,15 +35,17 @@ class ApiService {
     if (data is String) {
       try {
         final decoded = json.decode(data);
-        if (decoded is Map<String, dynamic>)
+        if (decoded is Map<String, dynamic>) {
           return ResponseModel.fromJson(decoded);
-        if (decoded is List)
+        }
+        if (decoded is List) {
           return ResponseModel(
             success: true,
             message: '',
             traceId: '',
             result: decoded,
           );
+        }
       } catch (_) {}
     }
 

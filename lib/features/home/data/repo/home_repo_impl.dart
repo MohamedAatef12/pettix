@@ -151,8 +151,7 @@ class HomeRepositoryImpl implements HomeDomainRepository {
       (success) {
         _postUpdateController.add(PostSyncUpdate(postId: postId, type: PostSyncUpdateType.addComment));
         if (creatorId != null) {
-          final currentUser = homeLocalDataSource.getUserData();
-          final isReply = parentCommentId != null;
+          homeLocalDataSource.getUserData();
         }
         return const Right(null);
       },
@@ -203,7 +202,7 @@ class HomeRepositoryImpl implements HomeDomainRepository {
       (success) {
         _postUpdateController.add(PostSyncUpdate(postId: postId, type: PostSyncUpdateType.like));
         if (creatorId != null) {
-          final currentUser = homeLocalDataSource.getUserData();
+          homeLocalDataSource.getUserData();
         }
         
         return Right(
@@ -292,7 +291,7 @@ class HomeRepositoryImpl implements HomeDomainRepository {
       (failure) => Left(failure),
       (success) {
         if (creatorId != null) {
-          final currentUser = homeLocalDataSource.getUserData();
+          homeLocalDataSource.getUserData();
         }
         
         return Right(

@@ -7,8 +7,6 @@ import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:pettix/features/chat/presentation/bloc/chat_event.dart';
-
-import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
 class ChatTextFormField extends StatefulWidget {

@@ -1,9 +1,8 @@
 import 'dart:developer';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
-import 'package:pettix/config/di/di_wrapper.dart';
-import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/data/network/api_services.dart';
 import 'package:pettix/data/network/constants.dart';
 import 'package:pettix/data/network/failure.dart';
@@ -39,10 +38,10 @@ class RemoteDataSourceImpl implements RemoteDataSource {
       final resultData = response.result as Map<String, dynamic>? ?? {};
       if (resultData['data'] != null &&
           (resultData['data'] as List).isNotEmpty) {
-        print(
+        debugPrint(
           '🔍 [DEBUG] First Post JSON keys: ${(resultData['data'] as List).first.keys.toList()}',
         );
-        print(
+        debugPrint(
           '🔍 [DEBUG] First Post JSON: ${(resultData['data'] as List).first}',
         );
       }
@@ -307,7 +306,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
       final rawResponse = await apiService.delete(
         endPoint: '${Constants.postUnLikesEndpoint}/$postId',
       );
-      print(
+      debugPrint(
         '🚀 [API RESPONSE FOR UNLIKE] success=${rawResponse.success}, message="${rawResponse.message}", result=${rawResponse.result}',
       );
       if (!rawResponse.success) {

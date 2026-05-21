@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -643,7 +642,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       },
       (user) async {
         final imagePaths = state.selectedImages.map((file) => file.path).toList();
-        final selectedImagesCopy = List<File>.from(state.selectedImages);
         final contentCopy = text;
 
         // Reset local input state
@@ -1089,7 +1087,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   void _revertUnlike(int postId, Emitter<HomeState> emit, {String? error}) {
     if (error != null) {
-      print('❌ [HomeBloc] _revertUnlike triggered for post $postId due to error: $error');
+        debugPrint('❌ [HomeBloc] _revertUnlike triggered for post $postId due to error: $error');
     }
     final updatedLiked = List<int>.from(state.likedPostIds)..add(postId);
     final currentCount = state.postLikesCount[postId] ?? 0;
@@ -1167,9 +1165,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     throttledPostIds.add(commentId);
 
     final updatedCommentLikes =
-    Map<int, int>.from(state.commentLikesCount ?? {});
+    Map<int, int>.from(state.commentLikesCount );
     final updatedLikedComments =
-    List<int>.from(state.likedCommentId ?? []);
+    List<int>.from(state.likedCommentId );
 
     final currentCount = updatedCommentLikes[commentId] ?? 1;
     updatedCommentLikes[commentId] =
@@ -1209,7 +1207,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     final likes = result.getOrElse(() => []);
 
-    final updatedMap = Map<int, int>.from(state.commentLikesCount ?? {});
+    final updatedMap = Map<int, int>.from(state.commentLikesCount );
     updatedMap[commentId] = likes.length;
 
     final userResult = await getUserDataUseCase.call();
@@ -1220,7 +1218,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
 
     final user = userResult.getOrElse(() => throw '');
-    final likedCommentIds = List<int>.from(state.likedCommentId ?? []);
+    final likedCommentIds = List<int>.from(state.likedCommentId);
 
     final isLikedByUser = likes.any((like) => like.author.id == user.id);
 
@@ -1241,8 +1239,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   void _revertCommentLike(int commentId, Emitter<HomeState> emit) {
     final updatedLikedComments =
-    List<int>.from(state.likedCommentId ?? [])..remove(commentId);
-    final updatedCounts = Map<int, int>.from(state.commentLikesCount ?? {});
+    List<int>.from(state.likedCommentId)..remove(commentId);
+    final updatedCounts = Map<int, int>.from(state.commentLikesCount);
     final currentCount = updatedCounts[commentId] ?? 1;
     updatedCounts[commentId] =
     currentCount > 0 ? currentCount - 1 : 0;
@@ -1257,8 +1255,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   void _revertCommentUnlike(int commentId, Emitter<HomeState> emit) {
     final updatedLikedComments =
-    List<int>.from(state.likedCommentId ?? [])..add(commentId);
-    final updatedCounts = Map<int, int>.from(state.commentLikesCount ?? {});
+    List<int>.from(state.likedCommentId)..add(commentId);
+    final updatedCounts = Map<int, int>.from(state.commentLikesCount);
     final currentCount = updatedCounts[commentId] ?? 0;
     updatedCounts[commentId] = currentCount + 1;
 

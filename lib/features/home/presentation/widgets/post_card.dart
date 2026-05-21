@@ -2,29 +2,22 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:pettix/core/widgets/app_profile_image.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/shimmers/report_shimmer.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/rtl_aware_icon.dart';
-
 import 'package:pettix/features/home/domain/entities/post_entity.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
-import 'package:pettix/features/home/presentation/pages/comments_page.dart';
-import 'package:pettix/features/home/presentation/pages/comments_page.dart';
 import 'package:pettix/main/my_app.dart';
-
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:pettix/features/home/presentation/blocs/home_state.dart';
-
 import '../../../../config/router/routes.dart';
 
 class PostCard extends StatelessWidget {
@@ -158,7 +151,7 @@ class PostCard extends StatelessWidget {
                                                 child: Container(
                                                   decoration: BoxDecoration(
                                                     color: AppColors.current.red
-                                                        .withOpacity(0.05),
+                                                        .withValues(alpha: 0.05),
                                                     borderRadius:
                                                         BorderRadius.all(
                                                           Radius.circular(10.r),
@@ -553,7 +546,7 @@ class PostCard extends StatelessWidget {
                           colorFilter: ColorFilter.mode(
                             isLiked
                                 ? AppColors.current.red
-                                : AppColors.current.text.withOpacity(0.7),
+                                : AppColors.current.text.withValues(alpha: 0.7),
                             BlendMode.srcIn,
                           ),
                           height: 24.h,
@@ -606,10 +599,8 @@ class PostCard extends StatelessWidget {
                           'assets/icons/save_post.svg',
                           colorFilter: ColorFilter.mode(
                             isSaved
-                                ? AppColors
-                                    .current
-                                    .yellow // Gold color
-                                : AppColors.current.text.withOpacity(0.7),
+                                ? AppColors.current.yellow // Gold color
+                                : AppColors.current.text.withValues(alpha: 0.7),
                             BlendMode.srcIn,
                           ),
                           height: 26.h,

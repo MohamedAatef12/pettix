@@ -126,9 +126,9 @@ class _AnimatedToastState extends State<_AnimatedToast>
                 vertical: 14,
               ),
               decoration: BoxDecoration(
-                color: widget.color.withOpacity(0.25),
+                color: widget.color.withValues(alpha: 0.25),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.2)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
               ),
               child: Row(
                 children: [

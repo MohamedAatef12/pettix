@@ -1,6 +1,5 @@
 import 'package:dartz/dartz.dart';
 import 'package:pettix/data/network/failure.dart';
-import 'package:pettix/features/auth/domain/entities/register_domain_entity.dart';
 import 'package:pettix/features/auth/domain/entities/user_entity.dart';
 import 'package:pettix/features/home/domain/entities/comment_like_entity.dart';
 import 'package:pettix/features/home/domain/entities/comments_entity.dart';

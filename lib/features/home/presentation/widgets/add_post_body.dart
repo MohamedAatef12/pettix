@@ -8,12 +8,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
-import 'package:pettix/core/constants/padding.dart';
-import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
-import 'package:pettix/data/network/constants.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 import 'package:pettix/features/home/presentation/blocs/home_state.dart';
@@ -37,82 +33,80 @@ class AddPostBody extends StatelessWidget {
       },
       child: BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) {
-          return Container(
-            child: Column(
-              children: [
-                // ─── Custom Header ──────────────────────────────────────────
-                _Header(
-                  isLoading: state.isAddPostLoading,
-                  onCancel: () => context.pop(),
-                  onPost: () => bloc.add(SubmitPostEvent()),
-                ),
-
-                Expanded(
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: EdgeInsets.symmetric(horizontal: 20.w),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 16.h),
-                        // ─── User Profile Info ──────────────────────────────
-                        _UserHeader(userData: userData),
-
-                        SizedBox(height: 24.h),
-
-                        // ─── Content Input ──────────────────────────────────
-                        TextField(
-                          controller: bloc.postTextController,
-                          maxLines: null,
-                          minLines: 5,
-                          keyboardType: TextInputType.multiline,
-                          style: TextStyle(
-                            fontSize: 18.sp,
-                            color: AppColors.current.text,
-                            height: 1.5,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: "What's on your mind?",
-                            hintStyle: TextStyle(
-                              color: AppColors.current.midGray,
-                              fontSize: 18.sp,
-                            ),
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                          ),
+          return Column(
+            children: [
+              // ─── Custom Header ──────────────────────────────────────────
+              _Header(
+                isLoading: state.isAddPostLoading,
+                onCancel: () => context.pop(),
+                onPost: () => bloc.add(SubmitPostEvent()),
+              ),
+          
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 16.h),
+                      // ─── User Profile Info ──────────────────────────────
+                      _UserHeader(userData: userData),
+          
+                      SizedBox(height: 24.h),
+          
+                      // ─── Content Input ──────────────────────────────────
+                      TextField(
+                        controller: bloc.postTextController,
+                        maxLines: null,
+                        minLines: 5,
+                        keyboardType: TextInputType.multiline,
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          color: AppColors.current.text,
+                          height: 1.5,
                         ),
-
-                        SizedBox(height: 20.h),
-
-                        // ─── Media Preview ──────────────────────────────────
-                        if (state.selectedImages.isNotEmpty)
-                          _ImagePreviewGrid(
-                            images: state.selectedImages,
-                            onRemove:
-                                (i) => bloc.add(RemoveSelectedImageEvent(i)),
+                        decoration: InputDecoration(
+                          hintText: "What's on your mind?",
+                          hintStyle: TextStyle(
+                            color: AppColors.current.midGray,
+                            fontSize: 18.sp,
                           ),
-
-                        SizedBox(height: 100.h), // Space for bottom toolbar
-                      ],
-                    ),
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                        ),
+                      ),
+          
+                      SizedBox(height: 20.h),
+          
+                      // ─── Media Preview ──────────────────────────────────
+                      if (state.selectedImages.isNotEmpty)
+                        _ImagePreviewGrid(
+                          images: state.selectedImages,
+                          onRemove:
+                              (i) => bloc.add(RemoveSelectedImageEvent(i)),
+                        ),
+          
+                      SizedBox(height: 100.h), // Space for bottom toolbar
+                    ],
                   ),
                 ),
-
-                // ─── Bottom Toolbar ─────────────────────────────────────────
-                _MediaToolbar(
-                  onPickGallery: () => bloc.add(PickImagesFromGalleryEvent()),
-                  onPickCamera: () async {
-                    final pickedFile = await ImagePicker().pickImage(
-                      source: ImageSource.camera,
-                    );
-                    if (pickedFile != null) {
-                      bloc.add(AddImageFromCameraEvent(File(pickedFile.path)));
-                    }
-                  },
-                ),
-              ],
-            ),
+              ),
+          
+              // ─── Bottom Toolbar ─────────────────────────────────────────
+              _MediaToolbar(
+                onPickGallery: () => bloc.add(PickImagesFromGalleryEvent()),
+                onPickCamera: () async {
+                  final pickedFile = await ImagePicker().pickImage(
+                    source: ImageSource.camera,
+                  );
+                  if (pickedFile != null) {
+                    bloc.add(AddImageFromCameraEvent(File(pickedFile.path)));
+                  }
+                },
+              ),
+            ],
           );
         },
       ),

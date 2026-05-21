@@ -172,7 +172,7 @@ class ChatRepositoryImpl implements ChatRepository {
         var message = MessageModel.fromJson(response.result as Map<String, dynamic>);
         
         if (message.content.isEmpty) {
-          message = message.copyWith(content: content) as MessageModel;
+          message = message.copyWith(content: content);
         }
 
         // Save to cache
