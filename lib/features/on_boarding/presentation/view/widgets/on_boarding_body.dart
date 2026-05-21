@@ -57,8 +57,10 @@ class OnBoardingBody extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                              child:  SvgPicture.asset(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10.0,
+                              ),
+                              child: SvgPicture.asset(
                                 slide.image,
                                 fit: BoxFit.fill,
                                 width: double.infinity,
@@ -120,8 +122,7 @@ class OnBoardingBody extends StatelessWidget {
                       onTap: () {
                         if (state.currentPage == bloc.slides.length - 1) {
                           context.go(AppRoutes.login);
-                           SharedPrefsHelper.setBool('isFirstOpen', false);
-
+                          SharedPrefsHelper.setBool('isFirstOpen', false);
                         } else {
                           _pageController.nextPage(
                             duration: const Duration(milliseconds: 300),
@@ -142,7 +143,7 @@ class OnBoardingBody extends StatelessWidget {
                     ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         );
@@ -150,4 +151,3 @@ class OnBoardingBody extends StatelessWidget {
     );
   }
 }
-

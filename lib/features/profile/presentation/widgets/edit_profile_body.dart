@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/features/profile/domain/entities/update_profile_entity.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_event.dart';
@@ -46,29 +47,11 @@ class EditProfileBody extends StatelessWidget {
       listenWhen: (prev, curr) => curr.status != prev.status,
       listener: (context, state) {
         if (state.status == ProfileStatus.success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(AppText.profileUpdated),
-              backgroundColor: AppColors.current.green,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-            ),
-          );
+          AuthToast.showSuccess(context, AppText.profileUpdated);
           context.pop();
         }
         if (state.status == ProfileStatus.error) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage ?? AppText.error),
-              backgroundColor: AppColors.current.red,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-            ),
-          );
+          AuthToast.showError(context, state.errorMessage ?? AppText.error);
         }
       },
       builder: (context, state) {

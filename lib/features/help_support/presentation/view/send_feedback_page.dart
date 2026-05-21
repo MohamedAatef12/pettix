@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 
 class SendFeedbackPage extends StatefulWidget {
@@ -49,24 +50,14 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
 
   void _submit() async {
     if (_feedbackController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: const Text('Please write your feedback before submitting.'),
-        backgroundColor: AppColors.current.red,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-      ));
+      AuthToast.showError(context, 'Please write your feedback before submitting.');
       return;
     }
     setState(() => _submitting = true);
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
     setState(() => _submitting = false);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: const Text('Thank you for your feedback! 🎉'),
-      backgroundColor: AppColors.current.green,
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-    ));
+    AuthToast.showSuccess(context, 'Thank you for your feedback! 🎉');
     context.pop();
   }
 

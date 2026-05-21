@@ -11,7 +11,9 @@ import 'package:pettix/features/my_pets/presentation/widgets/pet_id_card.dart';
 /// Horizontal scroll section shown inside the profile screen.
 /// Displays an "Add Pet" card at the start followed by pet ID cards.
 class PetsSection extends StatelessWidget {
-  const PetsSection({super.key});
+  final bool isCurrentUser;
+  final int? userId;
+  const PetsSection({super.key, this.isCurrentUser = true, this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +22,7 @@ class PetsSection extends StatelessWidget {
           prev.status != curr.status &&
           curr.status == MyPetsStatus.success,
       listener: (context, _) {
-        context.read<MyPetsBloc>().add(const FetchUserPetsEvent());
+        context.read<MyPetsBloc>().add(FetchUserPetsEvent(userId: userId));
       },
       builder: (context, state) {
         if (state.status == MyPetsStatus.loading &&

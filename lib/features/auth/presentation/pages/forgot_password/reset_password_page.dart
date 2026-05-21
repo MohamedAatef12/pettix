@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pettix/config/di/di.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -29,7 +30,26 @@ class ResetPassword extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppColors.current.white,
     centerTitle: true,
-        title: Image.asset('assets/images/horizontal_logo.png'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'assets/images/logo1.png',
+              height: 30.h,
+              width: 30.w,
+              fit: BoxFit.contain,
+            ),
+            SizedBox(width: 8.w),
+            Text(
+              'Pettix',
+              style: TextStyle(
+                fontSize: 24.sp,
+                fontWeight: FontWeight.bold,
+                color: AppColors.current.primary,
+              ),
+            ),
+          ],
+        ),
 
         leading: GestureDetector(
          onTap: (){

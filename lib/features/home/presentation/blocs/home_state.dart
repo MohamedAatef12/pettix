@@ -12,7 +12,6 @@ const _copyWithSentinel = Object();
 
 enum PostFetchType { timeline, userPosts, savedPosts }
 
-
 class HomeState extends Equatable {
   final List<PostEntity> posts;
   final List<CommentEntity> comments;
@@ -135,7 +134,10 @@ class HomeState extends Equatable {
       totalCount: totalCount ?? this.totalCount,
       selectedImages: selectedImages ?? this.selectedImages,
       // If the caller did not pass a value, keep current. If they passed null explicitly, set to null.
-      replyingTo: replyingTo == _copyWithSentinel ? this.replyingTo : (replyingTo as CommentEntity?),
+      replyingTo:
+          replyingTo == _copyWithSentinel
+              ? this.replyingTo
+              : (replyingTo as CommentEntity?),
       expandedComments: expandedComments ?? this.expandedComments,
       commentLikes: commentLikes ?? this.commentLikes,
       likedCommentId: likedCommentId ?? this.likedCommentId,

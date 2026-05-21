@@ -9,14 +9,17 @@ import '../../models/post_model.dart';
 
 abstract class RemoteDataSource {
   // Posts
-  Future<Either<Failure, PaginatedPostsModel>> getPosts({int pageIndex = 1, int pageSize = 10});
+  Future<Either<Failure, PaginatedPostsModel>> getPosts({
+    int pageIndex = 1,
+    int pageSize = 10,
+  });
   Future<Either<Failure, List<PostModel>>> getUserPosts();
   Future<Either<Failure, List<PostModel>>> getSavedPosts();
   Future<Either<Failure, PostModel>> getPostById(int id);
   Future<Either<Failure, void>> addPost(PostModel post);
   Future<Either<Failure, void>> deletePost(int id);
   Future<Either<Failure, void>> editPost(PostModel post);
-  Future<Either<Failure,int>> getPostCommentsCount(int postId);
+  Future<Either<Failure, int>> getPostCommentsCount(int postId);
   // Comments
   Future<Either<Failure, List<CommentModel>>> getPostComments(int id);
   Future<Either<Failure, void>> addComment(
@@ -31,14 +34,20 @@ abstract class RemoteDataSource {
   Future<Either<Failure, List<LikesModel>>> getPostLikes(int postId);
   Future<Either<Failure, void>> likePost(int postId, int userId);
   Future<Either<Failure, void>> unlikePost(int postId);
-  Future<Either<Failure,List<CommentsLikeModel>>>getCommentsLikesCount(int commentId);
+  Future<Either<Failure, List<CommentsLikeModel>>> getCommentsLikesCount(
+    int commentId,
+  );
   Future<Either<Failure, void>> likeComment(int commentId);
   Future<Either<Failure, void>> unlikeComment(int commentId);
-// reports
-  Future<Either<Failure, void>> reportPost(int postId, int reasonId, String reason);
+  // reports
+  Future<Either<Failure, void>> reportPost(
+    int postId,
+    int reasonId,
+    String reason,
+  );
   Future<Either<Failure, List<dynamic>>> getReportReasons();
   Future<Either<Failure, List<dynamic>>> reportedPosts(int postId);
-// saved posts
+  // saved posts
   Future<Either<Failure, void>> savePost(int postId);
   Future<Either<Failure, void>> unSavePost(int postId);
 }

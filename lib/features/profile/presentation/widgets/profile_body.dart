@@ -15,7 +15,9 @@ import 'package:pettix/features/profile/presentation/widgets/profile_header.dart
 import 'package:pettix/features/profile/presentation/widgets/profile_info_card.dart';
 
 class ProfileBody extends StatelessWidget {
-  const ProfileBody({super.key});
+  final bool isCurrentUser;
+  final int? userId;
+  const ProfileBody({super.key, this.isCurrentUser = true, this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +34,7 @@ class ProfileBody extends StatelessWidget {
         if (profile == null) {
           return const ProfileShimmer();
         }
-        return _ProfileContent( profile: profile);
+        return _ProfileContent(profile: profile, isCurrentUser: isCurrentUser, userId: userId);
       },
     );
   }
@@ -40,7 +42,13 @@ class ProfileBody extends StatelessWidget {
 
 class _ProfileContent extends StatelessWidget {
   final UserEntity profile;
-  const _ProfileContent({required this.profile});
+  final bool isCurrentUser;
+  final int? userId;
+  const _ProfileContent({
+    required this.profile,
+    required this.isCurrentUser,
+    this.userId,
+  });
 
   String _genderLabel(int? id) {
     if (id == 1) return AppText.male;
@@ -57,10 +65,12 @@ class _ProfileContent extends StatelessWidget {
             children: [
               ProfileHeader(
                 profile: profile,
-                onEditTap: () => context.push(
-                  AppRoutes.editProfile,
-                  extra: context.read<ProfileBloc>(),
-                ),
+                onEditTap: isCurrentUser
+                    ? () => context.push(
+                          AppRoutes.editProfile,
+                          extra: context.read<ProfileBloc>(),
+                        )
+                    : null,
               ),
               ProfileNameSection(profile: profile),
               SizedBox(height: 24.h),
@@ -119,9 +129,9 @@ class _ProfileContent extends StatelessWidget {
                       ],
                     ),
                     SizedBox(height: 24.h),
-                    _SectionLabel('My Pets'),
+                    _SectionLabel(isCurrentUser ? 'My Pets' : 'Pets'),
                     SizedBox(height: 8.h),
-                    const PetsSection(),
+                    PetsSection(isCurrentUser: isCurrentUser, userId: userId),
                     SizedBox(height: 32.h),
                   ],
                 ),

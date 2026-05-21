@@ -11,7 +11,11 @@ abstract class MyPetsEvent extends Equatable {
 
 /// Loads the current user's pet list from the server.
 class FetchUserPetsEvent extends MyPetsEvent {
-  const FetchUserPetsEvent();
+  final int? userId;
+  const FetchUserPetsEvent({this.userId});
+
+  @override
+  List<Object?> get props => [userId];
 }
 
 /// Loads category, color, and medical lookup lists from the server.
