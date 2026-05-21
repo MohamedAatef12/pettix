@@ -5,8 +5,6 @@ import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 import 'package:pettix/features/my_pets/presentation/widgets/pet_passport.dart';
 
-import '../../../../data/network/constants.dart';
-
 /// National-ID-style card displayed in the horizontal pet list on the profile.
 class PetIdCard extends StatelessWidget {
   final PetEntity pet;

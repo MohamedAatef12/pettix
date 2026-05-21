@@ -2,7 +2,6 @@ import 'package:equatable/equatable.dart';
 import 'package:pettix/features/home/domain/entities/author_entity.dart';
 import 'package:pettix/features/home/domain/entities/comments_entity.dart';
 import 'package:pettix/features/home/domain/entities/likes_entity.dart';
-import '../../data/models/author_model.dart';
 
 class PostEntity extends Equatable {
   final int id;

@@ -42,8 +42,8 @@ class CommentModel extends CommentEntity {
           ? json['parentCommentId']
           : int.tryParse(json['parentCommentId']?.toString() ?? ''),
       replies: (json['replies'] as List<dynamic>?)
-          ?.where((e) => e is Map<String, dynamic>)
-          .map((e) => CommentModel.fromJson(e as Map<String, dynamic>))
+          ?.whereType<Map<String, dynamic>>()
+          .map((e) => CommentModel.fromJson(e))
           .toList() ??
           [],
       likes: (json['likes'] as List<dynamic>?)

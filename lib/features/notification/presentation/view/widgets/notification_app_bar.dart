@@ -17,7 +17,7 @@ class NotificationAppBar extends StatelessWidget implements PreferredSizeWidget 
         color: AppColors.current.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -32,7 +32,7 @@ class NotificationAppBar extends StatelessWidget implements PreferredSizeWidget 
               child: Container(
                 padding: EdgeInsets.all(8.w),
                 decoration: BoxDecoration(
-                  color: AppColors.current.lightBlue.withOpacity(0.5),
+                  color: AppColors.current.lightBlue.withValues(alpha: 0.5),
                   shape: BoxShape.circle,
                 ),
                 child: RtlAwareIcon(

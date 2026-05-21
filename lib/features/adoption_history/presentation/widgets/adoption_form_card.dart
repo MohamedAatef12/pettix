@@ -65,7 +65,7 @@ class AdoptionFormCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -167,14 +167,14 @@ class _AvatarBlock extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.current.primary.withOpacity(0.8),
+            AppColors.current.primary.withValues(alpha: 0.8),
             AppColors.current.primary,
           ],
         ),
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: AppColors.current.primary.withOpacity(0.2),
+            color: AppColors.current.primary.withValues(alpha: 0.2),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -186,7 +186,7 @@ class _AvatarBlock extends StatelessWidget {
           children: [
             Icon(
               Icons.pets_rounded,
-              color: AppColors.current.white.withOpacity(0.6),
+              color: AppColors.current.white.withValues(alpha: 0.6),
               size: 16.sp,
             ),
             Text(
@@ -216,7 +216,7 @@ class _StatusBadge extends StatelessWidget {
         color: style.bg,
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
-          color: style.text.withOpacity(0.1),
+          color: style.text.withValues(alpha: 0.1),
           width: 1,
         ),
       ),

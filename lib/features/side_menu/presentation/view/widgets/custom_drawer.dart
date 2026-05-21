@@ -10,7 +10,6 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
-import 'package:pettix/data/network/constants.dart';
 import 'package:pettix/features/auth/data/models/user_model.dart';
 import 'package:pettix/core/services/signalr_service.dart';
 import 'package:pettix/features/chat/data/data_source/chat_local_data_source.dart';

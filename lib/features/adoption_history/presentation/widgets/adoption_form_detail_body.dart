@@ -375,7 +375,7 @@ class _ActionButtons extends StatelessWidget {
                       onConfirm: () {
                         context.read<AdoptionHistoryBloc>().add(
                           UpdateFormStatusEvent(
-                            formId: form.id!,
+                            formId: form.id,
                             status: AdoptionFormStatus.approved.value,
                           ),
                         );
@@ -402,7 +402,7 @@ class _ActionButtons extends StatelessWidget {
                       onConfirm: () {
                         context.read<AdoptionHistoryBloc>().add(
                           UpdateFormStatusEvent(
-                            formId: form.id!,
+                            formId: form.id,
                             status: AdoptionFormStatus.rejected.value,
                           ),
                         );

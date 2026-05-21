@@ -26,9 +26,7 @@ class NotificationBody extends StatelessWidget {
         return AppText.emergency;
       case NotificationType.adoption:
         return AppText.adoption;
-      default:
-        return AppText.all;
-    }
+      }
   }
 
   IconData _getIconForType(NotificationType type) {
@@ -43,9 +41,7 @@ class NotificationBody extends StatelessWidget {
         return Icons.emergency_rounded;
       case NotificationType.adoption:
         return Icons.pets_rounded;
-      default:
-        return Icons.notifications_rounded;
-    }
+      }
   }
 
   @override
@@ -72,7 +68,7 @@ class NotificationBody extends StatelessWidget {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.01),
+                      color: Colors.black.withValues(alpha: 0.01),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -115,7 +111,7 @@ class NotificationBody extends StatelessWidget {
                       _getTranslatedTitle(NotificationType.values[state.currentIndex]),
                       style: AppTextStyles.description.copyWith(
                         fontSize: 12.sp,
-                        color: AppColors.current.lightText.withOpacity(0.6),
+                        color: AppColors.current.lightText.withValues(alpha: 0.6),
                         fontWeight: FontWeight.w500,
                       ),
                     ),

@@ -5,8 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:pettix/core/widgets/rtl_aware_icon.dart';
 import 'package:pettix/features/adoption_history/domain/entities/adoption_form_entity.dart';
 import 'package:pettix/features/adoption_history/presentation/bloc/adoption_history_bloc.dart';
 import 'package:pettix/features/adoption_history/presentation/bloc/adoption_history_event.dart';
@@ -79,7 +77,7 @@ class _HistoryHeader extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 15,
             offset: const Offset(0, 4),
           ),
@@ -207,13 +205,13 @@ class _TabButton extends StatelessWidget {
           boxShadow: [
             if (isActive)
               BoxShadow(
-                color: AppColors.current.primary.withOpacity(0.3),
+                color: AppColors.current.primary.withValues(alpha: 0.3),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               )
             else
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -343,13 +341,13 @@ class _FormsTabState extends State<_FormsTab>
           boxShadow: [
             if (isSelected)
               BoxShadow(
-                color: AppColors.current.primary.withOpacity(0.3),
+                color: AppColors.current.primary.withValues(alpha: 0.3),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               )
             else
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -499,7 +497,7 @@ class _LoadingList extends StatelessWidget {
               borderRadius: BorderRadius.circular(20.r),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withValues(alpha: 0.04),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),

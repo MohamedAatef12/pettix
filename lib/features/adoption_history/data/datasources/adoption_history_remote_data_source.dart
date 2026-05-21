@@ -1,14 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
-import 'package:pettix/data/caching/cache_manager.dart';
 import 'package:pettix/data/network/api_services.dart';
 import 'package:pettix/data/network/constants.dart';
 import 'package:pettix/data/network/failure.dart';
 import 'package:pettix/features/adoption_history/data/models/adoption_form_model.dart';
 import 'package:pettix/features/adoption_history/domain/entities/adoption_form_entity.dart';
-
-import '../../../../config/di/di_wrapper.dart';
-import '../../../../data/caching/i_cache_manager.dart';
 
 abstract class AdoptionHistoryRemoteDataSource {
   Future<Either<Failure, List<AdoptionFormEntity>>> getClientForms();

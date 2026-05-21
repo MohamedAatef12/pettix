@@ -75,7 +75,7 @@ class PetBrowseCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      pet.name ?? 'Unknown',
+                      pet.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(

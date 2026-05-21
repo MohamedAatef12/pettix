@@ -136,7 +136,7 @@ class PostModel extends PostEntity {
         }
       }
 
-      final String extension = p.extension(image).replaceFirst('.', '') ?? 'jpg';
+      final String extension = p.extension(image).replaceFirst('.', '') ;
 
       encodedImages.add({
         "filename": "image_${DateTime.now().millisecondsSinceEpoch}.$extension",

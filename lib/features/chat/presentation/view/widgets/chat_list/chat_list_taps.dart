@@ -3,14 +3,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/config/router/routes.dart';
-import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/chat/presentation/bloc/chat_list_bloc.dart';
 import 'package:pettix/features/chat/presentation/bloc/chat_list_state.dart';
 import 'package:pettix/features/chat/domain/entity/conversation_entity.dart';
-import 'package:pettix/core/shimmers/chat_list_shimmer.dart';
-
 import 'package:pettix/features/chat/presentation/view/widgets/updating_banner.dart';
 import 'package:pettix/core/widgets/app_profile_image.dart';
 

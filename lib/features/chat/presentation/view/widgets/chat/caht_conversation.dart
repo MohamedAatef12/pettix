@@ -6,11 +6,8 @@ import 'package:pettix/features/chat/presentation/view/widgets/chat/profile_card
 import 'package:pettix/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:pettix/features/chat/presentation/bloc/chat_event.dart';
 import 'package:pettix/features/chat/presentation/bloc/chat_state.dart';
-
 import 'package:pettix/features/chat/presentation/view/widgets/updating_banner.dart';
-import 'dart:io';
 import 'package:pettix/core/widgets/app_cached_image.dart';
-import 'package:pettix/core/shimmers/chat_body_shimmer.dart';
 
 class ChatConversation extends StatefulWidget {
   final int userIndex;

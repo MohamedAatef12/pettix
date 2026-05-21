@@ -46,7 +46,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
             final unreadInPage = notifications.where((n) => !n.isRead).length;
             final currentKnown = updatedCounts[event.notificationTypeId!] ?? 0;
 
-            if (unreadInPage > currentKnown || (event.pageSize ?? 10) >= 40) {
+            if (unreadInPage > currentKnown || (event.pageSize) >= 40) {
               updatedCounts[event.notificationTypeId!] = unreadInPage;
             }
           }
@@ -59,7 +59,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
             notifications: currentList,
             unreadCountsByType: updatedCounts,
             isPaginating: false,
-            hasMore: notifications.length == (event.pageSize ?? 10),
+            hasMore: notifications.length == (event.pageSize),
           ));
         },
       );
