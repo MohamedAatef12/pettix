@@ -35,6 +35,10 @@ import '../../features/adoption/domain/usecases/get_adoption_options_usecase.dar
     as _i756;
 import '../../features/adoption/domain/usecases/get_paged_pets_usecase.dart'
     as _i1025;
+import '../../features/adoption/domain/usecases/get_pet_report_reasons_usecase.dart'
+    as _i526;
+import '../../features/adoption/domain/usecases/report_pet_usecase.dart'
+    as _i447;
 import '../../features/adoption/domain/usecases/submit_adoption_form_usecase.dart'
     as _i843;
 import '../../features/adoption/presentation/bloc/adoption_bloc.dart' as _i943;
@@ -350,6 +354,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i1025.GetPagedPetsUseCase>(
       () => _i1025.GetPagedPetsUseCase(gh<_i838.AdoptionBrowseRepository>()),
     );
+    gh.factory<_i526.GetPetReportReasonsUseCase>(
+      () => _i526.GetPetReportReasonsUseCase(
+        gh<_i838.AdoptionBrowseRepository>(),
+      ),
+    );
+    gh.factory<_i447.ReportPetUseCase>(
+      () => _i447.ReportPetUseCase(gh<_i838.AdoptionBrowseRepository>()),
+    );
     gh.lazySingleton<_i133.AdoptionRepository>(
       () => _i35.AdoptionRepositoryImpl(gh<_i956.AdoptionRemoteDataSource>()),
     );
@@ -431,6 +443,14 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i46.MarkNotificationAsReadUseCase>(),
       ),
     );
+    gh.factory<_i1029.AdoptionBrowseBloc>(
+      () => _i1029.AdoptionBrowseBloc(
+        gh<_i1025.GetPagedPetsUseCase>(),
+        gh<_i982.GetPetOptionsUseCase>(),
+        gh<_i526.GetPetReportReasonsUseCase>(),
+        gh<_i447.ReportPetUseCase>(),
+      ),
+    );
     gh.factory<_i118.GetUserDataUseCase>(
       () => _i118.GetUserDataUseCase(gh<_i986.HomeDomainRepository>()),
     );
@@ -473,12 +493,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i975.VerifyOtp>(
       () => _i975.VerifyOtp(gh<_i787.AuthRepository>()),
-    );
-    gh.factory<_i1029.AdoptionBrowseBloc>(
-      () => _i1029.AdoptionBrowseBloc(
-        gh<_i1025.GetPagedPetsUseCase>(),
-        gh<_i982.GetPetOptionsUseCase>(),
-      ),
     );
     gh.factory<_i469.ProfileBloc>(
       () => _i469.ProfileBloc(

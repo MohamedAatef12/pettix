@@ -34,6 +34,7 @@ import '../../features/auth/presentation/pages/forgot_password/password_reset_do
 import '../../features/auth/presentation/pages/forgot_password/reset_password_page.dart';
 import '../../features/adoption/presentation/view/adoption_screen.dart';
 import '../../features/adoption/presentation/view/pet_profile_screen.dart';
+import '../../features/adoption/presentation/bloc/adoption_browse_bloc.dart';
 import '../../features/my_pets/domain/entities/pet_entity.dart';
 import '../../features/auth/presentation/pages/forgot_password/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/forgot_password/otp_forgot_password_page.dart';
@@ -338,7 +339,10 @@ final List<RouteBase> _adoptionRoutes = [
     name: AppRouteNames.petProfile,
     pageBuilder: (context, state) => _customTransition(
       state: state,
-      child: PetProfileScreen(pet: state.extra as PetEntity),
+      child: BlocProvider(
+        create: (_) => DI.find<AdoptionBrowseBloc>(),
+        child: PetProfileScreen(pet: state.extra as PetEntity),
+      ),
     ),
   ),
   GoRoute(

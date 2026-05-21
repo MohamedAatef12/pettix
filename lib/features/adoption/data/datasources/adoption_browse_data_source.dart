@@ -8,6 +8,8 @@ import 'package:pettix/features/my_pets/data/models/pet_model.dart';
 
 abstract class AdoptionBrowseDataSource {
   Future<Either<Failure, PagedPetsResult>> getPagedPets(PagedPetsParams params);
+  Future<Either<Failure, List<dynamic>>> getPetReportReasons();
+  Future<Either<Failure, void>> reportPet(int petId, int reasonId, String customReason);
 }
 
 @LazySingleton(as: AdoptionBrowseDataSource)
@@ -49,6 +51,46 @@ class AdoptionBrowseDataSourceImpl implements AdoptionBrowseDataSource {
             .toList();
 
         return Right(PagedPetsResult(items: pets, totalCount: total));
+      }
+      return Left(Failure(response.message));
+    } catch (e) {
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<dynamic>>> getPetReportReasons() async {
+    try {
+      final response = await _apiService.getList(
+        endPoint: Constants.reportPetReasonsEndpoint,
+      );
+      if (response.success == true) {
+        final data = response.result as List? ?? [];
+        return Right(data);
+      }
+      return Left(Failure(response.message));
+    } catch (e) {
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> reportPet(
+    int petId,
+    int reasonId,
+    String customReason,
+  ) async {
+    try {
+      final response = await _apiService.post(
+        endPoint: '${Constants.reportPetEndpoint}/$petId/report',
+        data: {
+          'petId': petId,
+          'reasonId': reasonId,
+          'customReason': customReason,
+        },
+      );
+      if (response.success == true) {
+        return const Right(null);
       }
       return Left(Failure(response.message));
     } catch (e) {

@@ -51,6 +51,8 @@ class Constants {
   static const String petCategoryEndpoint = '/api/Adoption/PetCategory';
   static const String petColorsEndpoint = '/api/Adoption/PetColors';
   static const String petMedicalsEndpoint = '/api/Adoption/PetMedicals';
+  static const String reportPetReasonsEndpoint = '/api/Adoption/Pets/report-reasons';
+  static const String reportPetEndpoint = '/api/Adoption/Pets';
 
   //// Adoption Forms
   static const String adoptionFormsEndpoint = '/api/Adoption/AdoptionForms';

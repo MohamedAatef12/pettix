@@ -260,7 +260,6 @@ class _Avatar extends StatelessWidget {
       child: AppProfileImage(
         imageUrl: url,
         radius: 28.r,
-        heroTag: id != null ? 'user_avatar_$id' : null,
         backgroundColor: AppColors.current.lightGray,
       ),
     );

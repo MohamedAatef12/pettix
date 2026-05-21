@@ -46,7 +46,6 @@ class PostCard extends StatelessWidget {
                   AppProfileImage(
                     imageUrl: post.author.avatar,
                     radius: 30,
-                    heroTag: 'user_avatar_${post.author.id}',
                   ),
                   SizedBox(width: 10.w),
                   Column(
