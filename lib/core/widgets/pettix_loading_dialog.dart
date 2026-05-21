@@ -103,7 +103,7 @@ class _PettixLoadingDialogState extends State<PettixLoadingDialog>
                                   width: 8.r,
                                   height: 8.r,
                                   decoration: BoxDecoration(
-                                    color: AppColors.current.primary.withValues(alpha: opacity),
+                                     color: AppColors.current.primary.withValues(alpha: opacity),
                                     shape: BoxShape.circle,
                                   ),
                                 ),
