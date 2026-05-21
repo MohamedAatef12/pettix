@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
-import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_bloc.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_event.dart';
@@ -30,34 +28,83 @@ class PetsSection extends StatelessWidget {
           return _LoadingRow();
         }
 
+        if (state.pets.isEmpty) {
+          return Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 16.w),
+            decoration: BoxDecoration(
+              color: AppColors.current.lightBlue.withAlpha(80),
+              borderRadius: BorderRadius.circular(16.r),
+              border: Border.all(
+                color: AppColors.current.primary.withAlpha(40),
+                width: 1.2,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 48.w,
+                  height: 48.w,
+                  decoration: BoxDecoration(
+                    color: AppColors.current.primary.withAlpha(20),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.pets_rounded,
+                    color: AppColors.current.primary,
+                    size: 22.w,
+                  ),
+                ),
+                SizedBox(width: 14.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'No Pets Registered Yet',
+                        style: TextStyle(
+                          color: AppColors.current.text,
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      SizedBox(height: 3.h),
+                      Text(
+                        'Add your pets from the side menu to keep track of their details and vaccinations.',
+                        style: TextStyle(
+                          color: AppColors.current.midGray,
+                          fontSize: 10.sp,
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
         return SizedBox(
           height: 125.h,
-          child: ListView(
+          child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.zero,
-            children: [
-              _AddPetCard(
-                onTap: () => context.push(
-                  AppRoutes.addPet,
-                  extra: context.read<MyPetsBloc>(),
-                ),
-              ),
-              ...state.pets.map((pet) {
-                return PetIdCard(
-                  pet: pet,
-                  onToggleStatus: (newStatus) => context
-                      .read<MyPetsBloc>()
-                      .add(UpdatePetStatusEvent(petId: pet.id, status: newStatus)),
-                  onDeletePet: () => context
-                      .read<MyPetsBloc>()
-                      .add(DeletePetEvent(pet.id)),
-                  onEditPet: () {
-                    // For now, edit pet doesn't have a specific route or accepts arguments
-                    // Can push to AddPet with args if implemented
-                  },
-                );
-              }),
-            ],
+            itemCount: state.pets.length,
+            itemBuilder: (context, index) {
+              final pet = state.pets[index];
+              return PetIdCard(
+                pet: pet,
+                onToggleStatus: (newStatus) => context
+                    .read<MyPetsBloc>()
+                    .add(UpdatePetStatusEvent(petId: pet.id, status: newStatus)),
+                onDeletePet: () => context
+                    .read<MyPetsBloc>()
+                    .add(DeletePetEvent(pet.id)),
+                onEditPet: () {},
+              );
+            },
           ),
         );
       },
@@ -94,57 +141,3 @@ class _SkeletonCard extends StatelessWidget {
   }
 }
 
-/// Dashed-border card used to trigger add-pet navigation.
-class _AddPetCard extends StatelessWidget {
-  final VoidCallback onTap;
-
-  const _AddPetCard({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 90.w,
-        height: 125.h,
-        margin: EdgeInsets.only(right: 12.w),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(
-            color: AppColors.current.primary.withAlpha(100),
-            width: 1.5,
-            style: BorderStyle.solid,
-          ),
-          color: AppColors.current.lightBlue,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 36.w,
-              height: 36.w,
-              decoration: BoxDecoration(
-                color: AppColors.current.primary.withAlpha(20),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.add_rounded,
-                color: AppColors.current.primary,
-                size: 20.w,
-              ),
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              'Add Pet',
-              style: TextStyle(
-                color: AppColors.current.primary,
-                fontSize: 10.sp,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
