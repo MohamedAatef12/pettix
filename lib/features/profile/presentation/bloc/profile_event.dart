@@ -6,7 +6,13 @@ abstract class ProfileEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class FetchProfileEvent extends ProfileEvent {}
+class FetchProfileEvent extends ProfileEvent {
+  final int? userId;
+  FetchProfileEvent({this.userId});
+
+  @override
+  List<Object?> get props => [userId];
+}
 
 class InitEditFormEvent extends ProfileEvent {}
 

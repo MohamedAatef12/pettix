@@ -81,15 +81,18 @@ class PostModel extends PostEntity {
 
       if (raw.startsWith('http')) {
         // ✅ Already a proper URL
-        result.add(raw);
+        // Workaround: Backend sometimes returns ContactsUploads instead of PostsUploads for post images.
+        final correctedUrl = raw.replaceAll('ContactsUploads', 'PostsUploads');
+        result.add(correctedUrl);
       } else if (raw.startsWith('data:image') && raw.contains('Resources/')) {
         // ⚠️ Malformed: "data:image/png;base64,Resources/PostsUploads/xyz.jpg"
         // Extract the relative path and build a real URL.
         final pathPart = raw.split(',').last.trim();
         final cleanPath = pathPart.startsWith('/') ? pathPart.substring(1) : pathPart;
         final properUrl = '${Constants.baseUrl}/$cleanPath';
-        debugPrint('🔧 [PostModel] Fixed malformed image URL → $properUrl');
-        result.add(properUrl);
+        final correctedUrl = properUrl.replaceAll('ContactsUploads', 'PostsUploads');
+        debugPrint('🔧 [PostModel] Fixed malformed image URL → $correctedUrl');
+        result.add(correctedUrl);
       } else if (raw.startsWith('data:image')) {
         // ✅ Real base64 image data
         result.add(raw);

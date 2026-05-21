@@ -77,11 +77,11 @@ class MyPetsBloc extends Bloc<MyPetsEvent, MyPetsState> {
     FetchUserPetsEvent event,
     Emitter<MyPetsState> emit,
   ) async {
-    final userId = _cacheManager.getUserData()?.id;
+    final userId = event.userId ?? _cacheManager.getUserData()?.id;
     if (userId == null) {
       emit(state.copyWith(
         status: MyPetsStatus.error,
-        errorMessage: 'User not found in cache',
+        errorMessage: 'User not found',
       ));
       return;
     }

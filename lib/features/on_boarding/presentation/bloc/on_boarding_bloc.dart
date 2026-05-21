@@ -14,12 +14,13 @@ class OnBoardingBloc extends Bloc<OnBoardingEvent, OnBoardingState> {
     OnBoardingSlide(
       image: "assets/images/on_boarding2.svg",
       title: AppText.careSafetySecondChances,
-      desc:  AppText.findLovingHomes
+      desc: AppText.findLovingHomes,
     ),
     OnBoardingSlide(
       image: "assets/images/on_boarding3.svg",
       title: AppText.everythingYourPetNeeds,
-      desc: AppText.discoverFoodToys  ),
+      desc: AppText.discoverFoodToys,
+    ),
   ];
 
   OnBoardingBloc() : super(OnBoardingInitial()) {

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/sized_box.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import '../../../../config/di/di.dart';
 import '../bloc/adoption_bloc.dart';
@@ -40,8 +41,7 @@ class ApplicationScreens extends StatelessWidget {
         listener: (context, state) {
           final msg = state.errorMessage;
           if (msg != null && msg.isNotEmpty) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(msg)));
+            AuthToast.showError(context, msg);
           }
         },
         builder: (context, state) {

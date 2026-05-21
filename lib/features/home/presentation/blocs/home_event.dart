@@ -13,7 +13,6 @@ abstract class HomeEvent extends Equatable {
 class FetchPostsEvent extends HomeEvent {}
 
 class GetUserPostsEvent extends HomeEvent {
-
   GetUserPostsEvent();
   @override
   List<Object?> get props => [];
@@ -65,22 +64,29 @@ class AddLikeEvent extends HomeEvent {
   @override
   List<Object?> get props => [postId, creatorId];
 }
+
 class GetPostCommentsCountsEvent extends HomeEvent {
   final int postId;
   GetPostCommentsCountsEvent(this.postId);
   @override
   List<Object?> get props => [postId];
 }
+
 class DeleteLikeEvent extends HomeEvent {
   final int postId;
   DeleteLikeEvent(this.postId);
   @override
   List<Object?> get props => [postId];
 }
+
 class ClearPostDetailsEvent extends HomeEvent {}
+
 class PickImageEvent extends HomeEvent {}
+
 class SubmitPostEvent extends HomeEvent {}
+
 class PickImagesFromGalleryEvent extends HomeEvent {}
+
 class AddImageFromCameraEvent extends HomeEvent {
   final File image;
   AddImageFromCameraEvent(this.image);
@@ -94,25 +100,34 @@ class RemoveSelectedImageEvent extends HomeEvent {
   @override
   List<Object?> get props => [index];
 }
+
 class AddReplyEvent extends HomeEvent {
   final CommentEntity reply;
   final int parentCommentId;
   final int? creatorId;
   final int? initialCount;
-  AddReplyEvent(this.reply, this.parentCommentId, {this.creatorId, this.initialCount});
+  AddReplyEvent(
+    this.reply,
+    this.parentCommentId, {
+    this.creatorId,
+    this.initialCount,
+  });
   @override
   List<Object?> get props => [reply, parentCommentId, creatorId, initialCount];
 }
+
 class SetReplyingToEvent extends HomeEvent {
   final CommentEntity? comment;
   SetReplyingToEvent(this.comment);
 }
+
 class ToggleCommentRepliesEvent extends HomeEvent {
   final int commentId;
-   ToggleCommentRepliesEvent(this.commentId);
+  ToggleCommentRepliesEvent(this.commentId);
   @override
   List<Object?> get props => [commentId];
 }
+
 class RefreshCommentsSilentlyEvent extends HomeEvent {
   final int postId;
   RefreshCommentsSilentlyEvent(this.postId);
@@ -120,6 +135,7 @@ class RefreshCommentsSilentlyEvent extends HomeEvent {
   @override
   List<Object?> get props => [postId];
 }
+
 class UpdatePostCommentsCountEvent extends HomeEvent {
   final int postId;
   UpdatePostCommentsCountEvent(this.postId);
@@ -127,26 +143,30 @@ class UpdatePostCommentsCountEvent extends HomeEvent {
   @override
   List<Object?> get props => [postId];
 }
-class AddCommentLikeEvent extends HomeEvent{
+
+class AddCommentLikeEvent extends HomeEvent {
   final int commentId;
   final int? creatorId;
   AddCommentLikeEvent(this.commentId, {this.creatorId});
   @override
   List<Object?> get props => [commentId, creatorId];
 }
-class GetCommentsLikeEvent extends HomeEvent{
+
+class GetCommentsLikeEvent extends HomeEvent {
   final int commentId;
   GetCommentsLikeEvent(this.commentId);
   @override
   List<Object?> get props => [commentId];
 }
-class UnLikeCommentEvent extends HomeEvent{
+
+class UnLikeCommentEvent extends HomeEvent {
   final int commentId;
   UnLikeCommentEvent(this.commentId);
   @override
   List<Object?> get props => [commentId];
 }
-class ReportPostEvent extends HomeEvent{
+
+class ReportPostEvent extends HomeEvent {
   final int postId;
   final int reasonId;
   final String reason;
@@ -154,20 +174,24 @@ class ReportPostEvent extends HomeEvent{
   @override
   List<Object?> get props => [postId, reasonId, reason];
 }
-class GetReportReasonsEvent extends HomeEvent{}
-class GetReportedPostsEvent extends HomeEvent{
+
+class GetReportReasonsEvent extends HomeEvent {}
+
+class GetReportedPostsEvent extends HomeEvent {
   final int postId;
   GetReportedPostsEvent(this.postId);
   @override
   List<Object?> get props => [postId];
 }
-class SavePostEvent extends HomeEvent{
+
+class SavePostEvent extends HomeEvent {
   final int postId;
   SavePostEvent(this.postId);
   @override
   List<Object?> get props => [postId];
 }
-class UnSavePostEvent extends HomeEvent{
+
+class UnSavePostEvent extends HomeEvent {
   final int postId;
   UnSavePostEvent(this.postId);
   @override

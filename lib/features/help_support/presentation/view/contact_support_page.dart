@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 
@@ -34,12 +35,7 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
     setState(() => _sending = false);
     _subjectController.clear();
     _messageController.clear();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: const Text('Message sent! We\'ll get back to you shortly.'),
-      backgroundColor: AppColors.current.green,
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-    ));
+    AuthToast.showSuccess(context, 'Message sent! We\'ll get back to you shortly.');
   }
 
   @override

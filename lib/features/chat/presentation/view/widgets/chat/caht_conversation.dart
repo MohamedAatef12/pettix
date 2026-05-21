@@ -28,9 +28,12 @@ class _ChatConversationState extends State<ChatConversation> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 50) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 50) {
       final state = context.read<ChatBloc>().state;
-      if (state.hasMore && state.status != ChatStatus.paginating && state.status != ChatStatus.loading) {
+      if (state.hasMore &&
+          state.status != ChatStatus.paginating &&
+          state.status != ChatStatus.loading) {
         if (state.conversationId != null) {
           context.read<ChatBloc>().add(GetMessagesEvent(state.conversationId!));
         }
@@ -48,11 +51,15 @@ class _ChatConversationState extends State<ChatConversation> {
   Widget build(BuildContext context) {
     return BlocBuilder<ChatBloc, ChatState>(
       builder: (context, state) {
-
         if (state.status == ChatStatus.loading && state.messages.isEmpty) {
           return const Center(child: UpdatingBanner());
         } else if (state.status == ChatStatus.error && state.messages.isEmpty) {
-          return Center(child: Text(state.errorMessage, style: const TextStyle(color: Colors.red)));
+          return Center(
+            child: Text(
+              state.errorMessage,
+              style: const TextStyle(color: Colors.red),
+            ),
+          );
         }
 
         final messages = state.messages;
@@ -66,47 +73,48 @@ class _ChatConversationState extends State<ChatConversation> {
               itemCount: messages.length + (isPaginating ? 1 : 0) + 1,
               padding: EdgeInsets.only(bottom: 16.h),
               reverse: true,
-          itemBuilder: (context, index) {
-            final totalSlots = messages.length + (isPaginating ? 1 : 0);
+              itemBuilder: (context, index) {
+                final totalSlots = messages.length + (isPaginating ? 1 : 0);
 
-            // Profile card is always the very last slot → stays pinned at the top
-            if (index == totalSlots) {
-              final otherMember = state.conversation?.members
-                      .where((m) => m.user.id != state.currentUserId)
-                      .firstOrNull ??
-                  (state.conversation?.members.isNotEmpty == true
-                      ? state.conversation?.members.first
-                      : null);
-              return Column(
-                children: [
-                  ProfileCard(
-                    index: widget.userIndex,
-                    name: otherMember?.user.displayName,
-                    avatarUrl: otherMember?.user.avatar,
-                  ),
-                  SizedBox(height: 10.h),
-                ],
-              );
-            }
+                // Profile card is always the very last slot → stays pinned at the top
+                if (index == totalSlots) {
+                  final otherMember =
+                      state.conversation?.members
+                          .where((m) => m.user.id != state.currentUserId)
+                          .firstOrNull ??
+                      (state.conversation?.members.isNotEmpty == true
+                          ? state.conversation?.members.first
+                          : null);
+                  return Column(
+                    children: [
+                      ProfileCard(
+                        index: otherMember?.user.id ?? widget.userIndex,
+                        name: otherMember?.user.displayName,
+                        avatarUrl: otherMember?.user.avatar,
+                      ),
+                      SizedBox(height: 10.h),
+                    ],
+                  );
+                }
 
-            // Pagination spinner sits just above the oldest message, below the card
-            if (isPaginating && index == messages.length) {
-              return const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Center(child: CircularProgressIndicator()),
-              );
-            }
+                // Pagination spinner sits just above the oldest message, below the card
+                if (isPaginating && index == messages.length) {
+                  return const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
 
-            final msg = messages[index];
-            final isMe = msg.senderId == state.currentUserId;
+                final msg = messages[index];
+                final isMe = msg.senderId == state.currentUserId;
 
-            return ChatBubble(
-              text: msg.content,
-              isMe: isMe,
-              isSending: msg.isSending,
-              imageUrl: msg.imageUrl,
-            );
-          },
+                return ChatBubble(
+                  text: msg.content,
+                  isMe: isMe,
+                  isSending: msg.isSending,
+                  imageUrl: msg.imageUrl,
+                );
+              },
             ),
             if (state.status == ChatStatus.loading)
               Align(
@@ -122,7 +130,6 @@ class _ChatConversationState extends State<ChatConversation> {
     );
   }
 }
-
 
 class ChatBubble extends StatelessWidget {
   final String text;
@@ -148,12 +155,16 @@ class ChatBubble extends StatelessWidget {
         children: [
           Container(
             margin: EdgeInsets.symmetric(vertical: 6.h, horizontal: 12.w),
-            padding: imageUrl != null ? EdgeInsets.all(4.r) : EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+            padding:
+                imageUrl != null
+                    ? EdgeInsets.all(4.r)
+                    : EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
             constraints: BoxConstraints(maxWidth: 260.w),
             decoration: BoxDecoration(
-              color: isMe
-                  ? AppColors.current.primary
-                  : AppColors.current.blueGray.withValues(alpha: 0.4),
+              color:
+                  isMe
+                      ? AppColors.current.primary
+                      : AppColors.current.blueGray.withValues(alpha: 0.4),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(14.r),
                 topRight: Radius.circular(14.r),
@@ -214,8 +225,6 @@ class ChatBubble extends StatelessWidget {
     );
   }
 
-
-
   void _openImagePreview(BuildContext context, String path) {
     showGeneralDialog(
       context: context,
@@ -268,7 +277,11 @@ class ChatBubble extends StatelessWidget {
                         color: Colors.black.withValues(alpha: 0.5),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.close, color: Colors.white, size: 24),
+                      child: const Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 24,
+                      ),
                     ),
                   ),
                 ),
@@ -279,6 +292,4 @@ class ChatBubble extends StatelessWidget {
       },
     );
   }
-
-
 }

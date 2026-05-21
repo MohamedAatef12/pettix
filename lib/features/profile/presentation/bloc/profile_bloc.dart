@@ -46,11 +46,11 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     FetchProfileEvent event,
     Emitter<ProfileState> emit,
   ) async {
-    final userId = _cacheManager.getUserData()?.id;
+    final userId = event.userId ?? _cacheManager.getUserData()?.id;
     if (userId == null) {
       emit(state.copyWith(
         status: ProfileStatus.error,
-        errorMessage: 'User not found in cache',
+        errorMessage: 'User not found',
       ));
       return;
     }

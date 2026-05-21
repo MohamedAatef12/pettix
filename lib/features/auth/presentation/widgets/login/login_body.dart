@@ -6,6 +6,7 @@ import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
+import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_state.dart';
@@ -22,15 +23,28 @@ class LoginBody extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.asset('assets/images/horizontal_logo.png',
-              height: 25.h,width: 100.w,
-            fit: BoxFit.fill,
+            Row(
+              children: [
+                Image.asset('assets/images/logo1.png',
+                  height: 50.h,width: 50.w,
+                fit: BoxFit.fill,
+                ),
+                Text(
+                  'Pettix',
+                  style: TextStyle(
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.current.primary,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 20.h,),
+
             SizedBox(
               width: 250.w,
               child: Text(AppText.loginTitle,
-              style: AppTextStyles.title,),
+              style: AppTextStyles.title,
+              ),
             ),
         
             Text(AppText.loginSubtitle,style: AppTextStyles.smallDescription,),

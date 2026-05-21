@@ -9,6 +9,7 @@ class NotificationModel extends NotificationEntity {
     required super.isRead,
     required super.date,
     required super.notificationTypeId,
+    super.metadata,
   });
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
@@ -20,6 +21,7 @@ class NotificationModel extends NotificationEntity {
       isRead: json['isRead'] as bool? ?? false,
       date: json['date'] != null ? DateTime.parse(json['date'] as String) : DateTime.now(),
       notificationTypeId: json['notificationTypeId'] as int? ?? 0,
+      metadata: json['metadata'] as String?,
     );
   }
 
@@ -32,6 +34,7 @@ class NotificationModel extends NotificationEntity {
       'isRead': isRead,
       'date': date.toIso8601String(),
       'notificationTypeId': notificationTypeId,
+      'metadata': metadata,
     };
   }
 }

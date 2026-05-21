@@ -33,7 +33,7 @@ class CategoryListBody extends StatelessWidget {
               children: [
                 Expanded(
                   child: Image.asset(
-                    'assets/images/logo.png',
+                    'assets/images/logo1.png',
                     fit: BoxFit.contain,
                   ),
                 ),
