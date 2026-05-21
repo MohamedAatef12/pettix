@@ -87,6 +87,16 @@ class CustomDrawer extends StatelessWidget {
                       context.push(AppRoutes.adoptionHistory);
                     },
                   ),
+                  _Tile(
+                    icon: Icons.pets_rounded,
+                    label: 'Manage My Pets',
+                    color: AppColors.current.primary,
+                    onTap: () {
+                      final router = GoRouter.of(context);
+                      Navigator.of(context).pop();
+                      router.push(AppRoutes.myPets);
+                    },
+                  ),
                   _Section(AppText.storeOrders),
                   _Tile(
                     icon: Icons.inventory_2_rounded,
@@ -258,7 +268,6 @@ class _Avatar extends StatelessWidget {
       child: AppProfileImage(
         imageUrl: url,
         radius: 28.r,
-        heroTag: id != null ? 'user_avatar_$id' : null,
         backgroundColor: AppColors.current.lightGray,
       ),
     );
@@ -545,3 +554,5 @@ class _LogoutTile extends StatelessWidget {
     );
   }
 }
+
+

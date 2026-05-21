@@ -98,7 +98,13 @@ class _HistoryHeader extends StatelessWidget {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
+                        onPressed: () {
+                          if (context.canPop()) {
+                            context.pop();
+                          } else {
+                            context.goNamed(AppRouteNames.bottomNav);
+                          }
+                        },
                         icon: Icon(
                           Icons.arrow_back_ios_new_rounded,
                           color: AppColors.current.text,

@@ -32,6 +32,12 @@ class AdoptionState extends Equatable {
   final bool agreed;
   final bool termsAccepted;
 
+  // UI Interactive States (BLoC Owned)
+  final bool isEditingPersonal;
+  final bool isEditingLiving;
+  final bool isEditingPet;
+  final bool isSubmitted;
+
   const AdoptionState({
     this.status = AdoptionStatus.initial,
     this.options,
@@ -49,6 +55,10 @@ class AdoptionState extends Equatable {
     this.petType,
     this.agreed = false,
     this.termsAccepted = false,
+    this.isEditingPersonal = false,
+    this.isEditingLiving = false,
+    this.isEditingPet = false,
+    this.isSubmitted = false,
   });
 
   AdoptionState copyWith({
@@ -68,6 +78,10 @@ class AdoptionState extends Equatable {
     String? petType,
     bool? agreed,
     bool? termsAccepted,
+    bool? isEditingPersonal,
+    bool? isEditingLiving,
+    bool? isEditingPet,
+    bool? isSubmitted,
   }) {
     return AdoptionState(
       status: status ?? this.status,
@@ -88,26 +102,34 @@ class AdoptionState extends Equatable {
       petType: petType ?? this.petType,
       agreed: agreed ?? this.agreed,
       termsAccepted: termsAccepted ?? this.termsAccepted,
+      isEditingPersonal: isEditingPersonal ?? this.isEditingPersonal,
+      isEditingLiving: isEditingLiving ?? this.isEditingLiving,
+      isEditingPet: isEditingPet ?? this.isEditingPet,
+      isSubmitted: isSubmitted ?? this.isSubmitted,
     );
   }
 
   @override
   List<Object?> get props => [
-    status,
-    options,
-    errorMessage,
-    formData,
-    currentStep,
-    petId,
-    fullName,
-    email,
-    phoneNumber,
-    dateOfBirth,
-    selectedLivingSituationId,
-    selectedResidenceTypeId,
-    hasOwnedPetBefore,
-    petType,
-    agreed,
-    termsAccepted,
-  ];
+        status,
+        options,
+        errorMessage,
+        formData,
+        currentStep,
+        petId,
+        fullName,
+        email,
+        phoneNumber,
+        dateOfBirth,
+        selectedLivingSituationId,
+        selectedResidenceTypeId,
+        hasOwnedPetBefore,
+        petType,
+        agreed,
+        termsAccepted,
+        isEditingPersonal,
+        isEditingLiving,
+        isEditingPet,
+        isSubmitted,
+      ];
 }

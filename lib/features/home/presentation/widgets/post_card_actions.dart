@@ -49,7 +49,7 @@ class PostCardActions extends StatelessWidget {
               child: SvgPicture.asset(
                 'assets/icons/like.svg',
                 colorFilter: ColorFilter.mode(
-                  isLiked ? AppColors.current.red : AppColors.current.text.withOpacity(0.7),
+                  isLiked ? AppColors.current.red : AppColors.current.text.withValues(alpha: 0.7),
                   BlendMode.srcIn,
                 ),
                 height: 24.h,
@@ -97,7 +97,7 @@ class PostCardActions extends StatelessWidget {
               child: SvgPicture.asset(
                 'assets/icons/save_post.svg',
                 colorFilter: ColorFilter.mode(
-                  isSaved ? AppColors.current.yellow : AppColors.current.text.withOpacity(0.7),
+                  isSaved ? AppColors.current.yellow : AppColors.current.text.withValues(alpha: 0.7),
                   BlendMode.srcIn,
                 ),
                 height: 26.h,

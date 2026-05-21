@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:intl/intl.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/shimmers/report_shimmer.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -158,7 +157,7 @@ class PostCardHeader extends StatelessWidget {
                                     Container(
                                       padding: EdgeInsets.all(12.r),
                                       decoration: BoxDecoration(
-                                        color: AppColors.current.red.withOpacity(0.05),
+                                        color: AppColors.current.red.withValues(alpha: 0.05),
                                         borderRadius: BorderRadius.circular(12.r),
                                       ),
                                       child: Row(
@@ -193,7 +192,7 @@ class PostCardHeader extends StatelessWidget {
                                       (_, __) => Divider(
                                         height: 1.h,
                                         thickness: 1.h,
-                                        color: AppColors.current.lightGray.withOpacity(0.3),
+                                        color: AppColors.current.lightGray.withValues(alpha: 0.3),
                                       ),
                                   itemBuilder: (context, index) {
                                     final reason = state.reportReasons[index];
@@ -210,7 +209,7 @@ class PostCardHeader extends StatelessWidget {
                                       leading: Container(
                                         padding: EdgeInsets.all(8.r),
                                         decoration: BoxDecoration(
-                                          color: AppColors.current.red.withOpacity(0.08),
+                                          color: AppColors.current.red.withValues(alpha: 0.08),
                                           shape: BoxShape.circle,
                                         ),
                                         child: Icon(

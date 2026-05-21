@@ -63,3 +63,22 @@ class SortPetsEvent extends AdoptionBrowseEvent {
 class ResetFiltersEvent extends AdoptionBrowseEvent {
   const ResetFiltersEvent();
 }
+
+class FetchPetReportReasonsEvent extends AdoptionBrowseEvent {
+  const FetchPetReportReasonsEvent();
+}
+
+class ReportPetEvent extends AdoptionBrowseEvent {
+  final int petId;
+  final int reasonId;
+  final String customReason;
+
+  const ReportPetEvent({
+    required this.petId,
+    required this.reasonId,
+    required this.customReason,
+  });
+
+  @override
+  List<Object?> get props => [petId, reasonId, customReason];
+}
