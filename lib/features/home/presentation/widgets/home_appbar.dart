@@ -1,22 +1,15 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
-
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
-import 'package:pettix/data/network/constants.dart';
 import 'package:pettix/features/notification/presentation/bloc/notification_bloc.dart';
 import 'package:pettix/features/notification/presentation/bloc/notification_state.dart';
-
 import 'package:pettix/core/widgets/app_profile_image.dart';
 
 class HomeAppBar extends StatelessWidget {

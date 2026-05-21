@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 
 class ChatListShimmer extends StatefulWidget {

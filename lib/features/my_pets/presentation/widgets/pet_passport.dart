@@ -1,14 +1,11 @@
 import 'dart:math';
-
 import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/text_styles.dart';
-
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 
-import '../../../../data/network/constants.dart';
 
 /// Opens the pet passport overlay.
 /// [onToggleStatus] is called when the owner taps the availability toggle.

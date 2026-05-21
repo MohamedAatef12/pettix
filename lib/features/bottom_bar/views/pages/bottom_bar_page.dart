@@ -8,7 +8,6 @@ import 'package:pettix/features/adoption/presentation/view/adoption_screen.dart'
 import 'package:pettix/features/home/presentation/pages/home_page.dart';
 import 'package:pettix/features/notification/presentation/bloc/notification_bloc.dart';
 import 'package:pettix/features/notification/presentation/bloc/notification_event.dart';
-import 'package:pettix/features/profile/presentation/view/profile_screen.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 import 'package:pettix/features/home/presentation/blocs/home_state.dart';

@@ -1,8 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
-import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/core/models/response_model.dart';
-import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/data/network/api_services.dart';
 
 abstract class ChatRemoteDataSource {

@@ -133,17 +133,17 @@ class NotificationCard extends StatelessWidget {
         duration: const Duration(milliseconds: 300),
         margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
         decoration: BoxDecoration(
-          color: notification.isRead ? color : AppColors.current.primary.withOpacity(0.03),
+          color: notification.isRead ? color : AppColors.current.primary.withValues(alpha: 0.03),
           borderRadius: BorderRadius.circular(20.r),
           border: Border.all(
             color: notification.isRead 
                 ? Colors.transparent 
-                : AppColors.current.primary.withOpacity(0.2),
+                : AppColors.current.primary.withValues(alpha: 0.2),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               spreadRadius: 0,
               blurRadius: 15,
               offset: const Offset(0, 8),
@@ -180,10 +180,10 @@ class NotificationCard extends StatelessWidget {
                       height: 52.h,
                       width: 52.w,
                       decoration: BoxDecoration(
-                        color: _getIconColor().withOpacity(0.12),
+                        color: _getIconColor().withValues(alpha: 0.12),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: _getIconColor().withOpacity(0.08),
+                          color: _getIconColor().withValues(alpha: 0.08),
                           width: 1,
                         ),
                       ),
@@ -218,7 +218,7 @@ class NotificationCard extends StatelessWidget {
                                 DateFormatter.formatTimeAgo(notification.date),
                                 style: AppTextStyles.smallDescription.copyWith(
                                   fontSize: 11.sp,
-                                  color: AppColors.current.lightText.withOpacity(0.6),
+                                  color: AppColors.current.lightText.withValues(alpha: 0.6),
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -229,7 +229,7 @@ class NotificationCard extends StatelessWidget {
                             notification.body,
                             style: AppTextStyles.description.copyWith(
                               fontSize: 14.sp,
-                              color: AppColors.current.text.withOpacity(0.7),
+                              color: AppColors.current.text.withValues(alpha: 0.7),
                               height: 1.4,
                             ),
                           ),

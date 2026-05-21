@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -1262,7 +1261,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     final likes = result.getOrElse(() => []);
 
-    final updatedMap = Map<int, int>.from(state.commentLikesCount ?? {});
+    final updatedMap = Map<int, int>.from(state.commentLikesCount );
     updatedMap[commentId] = likes.length;
 
     final userResult = await getUserDataUseCase.call();
@@ -1273,7 +1272,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
 
     final user = userResult.getOrElse(() => throw '');
-    final likedCommentIds = List<int>.from(state.likedCommentId ?? []);
+    final likedCommentIds = List<int>.from(state.likedCommentId);
 
     final isLikedByUser = likes.any((like) => like.author.id == user.id);
 

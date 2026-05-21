@@ -1,11 +1,9 @@
 import 'package:pettix/core/widgets/app_profile_image.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/shimmers/comments_shimmer.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -232,7 +230,7 @@ class CommentsBody extends StatelessWidget {
                       colorFilter: ColorFilter.mode(
                         isLiked
                             ? AppColors.current.red
-                            : AppColors.current.text.withOpacity(0.7),
+                            : AppColors.current.text.withValues(alpha: 0.7),
                         BlendMode.srcIn,
                       ),
                       height: 30.h,

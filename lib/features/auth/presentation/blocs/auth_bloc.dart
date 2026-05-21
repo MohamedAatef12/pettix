@@ -197,7 +197,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(LoginLoading());
 
     final fcmToken = await DI.find<ICacheManager>().getFcmToken();
-    print('🚀 FCM TOKEN FOR LOGIN: $fcmToken');
+    debugPrint('🚀 FCM TOKEN FOR LOGIN: $fcmToken');
     final result = await loginUseCase(event.model.copyWith(fcmToken: fcmToken));
     await result.fold(
           (failure) async {
@@ -251,7 +251,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
 
       final fcmToken = await DI.find<ICacheManager>().getFcmToken();
-      print('🚀 FCM TOKEN FOR GOOGLE LOGIN: $fcmToken');
+      debugPrint('🚀 FCM TOKEN FOR GOOGLE LOGIN: $fcmToken');
       final result = await googleLoginUseCase(
         GoogleLoginEntity(idToken: googleAuth.idToken!, fcmToken: fcmToken),
       );

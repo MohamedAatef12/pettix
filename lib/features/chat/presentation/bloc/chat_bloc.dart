@@ -9,7 +9,6 @@ import 'package:pettix/features/chat/domain/use_cases/send_message_use_case.dart
 import 'package:pettix/features/home/domain/usecases/get_user_cached%20_data.dart';
 import '../../domain/use_cases/delete_message_use_case.dart';
 import '../../domain/use_cases/edit_message_use_case.dart';
-import '../../domain/use_cases/get_messages_use_case.dart';
 import '../../domain/use_cases/get_cached_messages_use_case.dart';
 import '../../domain/use_cases/find_cached_conversation_use_case.dart';
 import '../../domain/use_cases/get_conversation_details_use_case.dart';
@@ -89,7 +88,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       });
     } else if (finalConvId != null) {
        // Pre-load cached messages (cache-first) immediately
-       add(GetMessagesEvent(finalConvId!, isRefresh: true));
+       add(GetMessagesEvent(finalConvId, isRefresh: true));
        messagesPreLoaded = true;
     }
 

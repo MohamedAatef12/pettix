@@ -37,13 +37,13 @@ class NotificationsTabButton extends StatelessWidget {
           boxShadow: [
             if (isActive)
               BoxShadow(
-                color: AppColors.current.primary.withOpacity(0.3),
+                color: AppColors.current.primary.withValues(alpha: 0.3),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               )
             else
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),

@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'package:injectable/injectable.dart';
-import 'package:signalr_netcore/hub_connection.dart';
-import 'package:signalr_netcore/hub_connection_builder.dart';
 import 'package:signalr_netcore/ihub_protocol.dart';
 import 'package:signalr_netcore/signalr_client.dart';
 import 'package:talker_flutter/talker_flutter.dart';
