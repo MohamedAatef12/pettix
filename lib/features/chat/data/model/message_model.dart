@@ -20,16 +20,16 @@ class MessageModel extends MessageEntity {
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
     return MessageModel(
-      id: int.tryParse(json['id']?.toString() ?? '') ?? 0,
-      conversationId: int.tryParse(json['conversationId']?.toString() ?? '') ?? 0,
-      senderId: int.tryParse((json['senderUserId'] ?? json['senderId'])?.toString() ?? '') ?? 0,
-      content: json['messageText'] ?? json['content'] ?? '',
-      sentAt: DateTime.tryParse(json['createdAt'] ?? json['sentAt'] ?? '') ?? DateTime.now(),
-      editedAt: json['updatedAt'] != null ? DateTime.tryParse(json['updatedAt']) : (json['editedAt'] != null ? DateTime.tryParse(json['editedAt']) : null),
-      isDeleted: json['deleted'] ?? json['isDeleted'] ?? false,
+      id: int.tryParse((json['id'] ?? json['Id'])?.toString() ?? '') ?? 0,
+      conversationId: int.tryParse((json['conversationId'] ?? json['ConversationId'] ?? json['chatId'] ?? json['ChatId'] ?? json['roomId'] ?? json['RoomId'])?.toString() ?? '') ?? 0,
+      senderId: int.tryParse((json['senderUserId'] ?? json['SenderUserId'] ?? json['senderId'] ?? json['SenderId'])?.toString() ?? '') ?? 0,
+      content: json['messageText'] ?? json['MessageText'] ?? json['content'] ?? json['Content'] ?? '',
+      sentAt: DateTime.tryParse((json['createdAt'] ?? json['CreatedAt'] ?? json['sentAt'] ?? json['SentAt'])?.toString() ?? '') ?? DateTime.now(),
+      editedAt: (json['updatedAt'] ?? json['UpdatedAt']) != null ? DateTime.tryParse((json['updatedAt'] ?? json['UpdatedAt']).toString()) : ((json['editedAt'] ?? json['EditedAt']) != null ? DateTime.tryParse((json['editedAt'] ?? json['EditedAt']).toString()) : null),
+      isDeleted: json['deleted'] ?? json['Deleted'] ?? json['isDeleted'] ?? json['IsDeleted'] ?? false,
       isSending: false, // Messages from backend are never "sending"
-      sender: json['sender'] != null ? ChatUserModel.fromJson(json['sender']) : null,
-      imageUrl: _processImageUrl(json['imageUrl'] ?? json['mediaUrl'] ?? json['attachmentUrl']),
+      sender: (json['sender'] ?? json['Sender']) != null ? ChatUserModel.fromJson(json['sender'] ?? json['Sender']) : null,
+      imageUrl: _processImageUrl(json['imageUrl'] ?? json['ImageUrl'] ?? json['mediaUrl'] ?? json['MediaUrl'] ?? json['attachmentUrl'] ?? json['AttachmentUrl']),
     );
   }
 
@@ -66,6 +66,7 @@ class MessageModel extends MessageEntity {
     DateTime? editedAt,
     bool? isDeleted,
     bool? isSending,
+    bool? isFailed,
     ChatUserEntity? sender,
     String? imageUrl,
   }) {

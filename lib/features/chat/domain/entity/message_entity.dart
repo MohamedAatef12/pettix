@@ -10,6 +10,7 @@ class MessageEntity extends Equatable {
   final DateTime? editedAt;
   final bool isDeleted;
   final bool isSending;
+  final bool isFailed;
   final ChatUserEntity? sender;
   final String? imageUrl;
 
@@ -22,6 +23,7 @@ class MessageEntity extends Equatable {
     this.editedAt,
     this.isDeleted = false,
     this.isSending = false,
+    this.isFailed = false,
     this.sender,
     this.imageUrl,
   });
@@ -35,6 +37,7 @@ class MessageEntity extends Equatable {
     DateTime? editedAt,
     bool? isDeleted,
     bool? isSending,
+    bool? isFailed,
     ChatUserEntity? sender,
     String? imageUrl,
   }) {
@@ -47,11 +50,12 @@ class MessageEntity extends Equatable {
       editedAt: editedAt ?? this.editedAt,
       isDeleted: isDeleted ?? this.isDeleted,
       isSending: isSending ?? this.isSending,
+      isFailed: isFailed ?? this.isFailed,
       sender: sender ?? this.sender,
       imageUrl: imageUrl ?? this.imageUrl,
     );
   }
 
   @override
-  List<Object?> get props => [id, conversationId, senderId, content, sentAt, editedAt, isDeleted, isSending, sender, imageUrl];
+  List<Object?> get props => [id, conversationId, senderId, content, sentAt, editedAt, isDeleted, isSending, isFailed, sender, imageUrl];
 }

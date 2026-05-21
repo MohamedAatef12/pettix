@@ -9,7 +9,6 @@ import 'package:pettix/features/chat/domain/use_cases/send_message_use_case.dart
 import 'package:pettix/features/home/domain/usecases/get_user_cached%20_data.dart';
 import '../../domain/use_cases/delete_message_use_case.dart';
 import '../../domain/use_cases/edit_message_use_case.dart';
-import '../../domain/use_cases/get_messages_use_case.dart';
 import '../../domain/use_cases/get_cached_messages_use_case.dart';
 import '../../domain/use_cases/find_cached_conversation_use_case.dart';
 import '../../domain/use_cases/get_conversation_details_use_case.dart';
@@ -17,7 +16,7 @@ import '../../domain/use_cases/get_cached_conversation_by_id_use_case.dart';
 import 'chat_event.dart';
 import 'chat_state.dart';
 
-@injectable
+  @injectable
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final GetMessagesUseCase _getMessagesUseCase;
   final GetCachedMessagesUseCase _getCachedMessagesUseCase;
@@ -33,6 +32,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   StreamSubscription? _messageSubscription;
   StreamSubscription? _deleteSubscription;
+
+  int? _currentConversationId;
 
   static const int _pageSize = 20;
 
@@ -56,15 +57,71 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<InitializeChatEvent>(_onInitializeChat);
     on<GetMessagesEvent>(_onGetMessages);
     on<SendMessageEvent>(_onSendMessage);
+    on<ResendMessageEvent>(_onResendMessage);
     on<EditMessageEvent>(_onEditMessage);
     on<DeleteMessageEvent>(_onDeleteMessage);
     on<OnMessageReceivedEvent>(_onMessageReceived);
     on<OnMessageDeletedEvent>(_onMessageDeleted);
+
+    // Setup global subscriptions early to capture messages before chat initialization completes
+    _setupGlobalSubscriptions();
+  }
+
+  void _setupGlobalSubscriptions() {
+    _messageSubscription?.cancel();
+    _messageSubscription = _signalRService.messageStream.listen((message) {
+      if (_currentConversationId == null) return;
+      
+      bool belongsToCurrent = message.conversationId == _currentConversationId;
+      
+      // Fallback: If backend omits conversationId, check if sender is in the current conversation
+      if (!belongsToCurrent && message.conversationId == 0) {
+        final members = state.conversation?.members;
+        if (members != null && members.any((m) => m.userId == message.senderId)) {
+          belongsToCurrent = true;
+        }
+      }
+
+      if (belongsToCurrent) {
+        final msgToDispatch = message.conversationId == 0 
+            ? message.copyWith(conversationId: _currentConversationId) 
+            : message;
+        add(OnMessageReceivedEvent(msgToDispatch));
+      }
+    });
+
+    _deleteSubscription?.cancel();
+    _deleteSubscription = _signalRService.deleteStream.listen((messageId) {
+      add(OnMessageDeletedEvent(messageId));
+    });
   }
 
   Future<void> _onInitializeChat(InitializeChatEvent event, Emitter<ChatState> emit) async {
+    // Ensure SignalR connection is alive
+    await _signalRService.start();
+
+    // 0. Set conversation ID IMMEDIATELY to enable SignalR filtering during initialization
+    // This prevents messages from being dropped during the async initialization phase
+    int? finalConvId = event.conversationId;
+
+    // If we only have otherUserId, we need to find the conversation ID first
+    if (finalConvId == null && event.otherUserId != null) {
+      final cacheLookup = await _findCachedConversationUseCase(event.otherUserId!);
+      cacheLookup.fold((_) {}, (convo) {
+        if (convo != null) {
+          finalConvId = convo.id;
+        }
+      });
+    }
+
+    // Set the active conversation ID to enable message filtering in subscriptions
+    if (finalConvId != null) {
+      _currentConversationId = finalConvId;
+      _signalRService.joinConversation(finalConvId!);
+    }
+
     // 1. Initial status
-    emit(state.copyWith(status: ChatStatus.loading, conversationId: event.conversationId));
+    emit(state.copyWith(status: ChatStatus.loading, conversationId: finalConvId));
 
     // Fetch user info for isMe check
     final userResult = await _getUserDataUseCase();
@@ -72,42 +129,29 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     userResult.fold((_) {}, (user) => currentUserId = user.id);
     emit(state.copyWith(currentUserId: currentUserId));
 
-    int? finalConvId = event.conversationId;
-    bool messagesPreLoaded = false; // tracks if GetMessagesEvent was already dispatched
-
-    // 2. If we only have otherUserId, try to find the cached conversation ID first
+    // 2. If we need to fetch conversation details from cache
     if (finalConvId == null && event.otherUserId != null) {
-      final cacheLookup = await _findCachedConversationUseCase(event.otherUserId!);
-      cacheLookup.fold((_) {}, (convo) {
-        if (convo != null) {
-          finalConvId = convo.id;
-          emit(state.copyWith(conversation: convo, conversationId: finalConvId));
-          // Pre-load cached messages immediately while remote initialization happens
-          add(GetMessagesEvent(finalConvId!, isRefresh: true));
-          messagesPreLoaded = true;
-        }
-      });
-    } else if (finalConvId != null) {
-       // Pre-load cached messages (cache-first) immediately
-       add(GetMessagesEvent(finalConvId!, isRefresh: true));
-       messagesPreLoaded = true;
-    }
-
-    // 3. Perform remote initialization
-    if (finalConvId == null && event.otherUserId != null) {
+      // Already tried cache above, now get the conversation ID from remote
       final result = await _createPrivateConversationUseCase(event.otherUserId!);
       result.fold(
         (failure) {
-          if (state.conversation == null) {
-             emit(state.copyWith(status: ChatStatus.error, errorMessage: failure.message));
-          }
+          emit(state.copyWith(status: ChatStatus.error, errorMessage: failure.message));
         },
         (conversation) {
           finalConvId = conversation.id;
+          _currentConversationId = finalConvId;
           emit(state.copyWith(conversation: conversation, conversationId: finalConvId));
         },
       );
-    } else if (finalConvId != null) {
+    }
+
+    // Pre-load cached messages immediately while remote initialization happens
+    if (finalConvId != null) {
+      add(GetMessagesEvent(finalConvId!, isRefresh: true));
+    }
+
+    // 3. Perform remote initialization for more details
+    if (finalConvId != null) {
       // Look up cached conversation details first to skip API call if possible
       bool skippedRemoteConv = false;
       final cachedConvResult = await _getCachedConversationByIdUseCase(finalConvId!);
@@ -124,26 +168,6 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
            (_) {},
            (conversation) => emit(state.copyWith(conversation: conversation)),
          );
-      }
-    }
-
-    // 4. Setup SignalR and fetch messages (if not already fetched by GetMessagesEvent)
-    if (finalConvId != null) {
-      _messageSubscription?.cancel();
-      _messageSubscription = _signalRService.messageStream.listen((message) {
-        if (message.conversationId == finalConvId) {
-          add(OnMessageReceivedEvent(message));
-        }
-      });
-
-      _deleteSubscription?.cancel();
-      _deleteSubscription = _signalRService.deleteStream.listen((messageId) {
-        add(OnMessageDeletedEvent(messageId));
-      });
-
-      // Only dispatch if not already pre-loaded (avoids the double API call)
-      if (!messagesPreLoaded) {
-        add(GetMessagesEvent(finalConvId!, isRefresh: true));
       }
     } else if (event.otherUserId == null) {
       emit(state.copyWith(status: ChatStatus.error, errorMessage: 'No conversation or user ID provided'));
@@ -235,13 +259,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     result.fold(
       (failure) {
-        // Remove the optimistic message on failure
-        final updatedMessages = state.messages.where((m) => m.id != optimisticMessage.id).toList();
-        emit(state.copyWith(
-          status: ChatStatus.error,
-          errorMessage: failure.message,
-          messages: updatedMessages,
-        ));
+        // Mark the optimistic message as failed instead of removing it
+        final updatedMessages = state.messages.map((m) {
+          if (m.id == optimisticMessage.id) {
+            return m.copyWith(isSending: false, isFailed: true);
+          }
+          return m;
+        }).toList();
+        emit(state.copyWith(messages: updatedMessages));
       },
       (message) {
         // Check if SignalR already added this message (race condition)
@@ -263,6 +288,19 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         }
       },
     );
+  }
+
+  Future<void> _onResendMessage(ResendMessageEvent event, Emitter<ChatState> emit) async {
+    // Remove the failed message from the list
+    final withoutFailed = state.messages.where((m) => m.id != event.failedMessageId).toList();
+    emit(state.copyWith(messages: withoutFailed));
+
+    // Re-dispatch as a normal send
+    add(SendMessageEvent(
+      conversationId: event.conversationId,
+      content: event.content,
+      imagePath: event.imagePath,
+    ));
   }
 
   Future<void> _onEditMessage(EditMessageEvent event, Emitter<ChatState> emit) async {
@@ -333,6 +371,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   @override
   Future<void> close() {
+    _currentConversationId = null;
     _messageSubscription?.cancel();
     _deleteSubscription?.cancel();
     return super.close();

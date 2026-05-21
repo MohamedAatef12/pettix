@@ -74,3 +74,20 @@ class OnMessageDeletedEvent extends ChatEvent {
   @override
   List<Object?> get props => [messageId];
 }
+
+class ResendMessageEvent extends ChatEvent {
+  final int failedMessageId; // the temp optimistic ID to remove
+  final int conversationId;
+  final String content;
+  final String? imagePath;
+
+  const ResendMessageEvent({
+    required this.failedMessageId,
+    required this.conversationId,
+    required this.content,
+    this.imagePath,
+  });
+
+  @override
+  List<Object?> get props => [failedMessageId, conversationId, content, imagePath];
+}

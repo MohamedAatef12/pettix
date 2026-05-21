@@ -103,6 +103,9 @@ class ChatListBloc extends Bloc<ChatListEvent, ChatListState> {
   }
 
   Future<void> _onGetConversations(GetConversationsEvent event, Emitter<ChatListState> emit) async {
+    // Ensure SignalR connection is alive
+    _signalRService.start();
+
     // 1. Try to load from Cache first for instant feedback
     final cacheResult = await _getCachedConversationsUseCase();
     final userResult = await _getUserDataUseCase();
