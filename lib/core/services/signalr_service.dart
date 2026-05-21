@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:injectable/injectable.dart';
 import 'package:signalr_netcore/ihub_protocol.dart';
 import 'package:signalr_netcore/signalr_client.dart';
 import 'package:talker_flutter/talker_flutter.dart';
+import 'package:logging/logging.dart';
 import '../../data/caching/i_cache_manager.dart';
 import '../../data/network/constants.dart';
 import '../../features/chat/data/data_source/chat_local_data_source.dart';
@@ -26,7 +28,7 @@ class SignalRService {
   SignalRService(this._cacheManager, this._talker, this._chatLocalCache);
 
   Future<void> start() async {
-    if (_hubConnection?.state == HubConnectionState.Connected) return;
+    if (_hubConnection?.state == HubConnectionState.Connected || _hubConnection?.state == HubConnectionState.Connecting) return;
 
     final token = await _cacheManager.getToken();
     if (token == null || token.isEmpty) {
@@ -37,6 +39,12 @@ class SignalRService {
     // Backend constraint: token MUST be in the query string
     final hubUrl = '${Constants.baseUrl}/hubs/chat?access_token=$token';
     
+    // Enable verbose SignalR logging
+    Logger.root.level = Level.ALL;
+    Logger.root.onRecord.listen((LogRecord rec) {
+      _talker.verbose('SignalR-Internal: ${rec.level.name}: ${rec.time}: ${rec.message}');
+    });
+
     _hubConnection = HubConnectionBuilder()
         .withUrl(
           hubUrl,
@@ -44,6 +52,7 @@ class SignalRService {
             headers: MessageHeaders()..setHeaderValue('ngrok-skip-browser-warning', 'true'),
           ),
         )
+        .configureLogging(Logger("SignalR"))
         .withAutomaticReconnect()
         .build();
 
@@ -60,10 +69,30 @@ class SignalRService {
     });
 
     // Register Listeners
-    _hubConnection!.on('messageReceived', (arguments) {
+    void onMessageReceived(List<Object?>? arguments) {
       if (arguments != null && arguments.isNotEmpty) {
         try {
-          final messageJson = arguments[0] as Map<String, dynamic>;
+          Map<String, dynamic>? messageJson;
+          for (var arg in arguments) {
+            if (arg is Map<String, dynamic>) {
+              messageJson = arg;
+              break;
+            } else if (arg is String) {
+              try {
+                final decoded = jsonDecode(arg);
+                if (decoded is Map<String, dynamic>) {
+                  messageJson = decoded;
+                  break;
+                }
+              } catch (_) {}
+            }
+          }
+          
+          if (messageJson == null) {
+            _talker.warning('SignalR: No valid Map found in messageReceived arguments: $arguments');
+            return;
+          }
+          
           final message = MessageModel.fromJson(messageJson);
           _messageController.add(message);
           
@@ -75,24 +104,56 @@ class SignalRService {
           _talker.error('SignalR: Error parsing messageReceived: $e');
         }
       }
-    });
+    }
 
-    _hubConnection!.on('conversationUpdated', (arguments) {
+    final eventNames = [
+      'messageReceived', 'MessageReceived', 
+      'ReceiveMessage', 'receiveMessage', 
+      'newMessage', 'NewMessage', 
+      'chatMessage', 'ChatMessage', 
+      'onMessage', 'OnMessage', 
+      'broadcastMessage', 'BroadcastMessage',
+      'Receive', 'receive'
+    ];
+    
+    for (var event in eventNames) {
+      _hubConnection!.on(event, onMessageReceived);
+    }
+
+    void onConversationUpdated(List<Object?>? arguments) {
       _conversationController.add(null);
       _talker.info('SignalR: Conversation updated');
-    });
+    }
 
-    _hubConnection!.on('messageDeleted', (arguments) {
+    _hubConnection!.on('conversationUpdated', onConversationUpdated);
+    _hubConnection!.on('ConversationUpdated', onConversationUpdated);
+
+    void onMessageDeleted(List<Object?>? arguments) {
       if (arguments != null && arguments.isNotEmpty) {
         try {
-          final messageId = arguments[0] as int;
-          _deleteController.add(messageId);
-          _talker.info('SignalR: Message deleted: $messageId');
+          int? messageId;
+          for (var arg in arguments) {
+            if (arg is int) {
+              messageId = arg;
+              break;
+            } else if (arg is String) {
+              messageId = int.tryParse(arg);
+              if (messageId != null) break;
+            }
+          }
+          
+          if (messageId != null) {
+            _deleteController.add(messageId);
+            _talker.info('SignalR: Message deleted: $messageId');
+          }
         } catch (e) {
           _talker.error('SignalR: Error parsing messageDeleted: $e');
         }
       }
-    });
+    }
+
+    _hubConnection!.on('messageDeleted', onMessageDeleted);
+    _hubConnection!.on('MessageDeleted', onMessageDeleted);
     
     int retryCount = 0;
     const maxRetries = 6;
@@ -126,6 +187,23 @@ class SignalRService {
       _talker.info('SignalR: Connection stopped');
     } catch (e) {
       _talker.error('SignalR: Error stopping connection: $e');
+    }
+  }
+
+  Future<void> joinConversation(int conversationId) async {
+    if (_hubConnection?.state != HubConnectionState.Connected) return;
+    
+    // Many SignalR backends require clients to explicitly join a conversation group
+    // We try the most common method names defensively.
+    final methods = ['JoinConversation', 'JoinChat', 'JoinGroup', 'JoinRoom', 'SubscribeToConversation'];
+    for (var method in methods) {
+      try {
+        await _hubConnection!.invoke(method, args: [conversationId]);
+        _talker.info('SignalR: Successfully joined conversation via $method($conversationId)');
+        return; // Success! Stop trying.
+      } catch (e) {
+        _talker.verbose('SignalR: Join attempt with $method failed (might not exist): $e');
+      }
     }
   }
 

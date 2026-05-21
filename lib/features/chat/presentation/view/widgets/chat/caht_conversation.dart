@@ -108,11 +108,21 @@ class _ChatConversationState extends State<ChatConversation> {
                 final msg = messages[index];
                 final isMe = msg.senderId == state.currentUserId;
 
+                final conversationId = state.conversationId!;
                 return ChatBubble(
                   text: msg.content,
                   isMe: isMe,
                   isSending: msg.isSending,
+                  isFailed: msg.isFailed,
                   imageUrl: msg.imageUrl,
+                  onResend: msg.isFailed
+                      ? () => context.read<ChatBloc>().add(ResendMessageEvent(
+                            failedMessageId: msg.id,
+                            conversationId: conversationId,
+                            content: msg.content,
+                            imagePath: msg.imageUrl,
+                          ))
+                      : null,
                 );
               },
             ),
@@ -136,13 +146,17 @@ class ChatBubble extends StatelessWidget {
   final String? imageUrl;
   final bool isMe;
   final bool isSending;
+  final bool isFailed;
+  final VoidCallback? onResend;
 
   const ChatBubble({
     super.key,
     required this.text,
     required this.isMe,
     this.isSending = false,
+    this.isFailed = false,
     this.imageUrl,
+    this.onResend,
   });
 
   @override
@@ -159,7 +173,7 @@ class ChatBubble extends StatelessWidget {
                 imageUrl != null
                     ? EdgeInsets.all(4.r)
                     : EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
-            constraints: BoxConstraints(maxWidth: 260.w),
+            constraints:BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.55),
             decoration: BoxDecoration(
               color:
                   isMe
@@ -202,25 +216,62 @@ class ChatBubble extends StatelessWidget {
                       ),
                     ),
                   ),
+                if (isMe) ...[                  
+                  if (isFailed) ...[                    
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 2.h, right: 2.w, bottom: 2.h),
+                        child: Icon(
+                          Icons.error_outline,
+                          size: 14.r,
+                          color: Colors.redAccent,
+                        ),
+                      ),
+                    ),
+                  ] else if (isSending) ...[                    
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 2.h, right: 2.w, bottom: 2.h),
+                        child: Icon(
+                          Icons.access_time_rounded,
+                          size: 14.r,
+                          color: Colors.white54,
+                        ),
+                      ),
+                    ),
+                  ] else ...[                    
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 2.h, right: 2.w, bottom: 2.h),
+                        child: Icon(
+                          Icons.done_all,
+                          size: 14.r,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ],
             ),
           ),
-          if (isMe && isSending) SizedBox(width: 8.w),
-          if (isMe && isSending)
-            Padding(
-              padding: EdgeInsets.only(bottom: 8.h),
-              child: SizedBox(
-                width: 12.w,
-                height: 12.w,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    AppColors.current.primary,
-                  ),
+          // Resend button shown outside the bubble when failed
+          if (isMe && isFailed && onResend != null)
+            GestureDetector(
+              onTap: onResend,
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 8.h, right: 4.w),
+                child: Icon(
+                  Icons.refresh_rounded,
+                  size: 18.r,
+                  color: Colors.redAccent,
                 ),
               ),
             ),
-        ],
+    ]
       ),
     );
   }

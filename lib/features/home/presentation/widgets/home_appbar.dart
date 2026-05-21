@@ -48,8 +48,11 @@ class HomeAppBar extends StatelessWidget {
                     CircleAvatar(
                       radius: 20.r,
                       backgroundColor: AppColors.current.white,
-                      child: Icon(Iconsax.notification_bing,
-                          size: 20.r, color: AppColors.current.text),
+                      child: Icon(
+                        Iconsax.notification_bing,
+                        size: 20.r,
+                        color: AppColors.current.text,
+                      ),
                     ),
                     if (state.totalUnreadCount > 0)
                       Positioned(
@@ -62,7 +65,7 @@ class HomeAppBar extends StatelessWidget {
                             shape: BoxShape.circle,
                           ),
                           constraints: BoxConstraints(
-                            minWidth:10.w,
+                            minWidth: 10.w,
                             minHeight: 10.h,
                           ),
                         ),

@@ -94,7 +94,7 @@ class CustomDrawer extends StatelessWidget {
                     color: const Color(0xFF5EA8DF),
                     onTap: () {},
                   ),
-               
+
                   _TileSvg(
                     path: 'assets/icons/refund.svg',
                     label: AppText.refundsReturns,
@@ -150,9 +150,7 @@ class CustomDrawer extends StatelessWidget {
                     ),
                   ),
                   const _LogoutTile(),
-                  SizedBox(
-                    height: 70.h,
-                  ),
+                  SizedBox(height: 70.h),
                 ],
               ),
             ),
