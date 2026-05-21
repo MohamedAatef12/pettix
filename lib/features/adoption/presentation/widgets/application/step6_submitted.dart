@@ -348,7 +348,7 @@ class _InfoCard extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(8.w),
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.15),
+              color: iconColor.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10.r),
             ),
             child: Icon(icon, size: 18.w, color: iconColor),

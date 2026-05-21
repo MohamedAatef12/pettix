@@ -1218,9 +1218,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     throttledPostIds.add(commentId);
 
     final updatedCommentLikes = Map<int, int>.from(
-      state.commentLikesCount ?? {},
+      state.commentLikesCount ,
     );
-    final updatedLikedComments = List<int>.from(state.likedCommentId ?? []);
+    final updatedLikedComments = List<int>.from(state.likedCommentId );
 
     final currentCount = updatedCommentLikes[commentId] ?? 1;
     updatedCommentLikes[commentId] = currentCount > 0 ? currentCount - 1 : 0;
@@ -1292,9 +1292,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   void _revertCommentLike(int commentId, Emitter<HomeState> emit) {
-    final updatedLikedComments = List<int>.from(state.likedCommentId ?? [])
+    final updatedLikedComments = List<int>.from(state.likedCommentId )
       ..remove(commentId);
-    final updatedCounts = Map<int, int>.from(state.commentLikesCount ?? {});
+    final updatedCounts = Map<int, int>.from(state.commentLikesCount);
     final currentCount = updatedCounts[commentId] ?? 1;
     updatedCounts[commentId] = currentCount > 0 ? currentCount - 1 : 0;
 
@@ -1307,9 +1307,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   void _revertCommentUnlike(int commentId, Emitter<HomeState> emit) {
-    final updatedLikedComments = List<int>.from(state.likedCommentId ?? [])
+    final updatedLikedComments = List<int>.from(state.likedCommentId )
       ..add(commentId);
-    final updatedCounts = Map<int, int>.from(state.commentLikesCount ?? {});
+    final updatedCounts = Map<int, int>.from(state.commentLikesCount);
     final currentCount = updatedCounts[commentId] ?? 0;
     updatedCounts[commentId] = currentCount + 1;
 
