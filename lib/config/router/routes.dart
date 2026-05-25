@@ -45,6 +45,7 @@ class AppRoutes {
   static const String settings = '/settings';
 
   // ── My Pets ───────────────────────────────────────────────────────────────
+  static const String myPets = '/my_pets';
   static const String addPet = '/add_pet';
 
   // ── Adoption History ──────────────────────────────────────────────────────
@@ -113,6 +114,7 @@ class AppRouteNames {
   static const String settings = 'settings';
 
   // ── My Pets ───────────────────────────────────────────────────────────────
+  static const String myPets = 'my_pets';
   static const String addPet = 'add_pet';
 
   // ── Adoption History ──────────────────────────────────────────────────────

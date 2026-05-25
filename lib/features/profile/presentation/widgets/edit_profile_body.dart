@@ -1,4 +1,3 @@
-import 'package:pettix/features/profile/presentation/widgets/profile_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,7 +10,9 @@ import 'package:pettix/features/profile/domain/entities/update_profile_entity.da
 import 'package:pettix/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_event.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_state.dart';
+import 'package:pettix/features/profile/presentation/widgets/address_map_picker.dart';
 import 'package:pettix/features/profile/presentation/widgets/avatar_picker.dart';
+import 'package:pettix/features/profile/presentation/widgets/edit_profile_shimmer.dart';
 import 'package:pettix/features/profile/presentation/widgets/gender_dropdown.dart';
 
 class EditProfileBody extends StatelessWidget {
@@ -57,7 +58,7 @@ class EditProfileBody extends StatelessWidget {
         final bloc = context.read<ProfileBloc>();
         final profile = state.profile;
         if (profile == null) {
-          return const ProfileShimmer();
+          return const EditProfileShimmer();
         }
 
         final isUpdating = state.status == ProfileStatus.updating;
@@ -152,16 +153,28 @@ class EditProfileBody extends StatelessWidget {
                     SizedBox(height: 12.h),
                     const GenderDropdown(),
                     SizedBox(height: 12.h),
-                    _FilledField(
+
+                    // ── Address field with map picker ─────────────────────────
+                    _AddressPickerField(
                       controller: bloc.addressController,
-                      label: AppText.address,
-                      icon: Icons.location_on_outlined,
-                      iconColor: AppColors.current.red,
-                      maxLines: 2,
+                      onTap: () async {
+                        final picked =
+                            await Navigator.of(context).push<String>(
+                          MaterialPageRoute(
+                            builder: (_) => AddressMapPickerPage(
+                              initialAddress: bloc.addressController.text,
+                            ),
+                          ),
+                        );
+                        if (!context.mounted) return;
+                        if (picked != null && picked.isNotEmpty) {
+                          bloc.addressController.text = picked;
+                        }
+                      },
                     ),
                     SizedBox(height: 32.h),
 
-                    // ── Save button ────────────────────────────────────────
+                    // ── Save button ────────────────────────────────────────────
                     GestureDetector(
                       onTap: isUpdating ? null : () => _submit(context, state),
                       child: AnimatedContainer(
@@ -176,7 +189,8 @@ class EditProfileBody extends StatelessWidget {
                               ? []
                               : [
                                   BoxShadow(
-                                    color: AppColors.current.primary.withAlpha(80),
+                                    color:
+                                        AppColors.current.primary.withAlpha(80),
                                     blurRadius: 16,
                                     offset: const Offset(0, 6),
                                   ),
@@ -214,6 +228,72 @@ class EditProfileBody extends StatelessWidget {
   }
 }
 
+// ─── Address picker field ─────────────────────────────────────────────────────
+
+class _AddressPickerField extends StatelessWidget {
+  final TextEditingController controller;
+  final VoidCallback onTap;
+
+  const _AddressPickerField({
+    required this.controller,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      readOnly: true,
+      maxLines: 2,
+      onTap: onTap,
+      style: TextStyle(
+        color: AppColors.current.text,
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+      ),
+      decoration: InputDecoration(
+        labelText: AppText.address,
+        labelStyle:
+            TextStyle(color: AppColors.current.midGray, fontSize: 13.sp),
+        prefixIcon: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 14.w),
+          child: Icon(
+            Icons.location_on_outlined,
+            color: AppColors.current.red,
+            size: 20.w,
+          ),
+        ),
+        prefixIconConstraints: BoxConstraints(minWidth: 52.w),
+        suffixIcon: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12.w),
+          child: Icon(
+            Icons.map_outlined,
+            color: AppColors.current.primary,
+            size: 20.w,
+          ),
+        ),
+        suffixIconConstraints: BoxConstraints(minWidth: 52.w),
+        filled: true,
+        fillColor: AppColors.current.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14.r),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14.r),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14.r),
+          borderSide: BorderSide(color: AppColors.current.primary, width: 1.5),
+        ),
+        contentPadding:
+            EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      ),
+    );
+  }
+}
+
 // ─── Reusable filled text field ───────────────────────────────────────────────
 
 class _FilledField extends StatelessWidget {
@@ -246,7 +326,8 @@ class _FilledField extends StatelessWidget {
       ),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: AppColors.current.midGray, fontSize: 13.sp),
+        labelStyle:
+            TextStyle(color: AppColors.current.midGray, fontSize: 13.sp),
         prefixIcon: Padding(
           padding: EdgeInsets.symmetric(horizontal: 14.w),
           child: Icon(icon, color: iconColor, size: 20.w),
@@ -266,7 +347,8 @@ class _FilledField extends StatelessWidget {
           borderRadius: BorderRadius.circular(14.r),
           borderSide: BorderSide(color: AppColors.current.primary, width: 1.5),
         ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        contentPadding:
+            EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       ),
     );
   }

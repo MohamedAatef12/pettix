@@ -4,6 +4,8 @@ import 'package:injectable/injectable.dart';
 import 'package:pettix/features/adoption/domain/entities/paged_pets_params.dart';
 import 'package:pettix/features/adoption/domain/usecases/get_paged_pets_usecase.dart';
 import 'package:pettix/features/my_pets/domain/usecases/get_pet_options_usecase.dart';
+import 'package:pettix/features/adoption/domain/usecases/get_pet_report_reasons_usecase.dart';
+import 'package:pettix/features/adoption/domain/usecases/report_pet_usecase.dart';
 
 import 'adoption_browse_event.dart';
 import 'adoption_browse_state.dart';
@@ -13,14 +15,20 @@ class AdoptionBrowseBloc
     extends Bloc<AdoptionBrowseEvent, AdoptionBrowseState> {
   final GetPagedPetsUseCase _getPagedPets;
   final GetPetOptionsUseCase _getPetOptions;
+  final GetPetReportReasonsUseCase _getReportReasons;
+  final ReportPetUseCase _reportPet;
 
   /// Owned by the BLoC so the search TextField can remain stateless.
   final searchController = TextEditingController();
 
   static const int _pageSize = 10;
 
-  AdoptionBrowseBloc(this._getPagedPets, this._getPetOptions)
-      : super(const AdoptionBrowseState()) {
+  AdoptionBrowseBloc(
+    this._getPagedPets,
+    this._getPetOptions,
+    this._getReportReasons,
+    this._reportPet,
+  ) : super(const AdoptionBrowseState()) {
     on<InitAdoptionBrowseEvent>(_onInit);
     on<RefreshPetsEvent>(_onRefresh);
     on<LoadMorePetsEvent>(_onLoadMore);
@@ -29,6 +37,8 @@ class AdoptionBrowseBloc
     on<FilterByGenderEvent>(_onFilterGender);
     on<SortPetsEvent>(_onSort);
     on<ResetFiltersEvent>(_onReset);
+    on<FetchPetReportReasonsEvent>(_onFetchReportReasons);
+    on<ReportPetEvent>(_onReportPet);
   }
 
   @override
@@ -218,6 +228,30 @@ class AdoptionBrowseBloc
         currentPage: 0,
         hasMore: r.items.length >= _pageSize,
       )),
+    );
+  }
+
+  Future<void> _onFetchReportReasons(
+      FetchPetReportReasonsEvent event, Emitter<AdoptionBrowseState> emit) async {
+    emit(state.copyWith(isReportLoading: true, errorMessage: null, reportSuccess: false));
+    final result = await _getReportReasons();
+    result.fold(
+      (f) => emit(state.copyWith(isReportLoading: false, errorMessage: f.message)),
+      (reasons) => emit(state.copyWith(isReportLoading: false, reportReasons: reasons)),
+    );
+  }
+
+  Future<void> _onReportPet(
+      ReportPetEvent event, Emitter<AdoptionBrowseState> emit) async {
+    emit(state.copyWith(isReportLoading: true, errorMessage: null, reportSuccess: false));
+    final result = await _reportPet(ReportPetParams(
+      petId: event.petId,
+      reasonId: event.reasonId,
+      customReason: event.customReason,
+    ));
+    result.fold(
+      (f) => emit(state.copyWith(isReportLoading: false, errorMessage: f.message)),
+      (_) => emit(state.copyWith(isReportLoading: false, reportSuccess: true)),
     );
   }
 }

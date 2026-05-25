@@ -58,6 +58,20 @@ class AdoptionBloc extends Bloc<AdoptionEvent, AdoptionState> {
     on<PreviousStep>(_onPreviousStep);
     on<SubmitAdoptionForm>(_onSubmitAdoptionForm);
     on<ResetForm>(_onResetForm);
+
+    // Register UI-interactive events
+    on<ToggleEditingPersonal>(
+      (event, emit) => emit(state.copyWith(isEditingPersonal: !state.isEditingPersonal)),
+    );
+    on<ToggleEditingLiving>(
+      (event, emit) => emit(state.copyWith(isEditingLiving: !state.isEditingLiving)),
+    );
+    on<ToggleEditingPet>(
+      (event, emit) => emit(state.copyWith(isEditingPet: !state.isEditingPet)),
+    );
+    on<SetSubmitted>(
+      (event, emit) => emit(state.copyWith(isSubmitted: event.isSubmitted)),
+    );
   }
 
   void _onResetForm(ResetForm event, Emitter<AdoptionState> emit) {
@@ -93,9 +107,12 @@ class AdoptionBloc extends Bloc<AdoptionEvent, AdoptionState> {
     if (state.currentStep < 5) {
       if (_validateCurrentStep(state)) {
         final nextStep = state.currentStep + 1;
-        emit(state.copyWith(currentStep: nextStep));
+        emit(state.copyWith(currentStep: nextStep, isSubmitted: false));
       } else {
-        emit(state.copyWith(errorMessage: "Please fill all required fields"));
+        emit(state.copyWith(
+          errorMessage: "Please fill all required fields",
+          isSubmitted: true,
+        ));
         emit(state.copyWith(errorMessage: null));
       }
     }
@@ -113,10 +130,35 @@ class AdoptionBloc extends Bloc<AdoptionEvent, AdoptionState> {
       case 0: // Intro
         return true;
       case 1: // Personal
-        return state.fullName.isNotEmpty &&
-            state.email.isNotEmpty &&
-            state.phoneNumber.isNotEmpty &&
-            state.dateOfBirth.isNotEmpty;
+        if (state.fullName.isEmpty ||
+            state.email.isEmpty ||
+            state.phoneNumber.isEmpty ||
+            state.dateOfBirth.isEmpty) {
+          return false;
+        }
+        if (state.fullName.trim().length < 3 || !state.fullName.trim().contains(' ')) {
+          return false;
+        }
+        final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+        if (!emailRegex.hasMatch(state.email)) {
+          return false;
+        }
+        final cleanPhone = state.phoneNumber.replaceAll(RegExp(r'[\s\-\(\)\+]'), '');
+        if (cleanPhone.length != 11) {
+          return false;
+        }
+        try {
+          final dob = DateTime.parse(state.dateOfBirth);
+          final today = DateTime.now();
+          int age = today.year - dob.year;
+          if (today.month < dob.month || (today.month == dob.month && today.day < dob.day)) {
+            age--;
+          }
+          if (age < 18) return false;
+        } catch (_) {
+          return false;
+        }
+        return true;
       case 2: // Living
         return state.selectedLivingSituationId != null &&
             state.selectedResidenceTypeId != null;

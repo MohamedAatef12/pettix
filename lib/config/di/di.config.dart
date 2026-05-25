@@ -35,6 +35,10 @@ import '../../features/adoption/domain/usecases/get_adoption_options_usecase.dar
     as _i756;
 import '../../features/adoption/domain/usecases/get_paged_pets_usecase.dart'
     as _i1025;
+import '../../features/adoption/domain/usecases/get_pet_report_reasons_usecase.dart'
+    as _i526;
+import '../../features/adoption/domain/usecases/report_pet_usecase.dart'
+    as _i447;
 import '../../features/adoption/domain/usecases/submit_adoption_form_usecase.dart'
     as _i843;
 import '../../features/adoption/presentation/bloc/adoption_bloc.dart' as _i943;
@@ -99,16 +103,6 @@ import '../../features/chat/domain/use_cases/send_message_use_case.dart'
     as _i460;
 import '../../features/chat/presentation/bloc/chat_bloc.dart' as _i65;
 import '../../features/chat/presentation/bloc/chat_list_bloc.dart' as _i2;
-import '../../features/help_support/data/datasources/help_support_remote_data_source.dart'
-    as _i995;
-import '../../features/help_support/data/repositories/help_support_repository_impl.dart'
-    as _i38;
-import '../../features/help_support/domain/repositories/help_support_repository.dart'
-    as _i69;
-import '../../features/help_support/domain/usecases/submit_feedback_usecase.dart'
-    as _i419;
-import '../../features/help_support/presentation/bloc/feedback_bloc.dart'
-    as _i611;
 import '../../features/home/data/repo/home_repo_impl.dart' as _i1024;
 import '../../features/home/data/sources/local/local_data_source.dart' as _i526;
 import '../../features/home/data/sources/local/local_data_source_impl.dart'
@@ -242,9 +236,6 @@ extension GetItInjectableX on _i174.GetIt {
       ),
       dispose: (i) => i.dispose(),
     );
-    gh.lazySingleton<_i995.HelpSupportRemoteDataSource>(
-      () => _i995.HelpSupportRemoteDataSourceImpl(gh<_i655.ApiService>()),
-    );
     gh.factory<_i578.AddPetUseCase>(
       () => _i578.AddPetUseCase(gh<_i835.MyPetsRepository>()),
     );
@@ -360,13 +351,16 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i700.AppleLoginUseCase>(
       () => _i700.AppleLoginUseCase(gh<_i787.AuthRepository>()),
     );
-    gh.lazySingleton<_i69.HelpSupportRepository>(
-      () => _i38.HelpSupportRepositoryImpl(
-        gh<_i995.HelpSupportRemoteDataSource>(),
-      ),
-    );
     gh.factory<_i1025.GetPagedPetsUseCase>(
       () => _i1025.GetPagedPetsUseCase(gh<_i838.AdoptionBrowseRepository>()),
+    );
+    gh.factory<_i526.GetPetReportReasonsUseCase>(
+      () => _i526.GetPetReportReasonsUseCase(
+        gh<_i838.AdoptionBrowseRepository>(),
+      ),
+    );
+    gh.factory<_i447.ReportPetUseCase>(
+      () => _i447.ReportPetUseCase(gh<_i838.AdoptionBrowseRepository>()),
     );
     gh.lazySingleton<_i133.AdoptionRepository>(
       () => _i35.AdoptionRepositoryImpl(gh<_i956.AdoptionRemoteDataSource>()),
@@ -449,8 +443,13 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i46.MarkNotificationAsReadUseCase>(),
       ),
     );
-    gh.factory<_i419.SubmitFeedbackUseCase>(
-      () => _i419.SubmitFeedbackUseCase(gh<_i69.HelpSupportRepository>()),
+    gh.factory<_i1029.AdoptionBrowseBloc>(
+      () => _i1029.AdoptionBrowseBloc(
+        gh<_i1025.GetPagedPetsUseCase>(),
+        gh<_i982.GetPetOptionsUseCase>(),
+        gh<_i526.GetPetReportReasonsUseCase>(),
+        gh<_i447.ReportPetUseCase>(),
+      ),
     );
     gh.factory<_i118.GetUserDataUseCase>(
       () => _i118.GetUserDataUseCase(gh<_i986.HomeDomainRepository>()),
@@ -495,12 +494,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i975.VerifyOtp>(
       () => _i975.VerifyOtp(gh<_i787.AuthRepository>()),
     );
-    gh.factory<_i1029.AdoptionBrowseBloc>(
-      () => _i1029.AdoptionBrowseBloc(
-        gh<_i1025.GetPagedPetsUseCase>(),
-        gh<_i982.GetPetOptionsUseCase>(),
-      ),
-    );
     gh.factory<_i469.ProfileBloc>(
       () => _i469.ProfileBloc(
         gh<_i965.GetProfileUseCase>(),
@@ -536,9 +529,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i118.GetUserDataUseCase>(),
         gh<_i797.SignalRService>(),
       ),
-    );
-    gh.factory<_i611.FeedbackBloc>(
-      () => _i611.FeedbackBloc(gh<_i419.SubmitFeedbackUseCase>()),
     );
     return this;
   }

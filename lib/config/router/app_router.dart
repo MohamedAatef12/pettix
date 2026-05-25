@@ -27,6 +27,7 @@ import '../../features/legal/presentation/view/legal_content_page.dart';
 import '../../features/my_pets/presentation/bloc/my_pets_bloc.dart';
 import '../../features/my_pets/presentation/bloc/my_pets_event.dart';
 import '../../features/my_pets/presentation/view/add_pet_screen.dart';
+import '../../features/my_pets/presentation/view/my_pets_screen.dart';
 import '../../features/adoption_history/presentation/bloc/adoption_history_bloc.dart';
 import '../../features/adoption_history/presentation/bloc/adoption_history_event.dart';
 import '../../features/adoption_history/presentation/view/adoption_history_screen.dart';
@@ -36,6 +37,7 @@ import '../../features/auth/presentation/pages/forgot_password/password_reset_do
 import '../../features/auth/presentation/pages/forgot_password/reset_password_page.dart';
 import '../../features/adoption/presentation/view/adoption_screen.dart';
 import '../../features/adoption/presentation/view/pet_profile_screen.dart';
+import '../../features/adoption/presentation/bloc/adoption_browse_bloc.dart';
 import '../../features/my_pets/domain/entities/pet_entity.dart';
 import '../../features/auth/presentation/pages/forgot_password/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/forgot_password/otp_forgot_password_page.dart';
@@ -340,7 +342,10 @@ final List<RouteBase> _adoptionRoutes = [
     name: AppRouteNames.petProfile,
     pageBuilder: (context, state) => _customTransition(
       state: state,
-      child: PetProfileScreen(pet: state.extra as PetEntity),
+      child: BlocProvider(
+        create: (_) => DI.find<AdoptionBrowseBloc>(),
+        child: PetProfileScreen(pet: state.extra as PetEntity),
+      ),
     ),
   ),
   GoRoute(
@@ -411,6 +416,19 @@ final List<RouteBase> _profileRoutes = [
 ];
 
 final List<RouteBase> _myPetsRoutes = [
+  GoRoute(
+    path: AppRoutes.myPets,
+    name: AppRouteNames.myPets,
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: BlocProvider(
+        create: (_) => DI.find<MyPetsBloc>()
+          ..add(const FetchUserPetsEvent())
+          ..add(const FetchPetOptionsEvent()),
+        child: const MyPetsScreen(),
+      ),
+    ),
+  ),
   GoRoute(
     path: AppRoutes.addPet,
     name: AppRouteNames.addPet,

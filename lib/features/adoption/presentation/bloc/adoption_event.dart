@@ -114,3 +114,23 @@ class JumpToStep extends AdoptionEvent {
   @override
   List<Object> get props => [step];
 }
+
+// UI Interactive Events
+class ToggleEditingPersonal extends AdoptionEvent {
+  const ToggleEditingPersonal();
+}
+
+class ToggleEditingLiving extends AdoptionEvent {
+  const ToggleEditingLiving();
+}
+
+class ToggleEditingPet extends AdoptionEvent {
+  const ToggleEditingPet();
+}
+
+class SetSubmitted extends AdoptionEvent {
+  final bool isSubmitted;
+  const SetSubmitted(this.isSubmitted);
+  @override
+  List<Object> get props => [isSubmitted];
+}

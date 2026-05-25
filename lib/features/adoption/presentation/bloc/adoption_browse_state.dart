@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:pettix/features/my_pets/domain/entities/lookup_entity.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
+import 'package:pettix/features/home/domain/entities/report_reason_entity.dart';
 
 enum AdoptionBrowseStatus { initial, loading, loaded, loadingMore, error }
 
@@ -23,6 +24,10 @@ class AdoptionBrowseState extends Equatable {
 
   final String? errorMessage;
 
+  final List<ReportReasonEntity> reportReasons;
+  final bool isReportLoading;
+  final bool reportSuccess;
+
   const AdoptionBrowseState({
     this.status = AdoptionBrowseStatus.initial,
     this.pets = const [],
@@ -36,6 +41,9 @@ class AdoptionBrowseState extends Equatable {
     this.sortDescending = false,
     this.categories = const [],
     this.errorMessage,
+    this.reportReasons = const [],
+    this.isReportLoading = false,
+    this.reportSuccess = false,
   });
 
   bool get hasActiveFilters =>
@@ -61,6 +69,9 @@ class AdoptionBrowseState extends Equatable {
     bool clearGender = false,
     bool clearSearch = false,
     bool clearSort = false,
+    List<ReportReasonEntity>? reportReasons,
+    bool? isReportLoading,
+    bool? reportSuccess,
   }) {
     return AdoptionBrowseState(
       status: status ?? this.status,
@@ -77,6 +88,9 @@ class AdoptionBrowseState extends Equatable {
       sortDescending: sortDescending ?? this.sortDescending,
       categories: categories ?? this.categories,
       errorMessage: errorMessage,
+      reportReasons: reportReasons ?? this.reportReasons,
+      isReportLoading: isReportLoading ?? this.isReportLoading,
+      reportSuccess: reportSuccess ?? this.reportSuccess,
     );
   }
 
@@ -94,5 +108,8 @@ class AdoptionBrowseState extends Equatable {
         sortDescending,
         categories,
         errorMessage,
+        reportReasons,
+        isReportLoading,
+        reportSuccess,
       ];
 }

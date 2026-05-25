@@ -149,7 +149,7 @@ class AppCachedImage extends StatelessWidget {
             children: [
               Icon(
                 Icons.image_not_supported_outlined,
-                color: AppColors.current.midGray.withOpacity(0.5),
+                color: AppColors.current.midGray.withValues(alpha: 0.5),
                 size: isSmall ? 20.r : 32.r,
               ),
               if (!isSmall) ...[

@@ -58,24 +58,6 @@ class PetDescription extends StatelessWidget {
               ),
             ),
           ],
-          SizedBoxConstants.verticalMedium,
-          OutlinedButton.icon(
-            onPressed: () {},
-            icon: Icon(Icons.chat_bubble_outline_rounded,
-                size: 16.w, color: AppColors.current.primary),
-            label: Text(
-              'Message Owner',
-              style: TextStyle(
-                  fontSize: 14.sp, color: AppColors.current.primary),
-            ),
-            style: OutlinedButton.styleFrom(
-              minimumSize: Size(double.infinity, 44.h),
-              side: BorderSide(color: AppColors.current.primary),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-            ),
-          ),
         ],
       ),
     );

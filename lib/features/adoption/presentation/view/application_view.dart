@@ -2,11 +2,13 @@ import 'package:pettix/core/widgets/app_page_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/sized_box.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import '../../../../config/di/di.dart';
+import '../../../../config/router/routes.dart';
 import '../bloc/adoption_bloc.dart';
 import '../bloc/adoption_event.dart';
 import '../bloc/adoption_state.dart';
@@ -50,8 +52,12 @@ class ApplicationScreens extends StatelessWidget {
               backgroundColor: AppColors.current.white,
               appBar: _buildAppBar(context),
               body: StepSubmitted(
-                onViewApplication: () => Navigator.pop(context),
-                onBrowseMore: () => Navigator.pop(context),
+                onViewApplication: () {
+                  context.goNamed(AppRouteNames.adoptionHistory);
+                },
+                onBrowseMore: () {
+                  context.goNamed(AppRouteNames.adoption);
+                },
               ),
             );
           }
@@ -255,10 +261,10 @@ class _BackButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 50.h,
-        width: 50.w,
+        height: 45.h,
+        width: 45.w,
         decoration: BoxDecoration(
-          shape: BoxShape.circle,
+          borderRadius: BorderRadius.all(Radius.circular(12.r)),
           border: Border.all(color: AppColors.current.primary, width: 1.5),
         ),
         child: Icon(

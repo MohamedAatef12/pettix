@@ -34,7 +34,6 @@ class PetDetails extends StatelessWidget {
                   ),
                 ),
               ),
-              _StatusBadge(adoptionStatus: pet.adoptionStatus),
             ],
           ),
           SizedBoxConstants.verticalSmall,
@@ -55,34 +54,6 @@ class PetDetails extends StatelessWidget {
   }
 }
 
-class _StatusBadge extends StatelessWidget {
-  final int? adoptionStatus;
-
-  const _StatusBadge({required this.adoptionStatus});
-
-  @override
-  Widget build(BuildContext context) {
-    final available = adoptionStatus == null || adoptionStatus == 0;
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-      decoration: BoxDecoration(
-        color: available
-            ? AppColors.current.green.withValues(alpha: 0.12)
-            : AppColors.current.yellow.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(20.r),
-      ),
-      child: Text(
-        available ? 'Available' : 'Pending',
-        style: TextStyle(
-          color: available ? AppColors.current.green : AppColors.current.yellow,
-          fontSize: 11.sp,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-}
-
 class _Chip extends StatelessWidget {
   final String label;
   final bool isCode;
@@ -94,9 +65,10 @@ class _Chip extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: isCode
-            ? AppColors.current.primary.withValues(alpha: 0.1)
-            : AppColors.current.lightBlue,
+        color:
+            isCode
+                ? AppColors.current.primary.withValues(alpha: 0.1)
+                : AppColors.current.lightBlue,
         borderRadius: BorderRadius.circular(20.r),
       ),
       child: Text(
