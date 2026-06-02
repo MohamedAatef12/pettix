@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 
 class CategoryList extends StatelessWidget {
   const CategoryList({super.key});
 
   @override
   Widget build(BuildContext context) {
-    List<String> categories = ['Dogs', 'Cats', 'Birds', 'Rabbits', 'Fish'];
+    final categories = [
+      AppText.dogs,
+      AppText.cats,
+      AppText.birds,
+      AppText.rabbits,
+      AppText.fish,
+    ];
     List<String> categoryIcons = [
       'assets/images/Dog.svg',
       'assets/images/cat.svg',

@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_request_entity.dart';
 import 'package:pettix/features/my_pets/domain/usecases/add_pet_usecase.dart';
@@ -51,9 +52,11 @@ class MyPetsBloc extends Bloc<MyPetsEvent, MyPetsState> {
     on<PickPetImageEvent>(_onPickPetImage);
     on<RemovePetImageEvent>(_onRemovePetImage);
     on<AddVaccinationEvent>(
-      (e, emit) => emit(state.copyWith(
-        formVaccinations: [...state.formVaccinations, e.vaccination],
-      )),
+      (e, emit) => emit(
+        state.copyWith(
+          formVaccinations: [...state.formVaccinations, e.vaccination],
+        ),
+      ),
     );
     on<RemoveVaccinationEvent>((e, emit) {
       final updated = List.of(state.formVaccinations)..removeAt(e.index);
@@ -79,19 +82,23 @@ class MyPetsBloc extends Bloc<MyPetsEvent, MyPetsState> {
   ) async {
     final userId = event.userId ?? _cacheManager.getUserData()?.id;
     if (userId == null) {
-      emit(state.copyWith(
-        status: MyPetsStatus.error,
-        errorMessage: 'User not found',
-      ));
+      emit(
+        state.copyWith(
+          status: MyPetsStatus.error,
+          errorMessage: AppText.userNotFound,
+        ),
+      );
       return;
     }
     emit(state.copyWith(status: MyPetsStatus.loading));
     final result = await _getUserPets(userId);
     result.fold(
-      (failure) => emit(state.copyWith(
-        status: MyPetsStatus.error,
-        errorMessage: failure.message,
-      )),
+      (failure) => emit(
+        state.copyWith(
+          status: MyPetsStatus.error,
+          errorMessage: failure.message,
+        ),
+      ),
       (pets) => emit(state.copyWith(status: MyPetsStatus.loaded, pets: pets)),
     );
   }
@@ -102,34 +109,38 @@ class MyPetsBloc extends Bloc<MyPetsEvent, MyPetsState> {
   ) async {
     final result = await _getPetOptions();
     result.fold(
-      (failure) => emit(state.copyWith(
-        status: MyPetsStatus.error,
-        errorMessage: failure.message,
-      )),
-      (options) => emit(state.copyWith(
-        categories: options.categories,
-        colors: options.colors,
-        medicals: options.medicals,
-      )),
+      (failure) => emit(
+        state.copyWith(
+          status: MyPetsStatus.error,
+          errorMessage: failure.message,
+        ),
+      ),
+      (options) => emit(
+        state.copyWith(
+          categories: options.categories,
+          colors: options.colors,
+          medicals: options.medicals,
+        ),
+      ),
     );
   }
 
-  Future<void> _onAddPet(
-    AddPetEvent event,
-    Emitter<MyPetsState> emit,
-  ) async {
+  Future<void> _onAddPet(AddPetEvent event, Emitter<MyPetsState> emit) async {
     emit(state.copyWith(status: MyPetsStatus.submitting));
 
     // Attach picked images to the request.
     final images = <PetImageEntity>[];
     for (int i = 0; i < state.pickedImageBytes.length; i++) {
-      images.add(PetImageEntity(
-        filename: state.pickedImageFilenames.length > i
-            ? state.pickedImageFilenames[i]
-            : 'pet_image_$i.jpg',
-        base64: base64Encode(state.pickedImageBytes[i]),
-        state: 1, // newFile
-      ));
+      images.add(
+        PetImageEntity(
+          filename:
+              state.pickedImageFilenames.length > i
+                  ? state.pickedImageFilenames[i]
+                  : 'pet_image_$i.jpg',
+          base64: base64Encode(state.pickedImageBytes[i]),
+          state: 1, // newFile
+        ),
+      );
     }
 
     final enrichedRequest = PetRequestEntity(
@@ -148,10 +159,12 @@ class MyPetsBloc extends Bloc<MyPetsEvent, MyPetsState> {
 
     if (result.isLeft()) {
       result.fold(
-        (failure) => emit(state.copyWith(
-          status: MyPetsStatus.error,
-          errorMessage: failure.message,
-        )),
+        (failure) => emit(
+          state.copyWith(
+            status: MyPetsStatus.error,
+            errorMessage: failure.message,
+          ),
+        ),
         (_) {},
       );
       return;
@@ -169,14 +182,18 @@ class MyPetsBloc extends Bloc<MyPetsEvent, MyPetsState> {
   ) async {
     emit(state.copyWith(status: MyPetsStatus.submitting));
 
-    final result = await _updatePet(UpdatePetParams(event.petId, event.request));
+    final result = await _updatePet(
+      UpdatePetParams(event.petId, event.request),
+    );
 
     if (result.isLeft()) {
       result.fold(
-        (failure) => emit(state.copyWith(
-          status: MyPetsStatus.error,
-          errorMessage: failure.message,
-        )),
+        (failure) => emit(
+          state.copyWith(
+            status: MyPetsStatus.error,
+            errorMessage: failure.message,
+          ),
+        ),
         (_) {},
       );
       return;
@@ -196,10 +213,12 @@ class MyPetsBloc extends Bloc<MyPetsEvent, MyPetsState> {
 
     if (result.isLeft()) {
       result.fold(
-        (failure) => emit(state.copyWith(
-          status: MyPetsStatus.error,
-          errorMessage: failure.message,
-        )),
+        (failure) => emit(
+          state.copyWith(
+            status: MyPetsStatus.error,
+            errorMessage: failure.message,
+          ),
+        ),
         (_) {},
       );
       return;
@@ -221,60 +240,60 @@ class MyPetsBloc extends Bloc<MyPetsEvent, MyPetsState> {
 
     // Read bytes immediately to avoid Android temp-cache eviction.
     final Uint8List bytes = await picked.readAsBytes();
-    emit(state.copyWith(
-      pickedImageBytes: [...state.pickedImageBytes, bytes],
-      pickedImageFilenames: [...state.pickedImageFilenames, picked.name],
-    ));
+    emit(
+      state.copyWith(
+        pickedImageBytes: [...state.pickedImageBytes, bytes],
+        pickedImageFilenames: [...state.pickedImageFilenames, picked.name],
+      ),
+    );
   }
 
-  void _onRemovePetImage(
-    RemovePetImageEvent event,
-    Emitter<MyPetsState> emit,
-  ) {
+  void _onRemovePetImage(RemovePetImageEvent event, Emitter<MyPetsState> emit) {
     final bytes = List<Uint8List>.of(state.pickedImageBytes)
       ..removeAt(event.index);
     final names = List<String>.of(state.pickedImageFilenames)
       ..removeAt(event.index);
-    emit(state.copyWith(
-      pickedImageBytes: bytes,
-      pickedImageFilenames: names,
-    ));
+    emit(state.copyWith(pickedImageBytes: bytes, pickedImageFilenames: names));
   }
 
   Future<void> _onUpdatePetStatus(
     UpdatePetStatusEvent event,
     Emitter<MyPetsState> emit,
   ) async {
-    final result = await _updatePetStatus(
-      (petId: event.petId, status: event.status),
-    );
+    final result = await _updatePetStatus((
+      petId: event.petId,
+      status: event.status,
+    ));
     result.fold(
-      (failure) => emit(state.copyWith(
-        status: MyPetsStatus.error,
-        errorMessage: failure.message,
-      )),
+      (failure) => emit(
+        state.copyWith(
+          status: MyPetsStatus.error,
+          errorMessage: failure.message,
+        ),
+      ),
       (_) {
         // Optimistically update the pet in the local list.
-        final updated = state.pets.map((p) {
-          if (p.id == event.petId) {
-            return PetEntity(
-              id: p.id,
-              code: p.code,
-              name: p.name,
-              description: p.description,
-              details: p.details,
-              age: p.age,
-              adoptionStatus: event.status,
-              categoryName: p.categoryName,
-              genderName: p.genderName,
-              colorName: p.colorName,
-              imageUrls: p.imageUrls,
-              isBlocked: p.isBlocked,
-              vaccinations: p.vaccinations,
-            );
-          }
-          return p;
-        }).toList();
+        final updated =
+            state.pets.map((p) {
+              if (p.id == event.petId) {
+                return PetEntity(
+                  id: p.id,
+                  code: p.code,
+                  name: p.name,
+                  description: p.description,
+                  details: p.details,
+                  age: p.age,
+                  adoptionStatus: event.status,
+                  categoryName: p.categoryName,
+                  genderName: p.genderName,
+                  colorName: p.colorName,
+                  imageUrls: p.imageUrls,
+                  isBlocked: p.isBlocked,
+                  vaccinations: p.vaccinations,
+                );
+              }
+              return p;
+            }).toList();
         emit(state.copyWith(status: MyPetsStatus.loaded, pets: updated));
       },
     );

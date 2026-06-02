@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/sized_box.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
@@ -25,20 +26,22 @@ class ApplicationScreens extends StatelessWidget {
 
   const ApplicationScreens({super.key, required this.petId});
 
-  static const List<String> _stepTitles = [
-    'Set up your information',
-    'Living Situation',
-    'Pet Experience',
-    'Understanding & Agreements',
+  static List<String> get _stepTitles => [
+    AppText.setUpYourInformation,
+    AppText.livingSituation,
+    AppText.petExperience,
+    AppText.understandingAgreements,
   ];
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<AdoptionBloc>()
-        ..add(const ResetForm())
-        ..add(SetPetId(petId))
-        ..add(FetchAdoptionOptions()),
+      create:
+          (context) =>
+              getIt<AdoptionBloc>()
+                ..add(const ResetForm())
+                ..add(SetPetId(petId))
+                ..add(FetchAdoptionOptions()),
       child: BlocConsumer<AdoptionBloc, AdoptionState>(
         listener: (context, state) {
           final msg = state.errorMessage;
@@ -56,7 +59,7 @@ class ApplicationScreens extends StatelessWidget {
                   context.goNamed(AppRouteNames.adoptionHistory);
                 },
                 onBrowseMore: () {
-                  context.goNamed(AppRouteNames.adoption);
+                  context.go(AppRoutes.bottomNav, extra: 1);
                 },
               ),
             );
@@ -91,7 +94,7 @@ class ApplicationScreens extends StatelessWidget {
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
       title: Text(
-        'Adopt a Pet',
+        AppText.adoptAPet,
         style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
       ),
       centerTitle: true,
@@ -124,7 +127,7 @@ class _StepHeader extends StatelessWidget {
         children: [
           if (!isReview) ...[
             Text(
-              'Step ${state.currentStep} of 4',
+              '${AppText.step} ${state.currentStep} ${AppText.of} 4',
               style: TextStyle(
                 color: AppColors.current.midGray,
                 fontSize: 12.sp,
@@ -143,7 +146,7 @@ class _StepHeader extends StatelessWidget {
             _ProgressBar(step: state.currentStep),
           ] else
             Text(
-              'Review Your Application',
+              AppText.reviewYourApplication,
               style: TextStyle(
                 color: AppColors.current.text,
                 fontSize: 18.sp,
@@ -169,12 +172,15 @@ class _ProgressBar extends StatelessWidget {
         tween: Tween<double>(begin: 0.0, end: step / 4),
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOut,
-        builder: (context, value, _) => LinearProgressIndicator(
-          value: value,
-          backgroundColor: AppColors.current.lightGray,
-          valueColor: AlwaysStoppedAnimation<Color>(AppColors.current.primary),
-          minHeight: 6,
-        ),
+        builder:
+            (context, value, _) => LinearProgressIndicator(
+              value: value,
+              backgroundColor: AppColors.current.lightGray,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                AppColors.current.primary,
+              ),
+              minHeight: 6,
+            ),
       ),
     );
   }
@@ -230,7 +236,7 @@ class _BottomNav extends StatelessWidget {
           Expanded(
             child: CustomFilledButton(
               onPressed: () => bloc.add(NextStep()),
-              text: 'Next',
+              text: AppText.next,
               trailing: const Icon(
                 Icons.arrow_circle_right_outlined,
                 color: Colors.white,

@@ -21,7 +21,11 @@ class SettingsScreen extends StatelessWidget {
         centerTitle: true,
         leading: IconButton(
           onPressed: () => context.pop(),
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.current.text, size: 20.sp),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: AppColors.current.text,
+            size: 20.sp,
+          ),
         ),
         title: Text(
           AppText.settings,
@@ -39,14 +43,14 @@ class SettingsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionHeader('Account Settings'),
+              _buildSectionHeader(AppText.accountSettings),
               SizedBox(height: 12.h),
               _SettingsGroup(
                 tiles: [
                   _SettingsTile(
                     icon: Icons.notifications_none_rounded,
                     iconColor: const Color(0xFF5EA8DF),
-                    title: 'Notification Settings',
+                    title: AppText.notificationSettings,
                     onTap: () {
                       // Navigate to notification settings
                     },
@@ -70,16 +74,16 @@ class SettingsScreen extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 24.h),
-              _buildSectionHeader('App Settings'),
+              _buildSectionHeader(AppText.appSettings),
               SizedBox(height: 12.h),
               _SettingsGroup(
                 tiles: [
                   _SettingsTile(
                     icon: Icons.color_lens_outlined,
                     iconColor: const Color(0xFFE8A838),
-                    title: 'Themes',
+                    title: AppText.themes,
                     trailing: Text(
-                      'Light',
+                      AppText.light,
                       style: AppTextStyles.smallDescription.copyWith(
                         color: AppColors.current.midGray,
                         fontWeight: FontWeight.w600,
@@ -151,12 +155,13 @@ class _SettingsGroup extends StatelessWidget {
         shrinkWrap: true,
         padding: EdgeInsets.zero,
         itemCount: tiles.length,
-        separatorBuilder: (_, __) => Divider(
-          height: 1,
-          indent: 52.w,
-          endIndent: 16.w,
-          color: AppColors.current.lightGray,
-        ),
+        separatorBuilder:
+            (_, __) => Divider(
+              height: 1,
+              indent: 52.w,
+              endIndent: 16.w,
+              color: AppColors.current.lightGray,
+            ),
         itemBuilder: (_, i) => tiles[i],
       ),
     );
@@ -210,10 +215,7 @@ class _SettingsTile extends StatelessWidget {
                 ),
               ),
             ),
-            if (trailing != null) ...[
-              trailing!,
-              SizedBox(width: 8.w),
-            ],
+            if (trailing != null) ...[trailing!, SizedBox(width: 8.w)],
             if (showArrow)
               Icon(
                 Icons.arrow_forward_ios_rounded,

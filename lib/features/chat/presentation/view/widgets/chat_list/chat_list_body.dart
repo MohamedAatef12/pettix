@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
@@ -35,7 +36,7 @@ class ChatListBody extends StatelessWidget {
             child: CustomTextFormField(
               fillColor: true,
               fillColorValue: Colors.transparent,
-              hintText: 'Search conversations...',
+              hintText: AppText.searchConversations,
               border: InputBorder.none,
               enabledBorder: InputBorder.none,
               focusedBorder: InputBorder.none,

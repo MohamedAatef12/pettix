@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/sized_box.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -43,7 +44,8 @@ class PetDetails extends StatelessWidget {
             children: [
               if (pet.categoryName != null) _Chip(label: pet.categoryName!),
               if (pet.genderName != null) _Chip(label: pet.genderName!),
-              if (pet.age != null) _Chip(label: '${pet.age} yr'),
+              if (pet.age != null)
+                _Chip(label: '${pet.age} ${AppText.yearShort}'),
               if (pet.colorName != null) _Chip(label: pet.colorName!),
               _Chip(label: '#${pet.code}', isCode: true),
             ],

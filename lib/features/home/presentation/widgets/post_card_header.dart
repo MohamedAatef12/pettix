@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -31,10 +32,10 @@ String _formatCreationDate(String rawDate) {
     final dateTime = DateTime.parse(rawDate).toLocal();
     final now = DateTime.now();
     final diff = now.difference(dateTime);
-    if (diff.inSeconds < 60) return 'Just now';
-    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-    if (diff.inHours < 24) return '${diff.inHours}h ago';
-    if (diff.inDays < 7) return '${diff.inDays}d ago';
+    if (diff.inSeconds < 60) return AppText.justNow;
+    if (diff.inMinutes < 60) return AppText.minutesAgo(diff.inMinutes);
+    if (diff.inHours < 24) return AppText.hoursAgo(diff.inHours);
+    if (diff.inDays < 7) return AppText.daysAgo(diff.inDays);
     return DateFormat('MMM d, yyyy').format(dateTime);
   } catch (_) {
     return rawDate;
@@ -228,7 +229,7 @@ class PostCardHeader extends StatelessWidget {
                                       trailing: Icon(
                                         Icons.arrow_forward_ios_rounded,
                                         size: 14.r,
-                                        color: AppColors.current.midGray.withOpacity(0.6),
+                                        color: AppColors.current.midGray.withValues(alpha: 0.6),
                                       ),
                                       onTap: () {
                                         if (isOther) {
@@ -313,7 +314,7 @@ class PostCardHeader extends StatelessWidget {
                                                         Navigator.pop(context); // close sheet
                                                         AuthToast.showSuccess(
                                                           context,
-                                                          'Report sent successfully',
+                                                          AppText.reportSentSuccessfully,
                                                         );
                                                       }
                                                     },
@@ -340,7 +341,7 @@ class PostCardHeader extends StatelessWidget {
                                           Navigator.pop(context);
                                           AuthToast.showSuccess(
                                             context,
-                                            'Report sent successfully'.tr(),
+                                            AppText.reportSentSuccessfully,
                                           );
                                         }
                                       },

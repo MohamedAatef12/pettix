@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
@@ -22,15 +23,15 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
   final _stepsController = TextEditingController();
   bool _submitting = false;
 
-  static const _categories = [
-    _Category('App Crash', Icons.error_outline_rounded),
-    _Category('Feature Issue', Icons.tune_rounded),
-    _Category('Performance', Icons.speed_rounded),
-    _Category('UI / Display', Icons.phone_android_rounded),
-    _Category('Notifications', Icons.notifications_none_rounded),
-    _Category('Account / Login', Icons.lock_outline_rounded),
-    _Category('Payments', Icons.payment_rounded),
-    _Category('Other', Icons.more_horiz_rounded),
+  List<_Category> get _categories => [
+    _Category(AppText.appCrash, Icons.error_outline_rounded),
+    _Category(AppText.featureIssue, Icons.tune_rounded),
+    _Category(AppText.performance, Icons.speed_rounded),
+    _Category(AppText.uiDisplay, Icons.phone_android_rounded),
+    _Category(AppText.notificationsText, Icons.notifications_none_rounded),
+    _Category(AppText.accountLogin, Icons.lock_outline_rounded),
+    _Category(AppText.payments, Icons.payment_rounded),
+    _Category(AppText.other, Icons.more_horiz_rounded),
   ];
 
   @override
@@ -42,15 +43,16 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
   }
 
   void _submit() async {
-    if (_titleController.text.trim().isEmpty || _descController.text.trim().isEmpty) {
-      AuthToast.showError(context, 'Please fill in the title and description.');
+    if (_titleController.text.trim().isEmpty ||
+        _descController.text.trim().isEmpty) {
+      AuthToast.showError(context, AppText.fillTitleDescription);
       return;
     }
     setState(() => _submitting = true);
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
     setState(() => _submitting = false);
-    AuthToast.showSuccess(context, 'Report submitted! Thank you for helping us improve.');
+    AuthToast.showSuccess(context, AppText.reportSubmittedThanks);
     context.pop();
   }
 
@@ -67,7 +69,7 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _SectionLabel('Problem Category'),
+                  _SectionLabel(AppText.problemCategory),
                   SizedBox(height: 12.h),
                   Wrap(
                     spacing: 8.w,
@@ -78,16 +80,33 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
                         onTap: () => setState(() => _selectedCategory = i),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 150),
-                          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12.w,
+                            vertical: 8.h,
+                          ),
                           decoration: BoxDecoration(
-                            color: selected ? AppColors.current.primary : AppColors.current.white,
+                            color:
+                                selected
+                                    ? AppColors.current.primary
+                                    : AppColors.current.white,
                             borderRadius: BorderRadius.circular(20.r),
                             border: Border.all(
-                              color: selected ? AppColors.current.primary : AppColors.current.lightGray,
+                              color:
+                                  selected
+                                      ? AppColors.current.primary
+                                      : AppColors.current.lightGray,
                             ),
-                            boxShadow: selected
-                                ? [BoxShadow(color: AppColors.current.primary.withAlpha(40), blurRadius: 8, offset: const Offset(0, 2))]
-                                : [],
+                            boxShadow:
+                                selected
+                                    ? [
+                                      BoxShadow(
+                                        color: AppColors.current.primary
+                                            .withAlpha(40),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ]
+                                    : [],
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -95,15 +114,24 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
                               Icon(
                                 _categories[i].icon,
                                 size: 14.w,
-                                color: selected ? Colors.white : AppColors.current.midGray,
+                                color:
+                                    selected
+                                        ? Colors.white
+                                        : AppColors.current.midGray,
                               ),
                               SizedBox(width: 6.w),
                               Text(
                                 _categories[i].label,
                                 style: AppTextStyles.smallDescription.copyWith(
                                   fontSize: 12.sp,
-                                  color: selected ? Colors.white : AppColors.current.text,
-                                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                                  color:
+                                      selected
+                                          ? Colors.white
+                                          : AppColors.current.text,
+                                  fontWeight:
+                                      selected
+                                          ? FontWeight.w600
+                                          : FontWeight.w400,
                                 ),
                               ),
                             ],
@@ -115,26 +143,26 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
                   SizedBox(height: 24.h),
                   _FormCard(
                     children: [
-                      _FieldLabel('Problem Title'),
+                      _FieldLabel(AppText.problemTitle),
                       SizedBox(height: 8.h),
                       _InputField(
                         controller: _titleController,
-                        hint: 'Brief summary of the issue',
+                        hint: AppText.briefIssueSummary,
                       ),
                       SizedBox(height: 16.h),
-                      _FieldLabel('Describe the Problem'),
+                      _FieldLabel(AppText.describeProblem),
                       SizedBox(height: 8.h),
                       _InputField(
                         controller: _descController,
-                        hint: 'What happened? When were you trying to do?',
+                        hint: AppText.whatHappenedHint,
                         maxLines: 4,
                       ),
                       SizedBox(height: 16.h),
-                      _FieldLabel('Steps to Reproduce (optional)'),
+                      _FieldLabel(AppText.stepsToReproduceOptional),
                       SizedBox(height: 8.h),
                       _InputField(
                         controller: _stepsController,
-                        hint: '1. Open the app\n2. Tap on...\n3. The error appears...',
+                        hint: AppText.stepsToReproduceHint,
                         maxLines: 4,
                       ),
                     ],
@@ -145,7 +173,7 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
                   CustomFilledButton(
                     isLoading: _submitting,
                     onPressed: _submit,
-                    text: 'Submit Report',
+                    text: AppText.submitReport,
                     backgroundColor: AppColors.current.primary,
                     textColor: AppColors.current.white,
                   ),
@@ -162,7 +190,10 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.current.primary, AppColors.current.primary.withAlpha(210)],
+          colors: [
+            AppColors.current.primary,
+            AppColors.current.primary.withAlpha(210),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -175,12 +206,20 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
             children: [
               IconButton(
                 onPressed: () => context.pop(),
-                icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20.w),
+                icon: Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: Colors.white,
+                  size: 20.w,
+                ),
               ),
               Expanded(
                 child: Text(
-                  'Report a Problem',
-                  style: AppTextStyles.appbar.copyWith(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.w600),
+                  AppText.reportProblem,
+                  style: AppTextStyles.appbar.copyWith(
+                    color: Colors.white,
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               Icon(Icons.bug_report_rounded, color: Colors.white70, size: 26.w),
@@ -208,9 +247,18 @@ class _FormCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.current.white,
         borderRadius: BorderRadius.circular(18.r),
-        boxShadow: [BoxShadow(color: Colors.black.withAlpha(8), blurRadius: 10, offset: const Offset(0, 3))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(8),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: children),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: children,
+      ),
     );
   }
 }
@@ -219,7 +267,11 @@ class _InputField extends StatelessWidget {
   final TextEditingController controller;
   final String hint;
   final int maxLines;
-  const _InputField({required this.controller, required this.hint, this.maxLines = 1});
+  const _InputField({
+    required this.controller,
+    required this.hint,
+    this.maxLines = 1,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -232,7 +284,10 @@ class _InputField extends StatelessWidget {
         hintStyle: TextStyle(color: AppColors.current.midGray, fontSize: 12.sp),
         filled: true,
         fillColor: AppColors.current.lightBlue,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: BorderSide.none,
+        ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: AppColors.current.lightGray),
@@ -250,11 +305,19 @@ class _InputField extends StatelessWidget {
 class _DeviceInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final os = Platform.isAndroid ? 'Android' : Platform.isIOS ? 'iOS' : 'Unknown';
+    final os =
+        Platform.isAndroid
+            ? AppText.android
+            : Platform.isIOS
+            ? AppText.ios
+            : AppText.unknown;
     final rows = [
-      ('App Version', '1.0.0'),
-      ('Platform', os),
-      ('OS Build', Platform.operatingSystemVersion.split(' ').take(3).join(' ')),
+      (AppText.appVersion, '1.0.0'),
+      (AppText.platform, os),
+      (
+        AppText.osBuild,
+        Platform.operatingSystemVersion.split(' ').take(3).join(' '),
+      ),
     ];
 
     return Container(
@@ -269,33 +332,51 @@ class _DeviceInfoCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.info_outline_rounded, size: 16.w, color: AppColors.current.primary),
+              Icon(
+                Icons.info_outline_rounded,
+                size: 16.w,
+                color: AppColors.current.primary,
+              ),
               SizedBox(width: 6.w),
               Text(
-                'DEVICE INFO (auto-detected)',
+                AppText.deviceInfoAutoDetected,
                 style: AppTextStyles.smallDescription.copyWith(
-                  fontSize: 10.sp, fontWeight: FontWeight.w700,
-                  color: AppColors.current.primary, letterSpacing: 0.5,
+                  fontSize: 10.sp,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.current.primary,
+                  letterSpacing: 0.5,
                 ),
               ),
             ],
           ),
           SizedBox(height: 10.h),
-          ...rows.map((r) => Padding(
-                padding: EdgeInsets.only(bottom: 4.h),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 90.w,
-                      child: Text(r.$1,
-                          style: AppTextStyles.smallDescription.copyWith(fontSize: 12.sp, color: AppColors.current.midGray)),
+          ...rows.map(
+            (r) => Padding(
+              padding: EdgeInsets.only(bottom: 4.h),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 90.w,
+                    child: Text(
+                      r.$1,
+                      style: AppTextStyles.smallDescription.copyWith(
+                        fontSize: 12.sp,
+                        color: AppColors.current.midGray,
+                      ),
                     ),
-                    Text(r.$2,
-                        style: AppTextStyles.smallDescription.copyWith(
-                            fontSize: 12.sp, fontWeight: FontWeight.w600, color: AppColors.current.text)),
-                  ],
-                ),
-              )),
+                  ),
+                  Text(
+                    r.$2,
+                    style: AppTextStyles.smallDescription.copyWith(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.current.text,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -307,12 +388,14 @@ class _SectionLabel extends StatelessWidget {
   const _SectionLabel(this.text);
   @override
   Widget build(BuildContext context) => Text(
-        text.toUpperCase(),
-        style: AppTextStyles.smallDescription.copyWith(
-          fontSize: 10.sp, fontWeight: FontWeight.w700,
-          color: AppColors.current.midGray, letterSpacing: 0.8,
-        ),
-      );
+    text.toUpperCase(),
+    style: AppTextStyles.smallDescription.copyWith(
+      fontSize: 10.sp,
+      fontWeight: FontWeight.w700,
+      color: AppColors.current.midGray,
+      letterSpacing: 0.8,
+    ),
+  );
 }
 
 class _FieldLabel extends StatelessWidget {
@@ -320,7 +403,10 @@ class _FieldLabel extends StatelessWidget {
   const _FieldLabel(this.text);
   @override
   Widget build(BuildContext context) => Text(
-        text,
-        style: AppTextStyles.smallDescription.copyWith(fontSize: 13.sp, color: AppColors.current.midGray),
-      );
+    text,
+    style: AppTextStyles.smallDescription.copyWith(
+      fontSize: 13.sp,
+      color: AppColors.current.midGray,
+    ),
+  );
 }

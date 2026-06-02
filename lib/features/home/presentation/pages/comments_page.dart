@@ -14,6 +14,7 @@ import 'package:pettix/features/home/presentation/blocs/home_state.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/features/home/presentation/widgets/comments_body.dart';
 import 'package:pettix/features/home/presentation/widgets/post_card.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
 
 class CommentsPage extends StatefulWidget {
@@ -57,7 +58,7 @@ class _CommentsPageState extends State<CommentsPage> {
           ),
         ),
         title: Text(
-          'Comments',
+          AppText.comments,
           style: AppTextStyles.bold.copyWith(fontSize: 18.sp),
         ),
         centerTitle: true,
@@ -119,7 +120,7 @@ class _CommentsPageState extends State<CommentsPage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                'Replying to ',
+                                '${AppText.replyingTo} ',
                                 style: AppTextStyles.description.copyWith(
                                   fontSize: 11.sp,
                                   color: AppColors.current.text.withValues(alpha: 0.6),
@@ -167,7 +168,7 @@ class _CommentsPageState extends State<CommentsPage> {
                             child: TextField(
                               controller: bloc.commentTextController,
                               decoration: InputDecoration(
-                                hintText: 'Add a comment...',
+                                hintText: AppText.addComment,
                                 hintStyle: AppTextStyles.description.copyWith(
                                   fontSize: 13.sp,
                                 ),

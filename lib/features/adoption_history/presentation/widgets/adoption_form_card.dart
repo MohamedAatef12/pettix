@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/enums/app_enums.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/adoption_history/domain/entities/adoption_form_entity.dart';
@@ -11,27 +12,27 @@ import 'package:pettix/features/adoption_history/domain/entities/adoption_form_e
     AdoptionFormStatus.pending => (
       bg: const Color(0xFFFFF3CD),
       text: const Color(0xFF856404),
-      label: 'Pending',
+      label: AppText.pending,
     ),
     AdoptionFormStatus.approved => (
       bg: const Color(0xFFD1FAE5),
       text: const Color(0xFF065F46),
-      label: 'Approved',
+      label: AppText.approved,
     ),
     AdoptionFormStatus.rejected => (
       bg: const Color(0xFFFFE4E4),
       text: const Color(0xFF991B1B),
-      label: 'Rejected',
+      label: AppText.rejected,
     ),
     AdoptionFormStatus.cancelled => (
       bg: const Color(0xFFF3F4F6),
       text: const Color(0xFF6B7280),
-      label: 'Cancelled',
+      label: AppText.cancelled,
     ),
     null => (
       bg: const Color(0xFFF3F4F6),
       text: const Color(0xFF6B7280),
-      label: 'Unknown',
+      label: AppText.unknown,
     ),
   };
 }
@@ -86,7 +87,8 @@ class AdoptionFormCard extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            form.petName ?? 'Pet #${form.petId ?? '—'}',
+                            form.petName ??
+                                '${AppText.petNumber}${form.petId ?? '-'}',
                             style: TextStyle(
                               color: AppColors.current.text,
                               fontSize: 16.sp,
@@ -102,14 +104,18 @@ class AdoptionFormCard extends StatelessWidget {
                     Row(
                       children: [
                         Icon(
-                          isOwnerView ? Icons.person_outline_rounded : Icons.email_outlined,
+                          isOwnerView
+                              ? Icons.person_outline_rounded
+                              : Icons.email_outlined,
                           size: 14.sp,
                           color: AppColors.current.midGray,
                         ),
                         SizedBox(width: 4.w),
                         Expanded(
                           child: Text(
-                            isOwnerView ? 'By: ${form.fullName}' : form.email,
+                            isOwnerView
+                                ? '${AppText.by} ${form.fullName}'
+                                : form.email,
                             style: TextStyle(
                               color: AppColors.current.midGray,
                               fontSize: 12.sp,
@@ -120,14 +126,21 @@ class AdoptionFormCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    if (form.livingSituation != null || form.typeOfResidence != null) ...[
+                    if (form.livingSituation != null ||
+                        form.typeOfResidence != null) ...[
                       SizedBox(height: 10.h),
                       _TagRow(
                         items: [
                           if (form.livingSituation != null)
-                            (label: form.livingSituation!, icon: Icons.home_work_outlined),
+                            (
+                              label: form.livingSituation!,
+                              icon: Icons.home_work_outlined,
+                            ),
                           if (form.typeOfResidence != null)
-                            (label: form.typeOfResidence!, icon: Icons.location_city_outlined),
+                            (
+                              label: form.typeOfResidence!,
+                              icon: Icons.location_city_outlined,
+                            ),
                         ],
                       ),
                     ],
@@ -191,10 +204,7 @@ class _AvatarBlock extends StatelessWidget {
             ),
             Text(
               initials,
-              style: TextStyle(
-                color: AppColors.current.white,
-                fontSize: 20.sp,
-              ),
+              style: TextStyle(color: AppColors.current.white, fontSize: 20.sp),
             ),
           ],
         ),
@@ -215,17 +225,11 @@ class _StatusBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: style.bg,
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(
-          color: style.text.withValues(alpha: 0.1),
-          width: 1,
-        ),
+        border: Border.all(color: style.text.withValues(alpha: 0.1), width: 1),
       ),
       child: Text(
         style.label,
-        style: TextStyle(
-          color: style.text,
-          fontSize: 10.sp,
-        ),
+        style: TextStyle(color: style.text, fontSize: 10.sp),
       ),
     );
   }
@@ -241,38 +245,41 @@ class _TagRow extends StatelessWidget {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
-        children: items
-            .map(
-              (item) => Container(
-                margin: EdgeInsets.only(right: 8.w),
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: AppColors.current.lightBlue,
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      item.icon,
-                      size: 12.sp,
-                      color: AppColors.current.primary,
+        children:
+            items
+                .map(
+                  (item) => Container(
+                    margin: EdgeInsets.only(right: 8.w),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8.w,
+                      vertical: 4.h,
                     ),
-                    SizedBox(width: 4.w),
-                    Text(
-                      item.label,
-                      style: TextStyle(
-                        color: AppColors.current.primary,
-                        fontSize: 10.sp,
-                      ),
+                    decoration: BoxDecoration(
+                      color: AppColors.current.lightBlue,
+                      borderRadius: BorderRadius.circular(8.r),
                     ),
-                  ],
-                ),
-              ),
-            )
-            .toList(),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          item.icon,
+                          size: 12.sp,
+                          color: AppColors.current.primary,
+                        ),
+                        SizedBox(width: 4.w),
+                        Text(
+                          item.label,
+                          style: TextStyle(
+                            color: AppColors.current.primary,
+                            fontSize: 10.sp,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+                .toList(),
       ),
     );
   }
 }
-

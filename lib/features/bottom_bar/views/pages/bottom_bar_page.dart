@@ -23,9 +23,16 @@ import '../widgets/ios_nav_bar.dart';
 /// Renders [IosNavBar] on iOS and [AndroidNavBar] on all other platforms
 /// based on [defaultTargetPlatform]. Uses [IndexedStack] to preserve each
 /// page's state across tab switches.
-class BottomNavigationScreen extends StatelessWidget {
-  const BottomNavigationScreen({super.key});
+class BottomNavigationScreen extends StatefulWidget {
+  final int initialTab;
 
+  const BottomNavigationScreen({super.key, this.initialTab = 0});
+
+  @override
+  State<BottomNavigationScreen> createState() => _BottomNavigationScreenState();
+}
+
+class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
   static const _pages = <Widget>[
     HomePage(),
     AdoptionScreen(),
@@ -34,15 +41,25 @@ class BottomNavigationScreen extends StatelessWidget {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    DI.find<NotificationBloc>().add(const FetchAllUnreadCounts());
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => BottomNavigationBloc()),
+        BlocProvider(create: (_) {
+          final bloc = BottomNavigationBloc();
+          if (widget.initialTab != 0) bloc.add(NavigateToPage(widget.initialTab));
+          return bloc;
+        }),
         BlocProvider(
           create: (_) => HomeBloc.fromDI()..add(FetchPostsEvent()),
         ),
         BlocProvider.value(
-          value: DI.find<NotificationBloc>()..add(const FetchAllUnreadCounts()),
+          value: DI.find<NotificationBloc>(),
         ),
       ],
       child: MultiBlocListener(

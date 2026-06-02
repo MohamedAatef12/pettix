@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/config/router/routes.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/chat/presentation/bloc/chat_list_bloc.dart';
@@ -37,8 +38,8 @@ class ChatListTaps extends StatelessWidget {
             return Center(
               child: Text(
                 state.searchQuery.isEmpty
-                    ? 'No conversations found'
-                    : 'No results for "${state.searchQuery}"',
+                    ? AppText.noConversationsFound
+                    : AppText.noResultsFor(state.searchQuery),
                 style: AppTextStyles.description,
               ),
             );
@@ -164,7 +165,7 @@ class _ConversationCard extends StatelessWidget {
                         Expanded(
                           child: Text(
                             displayMember?.displayName ??
-                                'Conversation ${conversation.id}',
+                                AppText.conversationFallback(conversation.id),
                             style: AppTextStyles.bold.copyWith(
                               color: AppColors.current.text,
                               fontSize: 15.sp,
@@ -185,7 +186,7 @@ class _ConversationCard extends StatelessWidget {
                     ),
                     SizedBox(height: 6.h),
                     Text(
-                      conversation.lastMessage?.content ?? 'No messages yet...',
+                      conversation.lastMessage?.content ?? AppText.noMessagesYet,
                       style: TextStyle(
                         fontSize: 12.sp,
                         color: AppColors.current.lightText,
@@ -207,15 +208,12 @@ class _ConversationCard extends StatelessWidget {
     final now = DateTime.now();
     final difference = now.difference(date);
 
-    if (difference.inMinutes < 1) return 'Just now';
-    if (difference.inMinutes < 60) return '${difference.inMinutes}m ago';
+    if (difference.inMinutes < 1) return AppText.justNow;
+    if (difference.inMinutes < 60) return AppText.minutesAgo(difference.inMinutes);
     if (difference.inHours < 24) {
       return '${date.hour}:${date.minute.toString().padLeft(2, '0')}';
     }
-    if (difference.inDays < 7) {
-      final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      return days[date.weekday - 1];
-    }
+    if (difference.inDays < 7) return AppText.weekdayAbbr(date.weekday);
     return '${date.day}/${date.month}';
   }
 }

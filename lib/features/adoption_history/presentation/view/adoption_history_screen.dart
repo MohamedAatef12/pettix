@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/config/router/routes.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/adoption_history/domain/entities/adoption_form_entity.dart';
@@ -117,7 +118,7 @@ class _HistoryHeader extends StatelessWidget {
                       child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 80.w),
                         child: Text(
-                          'Adoption History',
+                          AppText.adoptionHistory,
                           textAlign: TextAlign.center,
                           style: AppTextStyles.bold.copyWith(
                             fontSize: 18.sp,
@@ -141,7 +142,7 @@ class _HistoryHeader extends StatelessWidget {
                 child: Row(
                   children: [
                     _TabButton(
-                      title: 'My Applications',
+                      title: AppText.myApplications,
                       icon: Icons.assignment_ind_rounded,
                       index: 0,
                       currentIndex: currentIndex,
@@ -156,7 +157,7 @@ class _HistoryHeader extends StatelessWidget {
                     ),
                     SizedBox(width: 12.w),
                     _TabButton(
-                      title: 'On My Pets',
+                      title: AppText.onMyPets,
                       icon: Icons.pets_rounded,
                       index: 1,
                       currentIndex: currentIndex,
@@ -302,23 +303,35 @@ class _FormsTabState extends State<_FormsTab>
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       child: Row(
         children: [
-          _filterChip(label: 'All', value: null, icon: Icons.grid_view_rounded),
+          _filterChip(
+            label: AppText.all,
+            value: null,
+            icon: Icons.grid_view_rounded,
+          ),
           SizedBox(width: 10.w),
           _filterChip(
-            label: 'Pending',
+            label: AppText.pending,
             value: 1,
             icon: Icons.hourglass_empty_rounded,
           ),
           SizedBox(width: 10.w),
           _filterChip(
-            label: 'Approved',
+            label: AppText.approved,
             value: 2,
             icon: Icons.check_circle_outline_rounded,
           ),
           SizedBox(width: 10.w),
-          _filterChip(label: 'Rejected', value: 3, icon: Icons.cancel_outlined),
+          _filterChip(
+            label: AppText.rejected,
+            value: 3,
+            icon: Icons.cancel_outlined,
+          ),
           SizedBox(width: 10.w),
-          _filterChip(label: 'Cancelled', value: 4, icon: Icons.block_flipped),
+          _filterChip(
+            label: AppText.cancelled,
+            value: 4,
+            icon: Icons.block_flipped,
+          ),
         ],
       ),
     );
@@ -623,8 +636,8 @@ class _EmptyView extends StatelessWidget {
           SizedBox(height: 16.h),
           Text(
             isOwnerView
-                ? 'No one has applied to\nyour pets yet'
-                : 'You haven\'t applied\nfor any pets yet',
+                ? AppText.noOwnerApplications
+                : AppText.noClientApplications,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: AppColors.current.midGray,
@@ -657,14 +670,14 @@ class _ErrorView extends StatelessWidget {
           ),
           SizedBox(height: 12.h),
           Text(
-            message ?? 'Something went wrong',
+            message ?? AppText.error,
             style: TextStyle(color: AppColors.current.midGray, fontSize: 13.sp),
           ),
           SizedBox(height: 16.h),
           TextButton(
             onPressed: onRetry,
             child: Text(
-              'Retry',
+              AppText.retry,
               style: TextStyle(
                 color: AppColors.current.primary,
                 fontWeight: FontWeight.w700,

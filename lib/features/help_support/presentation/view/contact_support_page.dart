@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
@@ -35,7 +36,7 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
     setState(() => _sending = false);
     _subjectController.clear();
     _messageController.clear();
-    AuthToast.showSuccess(context, 'Message sent! We\'ll get back to you shortly.');
+    AuthToast.showSuccess(context, AppText.messageSentSupport);
   }
 
   @override
@@ -51,15 +52,15 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _SectionLabel('Reach us directly'),
+                  _SectionLabel(AppText.reachUsDirectly),
                   SizedBox(height: 12.h),
                   _ContactCard(
                     icon: Icons.chat_bubble_rounded,
                     iconColor: const Color(0xFF10B981),
                     iconBg: const Color(0xFFECFDF5),
-                    title: 'Live Chat',
-                    subtitle: 'Available 9 AM – 6 PM · Typically replies in minutes',
-                    actionLabel: 'Chat Now',
+                    title: AppText.liveChat,
+                    subtitle: AppText.liveChatSubtitle,
+                    actionLabel: AppText.chatNow,
                     onAction: () {},
                   ),
                   SizedBox(height: 12.h),
@@ -67,9 +68,9 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
                     icon: Icons.email_outlined,
                     iconColor: const Color(0xFF5379B2),
                     iconBg: const Color(0xFFEEF2FF),
-                    title: 'Email Support',
-                    subtitle: 'support@pettix.com · Response within 24 hours',
-                    actionLabel: 'Send Email',
+                    title: AppText.emailSupport,
+                    subtitle: AppText.emailSupportSubtitle,
+                    actionLabel: AppText.sendEmail,
                     onAction: () {},
                   ),
                   SizedBox(height: 12.h),
@@ -77,13 +78,13 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
                     icon: Icons.phone_outlined,
                     iconColor: const Color(0xFFF97316),
                     iconBg: const Color(0xFFFFF7ED),
-                    title: 'Phone Support',
-                    subtitle: '+20 100 000 0000 · Sun – Thu, 10 AM – 5 PM',
-                    actionLabel: 'Call',
+                    title: AppText.phoneSupport,
+                    subtitle: AppText.phoneSupportSubtitle,
+                    actionLabel: AppText.call,
                     onAction: () {},
                   ),
                   SizedBox(height: 28.h),
-                  _SectionLabel('Send us a message'),
+                  _SectionLabel(AppText.sendUsMessage),
                   SizedBox(height: 12.h),
                   _MessageForm(
                     formKey: _formKey,
@@ -105,7 +106,10 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.current.primary, AppColors.current.primary.withAlpha(210)],
+          colors: [
+            AppColors.current.primary,
+            AppColors.current.primary.withAlpha(210),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -118,13 +122,19 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
             children: [
               IconButton(
                 onPressed: () => context.pop(),
-                icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20.w),
+                icon: Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: Colors.white,
+                  size: 20.w,
+                ),
               ),
               Expanded(
                 child: Text(
-                  'Contact Support',
+                  AppText.contactSupport,
                   style: AppTextStyles.appbar.copyWith(
-                    color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -162,14 +172,23 @@ class _ContactCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.current.white,
         borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [BoxShadow(color: Colors.black.withAlpha(8), blurRadius: 10, offset: const Offset(0, 3))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(8),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
             width: 46.w,
             height: 46.w,
-            decoration: BoxDecoration(color: iconBg, borderRadius: BorderRadius.circular(13.r)),
+            decoration: BoxDecoration(
+              color: iconBg,
+              borderRadius: BorderRadius.circular(13.r),
+            ),
             child: Icon(icon, color: iconColor, size: 22.w),
           ),
           SizedBox(width: 12.w),
@@ -177,10 +196,21 @@ class _ContactCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: AppTextStyles.bold.copyWith(fontSize: 14.sp, color: AppColors.current.text)),
+                Text(
+                  title,
+                  style: AppTextStyles.bold.copyWith(
+                    fontSize: 14.sp,
+                    color: AppColors.current.text,
+                  ),
+                ),
                 SizedBox(height: 3.h),
-                Text(subtitle,
-                    style: AppTextStyles.smallDescription.copyWith(fontSize: 11.sp, color: AppColors.current.midGray)),
+                Text(
+                  subtitle,
+                  style: AppTextStyles.smallDescription.copyWith(
+                    fontSize: 11.sp,
+                    color: AppColors.current.midGray,
+                  ),
+                ),
               ],
             ),
           ),
@@ -232,19 +262,26 @@ class _MessageForm extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.current.white,
         borderRadius: BorderRadius.circular(18.r),
-        boxShadow: [BoxShadow(color: Colors.black.withAlpha(8), blurRadius: 10, offset: const Offset(0, 3))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(8),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Form(
         key: formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _FieldLabel('Subject'),
+            _FieldLabel(AppText.subject),
             SizedBox(height: 8.h),
             CustomTextFormField(
               controller: subjectController,
-              hintText: 'Brief summary of your issue',
-              validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
+              hintText: AppText.briefIssueSummary,
+              validator:
+                  (v) => (v == null || v.isEmpty) ? AppText.required : null,
               fillColor: true,
               fillColorValue: AppColors.current.lightBlue,
               enabledBorder: OutlineInputBorder(
@@ -253,16 +290,20 @@ class _MessageForm extends StatelessWidget {
               ),
             ),
             SizedBox(height: 16.h),
-            _FieldLabel('Message'),
+            _FieldLabel(AppText.message),
             SizedBox(height: 8.h),
             TextFormField(
               controller: messageController,
               maxLines: 5,
-              validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
+              validator:
+                  (v) => (v == null || v.isEmpty) ? AppText.required : null,
               style: TextStyle(fontSize: 13.sp, color: AppColors.current.text),
               decoration: InputDecoration(
-                hintText: 'Describe your issue or question...',
-                hintStyle: TextStyle(color: AppColors.current.midGray, fontSize: 13.sp),
+                hintText: AppText.describeIssueQuestion,
+                hintStyle: TextStyle(
+                  color: AppColors.current.midGray,
+                  fontSize: 13.sp,
+                ),
                 filled: true,
                 fillColor: AppColors.current.lightBlue,
                 border: OutlineInputBorder(
@@ -275,7 +316,10 @@ class _MessageForm extends StatelessWidget {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.r),
-                  borderSide: BorderSide(color: AppColors.current.primary, width: 1.5),
+                  borderSide: BorderSide(
+                    color: AppColors.current.primary,
+                    width: 1.5,
+                  ),
                 ),
                 contentPadding: EdgeInsets.all(14.w),
               ),
@@ -284,7 +328,7 @@ class _MessageForm extends StatelessWidget {
             CustomFilledButton(
               isLoading: sending,
               onPressed: onSend,
-              text: 'Send Message',
+              text: AppText.sendMessage,
               backgroundColor: AppColors.current.primary,
               textColor: AppColors.current.white,
             ),
@@ -300,14 +344,14 @@ class _SectionLabel extends StatelessWidget {
   const _SectionLabel(this.text);
   @override
   Widget build(BuildContext context) => Text(
-        text.toUpperCase(),
-        style: AppTextStyles.smallDescription.copyWith(
-          fontSize: 10.sp,
-          fontWeight: FontWeight.w700,
-          color: AppColors.current.midGray,
-          letterSpacing: 0.8,
-        ),
-      );
+    text.toUpperCase(),
+    style: AppTextStyles.smallDescription.copyWith(
+      fontSize: 10.sp,
+      fontWeight: FontWeight.w700,
+      color: AppColors.current.midGray,
+      letterSpacing: 0.8,
+    ),
+  );
 }
 
 class _FieldLabel extends StatelessWidget {
@@ -315,10 +359,10 @@ class _FieldLabel extends StatelessWidget {
   const _FieldLabel(this.text);
   @override
   Widget build(BuildContext context) => Text(
-        text,
-        style: AppTextStyles.smallDescription.copyWith(
-          fontSize: 13.sp,
-          color: AppColors.current.midGray,
-        ),
-      );
+    text,
+    style: AppTextStyles.smallDescription.copyWith(
+      fontSize: 13.sp,
+      color: AppColors.current.midGray,
+    ),
+  );
 }

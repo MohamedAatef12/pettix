@@ -1,5 +1,6 @@
 import 'package:pettix/core/widgets/app_profile_image.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -67,7 +68,7 @@ class CommentsBody extends StatelessWidget {
                       ),
                       SizedBox(height: 10.h),
                       Text(
-                        'Something went wrong ..!\n   Please try again later.',
+                        AppText.somethingWentWrong,
                         style: TextStyle(
                           fontSize: 16.sp,
                           color: AppColors.current.red,
@@ -87,9 +88,9 @@ class CommentsBody extends StatelessWidget {
             slivers: [
               if (headerWidget != null)
                 SliverToBoxAdapter(child: headerWidget!),
-              const SliverFillRemaining(
+              SliverFillRemaining(
                 hasScrollBody: false,
-                child: Center(child: Text('No comments yet.')),
+                child: Center(child: Text(AppText.noCommentsYet)),
               ),
             ],
           );
@@ -197,7 +198,7 @@ class CommentsBody extends StatelessWidget {
                               bloc.add(SetReplyingToEvent(comment));
                             },
                             child: Text(
-                              'Reply (${_getTotalRepliesCount(comment)})',
+                              AppText.replyCount(_getTotalRepliesCount(comment)),
                               style: AppTextStyles.smallDescription.copyWith(
                                 color: AppColors.current.primary,
                                 fontSize: isReply ? 10.sp : 12.sp,
@@ -206,7 +207,7 @@ class CommentsBody extends StatelessWidget {
                           ),
                           SizedBox(width: 20.w),
                           Text(
-                            'Likes ${state.commentLikesCount[comment.id] ?? comment.likes.length}',
+                            AppText.likesCount(state.commentLikesCount[comment.id] ?? comment.likes.length),
                             style: AppTextStyles.smallDescription.copyWith(
                               color: AppColors.current.primary,
                               fontSize: isReply ? 10.sp : 12.sp,
@@ -250,8 +251,8 @@ class CommentsBody extends StatelessWidget {
               onTap: () => bloc.add(ToggleCommentRepliesEvent(comment.id)),
               child: Text(
                 expanded
-                    ? 'Hide replies'
-                    : 'View replies (${_getTotalRepliesCount(comment)})',
+                    ? AppText.hideReplies
+                    : AppText.viewRepliesCount(_getTotalRepliesCount(comment)),
                 style: AppTextStyles.smallDescription.copyWith(
                   color: AppColors.current.primary,
                   fontSize: isReply ? 10.sp : 12.sp,
@@ -297,10 +298,10 @@ class CommentsBody extends StatelessWidget {
       ).toUtc().add(const Duration(hours: 3));
       final now = DateTime.now().toUtc().add(const Duration(hours: 3));
       final diff = now.difference(dateTime);
-      if (diff.inSeconds < 60) return 'Just now';
-      if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-      if (diff.inHours < 24) return '${diff.inHours}h ago';
-      if (diff.inDays < 7) return '${diff.inDays}d ago';
+      if (diff.inSeconds < 60) return AppText.justNow;
+      if (diff.inMinutes < 60) return AppText.minutesAgo(diff.inMinutes);
+      if (diff.inHours < 24) return AppText.hoursAgo(diff.inHours);
+      if (diff.inDays < 7) return AppText.daysAgo(diff.inDays);
       return DateFormat('MMM d, yyyy').format(dateTime);
     } catch (_) {
       return rawDate;

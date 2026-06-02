@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import '../../bloc/adoption_bloc.dart';
 import '../../bloc/adoption_event.dart';
@@ -14,41 +15,42 @@ class Step1PersonalInfo extends StatelessWidget {
   // Validation methods
   String? _getNameError(String value, bool isSubmitted) {
     if (!isSubmitted && value.isEmpty) return null;
-    if (value.isEmpty) return 'Full name is required';
-    if (value.trim().length < 3) return 'Name must be at least 3 characters';
-    if (!value.trim().contains(' ')) return 'Please enter your first and last name';
+    if (value.isEmpty) return AppText.fullNameRequired;
+    if (value.trim().length < 3) return AppText.nameMinLength;
+    if (!value.trim().contains(' ')) return AppText.firstAndLastName;
     return null;
   }
 
   String? _getEmailError(String value, bool isSubmitted) {
     if (!isSubmitted && value.isEmpty) return null;
-    if (value.isEmpty) return 'Email address is required';
+    if (value.isEmpty) return AppText.emailAddressRequired;
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(value)) return 'Enter a valid email address';
+    if (!emailRegex.hasMatch(value)) return AppText.enterValidEmail;
     return null;
   }
 
   String? _getPhoneError(String value, bool isSubmitted) {
     if (!isSubmitted && value.isEmpty) return null;
-    if (value.isEmpty) return 'Phone number is required';
+    if (value.isEmpty) return AppText.phoneNumberRequired;
     final cleanPhone = value.replaceAll(RegExp(r'[\s\-\(\)\+]'), '');
-    if (cleanPhone.length != 11) return 'Phone number must be exactly 11 digits';
+    if (cleanPhone.length != 11) return AppText.phoneNumberElevenDigits;
     return null;
   }
 
   String? _getDobError(String value, bool isSubmitted) {
     if (!isSubmitted && value.isEmpty) return null;
-    if (value.isEmpty) return 'Date of birth is required';
+    if (value.isEmpty) return AppText.dateOfBirthRequired;
     try {
       final dob = DateTime.parse(value);
       final today = DateTime.now();
       int age = today.year - dob.year;
-      if (today.month < dob.month || (today.month == dob.month && today.day < dob.day)) {
+      if (today.month < dob.month ||
+          (today.month == dob.month && today.day < dob.day)) {
         age--;
       }
-      if (age < 18) return 'You must be at least 18 years old to adopt';
+      if (age < 18) return AppText.mustBeAdultToAdopt;
     } catch (_) {
-      return 'Invalid date format';
+      return AppText.invalidDateFormat;
     }
     return null;
   }
@@ -60,15 +62,21 @@ class Step1PersonalInfo extends StatelessWidget {
     return BlocBuilder<AdoptionBloc, AdoptionState>(
       builder: (context, state) {
         // Helper local validity checks
-        final isNameValid = state.fullName.isNotEmpty &&
+        final isNameValid =
+            state.fullName.isNotEmpty &&
             state.fullName.trim().length >= 3 &&
             state.fullName.trim().contains(' ');
 
         final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-        final isEmailValid = state.email.isNotEmpty && emailRegex.hasMatch(state.email);
+        final isEmailValid =
+            state.email.isNotEmpty && emailRegex.hasMatch(state.email);
 
-        final cleanPhone = state.phoneNumber.replaceAll(RegExp(r'[\s\-\(\)\+]'), '');
-        final isPhoneValid = state.phoneNumber.isNotEmpty && cleanPhone.length == 11;
+        final cleanPhone = state.phoneNumber.replaceAll(
+          RegExp(r'[\s\-\(\)\+]'),
+          '',
+        );
+        final isPhoneValid =
+            state.phoneNumber.isNotEmpty && cleanPhone.length == 11;
 
         bool isDobValid = false;
         if (state.dateOfBirth.isNotEmpty) {
@@ -76,7 +84,8 @@ class Step1PersonalInfo extends StatelessWidget {
             final dob = DateTime.parse(state.dateOfBirth);
             final today = DateTime.now();
             int age = today.year - dob.year;
-            if (today.month < dob.month || (today.month == dob.month && today.day < dob.day)) {
+            if (today.month < dob.month ||
+                (today.month == dob.month && today.day < dob.day)) {
               age--;
             }
             isDobValid = age >= 18;
@@ -89,20 +98,26 @@ class Step1PersonalInfo extends StatelessWidget {
             padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 24.h),
             physics: const BouncingScrollPhysics(),
             children: [
-              _FieldLabel(label: 'Full Name', icon: Icons.person_outline_rounded),
+              _FieldLabel(
+                label: AppText.fullName,
+                icon: Icons.person_outline_rounded,
+              ),
               SizedBox(height: 8.h),
               _AdoptionField(
                 controller: bloc.fullNameController,
                 onChanged: (v) {
                   bloc.add(UpdateFullName(v));
                 },
-                hint: 'Your full name',
+                hint: AppText.yourFullName,
                 keyboardType: TextInputType.name,
                 errorText: _getNameError(state.fullName, state.isSubmitted),
                 isValid: isNameValid,
               ),
               SizedBox(height: 20.h),
-              _FieldLabel(label: 'Email Address', icon: Icons.email_outlined),
+              _FieldLabel(
+                label: AppText.emailAddress,
+                icon: Icons.email_outlined,
+              ),
               SizedBox(height: 8.h),
               _AdoptionField(
                 controller: bloc.emailController,
@@ -115,7 +130,10 @@ class Step1PersonalInfo extends StatelessWidget {
                 isValid: isEmailValid,
               ),
               SizedBox(height: 20.h),
-              _FieldLabel(label: 'Phone Number', icon: Icons.phone_outlined),
+              _FieldLabel(
+                label: AppText.phoneNumber,
+                icon: Icons.phone_outlined,
+              ),
               SizedBox(height: 8.h),
               _AdoptionField(
                 controller: bloc.phoneNumberController,
@@ -128,12 +146,15 @@ class Step1PersonalInfo extends StatelessWidget {
                 isValid: isPhoneValid,
               ),
               SizedBox(height: 20.h),
-              _FieldLabel(label: 'Date of Birth', icon: Icons.cake_outlined),
+              _FieldLabel(
+                label: AppText.dateOfBirth,
+                icon: Icons.cake_outlined,
+              ),
               SizedBox(height: 8.h),
               _AdoptionField(
                 controller: bloc.dobController,
                 onChanged: (_) {},
-                hint: 'Tap to select',
+                hint: AppText.tapToSelect,
                 readOnly: true,
                 suffixIcon: Icon(
                   Icons.calendar_today_rounded,
@@ -166,102 +187,106 @@ class Step1PersonalInfo extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
       ),
-      builder: (_) => Container(
-        padding: EdgeInsets.only(bottom: 24.h),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Drag handle
-            Center(
-              child: Container(
-                margin: EdgeInsets.symmetric(vertical: 12.h),
-                width: 40.w,
-                height: 4.h,
-                decoration: BoxDecoration(
-                  color: AppColors.current.lightGray,
-                  borderRadius: BorderRadius.circular(2.r),
+      builder:
+          (_) => Container(
+            padding: EdgeInsets.only(bottom: 24.h),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Drag handle
+                Center(
+                  child: Container(
+                    margin: EdgeInsets.symmetric(vertical: 12.h),
+                    width: 40.w,
+                    height: 4.h,
+                    decoration: BoxDecoration(
+                      color: AppColors.current.lightGray,
+                      borderRadius: BorderRadius.circular(2.r),
+                    ),
+                  ),
                 ),
-              ),
-            ),
 
-            // Header: Cancel | Title | Confirm
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Text(
-                      'Cancel',
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        color: AppColors.current.lightText,
-                        fontWeight: FontWeight.w500,
+                // Header: Cancel | Title | Confirm
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20.w,
+                    vertical: 8.h,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Text(
+                          AppText.cancel,
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            color: AppColors.current.lightText,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        AppText.selectDateOfBirth,
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.current.text,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          final fmt = DateFormat('yyyy-MM-dd').format(selected);
+                          bloc.dobController.text = fmt;
+                          bloc.add(UpdateDateOfBirth(fmt));
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          AppText.confirm,
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            color: AppColors.current.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(height: 10.h),
+
+                // Branded Cupertino Date Picker container
+                Container(
+                  height: 180.h,
+                  margin: EdgeInsets.symmetric(horizontal: 20.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.current.lightBlue.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(16.r),
+                  ),
+                  child: CupertinoTheme(
+                    data: CupertinoThemeData(
+                      textTheme: CupertinoTextThemeData(
+                        dateTimePickerTextStyle: TextStyle(
+                          fontSize: 16.sp,
+                          color: AppColors.current.text,
+                        ),
                       ),
                     ),
-                  ),
-                  Text(
-                    'Select Date of Birth',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.current.text,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      final fmt = DateFormat('yyyy-MM-dd').format(selected);
-                      bloc.dobController.text = fmt;
-                      bloc.add(UpdateDateOfBirth(fmt));
-                      Navigator.pop(context);
-                    },
-                    child: Text(
-                      'Confirm',
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        color: AppColors.current.primary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            SizedBox(height: 10.h),
-
-            // Branded Cupertino Date Picker container
-            Container(
-              height: 180.h,
-              margin: EdgeInsets.symmetric(horizontal: 20.w),
-              decoration: BoxDecoration(
-                color: AppColors.current.lightBlue.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(16.r),
-              ),
-              child: CupertinoTheme(
-                data: CupertinoThemeData(
-                  textTheme: CupertinoTextThemeData(
-                    dateTimePickerTextStyle: TextStyle(
-                      fontSize: 16.sp,
-                      color: AppColors.current.text,
+                    child: CupertinoDatePicker(
+                      mode: CupertinoDatePickerMode.date,
+                      initialDateTime: selected,
+                      maximumDate: DateTime.now(),
+                      minimumDate: DateTime(1900),
+                      onDateTimeChanged: (val) {
+                        selected = val;
+                      },
                     ),
                   ),
                 ),
-                child: CupertinoDatePicker(
-                  mode: CupertinoDatePickerMode.date,
-                  initialDateTime: selected,
-                  maximumDate: DateTime.now(),
-                  minimumDate: DateTime(1900),
-                  onDateTimeChanged: (val) {
-                    selected = val;
-                  },
-                ),
-              ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 }
@@ -330,13 +355,10 @@ class _AdoptionField extends StatelessWidget {
     );
 
     // Dynamic Suffix Icon based on validation status
-    final Widget? finalSuffixIcon = isValid
-        ? Icon(
-            Icons.check_circle_rounded,
-            color: Colors.green,
-            size: 20.w,
-          )
-        : suffixIcon;
+    final Widget? finalSuffixIcon =
+        isValid
+            ? Icon(Icons.check_circle_rounded, color: Colors.green, size: 20.w)
+            : suffixIcon;
 
     return TextField(
       controller: controller,

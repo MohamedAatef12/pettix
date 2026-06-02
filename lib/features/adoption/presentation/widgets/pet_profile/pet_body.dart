@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/sized_box.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/adoption/presentation/widgets/pet_profile/pet_description.dart';
@@ -59,7 +60,7 @@ class _AdoptBottomBar extends StatelessWidget {
       child: ElevatedButton.icon(
         onPressed: () => context.push(AppRoutes.applications, extra: pet.id),
         icon: const Icon(Icons.pets_rounded, size: 20),
-        label: const Text('Apply to Adopt'),
+        label: Text(AppText.applyToAdopt),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.current.primary,
           foregroundColor: AppColors.current.white,
