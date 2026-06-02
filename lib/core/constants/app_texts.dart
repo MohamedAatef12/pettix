@@ -127,6 +127,10 @@ abstract class AppText {
 
   static String get search => 'Search'.tr();
   static String get reportPost => 'Report Post'.tr();
+  static String get reportAnonymousNote =>
+      'Your report is anonymous. We will review this post according to our community guidelines.'
+          .tr();
+  static String get specifyReportReason => 'Specify Report Reason'.tr();
   static String get specifyReason => 'Please specify the reason'.tr();
   static String get typeReasonHere => 'Type your reason here...'.tr();
   static String get cancel => 'Cancel'.tr();

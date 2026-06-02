@@ -95,6 +95,8 @@
   "add_post": "add_post",
   "Search": "Search",
   "Report Post": "Report Post",
+  "Your report is anonymous. We will review this post according to our community guidelines.": "Your report is anonymous. We will review this post according to our community guidelines.",
+  "Specify Report Reason": "Specify Report Reason",
   "Please specify the reason": "Please specify the reason",
   "Type your reason here...": "Type your reason here...",
   "Cancel": "Cancel",

@@ -96,6 +96,8 @@
 "add_post": "أضف منشور",
 "Search": "بحث",
 "Report Post": "الإبلاغ عن المنشور",
+  "Your report is anonymous. We will review this post according to our community guidelines.": "تقريرك مجهول الهوية. سنراجع هذا المنشور وفقًا لإرشادات مجتمعنا.",
+  "Specify Report Reason": "حدد سبب الإبلاغ",
 "Please specify the reason": "من فضلك حدد السبب",
 "Type your reason here...": "اكتب السبب هنا...",
 "Cancel": "إلغاء",

@@ -136,7 +136,7 @@ class PostCardHeader extends StatelessWidget {
                                       children: [
                                         SizedBox(width: 28.w),
                                         Text(
-                                          'Report Post'.tr(),
+                                          AppText.reportPost,
                                           style: AppTextStyles.bold.copyWith(
                                             fontSize: 18.sp,
                                             color: AppColors.current.text,
@@ -171,8 +171,7 @@ class PostCardHeader extends StatelessWidget {
                                           SizedBox(width: 10.w),
                                           Expanded(
                                             child: Text(
-                                              'Your report is anonymous. We will review this post according to our community guidelines.'
-                                                  .tr(),
+                                              AppText.reportAnonymousNote,
                                               style: AppTextStyles.description.copyWith(
                                                 fontSize: 12.sp,
                                                 color: AppColors.current.text,
@@ -250,7 +249,7 @@ class PostCardHeader extends StatelessWidget {
                                                     ),
                                                     SizedBox(width: 10.w),
                                                     Text(
-                                                      'Specify Report Reason'.tr(),
+                                                      AppText.specifyReportReason,
                                                       style: AppTextStyles.bold.copyWith(
                                                         fontSize: 16.sp,
                                                         color: AppColors.current.text,
@@ -266,7 +265,7 @@ class PostCardHeader extends StatelessWidget {
                                                     color: AppColors.current.text,
                                                   ),
                                                   decoration: InputDecoration(
-                                                    hintText: 'Type your reason here...'.tr(),
+                                                    hintText: AppText.typeReasonHere,
                                                     hintStyle: TextStyle(
                                                       color: AppColors.current.midGray,
                                                       fontSize: 12.sp,
@@ -292,7 +291,7 @@ class PostCardHeader extends StatelessWidget {
                                                   TextButton(
                                                     onPressed: () => Navigator.pop(ctx),
                                                     child: Text(
-                                                      'Cancel'.tr(),
+                                                      AppText.cancel,
                                                       style: TextStyle(
                                                         color: AppColors.current.red,
                                                         fontWeight: FontWeight.w600,
@@ -319,7 +318,7 @@ class PostCardHeader extends StatelessWidget {
                                                       }
                                                     },
                                                     child: Text(
-                                                      'Submit'.tr(),
+                                                      AppText.submit,
                                                       style: TextStyle(
                                                         color: AppColors.current.primary,
                                                         fontWeight: FontWeight.bold,
