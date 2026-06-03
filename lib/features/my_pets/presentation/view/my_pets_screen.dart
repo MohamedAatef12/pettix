@@ -193,37 +193,16 @@ class _MyPetsHeader extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: EdgeInsets.fromLTRB(4.w, 4.h, 4.w, 20.h),
-          child: SizedBox(
-            height: 30.h,
-            width: double.infinity,
-            child: Stack(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: AppTopBarBackButton(
-                    onPressed: () {
-                      if (context.canPop()) {
-                        context.pop();
-                      } else {
-                        context.goNamed(AppRouteNames.bottomNav);
-                      }
-                    },
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    AppText.myPets,
-                    style: AppTextStyles.bold.copyWith(
-                      fontSize: 18.sp,
-                      color: AppColors.current.text,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          padding: EdgeInsets.only(bottom: 8.h),
+          child: AppTopBar.back(
+            title: AppText.myPets,
+            onBack: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.goNamed(AppRouteNames.bottomNav);
+              }
+            },
           ),
         ),
       ),

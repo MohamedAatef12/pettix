@@ -14,6 +14,7 @@ import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 import 'package:pettix/features/home/presentation/blocs/home_state.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/features/side_menu/presentation/view/widgets/custom_drawer.dart';
 import '../bloc/bottom_bar_bloc.dart';
 import '../bloc/bottom_bar_events.dart';
 import '../bloc/bottom_bar_states.dart';
@@ -89,6 +90,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
                 final isIos = defaultTargetPlatform == TargetPlatform.iOS;
                 return Scaffold(
                   extendBody: !isIos,
+                  drawer: const CustomDrawer(),
                   body: IndexedStack(
                     index: state.index,
                     children: List.generate(

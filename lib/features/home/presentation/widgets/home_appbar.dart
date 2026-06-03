@@ -24,7 +24,7 @@ class HomeAppBar extends StatelessWidget {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => Scaffold.of(context).openDrawer(),
+            onTap: () => context.findRootAncestorStateOfType<ScaffoldState>()?.openDrawer(),
             child: AppProfileImage(
               imageUrl: user?.avatar ?? user?.image,
               radius: 27.r,

@@ -89,44 +89,15 @@ class _HistoryHeader extends StatelessWidget {
         bottom: false,
         child: Column(
           children: [
-            // Top bar
-            Padding(
-              padding: EdgeInsets.fromLTRB(4.w, 4.h, 4.w, 15.h),
-              child: SizedBox(
-                height: 30.h,
-                width: double.infinity,
-                child: Stack(
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: AppTopBarBackButton(
-                        onPressed: () {
-                          if (context.canPop()) {
-                            context.pop();
-                          } else {
-                            context.goNamed(AppRouteNames.bottomNav);
-                          }
-                        },
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.center,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 80.w),
-                        child: Text(
-                          AppText.adoptionHistory,
-                          textAlign: TextAlign.center,
-                          style: AppTextStyles.bold.copyWith(
-                            fontSize: 18.sp,
-                            color: AppColors.current.text,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            AppTopBar.back(
+              title: AppText.adoptionHistory,
+              onBack: () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.goNamed(AppRouteNames.bottomNav);
+                }
+              },
             ),
             // Custom Horizontal Tab bar
             Container(
