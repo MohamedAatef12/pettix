@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/features/chat/presentation/bloc/chat_bloc.dart';
@@ -68,13 +69,13 @@ class _ChatTextFormFieldState extends State<ChatTextFormField> {
             SizedBox(height: 25.h),
             _buildPickerOption(
               icon: Iconsax.camera,
-              label: 'Camera',
+              label: AppText.camera,
               onTap: () => _handleImageSelection(ImageSource.camera),
             ),
             SizedBox(height: 15.h),
             _buildPickerOption(
               icon: Iconsax.gallery,
-              label: 'Gallery',
+              label: AppText.gallery,
               onTap: () => _handleImageSelection(ImageSource.gallery),
             ),
             SizedBox(height: 15.h),
@@ -173,7 +174,7 @@ class _ChatTextFormFieldState extends State<ChatTextFormField> {
               controller: _controller,
               fillColor: true,
               fillColorValue: AppColors.current.lightGray,
-              hintText: 'write your message here',
+              hintText: AppText.writeYourMessage,
               border: InputBorder.none,
               enabledBorder: InputBorder.none,
               focusedBorder: InputBorder.none,

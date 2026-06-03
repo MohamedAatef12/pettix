@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_bloc.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_event.dart';
@@ -18,15 +19,14 @@ class PetsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<MyPetsBloc, MyPetsState>(
-      listenWhen: (prev, curr) =>
-          prev.status != curr.status &&
-          curr.status == MyPetsStatus.success,
+      listenWhen:
+          (prev, curr) =>
+              prev.status != curr.status && curr.status == MyPetsStatus.success,
       listener: (context, _) {
         context.read<MyPetsBloc>().add(FetchUserPetsEvent(userId: userId));
       },
       builder: (context, state) {
-        if (state.status == MyPetsStatus.loading &&
-            state.pets.isEmpty) {
+        if (state.status == MyPetsStatus.loading && state.pets.isEmpty) {
           return _LoadingRow();
         }
 
@@ -64,7 +64,7 @@ class PetsSection extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'No Pets Registered Yet',
+                        AppText.noPetsRegisteredYet,
                         style: TextStyle(
                           color: AppColors.current.text,
                           fontSize: 13.sp,
@@ -73,7 +73,7 @@ class PetsSection extends StatelessWidget {
                       ),
                       SizedBox(height: 3.h),
                       Text(
-                        'Add your pets from the side menu to keep track of their details and vaccinations.',
+                        AppText.petsSectionEmptyDescription,
                         style: TextStyle(
                           color: AppColors.current.midGray,
                           fontSize: 10.sp,
@@ -98,12 +98,13 @@ class PetsSection extends StatelessWidget {
               final pet = state.pets[index];
               return PetIdCard(
                 pet: pet,
-                onToggleStatus: (newStatus) => context
-                    .read<MyPetsBloc>()
-                    .add(UpdatePetStatusEvent(petId: pet.id, status: newStatus)),
-                onDeletePet: () => context
-                    .read<MyPetsBloc>()
-                    .add(DeletePetEvent(pet.id)),
+                onToggleStatus:
+                    (newStatus) => context.read<MyPetsBloc>().add(
+                      UpdatePetStatusEvent(petId: pet.id, status: newStatus),
+                    ),
+                onDeletePet:
+                    () =>
+                        context.read<MyPetsBloc>().add(DeletePetEvent(pet.id)),
                 onEditPet: () {},
               );
             },
@@ -142,4 +143,3 @@ class _SkeletonCard extends StatelessWidget {
     );
   }
 }
-

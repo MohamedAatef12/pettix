@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/sized_box.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -30,7 +31,7 @@ class PetDescription extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'About ${pet.name}',
+            '${AppText.about} ${pet.name}',
             style: AppTextStyles.bodyTitle.copyWith(
               fontSize: 16.sp,
               color: AppColors.current.text,

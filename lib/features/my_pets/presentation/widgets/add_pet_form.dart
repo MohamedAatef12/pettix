@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
@@ -22,21 +23,25 @@ class AddPetForm extends StatelessWidget {
     final name = bloc.nameController.text.trim();
     if (name.isEmpty) return;
 
-    bloc.add(AddPetEvent(
-      PetRequestEntity(
-        name: name,
-        description: bloc.descriptionController.text.trim().isEmpty
-            ? null
-            : bloc.descriptionController.text.trim(),
-        details: bloc.detailsController.text.trim().isEmpty
-            ? null
-            : bloc.detailsController.text.trim(),
-        age: int.tryParse(bloc.ageController.text.trim()),
-        categoryId: state.selectedCategoryId,
-        genderId: state.selectedGenderId,
-        colorId: state.selectedColorId,
+    bloc.add(
+      AddPetEvent(
+        PetRequestEntity(
+          name: name,
+          description:
+              bloc.descriptionController.text.trim().isEmpty
+                  ? null
+                  : bloc.descriptionController.text.trim(),
+          details:
+              bloc.detailsController.text.trim().isEmpty
+                  ? null
+                  : bloc.detailsController.text.trim(),
+          age: int.tryParse(bloc.ageController.text.trim()),
+          categoryId: state.selectedCategoryId,
+          genderId: state.selectedGenderId,
+          colorId: state.selectedColorId,
+        ),
       ),
-    ));
+    );
   }
 
   @override
@@ -45,11 +50,11 @@ class AddPetForm extends StatelessWidget {
       listenWhen: (prev, curr) => prev.status != curr.status,
       listener: (context, state) {
         if (state.status == MyPetsStatus.success) {
-          AuthToast.showSuccess(context, 'Pet added successfully!');
+          AuthToast.showSuccess(context, AppText.petAddedSuccessfully);
           context.pop();
         }
         if (state.status == MyPetsStatus.error) {
-          AuthToast.showError(context, state.errorMessage ?? 'Something went wrong');
+          AuthToast.showError(context, state.errorMessage ?? AppText.error);
         }
       },
       builder: (context, state) {
@@ -58,7 +63,10 @@ class AddPetForm extends StatelessWidget {
 
         return Column(
           children: [
-            _FormTopBar(isSubmitting: isSubmitting, onSave: () => _submit(context)),
+            _FormTopBar(
+              isSubmitting: isSubmitting,
+              onSave: () => _submit(context),
+            ),
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -69,18 +77,18 @@ class AddPetForm extends StatelessWidget {
                     const PetImagePickerRow(),
                     SizedBox(height: 24.h),
 
-                    _SectionLabel('Basic Info'),
+                    _SectionLabel(AppText.basicInfo),
                     SizedBox(height: 10.h),
                     _FilledField(
                       controller: bloc.nameController,
-                      label: 'Pet Name',
+                      label: AppText.petName,
                       icon: Icons.pets_rounded,
                       iconColor: AppColors.current.primary,
                     ),
                     SizedBox(height: 12.h),
                     _FilledField(
                       controller: bloc.descriptionController,
-                      label: 'Description',
+                      label: AppText.description,
                       icon: Icons.notes_rounded,
                       iconColor: const Color(0xFF7A6FD8),
                       maxLines: 3,
@@ -88,54 +96,57 @@ class AddPetForm extends StatelessWidget {
                     SizedBox(height: 12.h),
                     _FilledField(
                       controller: bloc.detailsController,
-                      label: 'Health & Personality Details',
+                      label: AppText.healthPersonalityDetails,
                       icon: Icons.health_and_safety_outlined,
                       iconColor: AppColors.current.teal,
                       maxLines: 3,
                     ),
                     SizedBox(height: 24.h),
 
-                    _SectionLabel('Details'),
+                    _SectionLabel(AppText.detailsSection),
                     SizedBox(height: 10.h),
                     _FilledField(
                       controller: bloc.ageController,
-                      label: 'Age (years)',
+                      label: AppText.ageYears,
                       icon: Icons.cake_outlined,
                       iconColor: const Color(0xFFE8A838),
                       keyboardType: TextInputType.number,
                     ),
                     SizedBox(height: 12.h),
                     _LookupDropdown(
-                      label: 'Category',
+                      label: AppText.category,
                       icon: Icons.category_outlined,
                       iconColor: const Color(0xFF5EA8DF),
                       items: state.categories,
                       selectedId: state.selectedCategoryId,
-                      onChanged: (id) => context
-                          .read<MyPetsBloc>()
-                          .add(SelectCategoryEvent(id)),
+                      onChanged:
+                          (id) => context.read<MyPetsBloc>().add(
+                            SelectCategoryEvent(id),
+                          ),
                     ),
                     SizedBox(height: 12.h),
                     _GenderDropdown(
                       selectedId: state.selectedGenderId,
-                      onChanged: (id) => context
-                          .read<MyPetsBloc>()
-                          .add(SelectGenderEvent(id)),
+                      onChanged:
+                          (id) => context.read<MyPetsBloc>().add(
+                            SelectGenderEvent(id),
+                          ),
                     ),
                     SizedBox(height: 12.h),
                     _LookupDropdown(
-                      label: 'Color',
+                      label: AppText.color,
                       icon: Icons.palette_outlined,
                       iconColor: AppColors.current.brown,
                       items: state.colors,
                       selectedId: state.selectedColorId,
-                      onChanged: (id) => context
-                          .read<MyPetsBloc>()
-                          .add(SelectColorEvent(id)),
+                      onChanged:
+                          (id) => context.read<MyPetsBloc>().add(
+                            SelectColorEvent(id),
+                          ),
                     ),
                     SizedBox(height: 24.h),
 
-                    _SectionLabel('Medical Records'),
+                    _SectionLabel(AppText.medicalRecords),
                     SizedBox(height: 10.h),
                     const VaccinationBuilder(),
                     SizedBox(height: 24.h),
@@ -180,7 +191,7 @@ class _FormTopBar extends StatelessWidget {
           ),
           Expanded(
             child: Text(
-              'Add Pet',
+              AppText.addPet,
               style: AppTextStyles.appbar.copyWith(
                 color: AppColors.current.text,
                 fontSize: 18.sp,
@@ -190,24 +201,24 @@ class _FormTopBar extends StatelessWidget {
           ),
           isSubmitting
               ? SizedBox(
-                  width: 20.w,
-                  height: 20.w,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: AppColors.current.primary,
-                  ),
-                )
+                width: 20.w,
+                height: 20.w,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.current.primary,
+                ),
+              )
               : TextButton(
-                  onPressed: onSave,
-                  child: Text(
-                    'Save',
-                    style: TextStyle(
-                      color: AppColors.current.primary,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w700,
-                    ),
+                onPressed: onSave,
+                child: Text(
+                  AppText.save,
+                  style: TextStyle(
+                    color: AppColors.current.primary,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
+              ),
         ],
       ),
     );
@@ -230,37 +241,40 @@ class _SaveButton extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         height: 52.h,
         decoration: BoxDecoration(
-          color: isSubmitting
-              ? AppColors.current.primary.withAlpha(140)
-              : AppColors.current.primary,
+          color:
+              isSubmitting
+                  ? AppColors.current.primary.withAlpha(140)
+                  : AppColors.current.primary,
           borderRadius: BorderRadius.circular(16.r),
-          boxShadow: isSubmitting
-              ? []
-              : [
-                  BoxShadow(
-                    color: AppColors.current.primary.withAlpha(80),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
+          boxShadow:
+              isSubmitting
+                  ? []
+                  : [
+                    BoxShadow(
+                      color: AppColors.current.primary.withAlpha(80),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
         ),
         child: Center(
-          child: isSubmitting
-              ? const SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 2.5,
+          child:
+              isSubmitting
+                  ? const SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2.5,
+                    ),
+                  )
+                  : Text(
+                    AppText.addPet,
+                    style: AppTextStyles.bold.copyWith(
+                      color: Colors.white,
+                      fontSize: 15.sp,
+                    ),
                   ),
-                )
-              : Text(
-                  'Add Pet',
-                  style: AppTextStyles.bold.copyWith(
-                    color: Colors.white,
-                    fontSize: 15.sp,
-                  ),
-                ),
         ),
       ),
     );
@@ -320,8 +334,10 @@ class _FilledField extends StatelessWidget {
       ),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle:
-            TextStyle(color: AppColors.current.midGray, fontSize: 13.sp),
+        labelStyle: TextStyle(
+          color: AppColors.current.midGray,
+          fontSize: 13.sp,
+        ),
         prefixIcon: Padding(
           padding: EdgeInsets.symmetric(horizontal: 14.w),
           child: Icon(icon, color: iconColor, size: 20.w),
@@ -339,11 +355,9 @@ class _FilledField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14.r),
-          borderSide:
-              BorderSide(color: AppColors.current.primary, width: 1.5),
+          borderSide: BorderSide(color: AppColors.current.primary, width: 1.5),
         ),
-        contentPadding:
-            EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       ),
     );
   }
@@ -385,38 +399,49 @@ class _LookupDropdown extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                    color: AppColors.current.midGray, fontSize: 13.sp),
+                  color: AppColors.current.midGray,
+                  fontSize: 13.sp,
+                ),
               ),
             ],
           ),
-          icon: Icon(Icons.expand_more_rounded,
-              color: AppColors.current.midGray, size: 20.w),
-          items: items.map((item) {
-            return DropdownMenuItem<int>(
-              value: item.id as int,
-              child: Text(
-                item.name as String,
-                style: TextStyle(
-                    color: AppColors.current.text, fontSize: 14.sp),
-              ),
-            );
-          }).toList(),
-          onChanged: onChanged,
-          selectedItemBuilder: (context) => items.map((item) {
-            return Row(
-              children: [
-                Icon(icon, color: iconColor, size: 20.w),
-                SizedBox(width: 12.w),
-                Text(
-                  item.name as String,
-                  style: TextStyle(
+          icon: Icon(
+            Icons.expand_more_rounded,
+            color: AppColors.current.midGray,
+            size: 20.w,
+          ),
+          items:
+              items.map((item) {
+                return DropdownMenuItem<int>(
+                  value: item.id as int,
+                  child: Text(
+                    item.name as String,
+                    style: TextStyle(
                       color: AppColors.current.text,
                       fontSize: 14.sp,
-                      fontWeight: FontWeight.w500),
-                ),
-              ],
-            );
-          }).toList(),
+                    ),
+                  ),
+                );
+              }).toList(),
+          onChanged: onChanged,
+          selectedItemBuilder:
+              (context) =>
+                  items.map((item) {
+                    return Row(
+                      children: [
+                        Icon(icon, color: iconColor, size: 20.w),
+                        SizedBox(width: 12.w),
+                        Text(
+                          item.name as String,
+                          style: TextStyle(
+                            color: AppColors.current.text,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    );
+                  }).toList(),
         ),
       ),
     );
@@ -431,9 +456,9 @@ class _GenderDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const genders = [
-      (id: 1, name: 'Male'),
-      (id: 2, name: 'Female'),
+    final genders = [
+      (id: 1, name: AppText.male),
+      (id: 2, name: AppText.female),
     ];
 
     return Container(
@@ -448,49 +473,66 @@ class _GenderDropdown extends StatelessWidget {
           value: selectedId,
           hint: Row(
             children: [
-              Icon(Icons.wc_rounded,
-                  color: const Color(0xFF3AAFA9), size: 20.w),
+              Icon(
+                Icons.wc_rounded,
+                color: const Color(0xFF3AAFA9),
+                size: 20.w,
+              ),
               SizedBox(width: 12.w),
               Text(
-                'Gender',
+                AppText.gender,
                 style: TextStyle(
-                    color: AppColors.current.midGray, fontSize: 13.sp),
+                  color: AppColors.current.midGray,
+                  fontSize: 13.sp,
+                ),
               ),
             ],
           ),
-          icon: Icon(Icons.expand_more_rounded,
-              color: AppColors.current.midGray, size: 20.w),
-          items: genders
-              .map(
-                (g) => DropdownMenuItem<int>(
-                  value: g.id,
-                  child: Text(
-                    g.name,
-                    style: TextStyle(
-                        color: AppColors.current.text, fontSize: 14.sp),
-                  ),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-          selectedItemBuilder: (_) => genders
-              .map(
-                (g) => Row(
-                  children: [
-                    Icon(Icons.wc_rounded,
-                        color: const Color(0xFF3AAFA9), size: 20.w),
-                    SizedBox(width: 12.w),
-                    Text(
-                      g.name,
-                      style: TextStyle(
+          icon: Icon(
+            Icons.expand_more_rounded,
+            color: AppColors.current.midGray,
+            size: 20.w,
+          ),
+          items:
+              genders
+                  .map(
+                    (g) => DropdownMenuItem<int>(
+                      value: g.id,
+                      child: Text(
+                        g.name,
+                        style: TextStyle(
                           color: AppColors.current.text,
                           fontSize: 14.sp,
-                          fontWeight: FontWeight.w500),
+                        ),
+                      ),
                     ),
-                  ],
-                ),
-              )
-              .toList(),
+                  )
+                  .toList(),
+          onChanged: onChanged,
+          selectedItemBuilder:
+              (_) =>
+                  genders
+                      .map(
+                        (g) => Row(
+                          children: [
+                            Icon(
+                              Icons.wc_rounded,
+                              color: const Color(0xFF3AAFA9),
+                              size: 20.w,
+                            ),
+                            SizedBox(width: 12.w),
+                            Text(
+                              g.name,
+                              style: TextStyle(
+                                color: AppColors.current.text,
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                      .toList(),
         ),
       ),
     );

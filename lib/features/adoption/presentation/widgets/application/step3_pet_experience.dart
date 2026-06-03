@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 import '../../bloc/adoption_bloc.dart';
@@ -21,9 +22,9 @@ class Step3PetExperience extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Have you owned or cared for a pet before?",
-                style: TextStyle(fontSize: 16),
+              Text(
+                AppText.haveOwnedPetBefore,
+                style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 12),
               Row(
@@ -31,7 +32,7 @@ class Step3PetExperience extends StatelessWidget {
                 children: [
                   Expanded(
                     child: CustomChoiceChip(
-                      label: "Yes",
+                      label: AppText.yes,
                       selected: state.hasOwnedPetBefore == true,
                       onSelected: () => bloc.add(const UpdateHasOwnedPet(true)),
                     ),
@@ -39,7 +40,7 @@ class Step3PetExperience extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: CustomChoiceChip(
-                      label: "No",
+                      label: AppText.no,
                       selected: state.hasOwnedPetBefore == false,
                       onSelected:
                           () => bloc.add(const UpdateHasOwnedPet(false)),
@@ -49,15 +50,15 @@ class Step3PetExperience extends StatelessWidget {
               ),
               if (state.hasOwnedPetBefore == true) ...[
                 const SizedBox(height: 30),
-                const Text(
-                  "If yes, what type?",
-                  style: TextStyle(fontSize: 16),
+                Text(
+                  AppText.ifYesWhatType,
+                  style: const TextStyle(fontSize: 16),
                 ),
                 const SizedBox(height: 12),
                 CustomTextFormField(
                   controller: bloc.petTypeController,
                   onChanged: (val) => bloc.add(UpdatePetType(val)),
-                  hintText: "Dog, Cat, etc.",
+                  hintText: AppText.petTypeHint,
                   fillColor: true,
                   fillColorValue: AppColors.current.white,
                   border: OutlineInputBorder(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/shimmers/report_shimmer.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -45,16 +46,17 @@ class PetProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocListener<AdoptionBrowseBloc, AdoptionBrowseState>(
-      listenWhen: (p, c) =>
-          p.reportSuccess != c.reportSuccess ||
-          (p.isReportLoading != c.isReportLoading &&
-              !c.isReportLoading &&
-              c.errorMessage != null),
+      listenWhen:
+          (p, c) =>
+              p.reportSuccess != c.reportSuccess ||
+              (p.isReportLoading != c.isReportLoading &&
+                  !c.isReportLoading &&
+                  c.errorMessage != null),
       listener: (context, state) {
         if (state.reportSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Report sent successfully'.tr()),
+              content: Text(AppText.reportSentSuccessfully),
               backgroundColor: Colors.green,
             ),
           );
@@ -84,11 +86,8 @@ class PetProfileScreen extends StatelessWidget {
           ),
           actions: [
             IconButton(
-              tooltip: 'Report Pet'.tr(),
-              icon: Icon(
-                Icons.flag_outlined,
-                color: AppColors.current.red,
-              ),
+              tooltip: AppText.reportPet,
+              icon: Icon(Icons.flag_outlined, color: AppColors.current.red),
               onPressed: () => _showReportSheet(context),
             ),
           ],
@@ -108,15 +107,13 @@ class _ReportPetSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AdoptionBrowseBloc, AdoptionBrowseState>(
-      buildWhen: (p, c) =>
-          p.reportReasons != c.reportReasons ||
-          p.isReportLoading != c.isReportLoading,
+      buildWhen:
+          (p, c) =>
+              p.reportReasons != c.reportReasons ||
+              p.isReportLoading != c.isReportLoading,
       builder: (context, state) {
         if (state.isReportLoading) {
-          return SizedBox(
-            height: 500.h,
-            child: const ReportShimmer(),
-          );
+          return SizedBox(height: 500.h, child: const ReportShimmer());
         }
 
         return SafeArea(
@@ -143,7 +140,7 @@ class _ReportPetSheet extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      'Report Pet'.tr(),
+                      AppText.reportPet,
                       textAlign: TextAlign.center,
                       style: AppTextStyles.bold.copyWith(
                         fontSize: 18.sp,
@@ -152,7 +149,7 @@ class _ReportPetSheet extends StatelessWidget {
                     ),
                     SizedBox(height: 6.h),
                     Text(
-                      'Help us keep the community safe. Please select a reason why you are reporting this pet.'.tr(),
+                      AppText.reportPetDescription,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 13.sp,
@@ -177,12 +174,17 @@ class _ReportPetSheet extends StatelessWidget {
                     final isOther = reason.name.toLowerCase().contains('other');
 
                     return Container(
-                      margin: EdgeInsets.symmetric(vertical: 6.h, horizontal: 20.w),
+                      margin: EdgeInsets.symmetric(
+                        vertical: 6.h,
+                        horizontal: 20.w,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.current.white,
                         borderRadius: BorderRadius.circular(14.r),
                         border: Border.all(
-                          color: AppColors.current.lightGray.withValues(alpha: 0.4),
+                          color: AppColors.current.lightGray.withValues(
+                            alpha: 0.4,
+                          ),
                           width: 1.r,
                         ),
                         boxShadow: [
@@ -194,15 +196,22 @@ class _ReportPetSheet extends StatelessWidget {
                         ],
                       ),
                       child: ListTile(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 2.h),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 2.h,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14.r),
                         ),
                         leading: CircleAvatar(
                           radius: 18.r,
-                          backgroundColor: AppColors.current.red.withValues(alpha: 0.08),
+                          backgroundColor: AppColors.current.red.withValues(
+                            alpha: 0.08,
+                          ),
                           child: Icon(
-                            isOther ? Icons.edit_note_rounded : Icons.report_gmailerrorred_rounded,
+                            isOther
+                                ? Icons.edit_note_rounded
+                                : Icons.report_gmailerrorred_rounded,
                             color: AppColors.current.red.withValues(alpha: 0.8),
                             size: 20.r,
                           ),
@@ -217,18 +226,22 @@ class _ReportPetSheet extends StatelessWidget {
                         trailing: Icon(
                           Icons.arrow_forward_ios_rounded,
                           size: 14.r,
-                          color: AppColors.current.lightText.withValues(alpha: 0.6),
+                          color: AppColors.current.lightText.withValues(
+                            alpha: 0.6,
+                          ),
                         ),
                         onTap: () {
                           if (isOther) {
                             Navigator.pop(context); // Close sheet
                             _showCustomReasonDialog(context, bloc, pet, reason);
                           } else {
-                            bloc.add(ReportPetEvent(
-                              petId: pet.id,
-                              reasonId: reason.id,
-                              customReason: reason.name,
-                            ));
+                            bloc.add(
+                              ReportPetEvent(
+                                petId: pet.id,
+                                reasonId: reason.id,
+                                customReason: reason.name,
+                              ),
+                            );
                             Navigator.pop(context); // Close sheet
                           }
                         },
@@ -266,7 +279,7 @@ class _ReportPetSheet extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Specify Reason'.tr(),
+                  AppText.specifyReason,
                   style: AppTextStyles.bold.copyWith(
                     fontSize: 18.sp,
                     color: AppColors.current.text,
@@ -275,7 +288,7 @@ class _ReportPetSheet extends StatelessWidget {
                 ),
                 SizedBox(height: 8.h),
                 Text(
-                  'Please provide details about why you want to report this pet listing.'.tr(),
+                  AppText.specifyReasonPetDescription,
                   style: TextStyle(
                     fontSize: 13.sp,
                     color: AppColors.current.lightText,
@@ -292,13 +305,15 @@ class _ReportPetSheet extends StatelessWidget {
                     color: AppColors.current.text,
                   ),
                   decoration: InputDecoration(
-                    hintText: 'Type your reason here...'.tr(),
+                    hintText: AppText.typeReasonHere,
                     hintStyle: TextStyle(
                       fontSize: 14.sp,
                       color: AppColors.current.lightText.withValues(alpha: 0.6),
                     ),
                     filled: true,
-                    fillColor: AppColors.current.lightBlue.withValues(alpha: 0.3),
+                    fillColor: AppColors.current.lightBlue.withValues(
+                      alpha: 0.3,
+                    ),
                     contentPadding: EdgeInsets.all(12.r),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.r),
@@ -310,7 +325,9 @@ class _ReportPetSheet extends StatelessWidget {
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.r),
                       borderSide: BorderSide(
-                        color: AppColors.current.lightGray.withValues(alpha: 0.5),
+                        color: AppColors.current.lightGray.withValues(
+                          alpha: 0.5,
+                        ),
                         width: 1.r,
                       ),
                     ),
@@ -337,7 +354,7 @@ class _ReportPetSheet extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          'Cancel'.tr(),
+                          AppText.cancel,
                           style: TextStyle(
                             color: AppColors.current.text,
                             fontWeight: FontWeight.w600,
@@ -351,11 +368,13 @@ class _ReportPetSheet extends StatelessWidget {
                         onPressed: () {
                           final custom = textController.text.trim();
                           if (custom.isNotEmpty) {
-                            bloc.add(ReportPetEvent(
-                              petId: pet.id,
-                              reasonId: reason.id,
-                              customReason: custom,
-                            ));
+                            bloc.add(
+                              ReportPetEvent(
+                                petId: pet.id,
+                                reasonId: reason.id,
+                                customReason: custom,
+                              ),
+                            );
                             Navigator.pop(dialogCtx);
                           }
                         },
@@ -368,7 +387,7 @@ class _ReportPetSheet extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          'Submit'.tr(),
+                          AppText.submit,
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,

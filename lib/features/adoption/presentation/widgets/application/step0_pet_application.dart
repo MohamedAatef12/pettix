@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/sized_box.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -24,7 +25,7 @@ class PetApplication extends StatelessWidget {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Text(
-            'Ready to welcome a pet at your home?',
+            AppText.readyToWelcomePet,
             style: AppTextStyles.title.copyWith(
               fontSize: 22.sp,
               color: AppColors.current.text,
@@ -35,7 +36,7 @@ class PetApplication extends StatelessWidget {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Text(
-            'To ensure the right choice, we\'ll ask you a few questions about your living situation and experience.',
+            AppText.adoptionIntro,
             style: TextStyle(
               fontSize: 15.sp,
               color: AppColors.current.lightText,
@@ -47,7 +48,7 @@ class PetApplication extends StatelessWidget {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Text(
-            'What to Expect',
+            AppText.whatToExpect,
             style: AppTextStyles.bodyTitle.copyWith(
               fontSize: 16.sp,
               color: AppColors.current.text,
@@ -55,27 +56,27 @@ class PetApplication extends StatelessWidget {
           ),
         ),
         SizedBoxConstants.verticalSmall,
-        const _ExpectationItem(
+        _ExpectationItem(
           icon: Icons.person_outline_rounded,
-          text: 'Fill in your personal information',
+          text: AppText.fillPersonalInformation,
         ),
-        const _ExpectationItem(
+        _ExpectationItem(
           icon: Icons.home_outlined,
-          text: 'Describe your living situation',
+          text: AppText.describeLivingSituation,
         ),
-        const _ExpectationItem(
+        _ExpectationItem(
           icon: Icons.pets_outlined,
-          text: 'Share your pet experience',
+          text: AppText.sharePetExperience,
         ),
-        const _ExpectationItem(
+        _ExpectationItem(
           icon: Icons.fact_check_outlined,
-          text: 'Review and submit your application',
+          text: AppText.reviewAndSubmitApplication,
         ),
         SizedBoxConstants.verticalLarge,
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: CustomFilledButton(
-            text: 'Start Application',
+            text: AppText.startApplication,
             onPressed: () => context.read<AdoptionBloc>().add(NextStep()),
             heightFactor: 0.06,
             backgroundColor: AppColors.current.primary,
@@ -109,7 +110,7 @@ class _HeroSection extends StatelessWidget {
             onTap: () => context.pop(),
             highlightColor: Colors.transparent,
             splashColor: Colors.transparent,
-            
+
             child: SizedBox(
               width: 40.w,
               height: 40.w,

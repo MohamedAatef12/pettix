@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/config/router/routes.dart';
+import 'package:pettix/core/bloc/theme/theme_cubit.dart';
+import 'package:pettix/core/bloc/theme/theme_option.dart';
 import 'package:pettix/features/adoption/presentation/view/adoption_screen.dart';
 import 'package:pettix/features/home/presentation/pages/home_page.dart';
 import 'package:pettix/features/notification/presentation/bloc/notification_bloc.dart';
@@ -23,9 +25,16 @@ import '../widgets/ios_nav_bar.dart';
 /// Renders [IosNavBar] on iOS and [AndroidNavBar] on all other platforms
 /// based on [defaultTargetPlatform]. Uses [IndexedStack] to preserve each
 /// page's state across tab switches.
-class BottomNavigationScreen extends StatelessWidget {
-  const BottomNavigationScreen({super.key});
+class BottomNavigationScreen extends StatefulWidget {
+  final int initialTab;
 
+  const BottomNavigationScreen({super.key, this.initialTab = 0});
+
+  @override
+  State<BottomNavigationScreen> createState() => _BottomNavigationScreenState();
+}
+
+class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
   static const _pages = <Widget>[
     HomePage(),
     AdoptionScreen(),
@@ -34,66 +43,93 @@ class BottomNavigationScreen extends StatelessWidget {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    DI.find<NotificationBloc>().add(const FetchAllUnreadCounts());
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => BottomNavigationBloc()),
         BlocProvider(
-          create: (_) => HomeBloc.fromDI()..add(FetchPostsEvent()),
+          create: (_) {
+            final bloc = BottomNavigationBloc();
+            if (widget.initialTab != 0) {
+              bloc.add(NavigateToPage(widget.initialTab));
+            }
+            return bloc;
+          },
         ),
-        BlocProvider.value(
-          value: DI.find<NotificationBloc>()..add(const FetchAllUnreadCounts()),
-        ),
+        BlocProvider(create: (_) => HomeBloc.fromDI()..add(FetchPostsEvent())),
+        BlocProvider.value(value: DI.find<NotificationBloc>()),
       ],
       child: MultiBlocListener(
         listeners: [
           BlocListener<HomeBloc, HomeState>(
-            listenWhen: (prev, curr) =>
-                curr.isPostUploadSuccess || curr.isPostUploadError,
+            listenWhen:
+                (prev, curr) =>
+                    curr.isPostUploadSuccess || curr.isPostUploadError,
             listener: (context, state) {
               if (state.isPostUploadSuccess) {
                 AuthToast.showSuccess(context, "Post uploaded successfully!");
               } else if (state.isPostUploadError) {
                 AuthToast.showError(
-                    context, state.error ?? "Failed to upload post");
+                  context,
+                  state.error ?? "Failed to upload post",
+                );
               }
             },
           ),
         ],
         child: BlocBuilder<BottomNavigationBloc, BottomNavigationState>(
           builder: (context, state) {
-            final isIos = defaultTargetPlatform == TargetPlatform.iOS;
-            return Scaffold(
-              extendBody: !isIos,
-              body: IndexedStack(
-                index: state.index,
-                children: List.generate(
-                  _pages.length,
-                  (i) => _LazyLoadWrapper(
-                    isSelected: state.index == i,
-                    child: _pages[i],
-                  ),
-                ),
-              ),
-              bottomNavigationBar: isIos
-                  ? IosNavBar(
-                      currentIndex: state.index,
-                      onTabChanged: (i) => context
-                          .read<BottomNavigationBloc>()
-                          .add(NavigateToPage(i)),
-                      onAddPost: () => context.push(AppRoutes.addPost,
-                          extra: context.read<HomeBloc>()),
-                      onChatList: () => context.push(AppRoutes.chatList),
-                    )
-                  : AndroidNavBar(
-                      currentIndex: state.index,
-                      onTabChanged: (i) => context
-                          .read<BottomNavigationBloc>()
-                          .add(NavigateToPage(i)),
-                      onAddPost: () => context.push(AppRoutes.addPost,
-                          extra: context.read<HomeBloc>()),
-                      onChatList: () => context.push(AppRoutes.chatList),
+            return BlocBuilder<ThemeCubit, AppThemeOption>(
+              builder: (context, themeOption) {
+                final isIos = defaultTargetPlatform == TargetPlatform.iOS;
+                return Scaffold(
+                  extendBody: !isIos,
+                  body: IndexedStack(
+                    index: state.index,
+                    children: List.generate(
+                      _pages.length,
+                      (i) => _LazyLoadWrapper(
+                        key: ValueKey('tab_${i}_${themeOption.name}'),
+                        isSelected: state.index == i,
+                        child: _pages[i],
+                      ),
                     ),
+                  ),
+                  bottomNavigationBar:
+                      isIos
+                          ? IosNavBar(
+                            currentIndex: state.index,
+                            onTabChanged:
+                                (i) => context.read<BottomNavigationBloc>().add(
+                                  NavigateToPage(i),
+                                ),
+                            onAddPost:
+                                () => context.push(
+                                  AppRoutes.addPost,
+                                  extra: context.read<HomeBloc>(),
+                                ),
+                            onChatList: () => context.push(AppRoutes.chatList),
+                          )
+                          : AndroidNavBar(
+                            currentIndex: state.index,
+                            onTabChanged:
+                                (i) => context.read<BottomNavigationBloc>().add(
+                                  NavigateToPage(i),
+                                ),
+                            onAddPost:
+                                () => context.push(
+                                  AppRoutes.addPost,
+                                  extra: context.read<HomeBloc>(),
+                                ),
+                            onChatList: () => context.push(AppRoutes.chatList),
+                          ),
+                );
+              },
             );
           },
         ),
@@ -109,7 +145,11 @@ class _LazyLoadWrapper extends StatefulWidget {
   final Widget child;
   final bool isSelected;
 
-  const _LazyLoadWrapper({required this.child, required this.isSelected});
+  const _LazyLoadWrapper({
+    super.key,
+    required this.child,
+    required this.isSelected,
+  });
 
   @override
   State<_LazyLoadWrapper> createState() => _LazyLoadWrapperState();

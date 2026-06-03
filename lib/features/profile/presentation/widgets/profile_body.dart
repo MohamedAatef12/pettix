@@ -34,7 +34,11 @@ class ProfileBody extends StatelessWidget {
         if (profile == null) {
           return const ProfileShimmer();
         }
-        return _ProfileContent(profile: profile, isCurrentUser: isCurrentUser, userId: userId);
+        return _ProfileContent(
+          profile: profile,
+          isCurrentUser: isCurrentUser,
+          userId: userId,
+        );
       },
     );
   }
@@ -65,12 +69,13 @@ class _ProfileContent extends StatelessWidget {
             children: [
               ProfileHeader(
                 profile: profile,
-                onEditTap: isCurrentUser
-                    ? () => context.push(
+                onEditTap:
+                    isCurrentUser
+                        ? () => context.push(
                           AppRoutes.editProfile,
                           extra: context.read<ProfileBloc>(),
                         )
-                    : null,
+                        : null,
               ),
               ProfileNameSection(profile: profile),
               SizedBox(height: 24.h),
@@ -129,7 +134,9 @@ class _ProfileContent extends StatelessWidget {
                       ],
                     ),
                     SizedBox(height: 24.h),
-                    _SectionLabel(isCurrentUser ? 'My Pets' : 'Pets'),
+                    _SectionLabel(
+                      isCurrentUser ? AppText.myPets : AppText.pets,
+                    ),
                     SizedBox(height: 8.h),
                     PetsSection(isCurrentUser: isCurrentUser, userId: userId),
                     SizedBox(height: 32.h),
@@ -161,5 +168,3 @@ class _SectionLabel extends StatelessWidget {
     );
   }
 }
-
-

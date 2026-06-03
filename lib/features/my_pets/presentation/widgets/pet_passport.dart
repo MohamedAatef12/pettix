@@ -2,10 +2,10 @@ import 'dart:math';
 import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
-
 
 /// Opens the pet passport overlay.
 /// [onToggleStatus] is called when the owner taps the availability toggle.
@@ -20,7 +20,7 @@ void showPetPassport(
   showGeneralDialog(
     context: context,
     barrierDismissible: true,
-    barrierLabel: 'Pet Passport',
+    barrierLabel: AppText.petPassport,
     barrierColor: Colors.black.withAlpha(160),
     transitionDuration: const Duration(milliseconds: 300),
     pageBuilder:
@@ -215,7 +215,7 @@ class _PassportFrontHeader extends StatelessWidget {
               ),
               SizedBox(width: 6.w),
               Text(
-                'PETTIX',
+                AppText.pettixBrand,
                 style: TextStyle(
                   color: AppColors.current.gold,
                   fontSize: 13.sp,
@@ -226,7 +226,7 @@ class _PassportFrontHeader extends StatelessWidget {
             ],
           ),
           Text(
-            'PET PASSPORT',
+            AppText.petPassportUpper,
             style: TextStyle(
               color: Colors.white.withAlpha(180),
               fontSize: 9.sp,
@@ -331,7 +331,7 @@ class _PassportFrontFooter extends StatelessWidget {
               ),
               SizedBox(width: 6.w),
               Text(
-                'Tap to see full details',
+                AppText.tapFullDetails,
                 style: TextStyle(
                   color: Colors.white.withAlpha(120),
                   fontSize: 10.sp,
@@ -386,24 +386,30 @@ class _PassportBack extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                 child: Column(
                   children: [
-                    _InfoRow(label: 'Code', value: pet.code),
+                    _InfoRow(label: AppText.code, value: pet.code),
                     if (pet.age != null)
-                      _InfoRow(label: 'Age', value: '${pet.age} years'),
+                      _InfoRow(
+                        label: AppText.age,
+                        value: '${pet.age} ${AppText.years}',
+                      ),
                     if (pet.categoryName != null)
-                      _InfoRow(label: 'Category', value: pet.categoryName!),
+                      _InfoRow(
+                        label: AppText.category,
+                        value: pet.categoryName!,
+                      ),
                     if (pet.genderName != null)
-                      _InfoRow(label: 'Gender', value: pet.genderName!),
+                      _InfoRow(label: AppText.gender, value: pet.genderName!),
                     if (pet.colorName != null)
-                      _InfoRow(label: 'Color', value: pet.colorName!),
+                      _InfoRow(label: AppText.color, value: pet.colorName!),
                     if (pet.description != null && pet.description!.isNotEmpty)
-                      _InfoBlock(label: 'About', value: pet.description!),
+                      _InfoBlock(label: AppText.about, value: pet.description!),
                     if (pet.details != null && pet.details!.isNotEmpty)
                       _InfoBlock(
-                        label: 'Health & Details',
+                        label: AppText.healthDetails,
                         value: pet.details!,
                       ),
                     if (pet.vaccinations.isNotEmpty) ...[
-                      _BackSectionTitle('Medical Records'),
+                      _BackSectionTitle(AppText.medicalRecords),
                       ...pet.vaccinations.map(
                         (v) => _VaccinationTile(vaccination: v),
                       ),
@@ -662,7 +668,7 @@ class _VaccinationTile extends StatelessWidget {
     final dateLabel =
         date != null
             ? '${date.day}/${date.month}/${date.year}'
-            : 'Date unknown';
+            : AppText.dateUnknown;
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 4.h),
@@ -749,7 +755,8 @@ class _StatusToggleButtonState extends State<_StatusToggleButton> {
     final color = isAvailable ? AppColors.current.red : AppColors.current.green;
     final icon =
         isAvailable ? Icons.visibility_off_rounded : Icons.pets_rounded;
-    final label = isAvailable ? 'Make Private' : 'Make Available for Adoption';
+    final label =
+        isAvailable ? AppText.makePrivate : AppText.makeAvailableForAdoption;
 
     return GestureDetector(
       onTap: _handleToggle,

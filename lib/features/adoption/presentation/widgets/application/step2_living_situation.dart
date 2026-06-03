@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import '../../bloc/adoption_bloc.dart';
 import '../../bloc/adoption_event.dart';
@@ -17,7 +18,7 @@ class Step2LivingSituation extends StatelessWidget {
         return ListView(
           padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 24.h),
           children: [
-            _SectionLabel(label: 'Living Situation'),
+            _SectionLabel(label: AppText.livingSituation),
             SizedBox(height: 12.h),
             if (options == null || options.livingSituations.isEmpty)
               _EmptyHint()
@@ -29,19 +30,21 @@ class Step2LivingSituation extends StatelessWidget {
                 mainAxisSpacing: 10.h,
                 crossAxisSpacing: 10.w,
                 childAspectRatio: 2.8,
-                children: options.livingSituations.map((e) {
-                  return _SelectCard(
-                    label: e.name,
-                    icon: _livingSituationIcon(e.name),
-                    selected: state.selectedLivingSituationId == e.id,
-                    onTap: () => context
-                        .read<AdoptionBloc>()
-                        .add(UpdateLivingSituation(e.id)),
-                  );
-                }).toList(),
+                children:
+                    options.livingSituations.map((e) {
+                      return _SelectCard(
+                        label: e.name,
+                        icon: _livingSituationIcon(e.name),
+                        selected: state.selectedLivingSituationId == e.id,
+                        onTap:
+                            () => context.read<AdoptionBloc>().add(
+                              UpdateLivingSituation(e.id),
+                            ),
+                      );
+                    }).toList(),
               ),
             SizedBox(height: 28.h),
-            _SectionLabel(label: 'Type of Residence'),
+            _SectionLabel(label: AppText.typeOfResidence),
             SizedBox(height: 12.h),
             if (options == null || options.residenceTypes.isEmpty)
               _EmptyHint()
@@ -53,16 +56,18 @@ class Step2LivingSituation extends StatelessWidget {
                 mainAxisSpacing: 10.h,
                 crossAxisSpacing: 10.w,
                 childAspectRatio: 2.8,
-                children: options.residenceTypes.map((e) {
-                  return _SelectCard(
-                    label: e.name,
-                    icon: _residenceIcon(e.name),
-                    selected: state.selectedResidenceTypeId == e.id,
-                    onTap: () => context
-                        .read<AdoptionBloc>()
-                        .add(UpdateResidenceType(e.id)),
-                  );
-                }).toList(),
+                children:
+                    options.residenceTypes.map((e) {
+                      return _SelectCard(
+                        label: e.name,
+                        icon: _residenceIcon(e.name),
+                        selected: state.selectedResidenceTypeId == e.id,
+                        onTap:
+                            () => context.read<AdoptionBloc>().add(
+                              UpdateResidenceType(e.id),
+                            ),
+                      );
+                    }).toList(),
               ),
           ],
         );
@@ -117,11 +122,8 @@ class _EmptyHint extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Text(
-        'Loading options...',
-        style: TextStyle(
-          fontSize: 13.sp,
-          color: AppColors.current.midGray,
-        ),
+        AppText.loadingOptions,
+        style: TextStyle(fontSize: 13.sp, color: AppColors.current.midGray),
       ),
     );
   }
@@ -149,14 +151,16 @@ class _SelectCard extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: EdgeInsets.symmetric(horizontal: 12.w),
         decoration: BoxDecoration(
-          color: selected
-              ? AppColors.current.primary.withValues(alpha: 0.08)
-              : AppColors.current.white,
+          color:
+              selected
+                  ? AppColors.current.primary.withValues(alpha: 0.08)
+                  : AppColors.current.white,
           borderRadius: BorderRadius.circular(10.r),
           border: Border.all(
-            color: selected
-                ? AppColors.current.primary
-                : AppColors.current.lightGray,
+            color:
+                selected
+                    ? AppColors.current.primary
+                    : AppColors.current.lightGray,
             width: selected ? 1.8 : 1.2,
           ),
         ),
@@ -165,9 +169,10 @@ class _SelectCard extends StatelessWidget {
             Icon(
               icon,
               size: 18.w,
-              color: selected
-                  ? AppColors.current.primary
-                  : AppColors.current.midGray,
+              color:
+                  selected
+                      ? AppColors.current.primary
+                      : AppColors.current.midGray,
             ),
             SizedBox(width: 8.w),
             Expanded(
@@ -177,11 +182,11 @@ class _SelectCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 13.sp,
-                  fontWeight:
-                      selected ? FontWeight.w700 : FontWeight.w500,
-                  color: selected
-                      ? AppColors.current.primary
-                      : AppColors.current.text,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                  color:
+                      selected
+                          ? AppColors.current.primary
+                          : AppColors.current.text,
                 ),
               ),
             ),
@@ -219,14 +224,16 @@ class CustomChoiceChip extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
         decoration: BoxDecoration(
-          color: selected
-              ? AppColors.current.primary.withValues(alpha: 0.08)
-              : AppColors.current.white,
+          color:
+              selected
+                  ? AppColors.current.primary.withValues(alpha: 0.08)
+                  : AppColors.current.white,
           borderRadius: BorderRadius.circular(10.r),
           border: Border.all(
-            color: selected
-                ? AppColors.current.primary
-                : AppColors.current.lightGray,
+            color:
+                selected
+                    ? AppColors.current.primary
+                    : AppColors.current.lightGray,
             width: selected ? 1.8 : 1.2,
           ),
         ),
@@ -236,9 +243,8 @@ class CustomChoiceChip extends StatelessWidget {
           style: TextStyle(
             fontSize: 14.sp,
             fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-            color: selected
-                ? AppColors.current.primary
-                : AppColors.current.text,
+            color:
+                selected ? AppColors.current.primary : AppColors.current.text,
           ),
         ),
       ),

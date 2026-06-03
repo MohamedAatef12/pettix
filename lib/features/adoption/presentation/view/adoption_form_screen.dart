@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../../config/di/di.dart';
+import '../../../../core/constants/app_texts.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/utils/auth_toast.dart';
 import '../../../../core/utils/custom_text_form_field.dart';
@@ -84,15 +85,15 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
     if (_formKey.currentState!.validate()) {
       if (_selectedLivingSituationId == null ||
           _selectedResidenceTypeId == null) {
-        AuthToast.showError(context, 'Please select all options');
+        AuthToast.showError(context, AppText.pleaseSelectAllOptions);
         return;
       }
       if (!_hasReadAndUnderstood || !_agreesToTerms) {
-        AuthToast.showError(context, 'Please agree to terms');
+        AuthToast.showError(context, AppText.pleaseAgreeToTerms);
         return;
       }
       if (_selectedDate == null) {
-        AuthToast.showError(context, 'Please select Date of Birth');
+        AuthToast.showError(context, AppText.pleaseSelectDateOfBirth);
         return;
       }
 
@@ -116,22 +117,34 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Adoption Application'),
+        title: Text(AppText.adoptionApplication),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.current.text),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: AppColors.current.text,
+          ),
           onPressed: () => context.pop(),
         ),
       ),
       body: BlocConsumer<AdoptionBloc, AdoptionState>(
         listener: (context, state) {
           if (state.status == AdoptionStatus.success) {
-            AuthToast.showSuccess(context, 'Application Submitted Successfully!');
+            AuthToast.showSuccess(
+              context,
+              AppText.applicationSubmittedSuccessfully,
+            );
             context.pop();
           } else if (state.status == AdoptionStatus.submitError) {
-            AuthToast.showError(context, state.errorMessage ?? 'Submission Failed');
+            AuthToast.showError(
+              context,
+              state.errorMessage ?? AppText.submissionFailed,
+            );
           } else if (state.status == AdoptionStatus.error) {
-            AuthToast.showError(context, state.errorMessage ?? 'Error Loading Options');
+            AuthToast.showError(
+              context,
+              state.errorMessage ?? AppText.errorLoadingOptions,
+            );
           }
         },
         builder: (context, state) {
@@ -150,9 +163,7 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
           }
 
           if (state.status == AdoptionStatus.error) {
-            return Center(
-              child: Text(state.errorMessage ?? 'Something went wrong'),
-            );
+            return Center(child: Text(state.errorMessage ?? AppText.error));
           }
 
           return const SizedBox.shrink();
@@ -171,20 +182,20 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
           children: [
             CustomTextFormField(
               controller: _fullNameController,
-              hintText: 'Full Name',
-              validator: (value) => value!.isEmpty ? 'Required' : null,
+              hintText: AppText.fullName,
+              validator: (value) => value!.isEmpty ? AppText.required : null,
             ),
             SizedBox(height: 10.h),
             CustomTextFormField(
               controller: _emailController,
-              hintText: 'Email',
-              validator: (value) => value!.isEmpty ? 'Required' : null,
+              hintText: AppText.email,
+              validator: (value) => value!.isEmpty ? AppText.required : null,
             ),
             SizedBox(height: 10.h),
             CustomTextFormField(
               controller: _phoneNumberController,
-              hintText: 'Phone Number',
-              validator: (value) => value!.isEmpty ? 'Required' : null,
+              hintText: AppText.phoneNumber,
+              validator: (value) => value!.isEmpty ? AppText.required : null,
             ),
             SizedBox(height: 10.h),
             InkWell(
@@ -192,21 +203,22 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
               child: IgnorePointer(
                 child: CustomTextFormField(
                   controller: _dateOfBirthController,
-                  hintText: 'Date of Birth',
-                  validator: (value) => value!.isEmpty ? 'Required' : null,
+                  hintText: AppText.dateOfBirth,
+                  validator:
+                      (value) => value!.isEmpty ? AppText.required : null,
                 ),
               ),
             ),
             SizedBox(height: 10.h),
             CustomTextFormField(
               controller: _petTypeController,
-              hintText: 'Pet Type',
-              validator: (value) => value!.isEmpty ? 'Required' : null,
+              hintText: AppText.petType,
+              validator: (value) => value!.isEmpty ? AppText.required : null,
             ),
             SizedBox(height: 10.h),
             DropdownButtonFormField<int>(
               initialValue: _selectedLivingSituationId,
-              hint: const Text('Living Situation'),
+              hint: Text(AppText.livingSituation),
               items:
                   options.livingSituations.map((e) {
                     return DropdownMenuItem(value: e.id, child: Text(e.name));
@@ -224,7 +236,7 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
             SizedBox(height: 10.h),
             DropdownButtonFormField<int>(
               initialValue: _selectedResidenceTypeId,
-              hint: const Text('Residence Type'),
+              hint: Text(AppText.residenceType),
               items:
                   options.residenceTypes.map((e) {
                     return DropdownMenuItem(value: e.id, child: Text(e.name));
@@ -241,17 +253,17 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
             ),
             SizedBox(height: 20.h),
             SwitchListTile(
-              title: const Text('Has owned or cared for pet before?'),
+              title: Text(AppText.hasOwnedOrCaredForPetBefore),
               value: _hasOwnedPetBefore,
               onChanged: (val) => setState(() => _hasOwnedPetBefore = val),
             ),
             CheckboxListTile(
-              title: const Text('I have read and understood everything'),
+              title: Text(AppText.haveReadAndUnderstoodEverything),
               value: _hasReadAndUnderstood,
               onChanged: (val) => setState(() => _hasReadAndUnderstood = val!),
             ),
             CheckboxListTile(
-              title: const Text('I agree to the terms'),
+              title: Text(AppText.agreeToTerms),
               value: _agreesToTerms,
               onChanged: (val) => setState(() => _agreesToTerms = val!),
             ),
@@ -267,9 +279,9 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: const Text(
-                  'Submit Application',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+                child: Text(
+                  AppText.submitApplication,
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
                 ),
               ),
             ),

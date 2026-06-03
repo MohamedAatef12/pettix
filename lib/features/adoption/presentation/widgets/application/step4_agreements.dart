@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import '../../bloc/adoption_bloc.dart';
 import '../../bloc/adoption_event.dart';
@@ -19,48 +20,36 @@ class Step4Agreements extends StatelessWidget {
           children: [
             // ── Understanding block ──────────────────────────────────────
             _SectionCard(
-              title: 'I Understand that:',
+              title: AppText.understandThat,
               icon: Icons.info_outline_rounded,
               iconColor: AppColors.current.primary,
-              children: const [
-                _AgreementPoint(
-                  text:
-                      'Pettix connects pet lovers, adopters, clinics and stores — it does not replace professional veterinary advice.',
-                ),
-                _AgreementPoint(
-                  text:
-                      'Any content shared in the community is the responsibility of the user who posts it.',
-                ),
+              children: [
+                _AgreementPoint(text: AppText.pettixDisclaimer),
+                _AgreementPoint(text: AppText.communityResponsibility),
               ],
             ),
             SizedBox(height: 16.h),
             // ── Agreement block ──────────────────────────────────────────
             _SectionCard(
-              title: 'I Agree to:',
+              title: AppText.agreeTo,
               icon: Icons.handshake_outlined,
               iconColor: AppColors.current.green,
-              children: const [
-                _AgreementPoint(
-                  text:
-                      'Use Pettix responsibly and respectfully, without harmful or inappropriate behaviour.',
-                ),
-                _AgreementPoint(
-                  text:
-                      'Provide accurate and truthful information when creating my profile or posting.',
-                ),
+              children: [
+                _AgreementPoint(text: AppText.usePettixResponsibly),
+                _AgreementPoint(text: AppText.provideAccurateInformation),
               ],
             ),
             SizedBox(height: 24.h),
             // ── Checkboxes ───────────────────────────────────────────────
             _CheckCard(
               value: state.agreed,
-              label: 'I have read and understood everything above.',
+              label: AppText.readAndUnderstoodAbove,
               onChanged: (v) => bloc.add(ToggleAgreement(v!)),
             ),
             SizedBox(height: 10.h),
             _CheckCard(
               value: state.termsAccepted,
-              label: 'I agree to the terms and conditions.',
+              label: AppText.agreeToTermsConditions,
               onChanged: (v) => bloc.add(ToggleTermsAcceptance(v!)),
             ),
           ],
@@ -175,14 +164,14 @@ class _CheckCard extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
         decoration: BoxDecoration(
-          color: value
-              ? AppColors.current.primary.withValues(alpha: 0.07)
-              : AppColors.current.white,
+          color:
+              value
+                  ? AppColors.current.primary.withValues(alpha: 0.07)
+                  : AppColors.current.white,
           borderRadius: BorderRadius.circular(12.r),
           border: Border.all(
-            color: value
-                ? AppColors.current.primary
-                : AppColors.current.lightGray,
+            color:
+                value ? AppColors.current.primary : AppColors.current.lightGray,
             width: value ? 1.8 : 1.2,
           ),
         ),
@@ -197,16 +186,21 @@ class _CheckCard extends StatelessWidget {
                     value ? AppColors.current.primary : AppColors.current.white,
                 borderRadius: BorderRadius.circular(6.r),
                 border: Border.all(
-                  color: value
-                      ? AppColors.current.primary
-                      : AppColors.current.lightGray,
+                  color:
+                      value
+                          ? AppColors.current.primary
+                          : AppColors.current.lightGray,
                   width: 1.5,
                 ),
               ),
-              child: value
-                  ? Icon(Icons.check_rounded,
-                      size: 14.w, color: AppColors.current.white)
-                  : null,
+              child:
+                  value
+                      ? Icon(
+                        Icons.check_rounded,
+                        size: 14.w,
+                        color: AppColors.current.white,
+                      )
+                      : null,
             ),
             SizedBox(width: 12.w),
             Expanded(
@@ -214,11 +208,11 @@ class _CheckCard extends StatelessWidget {
                 label,
                 style: TextStyle(
                   fontSize: 13.sp,
-                  color: value
-                      ? AppColors.current.text
-                      : AppColors.current.lightText,
-                  fontWeight:
-                      value ? FontWeight.w600 : FontWeight.w400,
+                  color:
+                      value
+                          ? AppColors.current.text
+                          : AppColors.current.lightText,
+                  fontWeight: value ? FontWeight.w600 : FontWeight.w400,
                   height: 1.4,
                 ),
               ),

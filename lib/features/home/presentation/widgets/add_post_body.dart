@@ -13,6 +13,7 @@ import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 import 'package:pettix/features/home/presentation/blocs/home_state.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/features/auth/data/models/user_model.dart';
 
 class AddPostBody extends StatelessWidget {
@@ -67,7 +68,7 @@ class AddPostBody extends StatelessWidget {
                           height: 1.5,
                         ),
                         decoration: InputDecoration(
-                          hintText: "What's on your mind?",
+                          hintText: AppText.whatsOnYourMind,
                           hintStyle: TextStyle(
                             color: AppColors.current.midGray,
                             fontSize: 18.sp,
@@ -137,7 +138,7 @@ class _Header extends StatelessWidget {
           TextButton(
             onPressed: onCancel,
             child: Text(
-              'Cancel',
+              AppText.cancel,
               style: TextStyle(
                 color: AppColors.current.midGray,
                 fontSize: 16.sp,
@@ -157,7 +158,7 @@ class _Header extends StatelessWidget {
               ),
             ),
             child: Text(
-                      'Post',
+                      AppText.post,
                       style: TextStyle(
                         fontSize: 15.sp,
                         fontWeight: FontWeight.w700,
@@ -197,7 +198,7 @@ class _UserHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              userData?.userName ?? 'User',
+              userData?.userName ?? AppText.userFallback,
               style: TextStyle(
                 color: AppColors.current.text,
                 fontSize: 16.sp,
@@ -220,7 +221,7 @@ class _UserHeader extends StatelessWidget {
                   ),
                   SizedBox(width: 4.w),
                   Text(
-                    'Public',
+                    AppText.publicLabel,
                     style: TextStyle(
                       color: AppColors.current.midGray,
                       fontSize: 11.sp,
@@ -321,14 +322,14 @@ class _MediaToolbar extends StatelessWidget {
           _ToolbarIcon(
             iconPath: 'assets/icons/add_photo.svg',
             color: const Color(0xFF34A853),
-            label: 'Photo',
+            label: AppText.photo,
             onTap: onPickGallery,
           ),
           SizedBox(width: 16.w),
           _ToolbarIcon(
             iconPath: 'assets/icons/camera.svg',
             color: AppColors.current.primary,
-            label: 'Camera',
+            label: AppText.camera,
             onTap: onPickCamera,
           ),
           const Spacer(),

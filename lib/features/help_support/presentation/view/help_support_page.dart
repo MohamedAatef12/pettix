@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/config/router/routes.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 
@@ -22,7 +23,7 @@ class HelpSupportPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'How can we help you?',
+                    AppText.howCanWeHelpYou,
                     style: AppTextStyles.bold.copyWith(
                       fontSize: 20.sp,
                       color: AppColors.current.text,
@@ -30,7 +31,7 @@ class HelpSupportPage extends StatelessWidget {
                   ),
                   SizedBox(height: 6.h),
                   Text(
-                    'Choose a category below to get the support you need.',
+                    AppText.chooseSupportCategory,
                     style: AppTextStyles.smallDescription.copyWith(
                       color: AppColors.current.midGray,
                       fontSize: 13.sp,
@@ -49,32 +50,32 @@ class HelpSupportPage extends StatelessWidget {
                         icon: Icons.quiz_rounded,
                         iconBg: const Color(0xFFEEF2FF),
                         iconColor: const Color(0xFF5379B2),
-                        title: 'FAQ',
-                        subtitle: 'Answers to the most common questions',
+                        title: AppText.faq,
+                        subtitle: AppText.faqSubtitle,
                         onTap: () => context.push(AppRoutes.faq),
                       ),
                       _SupportCard(
                         icon: Icons.headset_mic_rounded,
                         iconBg: const Color(0xFFECFDF5),
                         iconColor: const Color(0xFF10B981),
-                        title: 'Contact Support',
-                        subtitle: 'Chat, email, or call our team',
+                        title: AppText.contactSupport,
+                        subtitle: AppText.contactSupportSubtitle,
                         onTap: () => context.push(AppRoutes.contactSupport),
                       ),
                       _SupportCard(
                         icon: Icons.bug_report_rounded,
                         iconBg: const Color(0xFFFFF7ED),
                         iconColor: const Color(0xFFF97316),
-                        title: 'Report a Problem',
-                        subtitle: 'Tell us what\'s broken or not working',
+                        title: AppText.reportProblem,
+                        subtitle: AppText.reportProblemSubtitle,
                         onTap: () => context.push(AppRoutes.reportProblem),
                       ),
                       _SupportCard(
                         icon: Icons.rate_review_rounded,
                         iconBg: const Color(0xFFFDF4FF),
                         iconColor: const Color(0xFFA855F7),
-                        title: 'Send Feedback',
-                        subtitle: 'Share ideas to help us improve',
+                        title: AppText.sendFeedback,
+                        subtitle: AppText.sendFeedbackSubtitle,
                         onTap: () => context.push(AppRoutes.sendFeedback),
                       ),
                     ],
@@ -122,7 +123,7 @@ class _Header extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                  'Help & Support',
+                  AppText.helpSupport,
                   style: AppTextStyles.appbar.copyWith(
                     color: Colors.white,
                     fontSize: 18.sp,
@@ -130,7 +131,11 @@ class _Header extends StatelessWidget {
                   ),
                 ),
               ),
-              Icon(Icons.support_agent_rounded, color: Colors.white70, size: 28.w),
+              Icon(
+                Icons.support_agent_rounded,
+                color: Colors.white70,
+                size: 28.w,
+              ),
             ],
           ),
         ),
@@ -246,7 +251,7 @@ class _QuickHelpBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Need immediate help?',
+                  AppText.needImmediateHelp,
                   style: AppTextStyles.bold.copyWith(
                     fontSize: 13.sp,
                     color: AppColors.current.text,
@@ -254,7 +259,7 @@ class _QuickHelpBanner extends StatelessWidget {
                 ),
                 SizedBox(height: 3.h),
                 Text(
-                  'Our support team typically responds within a few hours.',
+                  AppText.supportTeamResponse,
                   style: AppTextStyles.smallDescription.copyWith(
                     fontSize: 11.sp,
                     color: AppColors.current.midGray,

@@ -186,7 +186,9 @@ final List<RouteBase> _homeRoutes = [
     name: AppRouteNames.bottomNav,
     pageBuilder: (context, state) => _customTransition(
       state: state,
-      child: const BottomNavigationScreen(),
+      child: BottomNavigationScreen(
+        initialTab: state.extra is int ? state.extra as int : 0,
+      ),
     ),
   ),
   GoRoute(

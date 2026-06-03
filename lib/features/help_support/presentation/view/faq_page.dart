@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 
@@ -23,20 +24,30 @@ class _FaqPageState extends State<FaqPage> {
 
   @override
   Widget build(BuildContext context) {
-    final filtered = _buildCategories()
-        .map((cat) => _FaqCategory(
-              title: cat.title,
-              icon: cat.icon,
-              color: cat.color,
-              items: cat.items
-                  .where((item) =>
-                      _query.isEmpty ||
-                      item.question.toLowerCase().contains(_query.toLowerCase()) ||
-                      item.answer.toLowerCase().contains(_query.toLowerCase()))
-                  .toList(),
-            ))
-        .where((cat) => cat.items.isNotEmpty)
-        .toList();
+    final filtered =
+        _buildCategories()
+            .map(
+              (cat) => _FaqCategory(
+                title: cat.title,
+                icon: cat.icon,
+                color: cat.color,
+                items:
+                    cat.items
+                        .where(
+                          (item) =>
+                              _query.isEmpty ||
+                              item.question.toLowerCase().contains(
+                                _query.toLowerCase(),
+                              ) ||
+                              item.answer.toLowerCase().contains(
+                                _query.toLowerCase(),
+                              ),
+                        )
+                        .toList(),
+              ),
+            )
+            .where((cat) => cat.items.isNotEmpty)
+            .toList();
 
     return Scaffold(
       backgroundColor: AppColors.current.lightBlue,
@@ -44,14 +55,16 @@ class _FaqPageState extends State<FaqPage> {
         children: [
           _buildHeader(context),
           Expanded(
-            child: filtered.isEmpty
-                ? _EmptySearch()
-                : ListView(
-                    padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 32.h),
-                    children: filtered
-                        .map((cat) => _CategorySection(category: cat))
-                        .toList(),
-                  ),
+            child:
+                filtered.isEmpty
+                    ? _EmptySearch()
+                    : ListView(
+                      padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 32.h),
+                      children:
+                          filtered
+                              .map((cat) => _CategorySection(category: cat))
+                              .toList(),
+                    ),
           ),
         ],
       ),
@@ -62,7 +75,10 @@ class _FaqPageState extends State<FaqPage> {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.current.primary, AppColors.current.primary.withAlpha(210)],
+          colors: [
+            AppColors.current.primary,
+            AppColors.current.primary.withAlpha(210),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -77,13 +93,19 @@ class _FaqPageState extends State<FaqPage> {
                 children: [
                   IconButton(
                     onPressed: () => context.pop(),
-                    icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20.w),
+                    icon: Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: Colors.white,
+                      size: 20.w,
+                    ),
                   ),
                   Expanded(
                     child: Text(
-                      'Frequently Asked Questions',
+                      AppText.frequentlyAskedQuestions,
                       style: AppTextStyles.appbar.copyWith(
-                        color: Colors.white, fontSize: 17.sp, fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                        fontSize: 17.sp,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -101,20 +123,35 @@ class _FaqPageState extends State<FaqPage> {
                 child: TextField(
                   controller: _searchController,
                   onChanged: (v) => setState(() => _query = v),
-                  style: TextStyle(fontSize: 14.sp, color: AppColors.current.text),
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: AppColors.current.text,
+                  ),
                   decoration: InputDecoration(
-                    hintText: 'Search questions...',
-                    hintStyle: TextStyle(color: AppColors.current.midGray, fontSize: 13.sp),
-                    prefixIcon: Icon(Icons.search_rounded, color: AppColors.current.midGray, size: 20.w),
-                    suffixIcon: _query.isNotEmpty
-                        ? GestureDetector(
-                            onTap: () {
-                              _searchController.clear();
-                              setState(() => _query = '');
-                            },
-                            child: Icon(Icons.close_rounded, color: AppColors.current.midGray, size: 18.w),
-                          )
-                        : null,
+                    hintText: AppText.searchQuestions,
+                    hintStyle: TextStyle(
+                      color: AppColors.current.midGray,
+                      fontSize: 13.sp,
+                    ),
+                    prefixIcon: Icon(
+                      Icons.search_rounded,
+                      color: AppColors.current.midGray,
+                      size: 20.w,
+                    ),
+                    suffixIcon:
+                        _query.isNotEmpty
+                            ? GestureDetector(
+                              onTap: () {
+                                _searchController.clear();
+                                setState(() => _query = '');
+                              },
+                              child: Icon(
+                                Icons.close_rounded,
+                                color: AppColors.current.midGray,
+                                size: 18.w,
+                              ),
+                            )
+                            : null,
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(vertical: 12.h),
                   ),
@@ -128,100 +165,87 @@ class _FaqPageState extends State<FaqPage> {
   }
 
   List<_FaqCategory> _buildCategories() => [
-        _FaqCategory(
-          title: 'General',
-          icon: Icons.info_outline_rounded,
-          color: AppColors.current.primary,
-          items: const [
-            _FaqItem(
-              question: 'What is Pettix?',
-              answer:
-                  'Pettix is a comprehensive pet care platform that connects pet lovers, facilitates adoption, provides access to veterinary clinics, and offers an online store for pet supplies.',
-            ),
-            _FaqItem(
-              question: 'Is Pettix available on Android and iOS?',
-              answer:
-                  'Yes! Pettix is available on both Android and iOS devices. Download it for free from the Google Play Store or the Apple App Store.',
-            ),
-            _FaqItem(
-              question: 'Is Pettix free to use?',
-              answer:
-                  'Creating an account and browsing the platform is completely free. Some premium features and store purchases may require payment.',
-            ),
-          ],
+    _FaqCategory(
+      title: AppText.general,
+      icon: Icons.info_outline_rounded,
+      color: AppColors.current.primary,
+      items: [
+        _FaqItem(
+          question: AppText.faqWhatIsPettix,
+          answer: AppText.faqWhatIsPettixAnswer,
         ),
-        _FaqCategory(
-          title: 'Account & Profile',
-          icon: Icons.person_outline_rounded,
-          color: const Color(0xFF7A6FD8),
-          items: const [
-            _FaqItem(
-              question: 'How do I create an account?',
-              answer:
-                  'Tap "Sign Up" on the login screen, enter your email address, set a password, and verify your email with the OTP we send you.',
-            ),
-            _FaqItem(
-              question: 'How do I reset my password?',
-              answer:
-                  'Tap "Forgot Password?" on the login screen, enter your email, and follow the instructions in the email we send you.',
-            ),
-            _FaqItem(
-              question: 'How do I update my profile information?',
-              answer:
-                  'Go to your Profile from the menu, tap the pen icon on your avatar or open the drawer and select "Edit Profile".',
-            ),
-            _FaqItem(
-              question: 'Can I delete my account?',
-              answer:
-                  'Yes. Go to Settings → Account → Delete Account. Note that this action is permanent and all your data will be removed.',
-            ),
-          ],
+        _FaqItem(
+          question: AppText.faqAvailableAndroidIos,
+          answer: AppText.faqAvailableAndroidIosAnswer,
         ),
-        _FaqCategory(
-          title: 'Adoption',
-          icon: Icons.pets_rounded,
-          color: const Color(0xFF10B981),
-          items: const [
-            _FaqItem(
-              question: 'How do I adopt a pet?',
-              answer:
-                  'Browse the Adoption section, find a pet you like, and tap "Apply". Fill in the adoption form and wait for approval from the owner.',
-            ),
-            _FaqItem(
-              question: 'How can I track my adoption application?',
-              answer:
-                  'Go to Adoption → My Applications to see the status of all your submitted adoption requests.',
-            ),
-            _FaqItem(
-              question: 'Can I list my pet for adoption?',
-              answer:
-                  'Yes. In the Adoption section, tap the "+" button and fill in your pet\'s details, photos, and requirements for potential adopters.',
-            ),
-          ],
+        _FaqItem(
+          question: AppText.faqFreeToUse,
+          answer: AppText.faqFreeToUseAnswer,
         ),
-        _FaqCategory(
-          title: 'Store & Orders',
-          icon: Icons.storefront_rounded,
-          color: const Color(0xFFF97316),
-          items: const [
-            _FaqItem(
-              question: 'How do I place an order?',
-              answer:
-                  'Browse the Store, add items to your cart, select your delivery address, and confirm your payment.',
-            ),
-            _FaqItem(
-              question: 'What payment methods are accepted?',
-              answer:
-                  'We accept credit/debit cards, mobile wallets, and cash on delivery (where available).',
-            ),
-            _FaqItem(
-              question: 'How do I return a product?',
-              answer:
-                  'You can return most products within 14 days of delivery. Go to My Orders, select the item, and tap "Request Return".',
-            ),
-          ],
+      ],
+    ),
+    _FaqCategory(
+      title: AppText.accountProfile,
+      icon: Icons.person_outline_rounded,
+      color: const Color(0xFF7A6FD8),
+      items: [
+        _FaqItem(
+          question: AppText.faqCreateAccount,
+          answer: AppText.faqCreateAccountAnswer,
         ),
-      ];
+        _FaqItem(
+          question: AppText.faqResetPassword,
+          answer: AppText.faqResetPasswordAnswer,
+        ),
+        _FaqItem(
+          question: AppText.faqUpdateProfile,
+          answer: AppText.faqUpdateProfileAnswer,
+        ),
+        _FaqItem(
+          question: AppText.faqDeleteAccount,
+          answer: AppText.faqDeleteAccountAnswer,
+        ),
+      ],
+    ),
+    _FaqCategory(
+      title: AppText.adoption,
+      icon: Icons.pets_rounded,
+      color: const Color(0xFF10B981),
+      items: [
+        _FaqItem(
+          question: AppText.faqAdoptPet,
+          answer: AppText.faqAdoptPetAnswer,
+        ),
+        _FaqItem(
+          question: AppText.faqTrackAdoption,
+          answer: AppText.faqTrackAdoptionAnswer,
+        ),
+        _FaqItem(
+          question: AppText.faqListPetForAdoption,
+          answer: AppText.faqListPetForAdoptionAnswer,
+        ),
+      ],
+    ),
+    _FaqCategory(
+      title: AppText.storeOrders,
+      icon: Icons.storefront_rounded,
+      color: const Color(0xFFF97316),
+      items: [
+        _FaqItem(
+          question: AppText.faqPlaceOrder,
+          answer: AppText.faqPlaceOrderAnswer,
+        ),
+        _FaqItem(
+          question: AppText.faqPaymentMethods,
+          answer: AppText.faqPaymentMethodsAnswer,
+        ),
+        _FaqItem(
+          question: AppText.faqReturnProduct,
+          answer: AppText.faqReturnProductAnswer,
+        ),
+      ],
+    ),
+  ];
 }
 
 class _FaqCategory {
@@ -299,7 +323,12 @@ class _CategorySection extends StatelessWidget {
                   children: [
                     _FaqTile(item: item, accentColor: category.color),
                     if (!isLast)
-                      Divider(height: 1, color: AppColors.current.lightGray, indent: 16.w, endIndent: 16.w),
+                      Divider(
+                        height: 1,
+                        color: AppColors.current.lightGray,
+                        indent: 16.w,
+                        endIndent: 16.w,
+                      ),
                   ],
                 );
               }),
@@ -321,7 +350,8 @@ class _FaqTile extends StatefulWidget {
   State<_FaqTile> createState() => _FaqTileState();
 }
 
-class _FaqTileState extends State<_FaqTile> with SingleTickerProviderStateMixin {
+class _FaqTileState extends State<_FaqTile>
+    with SingleTickerProviderStateMixin {
   bool _expanded = false;
   late AnimationController _controller;
   late Animation<double> _rotation;
@@ -329,10 +359,14 @@ class _FaqTileState extends State<_FaqTile> with SingleTickerProviderStateMixin 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(duration: const Duration(milliseconds: 200), vsync: this);
-    _rotation = Tween<double>(begin: 0, end: 0.5).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
     );
+    _rotation = Tween<double>(
+      begin: 0,
+      end: 0.5,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -378,7 +412,10 @@ class _FaqTileState extends State<_FaqTile> with SingleTickerProviderStateMixin 
             ),
             AnimatedCrossFade(
               duration: const Duration(milliseconds: 200),
-              crossFadeState: _expanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+              crossFadeState:
+                  _expanded
+                      ? CrossFadeState.showSecond
+                      : CrossFadeState.showFirst,
               firstChild: const SizedBox.shrink(),
               secondChild: Padding(
                 padding: EdgeInsets.only(top: 10.h, right: 24.w),
@@ -406,16 +443,26 @@ class _EmptySearch extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search_off_rounded, size: 56.r, color: AppColors.current.lightGray),
+          Icon(
+            Icons.search_off_rounded,
+            size: 56.r,
+            color: AppColors.current.lightGray,
+          ),
           SizedBox(height: 12.h),
           Text(
-            'No results found',
-            style: AppTextStyles.bold.copyWith(fontSize: 16.sp, color: AppColors.current.midGray),
+            AppText.noResultsFound,
+            style: AppTextStyles.bold.copyWith(
+              fontSize: 16.sp,
+              color: AppColors.current.midGray,
+            ),
           ),
           SizedBox(height: 4.h),
           Text(
-            'Try a different search term',
-            style: AppTextStyles.smallDescription.copyWith(fontSize: 13.sp, color: AppColors.current.midGray),
+            AppText.tryDifferentSearchTerm,
+            style: AppTextStyles.smallDescription.copyWith(
+              fontSize: 13.sp,
+              color: AppColors.current.midGray,
+            ),
           ),
         ],
       ),

@@ -90,24 +90,24 @@ class EditProfileBody extends StatelessWidget {
                   ),
                   isUpdating
                       ? SizedBox(
-                          width: 20.w,
-                          height: 20.w,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: AppColors.current.primary,
-                          ),
-                        )
+                        width: 20.w,
+                        height: 20.w,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.current.primary,
+                        ),
+                      )
                       : TextButton(
-                          onPressed: () => _submit(context, state),
-                          child: Text(
-                            AppText.save,
-                            style: TextStyle(
-                              color: AppColors.current.primary,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w700,
-                            ),
+                        onPressed: () => _submit(context, state),
+                        child: Text(
+                          AppText.save,
+                          style: TextStyle(
+                            color: AppColors.current.primary,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
+                      ),
                 ],
               ),
             ),
@@ -158,12 +158,12 @@ class EditProfileBody extends StatelessWidget {
                     _AddressPickerField(
                       controller: bloc.addressController,
                       onTap: () async {
-                        final picked =
-                            await Navigator.of(context).push<String>(
+                        final picked = await Navigator.of(context).push<String>(
                           MaterialPageRoute(
-                            builder: (_) => AddressMapPickerPage(
-                              initialAddress: bloc.addressController.text,
-                            ),
+                            builder:
+                                (_) => AddressMapPickerPage(
+                                  initialAddress: bloc.addressController.text,
+                                ),
                           ),
                         );
                         if (!context.mounted) return;
@@ -181,38 +181,41 @@ class EditProfileBody extends StatelessWidget {
                         duration: const Duration(milliseconds: 200),
                         height: 52.h,
                         decoration: BoxDecoration(
-                          color: isUpdating
-                              ? AppColors.current.primary.withAlpha(140)
-                              : AppColors.current.primary,
+                          color:
+                              isUpdating
+                                  ? AppColors.current.primary.withAlpha(140)
+                                  : AppColors.current.primary,
                           borderRadius: BorderRadius.circular(16.r),
-                          boxShadow: isUpdating
-                              ? []
-                              : [
-                                  BoxShadow(
-                                    color:
-                                        AppColors.current.primary.withAlpha(80),
-                                    blurRadius: 16,
-                                    offset: const Offset(0, 6),
-                                  ),
-                                ],
+                          boxShadow:
+                              isUpdating
+                                  ? []
+                                  : [
+                                    BoxShadow(
+                                      color: AppColors.current.primary
+                                          .withAlpha(80),
+                                      blurRadius: 16,
+                                      offset: const Offset(0, 6),
+                                    ),
+                                  ],
                         ),
                         child: Center(
-                          child: isUpdating
-                              ? SizedBox(
-                                  width: 22.w,
-                                  height: 22.w,
-                                  child: const CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2.5,
+                          child:
+                              isUpdating
+                                  ? SizedBox(
+                                    width: 22.w,
+                                    height: 22.w,
+                                    child: const CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2.5,
+                                    ),
+                                  )
+                                  : Text(
+                                    AppText.saveChanges,
+                                    style: AppTextStyles.bold.copyWith(
+                                      color: Colors.white,
+                                      fontSize: 15.sp,
+                                    ),
                                   ),
-                                )
-                              : Text(
-                                  AppText.saveChanges,
-                                  style: AppTextStyles.bold.copyWith(
-                                    color: Colors.white,
-                                    fontSize: 15.sp,
-                                  ),
-                                ),
                         ),
                       ),
                     ),
@@ -234,10 +237,7 @@ class _AddressPickerField extends StatelessWidget {
   final TextEditingController controller;
   final VoidCallback onTap;
 
-  const _AddressPickerField({
-    required this.controller,
-    required this.onTap,
-  });
+  const _AddressPickerField({required this.controller, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -253,8 +253,10 @@ class _AddressPickerField extends StatelessWidget {
       ),
       decoration: InputDecoration(
         labelText: AppText.address,
-        labelStyle:
-            TextStyle(color: AppColors.current.midGray, fontSize: 13.sp),
+        labelStyle: TextStyle(
+          color: AppColors.current.midGray,
+          fontSize: 13.sp,
+        ),
         prefixIcon: Padding(
           padding: EdgeInsets.symmetric(horizontal: 14.w),
           child: Icon(
@@ -287,8 +289,7 @@ class _AddressPickerField extends StatelessWidget {
           borderRadius: BorderRadius.circular(14.r),
           borderSide: BorderSide(color: AppColors.current.primary, width: 1.5),
         ),
-        contentPadding:
-            EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       ),
     );
   }
@@ -302,7 +303,6 @@ class _FilledField extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
   final TextInputType? keyboardType;
-  final int maxLines;
 
   const _FilledField({
     required this.controller,
@@ -310,7 +310,6 @@ class _FilledField extends StatelessWidget {
     required this.icon,
     required this.iconColor,
     this.keyboardType,
-    this.maxLines = 1,
   });
 
   @override
@@ -318,7 +317,6 @@ class _FilledField extends StatelessWidget {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
-      maxLines: maxLines,
       style: TextStyle(
         color: AppColors.current.text,
         fontSize: 14.sp,
@@ -326,8 +324,10 @@ class _FilledField extends StatelessWidget {
       ),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle:
-            TextStyle(color: AppColors.current.midGray, fontSize: 13.sp),
+        labelStyle: TextStyle(
+          color: AppColors.current.midGray,
+          fontSize: 13.sp,
+        ),
         prefixIcon: Padding(
           padding: EdgeInsets.symmetric(horizontal: 14.w),
           child: Icon(icon, color: iconColor, size: 20.w),
@@ -347,8 +347,7 @@ class _FilledField extends StatelessWidget {
           borderRadius: BorderRadius.circular(14.r),
           borderSide: BorderSide(color: AppColors.current.primary, width: 1.5),
         ),
-        contentPadding:
-            EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       ),
     );
   }

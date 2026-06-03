@@ -37,11 +37,12 @@ class OnBoardingBody extends StatelessWidget {
               Expanded(
                 child: Stack(
                   children: [
-                    SvgPicture.asset(
-                      'assets/images/on_boarding_background.svg',
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                    ),
+                    if (Theme.of(context).brightness == Brightness.light)
+                      SvgPicture.asset(
+                        'assets/images/on_boarding_background.svg',
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      ),
 
                     // ✅ PageView
                     PageView.builder(
