@@ -1,5 +1,5 @@
+import 'package:pettix/core/utils/date_formatter.dart';
 import 'package:pettix/core/widgets/app_profile_image.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -116,7 +116,7 @@ class CommentsBody extends StatelessWidget {
             }
             final commentIndex = index - headerCount;
             final comment = state.comments[commentIndex];
-            return _buildCommentItem(comment, bloc, state);
+            return _buildCommentItem(context, comment, bloc, state);
           },
         );
       },
@@ -124,6 +124,7 @@ class CommentsBody extends StatelessWidget {
   }
 
   Widget _buildCommentItem(
+    BuildContext context,
     CommentEntity comment,
     HomeBloc bloc,
     HomeState state, {
@@ -186,7 +187,7 @@ class CommentsBody extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            _formatCreationDate(comment.creationDate),
+                            DateFormatter.formatRelativeTime(context, comment.creationDate),
                             style: AppTextStyles.smallDescription.copyWith(
                               fontSize: isReply ? 12.sp : 12.sp,
                               color: AppColors.current.gray,
@@ -246,7 +247,7 @@ class CommentsBody extends StatelessWidget {
         ),
         if (comment.replies.isNotEmpty)
           Padding(
-            padding: EdgeInsets.only(left: isReply ? 45.w : 50.w, top: 6.h),
+            padding: EdgeInsetsDirectional.only(start: isReply ? 45.w : 50.w, top: 6.h),
             child: GestureDetector(
               onTap: () => bloc.add(ToggleCommentRepliesEvent(comment.id)),
               child: Text(
@@ -263,13 +264,14 @@ class CommentsBody extends StatelessWidget {
           ),
         if (expanded)
           Padding(
-            padding: EdgeInsets.only(left: isReply ? 0 : 50.w, top: 6.h),
+            padding: EdgeInsetsDirectional.only(start: isReply ? 0 : 50.w, top: 6.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children:
                   comment.replies
                       .map(
                         (reply) => _buildCommentItem(
+                          context,
                           reply,
                           bloc,
                           state,
@@ -291,22 +293,7 @@ class CommentsBody extends StatelessWidget {
     return count;
   }
 
-  String _formatCreationDate(String rawDate) {
-    try {
-      final dateTime = DateTime.parse(
-        rawDate,
-      ).toUtc().add(const Duration(hours: 3));
-      final now = DateTime.now().toUtc().add(const Duration(hours: 3));
-      final diff = now.difference(dateTime);
-      if (diff.inSeconds < 60) return AppText.justNow;
-      if (diff.inMinutes < 60) return AppText.minutesAgo(diff.inMinutes);
-      if (diff.inHours < 24) return AppText.hoursAgo(diff.inHours);
-      if (diff.inDays < 7) return AppText.daysAgo(diff.inDays);
-      return DateFormat('MMM d, yyyy').format(dateTime);
-    } catch (_) {
-      return rawDate;
-    }
-  }
+
 
   String _findParentAuthorName(int? parentId, List<CommentEntity> comments) {
     if (parentId == null) return '';

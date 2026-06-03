@@ -81,6 +81,8 @@ class DeleteLikeEvent extends HomeEvent {
 
 class ClearPostDetailsEvent extends HomeEvent {}
 
+class ClearErrorEvent extends HomeEvent {}
+
 class PickImageEvent extends HomeEvent {}
 
 class SubmitPostEvent extends HomeEvent {}
