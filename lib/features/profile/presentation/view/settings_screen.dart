@@ -7,6 +7,7 @@ import 'package:pettix/core/bloc/theme/theme_cubit.dart';
 import 'package:pettix/core/bloc/theme/theme_option.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
+import 'package:pettix/core/services/app_review_service.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -94,6 +95,12 @@ class SettingsScreen extends StatelessWidget {
                     ),
                     onTap: () => _showLanguagePicker(context),
                   ),
+                  _SettingsTile(
+                    icon: Icons.star_outline_rounded,
+                    iconColor: const Color(0xFFFFB547),
+                    title: AppText.ratePettix,
+                    onTap: () => _requestReview(context),
+                  ),
                 ],
               ),
               SizedBox(height: 24.h),
@@ -135,6 +142,20 @@ class SettingsScreen extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (_) => const _LanguagePickerSheet(),
     );
+  }
+
+  Future<void> _requestReview(BuildContext context) async {
+    try {
+      await AppReviewService.requestFromSettings();
+    } catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppText.reviewUnavailable),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 }
 

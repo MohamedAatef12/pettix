@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/sized_box.dart';
+import 'package:pettix/core/services/app_review_service.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
@@ -84,10 +85,13 @@ class _ApplicationScreensState extends State<ApplicationScreens> {
                     ..add(SetPetId(widget.petId))
                     ..add(FetchAdoptionOptions()),
           child: BlocConsumer<AdoptionBloc, AdoptionState>(
-            listener: (context, state) {
+            listener: (context, state) async {
               final msg = state.errorMessage;
               if (msg != null && msg.isNotEmpty) {
                 AuthToast.showError(context, msg);
+              }
+              if (state.status == AdoptionStatus.success) {
+                await AppReviewService.requestAfterFirstAdoption(context);
               }
             },
             builder: (context, state) {

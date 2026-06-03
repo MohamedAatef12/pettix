@@ -10,6 +10,7 @@ import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/themes/dark_theme.dart';
 import 'package:pettix/core/themes/extra_themes.dart';
 import 'package:pettix/core/themes/light_theme.dart';
+import 'package:upgrader/upgrader.dart';
 
 final router = appRouter();
 
@@ -81,6 +82,9 @@ class MyApp extends StatelessWidget {
                   debugShowCheckedModeBanner: false,
                   theme: effectiveTheme,
                   routerConfig: router,
+                  builder:
+                      (context, child) =>
+                          UpgradeAlert(child: child ?? const SizedBox.shrink()),
                 ),
           );
         },

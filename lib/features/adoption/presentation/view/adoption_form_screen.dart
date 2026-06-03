@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../../config/di/di.dart';
 import '../../../../core/constants/app_texts.dart';
+import '../../../../core/services/app_review_service.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/utils/auth_toast.dart';
 import '../../../../core/utils/custom_text_form_field.dart';
@@ -128,12 +129,14 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
         ),
       ),
       body: BlocConsumer<AdoptionBloc, AdoptionState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state.status == AdoptionStatus.success) {
             AuthToast.showSuccess(
               context,
               AppText.applicationSubmittedSuccessfully,
             );
+            await AppReviewService.requestAfterFirstAdoption(context);
+            if (!context.mounted) return;
             context.pop();
           } else if (state.status == AdoptionStatus.submitError) {
             AuthToast.showError(

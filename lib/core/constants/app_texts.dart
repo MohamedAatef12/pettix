@@ -245,6 +245,9 @@ abstract class AppText {
   static String get notificationSettings => 'Notification Settings'.tr();
   static String get appSettings => 'App Settings'.tr();
   static String get themes => 'Themes'.tr();
+  static String get ratePettix => 'Rate Pettix'.tr();
+  static String get reviewUnavailable =>
+      'Review is not available right now.'.tr();
   static String get light => 'Light'.tr();
   static String get pets => 'Pets'.tr();
   static String get unknownLocation => 'Unknown location'.tr();
