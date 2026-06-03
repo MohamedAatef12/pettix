@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/features/home/data/models/author_model.dart';
 import 'package:pettix/features/home/domain/entities/comments_entity.dart';
 import 'package:pettix/features/home/domain/entities/post_entity.dart';
@@ -42,33 +43,10 @@ class _CommentsPageState extends State<CommentsPage> {
 
     return Scaffold(
       backgroundColor: AppColors.current.lightBlue,
-      appBar: AppBar(
+      appBar: AppTopBar.back(
+        title: AppText.comments,
         backgroundColor: AppColors.current.white,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        leading: GestureDetector(
-          onTap: () => Navigator.of(context).pop(),
-          child: Padding(
-            padding: EdgeInsets.all(8.r),
-            child: Icon(
-              Icons.arrow_back_ios_new_rounded,
-              color: AppColors.current.text,
-              size: 22.r,
-            ),
-          ),
-        ),
-        title: Text(
-          AppText.comments,
-          style: AppTextStyles.bold.copyWith(fontSize: 18.sp),
-        ),
-        centerTitle: true,
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(1.h),
-          child: Container(
-            color: AppColors.current.lightGray.withValues(alpha: 0.5),
-            height: 1.h,
-          ),
-        ),
+        onBack: () => Navigator.of(context).pop(),
       ),
       body: Column(
         children: [
@@ -113,7 +91,9 @@ class _CommentsPageState extends State<CommentsPage> {
                             vertical: 5.h,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.current.primary.withValues(alpha: 0.12),
+                            color: AppColors.current.primary.withValues(
+                              alpha: 0.12,
+                            ),
                             borderRadius: BorderRadius.circular(15.r),
                           ),
                           child: Row(
@@ -123,7 +103,9 @@ class _CommentsPageState extends State<CommentsPage> {
                                 '${AppText.replyingTo} ',
                                 style: AppTextStyles.description.copyWith(
                                   fontSize: 11.sp,
-                                  color: AppColors.current.text.withValues(alpha: 0.6),
+                                  color: AppColors.current.text.withValues(
+                                    alpha: 0.6,
+                                  ),
                                 ),
                               ),
                               Text(
@@ -173,7 +155,9 @@ class _CommentsPageState extends State<CommentsPage> {
                                   fontSize: 13.sp,
                                 ),
                                 filled: true,
-                                fillColor: AppColors.current.gray.withValues(alpha: 0.08),
+                                fillColor: AppColors.current.gray.withValues(
+                                  alpha: 0.08,
+                                ),
                                 contentPadding: EdgeInsets.symmetric(
                                   horizontal: 16.w,
                                   vertical: 10.h,
@@ -214,46 +198,49 @@ class _CommentsPageState extends State<CommentsPage> {
     if (text.isEmpty) return;
 
     final userResult = await bloc.getUserDataUseCase.call();
-    userResult.fold(
-      (failure) => AuthToast.showError(context, failure.message),
-      (userData) {
-        // When replying to someone, the parentCommentId is already handled by the entity.
-        // We don't prepend the mention as it's handled by the UI display.
-        final replyingTo = bloc.state.replyingTo;
-        final fullText = text;
+    userResult.fold((failure) => AuthToast.showError(context, failure.message), (
+      userData,
+    ) {
+      // When replying to someone, the parentCommentId is already handled by the entity.
+      // We don't prepend the mention as it's handled by the UI display.
+      final replyingTo = bloc.state.replyingTo;
+      final fullText = text;
 
-        final comment = CommentEntity(
-          id: 0,
-          text: fullText,
-          author: AuthorModel(
-            id: userData.id,
-            email: userData.email,
-            nameAr: '',
-            nameEn: userData.userName,
-            phone: userData.phone,
-            genderId: userData.genderId,
-            genderName: userData.gender,
-            contactTypeId: userData.contactTypeId,
-            statusId: userData.statusId,
-            avatar: userData.avatar,
-            age: userData.age,
-          ),
-          creationDate: DateTime.now().toIso8601String(),
-          postId: widget.post.id,
-          parentCommentId: replyingTo?.id,
-          replies: [],
-          likes: [],
-          status: 1,
-        );
+      final comment = CommentEntity(
+        id: 0,
+        text: fullText,
+        author: AuthorModel(
+          id: userData.id,
+          email: userData.email,
+          nameAr: '',
+          nameEn: userData.userName,
+          phone: userData.phone,
+          genderId: userData.genderId,
+          genderName: userData.gender,
+          contactTypeId: userData.contactTypeId,
+          statusId: userData.statusId,
+          avatar: userData.avatar,
+          age: userData.age,
+        ),
+        creationDate: DateTime.now().toIso8601String(),
+        postId: widget.post.id,
+        parentCommentId: replyingTo?.id,
+        replies: [],
+        likes: [],
+        status: 1,
+      );
 
-        bloc.add(AddCommentEvent(
+      bloc.add(
+        AddCommentEvent(
           comment,
           creatorId: replyingTo?.author.id ?? widget.post.author.id,
-          initialCount: bloc.state.postCommentsCount[widget.post.id] ?? widget.post.totalComments,
-        ));
-        bloc.commentTextController.clear();
-        bloc.add(SetReplyingToEvent(null));
-      },
-    );
+          initialCount:
+              bloc.state.postCommentsCount[widget.post.id] ??
+              widget.post.totalComments,
+        ),
+      );
+      bloc.commentTextController.clear();
+      bloc.add(SetReplyingToEvent(null));
+    });
   }
 }

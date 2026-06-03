@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
 
 // ─── Reusable page for Privacy Policy, Terms & Conditions, Refund Policy ───────
 
@@ -65,14 +66,14 @@ class LegalContentPage extends StatelessWidget {
   Widget _buildHeader(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.current.primary,
-            AppColors.current.primary.withAlpha(210),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppColors.current.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(8),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: SafeArea(
         bottom: false,
@@ -80,25 +81,18 @@ class LegalContentPage extends StatelessWidget {
           padding: EdgeInsets.fromLTRB(8.w, 4.h, 16.w, 20.h),
           child: Row(
             children: [
-              IconButton(
-                onPressed: () => context.pop(),
-                icon: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: Colors.white,
-                  size: 20.w,
-                ),
-              ),
+              AppTopBarBackButton(onPressed: () => context.pop()),
               Expanded(
                 child: Text(
                   title,
                   style: AppTextStyles.appbar.copyWith(
-                    color: Colors.white,
+                    color: AppColors.current.text,
                     fontSize: 18.sp,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-              Icon(icon, color: Colors.white70, size: 24.w),
+              Icon(icon, color: AppColors.current.midGray, size: 24.w),
             ],
           ),
         ),

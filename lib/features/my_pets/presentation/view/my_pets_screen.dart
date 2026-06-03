@@ -8,6 +8,7 @@ import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/enums/app_enums.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/app_cached_image.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/features/my_pets/domain/entities/lookup_entity.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_request_entity.dart';
@@ -200,7 +201,7 @@ class _MyPetsHeader extends StatelessWidget {
               children: [
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: IconButton(
+                  child: AppTopBarBackButton(
                     onPressed: () {
                       if (context.canPop()) {
                         context.pop();
@@ -208,11 +209,6 @@ class _MyPetsHeader extends StatelessWidget {
                         context.goNamed(AppRouteNames.bottomNav);
                       }
                     },
-                    icon: Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      color: AppColors.current.text,
-                      size: 20.w,
-                    ),
                   ),
                 ),
                 Align(

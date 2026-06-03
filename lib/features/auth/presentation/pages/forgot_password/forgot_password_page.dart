@@ -10,7 +10,7 @@ import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
-import 'package:pettix/core/widgets/rtl_aware_icon.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/data/network/email_auth_service.dart';
 import 'package:pettix/features/auth/domain/usecases/apple_login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/forgot_password.dart';
@@ -30,32 +30,34 @@ class ForgotPasswordPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-     bool isValidEmail(String email) {
+    bool isValidEmail(String email) {
       final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
       return emailRegex.hasMatch(email);
     }
+
     return Scaffold(
       backgroundColor: AppColors.current.white,
       body: BlocProvider(
-        create: (context) => AuthBloc(
-          googleLoginUseCase: getIt<GoogleLoginUseCase>(),
-          appleLoginUseCase: getIt<AppleLoginUseCase>(),
-          loginUseCase: getIt<LoginUseCase>(),
-          registerUseCase: getIt<RegisterUseCase>(),
-          emailAuthService: getIt<EmailAuthService>(),
-          verifyOtp: getIt<VerifyOtp>(),
-          resendOtpUseCase: getIt<ResendOtpUseCase>(),
-          forgotPasswordUseCase: getIt<ForgotPasswordUseCase>(),
-          resetPasswordUseCase: getIt<ResetPasswordUseCase>(),
-          signalRService: getIt<SignalRService>(),
-        ),
+        create:
+            (context) => AuthBloc(
+              googleLoginUseCase: getIt<GoogleLoginUseCase>(),
+              appleLoginUseCase: getIt<AppleLoginUseCase>(),
+              loginUseCase: getIt<LoginUseCase>(),
+              registerUseCase: getIt<RegisterUseCase>(),
+              emailAuthService: getIt<EmailAuthService>(),
+              verifyOtp: getIt<VerifyOtp>(),
+              resendOtpUseCase: getIt<ResendOtpUseCase>(),
+              forgotPasswordUseCase: getIt<ForgotPasswordUseCase>(),
+              resetPasswordUseCase: getIt<ResetPasswordUseCase>(),
+              signalRService: getIt<SignalRService>(),
+            ),
         child: Builder(
           builder: (context) {
             final bloc = context.read<AuthBloc>();
             return BlocConsumer<AuthBloc, AuthState>(
               listener: (context, state) {
                 if (state is OtpSent) {
-                 context.pushNamed('otp_forgot_password', extra: bloc);
+                  context.pushNamed('otp_forgot_password', extra: bloc);
                 } else if (state is AuthError) {
                   AuthToast.showError(context, state.message);
                 }
@@ -75,22 +77,14 @@ class ForgotPasswordPage extends StatelessWidget {
                           Positioned(
                             top: 40.h,
                             left: 20.w,
-                            child: GestureDetector(
-                              onTap: () => context.pop(),
-                              child: RtlAwareIcon(
-                                child: Icon(
-                                  Icons.chevron_left,
-                                  size: 34.r,
-                                  color: AppColors.current.text,
-                                ),
-                              ),
+                            child: AppTopBarBackButton(
+                              onPressed: () => context.pop(),
+                              size: 34.r,
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(
-                        height: 20.h,
-                      ),
+                      SizedBox(height: 20.h),
                       Padding(
                         padding: PaddingConstants.horizontalMedium,
                         child: Column(
@@ -113,14 +107,17 @@ class ForgotPasswordPage extends StatelessWidget {
                                 fillColorValue: AppColors.current.white,
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(color: AppColors.current.lightGray),
+                                  borderSide: BorderSide(
+                                    color: AppColors.current.lightGray,
+                                  ),
                                 ),
                               ),
                             ),
                             SizedBox(height: 10.h),
                             BlocBuilder<AuthBloc, AuthState>(
                               builder: (context, state) {
-                                final isLoading = state is ForgotPasswordLoading;
+                                final isLoading =
+                                    state is ForgotPasswordLoading;
                                 return CustomFilledButton(
                                   isLoading: isLoading,
                                   onPressed: () {
@@ -135,7 +132,7 @@ class ForgotPasswordPage extends StatelessWidget {
                                   textColor: AppColors.current.white,
                                 );
                               },
-                            )
+                            ),
                           ],
                         ),
                       ),

@@ -11,6 +11,7 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/app_shimmer.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
 
 // Combined address state — single notifier avoids two separate rebuilds.
 @immutable
@@ -438,10 +439,9 @@ class _BackButton extends StatelessWidget {
               BoxShadow(color: Colors.black.withAlpha(40), blurRadius: 8),
             ],
           ),
-          child: Icon(
-            Icons.arrow_back_ios_new_rounded,
+          child: AppTopBarBackButton(
+            onPressed: () => Navigator.of(context).pop(),
             size: 18.w,
-            color: AppColors.current.text,
           ),
         ),
       ),

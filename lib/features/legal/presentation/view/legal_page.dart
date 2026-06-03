@@ -5,6 +5,7 @@ import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
 
 class LegalPage extends StatelessWidget {
   const LegalPage({super.key});
@@ -127,14 +128,14 @@ class LegalPage extends StatelessWidget {
   Widget _buildHeader(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.current.primary,
-            AppColors.current.primary.withAlpha(210),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppColors.current.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(8),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: SafeArea(
         bottom: false,
@@ -142,25 +143,22 @@ class LegalPage extends StatelessWidget {
           padding: EdgeInsets.fromLTRB(8.w, 4.h, 16.w, 20.h),
           child: Row(
             children: [
-              IconButton(
-                onPressed: () => context.pop(),
-                icon: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: Colors.white,
-                  size: 20.w,
-                ),
-              ),
+              AppTopBarBackButton(onPressed: () => context.pop()),
               Expanded(
                 child: Text(
                   AppText.legal,
                   style: AppTextStyles.appbar.copyWith(
-                    color: Colors.white,
+                    color: AppColors.current.text,
                     fontSize: 18.sp,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-              Icon(Icons.balance_rounded, color: Colors.white70, size: 26.w),
+              Icon(
+                Icons.balance_rounded,
+                color: AppColors.current.midGray,
+                size: 26.w,
+              ),
             ],
           ),
         ),

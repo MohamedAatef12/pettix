@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       create: (_) => ThemeCubit(),
       child: BlocBuilder<ThemeCubit, AppThemeOption>(
         builder: (ctx, themeOption) {
-          AppColors.current = switch (themeOption) {
+          final colors = switch (themeOption) {
             AppThemeOption.blueLight => AppColors.light,
             AppThemeOption.roseLight => AppColors.roseLight,
             AppThemeOption.indigoDark => AppColors.dark,
@@ -43,6 +43,7 @@ class MyApp extends StatelessWidget {
             AppThemeOption.plumDark => AppColors.plumDark,
             AppThemeOption.rubyDark => AppColors.rubyDark,
           };
+          AppColors.current = colors;
           final effectiveTheme = switch (themeOption) {
             AppThemeOption.blueLight => lightTheme,
             AppThemeOption.roseLight => roseLightTheme,
@@ -83,8 +84,13 @@ class MyApp extends StatelessWidget {
                   theme: effectiveTheme,
                   routerConfig: router,
                   builder:
-                      (context, child) =>
-                          UpgradeAlert(child: child ?? const SizedBox.shrink()),
+                      (context, child) => UpgradeAlert(
+                        navigatorKey: rootNavigatorKey,
+                        child: KeyedSubtree(
+                          key: ValueKey('app_theme_${themeOption.name}'),
+                          child: child ?? const SizedBox.shrink(),
+                        ),
+                      ),
                 ),
           );
         },

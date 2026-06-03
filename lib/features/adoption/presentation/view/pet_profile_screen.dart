@@ -7,6 +7,7 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/shimmers/report_shimmer.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_bloc.dart';
 import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_event.dart';
 import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_state.dart';
@@ -71,26 +72,15 @@ class PetProfileScreen extends StatelessWidget {
       },
       child: Scaffold(
         backgroundColor: AppColors.current.lightBlue,
-        appBar: AppBar(
-          elevation: 0,
+        appBar: AppTopBar.back(
+          title: pet.name,
           backgroundColor: AppColors.current.white,
-          surfaceTintColor: AppColors.current.white,
-          title: Text(pet.name, style: AppTextStyles.appbar),
-          centerTitle: true,
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios_new_rounded,
-              color: AppColors.current.text,
-            ),
-            onPressed: () => context.pop(),
+          onBack: () => context.pop(),
+          trailing: IconButton(
+            tooltip: AppText.reportPet,
+            icon: Icon(Icons.flag_outlined, color: AppColors.current.red),
+            onPressed: () => _showReportSheet(context),
           ),
-          actions: [
-            IconButton(
-              tooltip: AppText.reportPet,
-              icon: Icon(Icons.flag_outlined, color: AppColors.current.red),
-              onPressed: () => _showReportSheet(context),
-            ),
-          ],
         ),
         body: PetBody(pet: pet),
       ),

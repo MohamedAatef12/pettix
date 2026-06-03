@@ -8,6 +8,7 @@ import 'package:pettix/core/constants/sized_box.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_button.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/features/adoption/presentation/bloc/adoption_bloc.dart';
 import 'package:pettix/features/adoption/presentation/bloc/adoption_event.dart';
 
@@ -114,11 +115,7 @@ class _HeroSection extends StatelessWidget {
             child: SizedBox(
               width: 40.w,
               height: 40.w,
-              child: Icon(
-                Icons.arrow_back_ios_new_rounded,
-                color: AppColors.current.text,
-                size: 18.w,
-              ),
+              child: AppTopBarBackButton(onPressed: () => context.pop()),
             ),
           ),
         ),

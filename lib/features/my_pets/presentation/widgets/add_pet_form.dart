@@ -7,6 +7,7 @@ import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/enums/app_enums.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_request_entity.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_bloc.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_event.dart';
@@ -182,14 +183,7 @@ class _FormTopBar extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(8.w, 8.h, 16.w, 0),
       child: Row(
         children: [
-          IconButton(
-            onPressed: () => context.pop(),
-            icon: Icon(
-              Icons.arrow_back_ios_new_rounded,
-              color: AppColors.current.text,
-              size: 20.w,
-            ),
-          ),
+          AppTopBarBackButton(onPressed: () => context.pop()),
           Expanded(
             child: Text(
               AppText.addPet,

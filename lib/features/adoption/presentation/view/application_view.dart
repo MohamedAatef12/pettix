@@ -9,6 +9,7 @@ import 'package:pettix/core/services/app_review_service.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/features/my_pets/domain/usecases/get_user_pets_usecase.dart';
 import '../../../../config/di/di.dart';
@@ -200,20 +201,10 @@ class _ApplicationScreensState extends State<ApplicationScreens> {
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      title: Text(
-        AppText.adoptAPet,
-        style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
-      ),
-      centerTitle: true,
+    return AppTopBar.back(
+      title: AppText.adoptAPet,
       backgroundColor: AppColors.current.white,
-      surfaceTintColor: AppColors.current.white,
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new_rounded),
-        onPressed: () => Navigator.pop(context),
-      ),
+      onBack: () => Navigator.pop(context),
     );
   }
 }
@@ -381,11 +372,7 @@ class _BackButton extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(12.r)),
           border: Border.all(color: AppColors.current.primary, width: 1.5),
         ),
-        child: Icon(
-          Icons.arrow_back_ios_new_rounded,
-          color: AppColors.current.text,
-          size: 18.w,
-        ),
+        child: AppTopBarBackButton(onPressed: onTap, size: 18.w),
       ),
     );
   }

@@ -6,6 +6,7 @@ import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/features/adoption_history/domain/entities/adoption_form_entity.dart';
 import 'package:pettix/features/adoption_history/presentation/bloc/adoption_history_bloc.dart';
 import 'package:pettix/features/adoption_history/presentation/bloc/adoption_history_event.dart';
@@ -98,7 +99,7 @@ class _HistoryHeader extends StatelessWidget {
                   children: [
                     Align(
                       alignment: Alignment.centerLeft,
-                      child: IconButton(
+                      child: AppTopBarBackButton(
                         onPressed: () {
                           if (context.canPop()) {
                             context.pop();
@@ -106,11 +107,6 @@ class _HistoryHeader extends StatelessWidget {
                             context.goNamed(AppRouteNames.bottomNav);
                           }
                         },
-                        icon: Icon(
-                          Icons.arrow_back_ios_new_rounded,
-                          color: AppColors.current.text,
-                          size: 20.w,
-                        ),
                       ),
                     ),
                     Align(
