@@ -7,6 +7,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/app_shimmer.dart';
@@ -19,9 +20,9 @@ class _AddressState {
   const _AddressState({this.address = '', this.isLoading = false});
 
   _AddressState copyWith({String? address, bool? isLoading}) => _AddressState(
-        address: address ?? this.address,
-        isLoading: isLoading ?? this.isLoading,
-      );
+    address: address ?? this.address,
+    isLoading: isLoading ?? this.isLoading,
+  );
 }
 
 class AddressMapPickerPage extends StatefulWidget {
@@ -56,9 +57,7 @@ class _AddressMapPickerPageState extends State<AddressMapPickerPage> {
   @override
   void initState() {
     super.initState();
-    _addressNotifier = ValueNotifier(
-      const _AddressState(isLoading: true),
-    );
+    _addressNotifier = ValueNotifier(const _AddressState(isLoading: true));
     // Render the first map frame before touching the network or GPS.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _initLocation();
@@ -144,8 +143,7 @@ class _AddressMapPickerPageState extends State<AddressMapPickerPage> {
   Future<void> _fetchAddress(LatLng point) async {
     if (!mounted) return;
     // Keep stale address text visible — only flip the loading flag.
-    _addressNotifier.value =
-        _addressNotifier.value.copyWith(isLoading: true);
+    _addressNotifier.value = _addressNotifier.value.copyWith(isLoading: true);
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         'https://nominatim.openstreetmap.org/reverse',
@@ -163,16 +161,18 @@ class _AddressMapPickerPageState extends State<AddressMapPickerPage> {
       );
       if (mounted) {
         _addressNotifier.value = _AddressState(
-          address: (response.data?['display_name'] as String?) ??
-              'Unknown location',
+          address:
+              (response.data?['display_name'] as String?) ??
+              AppText.unknownLocation,
           isLoading: false,
         );
       }
     } catch (_) {
       // Failure: stop spinner, keep whatever address was shown.
       if (mounted) {
-        _addressNotifier.value =
-            _addressNotifier.value.copyWith(isLoading: false);
+        _addressNotifier.value = _addressNotifier.value.copyWith(
+          isLoading: false,
+        );
       }
     }
   }
@@ -183,7 +183,7 @@ class _AddressMapPickerPageState extends State<AddressMapPickerPage> {
     try {
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        _showSnackBar('Location services are disabled.');
+        _showSnackBar(AppText.locationServicesDisabled);
         return;
       }
 
@@ -191,13 +191,13 @@ class _AddressMapPickerPageState extends State<AddressMapPickerPage> {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          _showSnackBar('Location permission denied.');
+          _showSnackBar(AppText.locationPermissionDenied);
           return;
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        _showSnackBar('Enable location in device settings.');
+        _showSnackBar(AppText.enableLocationSettings);
         return;
       }
 
@@ -210,7 +210,7 @@ class _AddressMapPickerPageState extends State<AddressMapPickerPage> {
       if (!mounted) return;
 
       if (pos.isMocked) {
-        _showSnackBar('Real location unavailable on this device.');
+        _showSnackBar(AppText.realLocationUnavailable);
         return;
       }
 
@@ -219,9 +219,9 @@ class _AddressMapPickerPageState extends State<AddressMapPickerPage> {
       _mapController.move(current, 16.0);
       await _fetchAddress(current);
     } on TimeoutException {
-      _showSnackBar('Location request timed out. Try again.');
+      _showSnackBar(AppText.locationRequestTimedOut);
     } catch (e) {
-      _showSnackBar('Location error: ${e.runtimeType}');
+      _showSnackBar(AppText.locationError(e.runtimeType.toString()));
     } finally {
       if (mounted) _locationLoadingNotifier.value = false;
     }
@@ -297,21 +297,23 @@ class _AddressMapPickerPageState extends State<AddressMapPickerPage> {
           // Only the FAB icon swaps when location is loading.
           ValueListenableBuilder<bool>(
             valueListenable: _locationLoadingNotifier,
-            builder: (_, isLoading, __) => _LocationFab(
-              isLoading: isLoading,
-              onTap: _goToCurrentLocation,
-            ),
+            builder:
+                (_, isLoading, __) => _LocationFab(
+                  isLoading: isLoading,
+                  onTap: _goToCurrentLocation,
+                ),
           ),
 
           // Only the bottom card rebuilds on address/loading changes.
           ValueListenableBuilder<_AddressState>(
             valueListenable: _addressNotifier,
-            builder: (_, state, __) => _BottomCard(
-              address: state.address,
-              isLoadingAddress: state.isLoading,
-              bottomPadding: padding.bottom,
-              onConfirm: _confirm,
-            ),
+            builder:
+                (_, state, __) => _BottomCard(
+                  address: state.address,
+                  isLoadingAddress: state.isLoading,
+                  bottomPadding: padding.bottom,
+                  onConfirm: _confirm,
+                ),
           ),
         ],
       ),
@@ -325,10 +327,7 @@ class _MapLayer extends StatelessWidget {
   final MapController mapController;
   final void Function(MapCamera, bool) onMapMoved;
 
-  const _MapLayer({
-    required this.mapController,
-    required this.onMapMoved,
-  });
+  const _MapLayer({required this.mapController, required this.onMapMoved});
 
   @override
   Widget build(BuildContext context) {
@@ -475,19 +474,20 @@ class _LocationFab extends StatelessWidget {
               BoxShadow(color: Colors.black.withAlpha(40), blurRadius: 8),
             ],
           ),
-          child: isLoading
-              ? Padding(
-                  padding: EdgeInsets.all(12.w),
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
+          child:
+              isLoading
+                  ? Padding(
+                    padding: EdgeInsets.all(12.w),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.current.primary,
+                    ),
+                  )
+                  : Icon(
+                    Icons.my_location_rounded,
+                    size: 22.w,
                     color: AppColors.current.primary,
                   ),
-                )
-              : Icon(
-                  Icons.my_location_rounded,
-                  size: 22.w,
-                  color: AppColors.current.primary,
-                ),
         ),
       ),
     );
@@ -588,7 +588,7 @@ class _BottomCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'SELECTED LOCATION',
+              AppText.selectedLocationUpper,
               style: AppTextStyles.smallDescription.copyWith(
                 color: AppColors.current.midGray,
                 fontSize: 10.sp,
@@ -633,26 +633,27 @@ class _AddressRow extends StatelessWidget {
         ),
         SizedBox(width: 8.w),
         Expanded(
-          child: isLoading
-              ? _AddressShimmer()
-              : address.isEmpty
+          child:
+              isLoading
+                  ? _AddressShimmer()
+                  : address.isEmpty
                   ? Text(
-                      'Move the map to select a location',
-                      style: AppTextStyles.description.copyWith(
-                        color: AppColors.current.midGray,
-                        fontSize: 13.sp,
-                      ),
-                    )
-                  : Text(
-                      address,
-                      style: AppTextStyles.description.copyWith(
-                        color: AppColors.current.text,
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
+                    AppText.moveMapSelectLocation,
+                    style: AppTextStyles.description.copyWith(
+                      color: AppColors.current.midGray,
+                      fontSize: 13.sp,
                     ),
+                  )
+                  : Text(
+                    address,
+                    style: AppTextStyles.description.copyWith(
+                      color: AppColors.current.text,
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
         ),
       ],
     );
@@ -697,23 +698,25 @@ class _ConfirmButton extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         height: 52.h,
         decoration: BoxDecoration(
-          color: isDisabled
-              ? AppColors.current.primary.withAlpha(140)
-              : AppColors.current.primary,
+          color:
+              isDisabled
+                  ? AppColors.current.primary.withAlpha(140)
+                  : AppColors.current.primary,
           borderRadius: BorderRadius.circular(16.r),
-          boxShadow: isDisabled
-              ? []
-              : [
-                  BoxShadow(
-                    color: AppColors.current.primary.withAlpha(80),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
+          boxShadow:
+              isDisabled
+                  ? []
+                  : [
+                    BoxShadow(
+                      color: AppColors.current.primary.withAlpha(80),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
         ),
         child: Center(
           child: Text(
-            'Confirm Location',
+            AppText.confirmLocation,
             style: AppTextStyles.bold.copyWith(
               color: Colors.white,
               fontSize: 15.sp,

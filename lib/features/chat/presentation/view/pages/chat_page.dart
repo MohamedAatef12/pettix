@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/chat/presentation/view/widgets/chat_app_bar.dart';
 import 'package:pettix/features/chat/presentation/view/widgets/chat/chat_body.dart';
@@ -48,7 +49,7 @@ class ChatPage extends StatelessWidget {
 
                   final title = initialName ??
                       otherMember?.user.displayName ??
-                      (state.conversation != null ? 'Chat' : 'Loading...');
+                      (state.conversation != null ? AppText.chatTitle : AppText.loadingText);
                   
                   final avatarUrl = initialAvatar ?? otherMember?.user.avatar;
 

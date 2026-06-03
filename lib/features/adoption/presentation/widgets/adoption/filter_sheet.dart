@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_bloc.dart';
 import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_event.dart';
@@ -10,10 +11,11 @@ void showFilterSheet(BuildContext context) {
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => BlocProvider.value(
-      value: context.read<AdoptionBrowseBloc>(),
-      child: const _FilterSheet(),
-    ),
+    builder:
+        (_) => BlocProvider.value(
+          value: context.read<AdoptionBrowseBloc>(),
+          child: const _FilterSheet(),
+        ),
   );
 }
 
@@ -73,7 +75,7 @@ class _FilterSheetState extends State<_FilterSheet> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Filter & Sort',
+                AppText.filterSort,
                 style: TextStyle(
                   color: AppColors.current.text,
                   fontSize: 20.sp,
@@ -90,7 +92,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                   });
                 },
                 child: Text(
-                  'Reset All',
+                  AppText.resetAll,
                   style: TextStyle(
                     color: AppColors.current.primary,
                     fontSize: 14.sp,
@@ -101,14 +103,14 @@ class _FilterSheetState extends State<_FilterSheet> {
             ],
           ),
           SizedBox(height: 28.h),
-          _SectionLabel('GENDER'),
+          _SectionLabel(AppText.genderUpper),
           SizedBox(height: 12.h),
           _GenderChips(
             selected: _genderId,
             onSelected: (id) => setState(() => _genderId = id),
           ),
           SizedBox(height: 28.h),
-          _SectionLabel('SORT BY'),
+          _SectionLabel(AppText.sortByUpper),
           SizedBox(height: 12.h),
           _SortChips(
             selected: _sortBy,
@@ -135,11 +137,8 @@ class _FilterSheetState extends State<_FilterSheet> {
                 shadowColor: AppColors.current.primary.withValues(alpha: 0.3),
               ),
               child: Text(
-                'Apply Filters',
-                style: TextStyle(
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w800,
-                ),
+                AppText.applyFilters,
+                style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w800),
               ),
             ),
           ),
@@ -188,42 +187,44 @@ class _GenderChips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final options = [
-      (id: null, label: 'All', icon: Icons.pets_rounded),
-      (id: 1, label: 'Male', icon: Icons.male_rounded),
-      (id: 2, label: 'Female', icon: Icons.female_rounded),
+      (id: null, label: AppText.all, icon: Icons.pets_rounded),
+      (id: 1, label: AppText.male, icon: Icons.male_rounded),
+      (id: 2, label: AppText.female, icon: Icons.female_rounded),
     ];
 
     return Wrap(
       spacing: 8.w,
-      children: options.map((o) {
-        final active = selected == o.id;
-        return ChoiceChip(
-          label: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(o.icon,
-                  size: 14.w,
-                  color: active
-                      ? Colors.white
-                      : AppColors.current.midGray),
-              SizedBox(width: 4.w),
-              Text(o.label),
-            ],
-          ),
-          selected: active,
-          onSelected: (_) => onSelected(o.id),
-          selectedColor: AppColors.current.primary,
-          backgroundColor: AppColors.current.lightBlue,
-          labelStyle: TextStyle(
-            color: active ? Colors.white : AppColors.current.text,
-            fontSize: 12.sp,
-            fontWeight: FontWeight.w600,
-          ),
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.r)),
-          side: BorderSide.none,
-        );
-      }).toList(),
+      children:
+          options.map((o) {
+            final active = selected == o.id;
+            return ChoiceChip(
+              label: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    o.icon,
+                    size: 14.w,
+                    color: active ? Colors.white : AppColors.current.midGray,
+                  ),
+                  SizedBox(width: 4.w),
+                  Text(o.label),
+                ],
+              ),
+              selected: active,
+              onSelected: (_) => onSelected(o.id),
+              selectedColor: AppColors.current.primary,
+              backgroundColor: AppColors.current.lightBlue,
+              labelStyle: TextStyle(
+                color: active ? Colors.white : AppColors.current.text,
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w600,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.r),
+              ),
+              side: BorderSide.none,
+            );
+          }).toList(),
     );
   }
 }
@@ -236,32 +237,34 @@ class _SortChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const options = [
-      (value: null, label: 'Default'),
-      (value: 'name', label: 'Name'),
-      (value: 'age', label: 'Age'),
+    final options = [
+      (value: null, label: AppText.defaultSort),
+      (value: 'name', label: AppText.name),
+      (value: 'age', label: AppText.age),
     ];
 
     return Wrap(
       spacing: 8.w,
-      children: options.map((o) {
-        final active = selected == o.value;
-        return ChoiceChip(
-          label: Text(o.label),
-          selected: active,
-          onSelected: (_) => onSelected(o.value),
-          selectedColor: AppColors.current.primary,
-          backgroundColor: AppColors.current.lightBlue,
-          labelStyle: TextStyle(
-            color: active ? Colors.white : AppColors.current.text,
-            fontSize: 12.sp,
-            fontWeight: FontWeight.w600,
-          ),
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.r)),
-          side: BorderSide.none,
-        );
-      }).toList(),
+      children:
+          options.map((o) {
+            final active = selected == o.value;
+            return ChoiceChip(
+              label: Text(o.label),
+              selected: active,
+              onSelected: (_) => onSelected(o.value),
+              selectedColor: AppColors.current.primary,
+              backgroundColor: AppColors.current.lightBlue,
+              labelStyle: TextStyle(
+                color: active ? Colors.white : AppColors.current.text,
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w600,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.r),
+              ),
+              side: BorderSide.none,
+            );
+          }).toList(),
     );
   }
 }
@@ -277,22 +280,23 @@ class _OrderToggle extends StatelessWidget {
     return Row(
       children: [
         Text(
-          'Order:',
+          AppText.order,
           style: TextStyle(
-              color: AppColors.current.midGray,
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w600),
+            color: AppColors.current.midGray,
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         SizedBox(width: 12.w),
         _OrderChip(
-          label: 'Ascending',
+          label: AppText.ascending,
           icon: Icons.arrow_upward_rounded,
           active: !descending,
           onTap: () => onToggle(false),
         ),
         SizedBox(width: 8.w),
         _OrderChip(
-          label: 'Descending',
+          label: AppText.descending,
           icon: Icons.arrow_downward_rounded,
           active: descending,
           onTap: () => onToggle(true),
@@ -324,14 +328,17 @@ class _OrderChip extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
         decoration: BoxDecoration(
-          color: active
-              ? AppColors.current.primary.withAlpha(20)
-              : AppColors.current.lightBlue,
+          color:
+              active
+                  ? AppColors.current.primary.withAlpha(20)
+                  : AppColors.current.lightBlue,
           borderRadius: BorderRadius.circular(20.r),
           border: Border.all(
-              color: active
-                  ? AppColors.current.primary.withAlpha(80)
-                  : Colors.transparent),
+            color:
+                active
+                    ? AppColors.current.primary.withAlpha(80)
+                    : Colors.transparent,
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -341,9 +348,10 @@ class _OrderChip extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                  color: color,
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w600),
+                color: color,
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),

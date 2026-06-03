@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:injectable/injectable.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/enums/app_enums.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/features/auth/data/models/user_model.dart';
@@ -48,10 +49,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ) async {
     final userId = event.userId ?? _cacheManager.getUserData()?.id;
     if (userId == null) {
-      emit(state.copyWith(
-        status: ProfileStatus.error,
-        errorMessage: 'User not found',
-      ));
+      emit(
+        state.copyWith(
+          status: ProfileStatus.error,
+          errorMessage: AppText.userNotFound,
+        ),
+      );
       return;
     }
     emit(state.copyWith(status: ProfileStatus.loading));
@@ -63,9 +66,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           errorMessage: failure.message,
         ),
       ),
-      (profile) => emit(
-        state.copyWith(status: ProfileStatus.loaded, profile: profile),
-      ),
+      (profile) =>
+          emit(state.copyWith(status: ProfileStatus.loaded, profile: profile)),
     );
   }
 
@@ -104,9 +106,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         avatar: AvatarEntity(
           filename: filename,
           base64: base64Str,
-          state: (state.profile?.avatar == null)
-              ? ImageFileState.newFile
-              : ImageFileState.modified,
+          state:
+              (state.profile?.avatar == null)
+                  ? ImageFileState.newFile
+                  : ImageFileState.modified,
         ),
       );
     }
@@ -115,10 +118,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
     if (result.isLeft()) {
       result.fold(
-        (failure) => emit(state.copyWith(
-          status: ProfileStatus.error,
-          errorMessage: failure.message,
-        )),
+        (failure) => emit(
+          state.copyWith(
+            status: ProfileStatus.error,
+            errorMessage: failure.message,
+          ),
+        ),
         (_) {},
       );
       return;
@@ -127,14 +132,18 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     final userId = _cacheManager.getUserData()?.id ?? event.request.id;
     final fetchResult = await _getProfileUseCase(userId);
     fetchResult.fold(
-      (_) => emit(state.copyWith(status: ProfileStatus.success, clearAvatar: true)),
+      (_) => emit(
+        state.copyWith(status: ProfileStatus.success, clearAvatar: true),
+      ),
       (updated) {
         _cacheManager.setUserData(UserModel.fromEntity(updated));
-        emit(state.copyWith(
-          status: ProfileStatus.success,
-          profile: updated,
-          clearAvatar: true,
-        ));
+        emit(
+          state.copyWith(
+            status: ProfileStatus.success,
+            profile: updated,
+            clearAvatar: true,
+          ),
+        );
       },
     );
   }
@@ -150,10 +159,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     if (picked != null) {
       // Read bytes immediately — avoids stale temp-cache path issues on Android
       final bytes = await picked.readAsBytes();
-      emit(state.copyWith(
-        pickedAvatarBytes: bytes,
-        pickedAvatarFilename: picked.name,
-      ));
+      emit(
+        state.copyWith(
+          pickedAvatarBytes: bytes,
+          pickedAvatarFilename: picked.name,
+        ),
+      );
     }
   }
 

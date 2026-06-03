@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/shimmers/home_shimmer.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -68,7 +69,7 @@ class _HomeBodyState extends State<HomeBody> {
                       Row(
                         children: [
                           Text(
-                            'Uploading your post...',
+                            AppText.uploadingPost,
                             style: TextStyle(
                               color: AppColors.current.text,
                               fontWeight: FontWeight.w500,

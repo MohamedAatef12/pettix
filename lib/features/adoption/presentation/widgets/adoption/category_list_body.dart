@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 
 import '../../../../../config/router/routes.dart';
@@ -38,13 +39,11 @@ class CategoryListBody extends StatelessWidget {
                   ),
                 ),
                 ListTile(
-                  title: Center(child: Text('Charlie')),
-                  subtitle: Text(
-                    'Subbran animal leagueEnergtic and loves walks',
-                  ),
+                  title: Center(child: Text(AppText.demoPetName)),
+                  subtitle: Text(AppText.demoPetDescription),
                 ),
                 CustomFilledButton(
-                  text: 'View Profile',
+                  text: AppText.viewProfile,
                   onPressed: () {
                     context.push(AppRoutes.petProfile);
                   },

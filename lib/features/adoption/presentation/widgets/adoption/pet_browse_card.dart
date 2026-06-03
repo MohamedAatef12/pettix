@@ -1,6 +1,7 @@
 import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 
@@ -91,7 +92,7 @@ class PetBrowseCard extends StatelessWidget {
                           child: Hero(
                             tag: 'cat_${pet.id}',
                             child: Text(
-                              pet.categoryName ?? 'Unknown',
+                              pet.categoryName ?? AppText.unknown,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -112,7 +113,9 @@ class PetBrowseCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          pet.age != null ? '${pet.age} yrs' : 'Age unknown',
+                          pet.age != null
+                              ? '${pet.age} ${AppText.yearsShort}'
+                              : AppText.ageUnknown,
                           maxLines: 1,
                           style: TextStyle(
                             color: AppColors.current.blueGray,

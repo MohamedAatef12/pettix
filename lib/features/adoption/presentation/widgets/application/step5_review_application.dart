@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import '../../bloc/adoption_bloc.dart';
@@ -14,38 +15,39 @@ class StepReviewApplication extends StatelessWidget {
 
   // Validation methods
   String? _getNameError(String value) {
-    if (value.isEmpty) return 'Full name is required';
-    if (value.trim().length < 3) return 'Name must be at least 3 characters';
-    if (!value.trim().contains(' ')) return 'Please enter your first and last name';
+    if (value.isEmpty) return AppText.fullNameRequired;
+    if (value.trim().length < 3) return AppText.nameMinLength;
+    if (!value.trim().contains(' ')) return AppText.firstAndLastName;
     return null;
   }
 
   String? _getEmailError(String value) {
-    if (value.isEmpty) return 'Email address is required';
+    if (value.isEmpty) return AppText.emailAddressRequired;
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(value)) return 'Enter a valid email address';
+    if (!emailRegex.hasMatch(value)) return AppText.enterValidEmail;
     return null;
   }
 
   String? _getPhoneError(String value) {
-    if (value.isEmpty) return 'Phone number is required';
+    if (value.isEmpty) return AppText.phoneNumberRequired;
     final cleanPhone = value.replaceAll(RegExp(r'[\s\-\(\)\+]'), '');
-    if (cleanPhone.length != 11) return 'Phone number must be exactly 11 digits';
+    if (cleanPhone.length != 11) return AppText.phoneNumberElevenDigits;
     return null;
   }
 
   String? _getDobError(String value) {
-    if (value.isEmpty) return 'Date of birth is required';
+    if (value.isEmpty) return AppText.dateOfBirthRequired;
     try {
       final dob = DateTime.parse(value);
       final today = DateTime.now();
       int age = today.year - dob.year;
-      if (today.month < dob.month || (today.month == dob.month && today.day < dob.day)) {
+      if (today.month < dob.month ||
+          (today.month == dob.month && today.day < dob.day)) {
         age--;
       }
-      if (age < 18) return 'You must be at least 18 years old to adopt';
+      if (age < 18) return AppText.mustBeAdultToAdopt;
     } catch (_) {
-      return 'Invalid date format';
+      return AppText.invalidDateFormat;
     }
     return null;
   }
@@ -64,96 +66,100 @@ class StepReviewApplication extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
       ),
-      builder: (_) => Container(
-        padding: EdgeInsets.only(bottom: 24.h),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Center(
-              child: Container(
-                margin: EdgeInsets.symmetric(vertical: 12.h),
-                width: 40.w,
-                height: 4.h,
-                decoration: BoxDecoration(
-                  color: AppColors.current.lightGray,
-                  borderRadius: BorderRadius.circular(2.r),
+      builder:
+          (_) => Container(
+            padding: EdgeInsets.only(bottom: 24.h),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: Container(
+                    margin: EdgeInsets.symmetric(vertical: 12.h),
+                    width: 40.w,
+                    height: 4.h,
+                    decoration: BoxDecoration(
+                      color: AppColors.current.lightGray,
+                      borderRadius: BorderRadius.circular(2.r),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Text(
-                      'Cancel',
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        color: AppColors.current.lightText,
-                        fontWeight: FontWeight.w500,
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20.w,
+                    vertical: 8.h,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Text(
+                          AppText.cancel,
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            color: AppColors.current.lightText,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        AppText.selectDateOfBirth,
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.current.text,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          final fmt = DateFormat('yyyy-MM-dd').format(selected);
+                          bloc.dobController.text = fmt;
+                          bloc.add(UpdateDateOfBirth(fmt));
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          AppText.confirm,
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            color: AppColors.current.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 10.h),
+                Container(
+                  height: 180.h,
+                  margin: EdgeInsets.symmetric(horizontal: 20.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.current.lightBlue.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(16.r),
+                  ),
+                  child: CupertinoTheme(
+                    data: CupertinoThemeData(
+                      textTheme: CupertinoTextThemeData(
+                        dateTimePickerTextStyle: TextStyle(
+                          fontSize: 16.sp,
+                          color: AppColors.current.text,
+                        ),
                       ),
                     ),
-                  ),
-                  Text(
-                    'Select Date of Birth',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.current.text,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      final fmt = DateFormat('yyyy-MM-dd').format(selected);
-                      bloc.dobController.text = fmt;
-                      bloc.add(UpdateDateOfBirth(fmt));
-                      Navigator.pop(context);
-                    },
-                    child: Text(
-                      'Confirm',
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        color: AppColors.current.primary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 10.h),
-            Container(
-              height: 180.h,
-              margin: EdgeInsets.symmetric(horizontal: 20.w),
-              decoration: BoxDecoration(
-                color: AppColors.current.lightBlue.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(16.r),
-              ),
-              child: CupertinoTheme(
-                data: CupertinoThemeData(
-                  textTheme: CupertinoTextThemeData(
-                    dateTimePickerTextStyle: TextStyle(
-                      fontSize: 16.sp,
-                      color: AppColors.current.text,
+                    child: CupertinoDatePicker(
+                      mode: CupertinoDatePickerMode.date,
+                      initialDateTime: selected,
+                      maximumDate: DateTime.now(),
+                      minimumDate: DateTime(1900),
+                      onDateTimeChanged: (val) {
+                        selected = val;
+                      },
                     ),
                   ),
                 ),
-                child: CupertinoDatePicker(
-                  mode: CupertinoDatePickerMode.date,
-                  initialDateTime: selected,
-                  maximumDate: DateTime.now(),
-                  minimumDate: DateTime(1900),
-                  onDateTimeChanged: (val) {
-                    selected = val;
-                  },
-                ),
-              ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -184,15 +190,21 @@ class StepReviewApplication extends StatelessWidget {
     return BlocBuilder<AdoptionBloc, AdoptionState>(
       builder: (context, state) {
         // Validation Checks for Personal Info
-        final isNameValid = state.fullName.isNotEmpty &&
+        final isNameValid =
+            state.fullName.isNotEmpty &&
             state.fullName.trim().length >= 3 &&
             state.fullName.trim().contains(' ');
 
         final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-        final isEmailValid = state.email.isNotEmpty && emailRegex.hasMatch(state.email);
+        final isEmailValid =
+            state.email.isNotEmpty && emailRegex.hasMatch(state.email);
 
-        final cleanPhone = state.phoneNumber.replaceAll(RegExp(r'[\s\-\(\)\+]'), '');
-        final isPhoneValid = state.phoneNumber.isNotEmpty && cleanPhone.length == 11;
+        final cleanPhone = state.phoneNumber.replaceAll(
+          RegExp(r'[\s\-\(\)\+]'),
+          '',
+        );
+        final isPhoneValid =
+            state.phoneNumber.isNotEmpty && cleanPhone.length == 11;
 
         bool isDobValid = false;
         if (state.dateOfBirth.isNotEmpty) {
@@ -200,21 +212,25 @@ class StepReviewApplication extends StatelessWidget {
             final dob = DateTime.parse(state.dateOfBirth);
             final today = DateTime.now();
             int age = today.year - dob.year;
-            if (today.month < dob.month || (today.month == dob.month && today.day < dob.day)) {
+            if (today.month < dob.month ||
+                (today.month == dob.month && today.day < dob.day)) {
               age--;
             }
             isDobValid = age >= 18;
           } catch (_) {}
         }
 
-        final isPersonalValid = isNameValid && isEmailValid && isPhoneValid && isDobValid;
+        final isPersonalValid =
+            isNameValid && isEmailValid && isPhoneValid && isDobValid;
 
         // Validation Checks for Living
-        final isLivingValid = state.selectedLivingSituationId != null &&
+        final isLivingValid =
+            state.selectedLivingSituationId != null &&
             state.selectedResidenceTypeId != null;
 
         // Validation Checks for Pet Experience
-        final isPetValid = state.hasOwnedPetBefore != null &&
+        final isPetValid =
+            state.hasOwnedPetBefore != null &&
             (state.hasOwnedPetBefore == false ||
                 (state.petType != null && state.petType!.isNotEmpty));
 
@@ -223,7 +239,7 @@ class StepReviewApplication extends StatelessWidget {
           physics: const BouncingScrollPhysics(),
           children: [
             Text(
-              'Almost there! Review your information before submitting.',
+              AppText.reviewBeforeSubmitting,
               style: TextStyle(
                 fontSize: 13.sp,
                 color: AppColors.current.midGray,
@@ -234,180 +250,207 @@ class StepReviewApplication extends StatelessWidget {
 
             // 1. Personal Information Card
             _ReviewCard(
-              title: 'Personal Information',
+              title: AppText.personalInformation,
               icon: Icons.person_outline_rounded,
               isEditing: state.isEditingPersonal,
               isEnabled: !state.isEditingPersonal || isPersonalValid,
               onEditToggle: () {
                 bloc.add(const ToggleEditingPersonal());
               },
-              children: state.isEditingPersonal
-                  ? [
-                      _InlineEditRow(
-                        label: 'Full Name',
-                        child: _InlineTextField(
-                          controller: bloc.fullNameController,
-                          onChanged: (v) => bloc.add(UpdateFullName(v)),
-                          hint: 'Full Name',
-                          keyboardType: TextInputType.name,
-                          errorText: _getNameError(state.fullName),
-                          isValid: isNameValid,
+              children:
+                  state.isEditingPersonal
+                      ? [
+                        _InlineEditRow(
+                          label: AppText.fullName,
+                          child: _InlineTextField(
+                            controller: bloc.fullNameController,
+                            onChanged: (v) => bloc.add(UpdateFullName(v)),
+                            hint: AppText.fullName,
+                            keyboardType: TextInputType.name,
+                            errorText: _getNameError(state.fullName),
+                            isValid: isNameValid,
+                          ),
                         ),
-                      ),
-                      _InlineEditRow(
-                        label: 'Email',
-                        child: _InlineTextField(
-                          controller: bloc.emailController,
-                          onChanged: (v) => bloc.add(UpdateEmail(v)),
-                          hint: 'Email Address',
-                          keyboardType: TextInputType.emailAddress,
-                          errorText: _getEmailError(state.email),
-                          isValid: isEmailValid,
+                        _InlineEditRow(
+                          label: AppText.email,
+                          child: _InlineTextField(
+                            controller: bloc.emailController,
+                            onChanged: (v) => bloc.add(UpdateEmail(v)),
+                            hint: AppText.emailAddress,
+                            keyboardType: TextInputType.emailAddress,
+                            errorText: _getEmailError(state.email),
+                            isValid: isEmailValid,
+                          ),
                         ),
-                      ),
-                      _InlineEditRow(
-                        label: 'Phone',
-                        child: _InlineTextField(
-                          controller: bloc.phoneNumberController,
-                          onChanged: (v) => bloc.add(UpdatePhoneNumber(v)),
-                          hint: 'Phone Number',
-                          keyboardType: TextInputType.phone,
-                          errorText: _getPhoneError(state.phoneNumber),
-                          isValid: isPhoneValid,
+                        _InlineEditRow(
+                          label: AppText.phone,
+                          child: _InlineTextField(
+                            controller: bloc.phoneNumberController,
+                            onChanged: (v) => bloc.add(UpdatePhoneNumber(v)),
+                            hint: AppText.phoneNumber,
+                            keyboardType: TextInputType.phone,
+                            errorText: _getPhoneError(state.phoneNumber),
+                            isValid: isPhoneValid,
+                          ),
                         ),
-                      ),
-                      _InlineEditRow(
-                        label: 'Date of Birth',
-                        child: _InlineTextField(
-                          controller: bloc.dobController,
-                          onChanged: (_) {},
-                          hint: 'Date of Birth',
-                          readOnly: true,
-                          onTap: () => _showDatePicker(context, bloc),
-                          errorText: _getDobError(state.dateOfBirth),
-                          isValid: isDobValid,
+                        _InlineEditRow(
+                          label: AppText.dateOfBirth,
+                          child: _InlineTextField(
+                            controller: bloc.dobController,
+                            onChanged: (_) {},
+                            hint: AppText.dateOfBirth,
+                            readOnly: true,
+                            onTap: () => _showDatePicker(context, bloc),
+                            errorText: _getDobError(state.dateOfBirth),
+                            isValid: isDobValid,
+                          ),
                         ),
-                      ),
-                    ]
-                  : [
-                      _ReviewRow(label: 'Full Name', value: state.fullName),
-                      _ReviewRow(label: 'Email', value: state.email),
-                      _ReviewRow(label: 'Phone', value: state.phoneNumber),
-                      _ReviewRow(label: 'Date of Birth', value: state.dateOfBirth),
-                    ],
+                      ]
+                      : [
+                        _ReviewRow(
+                          label: AppText.fullName,
+                          value: state.fullName,
+                        ),
+                        _ReviewRow(label: AppText.email, value: state.email),
+                        _ReviewRow(
+                          label: AppText.phone,
+                          value: state.phoneNumber,
+                        ),
+                        _ReviewRow(
+                          label: AppText.dateOfBirth,
+                          value: state.dateOfBirth,
+                        ),
+                      ],
             ),
             SizedBox(height: 12.h),
 
             // 2. Living Situation Card
             _ReviewCard(
-              title: 'Living Situation',
+              title: AppText.livingSituation,
               icon: Icons.home_outlined,
               isEditing: state.isEditingLiving,
               isEnabled: !state.isEditingLiving || isLivingValid,
               onEditToggle: () {
                 bloc.add(const ToggleEditingLiving());
               },
-              children: state.isEditingLiving
-                  ? [
-                      _InlineSelectRow(
-                        label: 'Living Situation',
-                        options: state.options?.livingSituations ?? [],
-                        selectedId: state.selectedLivingSituationId,
-                        onSelect: (id) => bloc.add(UpdateLivingSituation(id)),
-                      ),
-                      SizedBox(height: 12.h),
-                      _InlineSelectRow(
-                        label: 'Type of Residence',
-                        options: state.options?.residenceTypes ?? [],
-                        selectedId: state.selectedResidenceTypeId,
-                        onSelect: (id) => bloc.add(UpdateResidenceType(id)),
-                      ),
-                    ]
-                  : [
-                      _ReviewRow(
-                        label: 'Living Situation',
-                        value: _getLivingSituationName(state),
-                      ),
-                      _ReviewRow(
-                        label: 'Type of Residence',
-                        value: _getResidenceTypeName(state),
-                      ),
-                    ],
+              children:
+                  state.isEditingLiving
+                      ? [
+                        _InlineSelectRow(
+                          label: AppText.livingSituation,
+                          options: state.options?.livingSituations ?? [],
+                          selectedId: state.selectedLivingSituationId,
+                          onSelect: (id) => bloc.add(UpdateLivingSituation(id)),
+                        ),
+                        SizedBox(height: 12.h),
+                        _InlineSelectRow(
+                          label: AppText.typeOfResidence,
+                          options: state.options?.residenceTypes ?? [],
+                          selectedId: state.selectedResidenceTypeId,
+                          onSelect: (id) => bloc.add(UpdateResidenceType(id)),
+                        ),
+                      ]
+                      : [
+                        _ReviewRow(
+                          label: AppText.livingSituation,
+                          value: _getLivingSituationName(state),
+                        ),
+                        _ReviewRow(
+                          label: AppText.typeOfResidence,
+                          value: _getResidenceTypeName(state),
+                        ),
+                      ],
             ),
             SizedBox(height: 12.h),
 
             // 3. Pet Experience Card
             _ReviewCard(
-              title: 'Pet Experience',
+              title: AppText.petExperience,
               icon: Icons.pets_rounded,
               isEditing: state.isEditingPet,
               isEnabled: !state.isEditingPet || isPetValid,
               onEditToggle: () {
                 bloc.add(const ToggleEditingPet());
               },
-              children: state.isEditingPet
-                  ? [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Have you owned or cared for a pet before?',
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: AppColors.current.midGray,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          SizedBox(height: 8.h),
-                          Row(
-                            children: [
-                              _ChoiceChip(
-                                label: 'Yes',
-                                isSelected: state.hasOwnedPetBefore == true,
-                                onTap: () => bloc.add(const UpdateHasOwnedPet(true)),
+              children:
+                  state.isEditingPet
+                      ? [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              AppText.haveOwnedPetBefore,
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: AppColors.current.midGray,
+                                fontWeight: FontWeight.w500,
                               ),
-                              SizedBox(width: 8.w),
-                              _ChoiceChip(
-                                label: 'No',
-                                isSelected: state.hasOwnedPetBefore == false,
-                                onTap: () => bloc.add(const UpdateHasOwnedPet(false)),
+                            ),
+                            SizedBox(height: 8.h),
+                            Row(
+                              children: [
+                                _ChoiceChip(
+                                  label: AppText.yes,
+                                  isSelected: state.hasOwnedPetBefore == true,
+                                  onTap:
+                                      () => bloc.add(
+                                        const UpdateHasOwnedPet(true),
+                                      ),
+                                ),
+                                SizedBox(width: 8.w),
+                                _ChoiceChip(
+                                  label: AppText.no,
+                                  isSelected: state.hasOwnedPetBefore == false,
+                                  onTap:
+                                      () => bloc.add(
+                                        const UpdateHasOwnedPet(false),
+                                      ),
+                                ),
+                              ],
+                            ),
+                            if (state.hasOwnedPetBefore == true) ...[
+                              SizedBox(height: 14.h),
+                              _InlineEditRow(
+                                label: AppText.typeOfPet,
+                                child: _InlineTextField(
+                                  controller: bloc.petTypeController,
+                                  onChanged: (v) => bloc.add(UpdatePetType(v)),
+                                  hint: AppText.petTypeHint,
+                                  errorText:
+                                      state.petType == null ||
+                                              state.petType!.isEmpty
+                                          ? AppText.petTypeRequired
+                                          : null,
+                                  isValid:
+                                      state.petType != null &&
+                                      state.petType!.isNotEmpty,
+                                ),
                               ),
                             ],
-                          ),
-                          if (state.hasOwnedPetBefore == true) ...[
-                            SizedBox(height: 14.h),
-                            _InlineEditRow(
-                              label: 'Type of pet',
-                              child: _InlineTextField(
-                                controller: bloc.petTypeController,
-                                onChanged: (v) => bloc.add(UpdatePetType(v)),
-                                hint: 'e.g., Dog, Cat',
-                                errorText: state.petType == null || state.petType!.isEmpty
-                                    ? 'Pet type is required'
-                                    : null,
-                                isValid: state.petType != null && state.petType!.isNotEmpty,
-                              ),
-                            ),
                           ],
-                        ],
-                      ),
-                    ]
-                  : [
-                      _ReviewRow(
-                        label: 'Owned a pet before?',
-                        value: state.hasOwnedPetBefore == true ? 'Yes' : 'No',
-                      ),
-                      if (state.hasOwnedPetBefore == true)
-                        _ReviewRow(
-                          label: 'Type of pet',
-                          value: state.petType ?? '—',
                         ),
-                    ],
+                      ]
+                      : [
+                        _ReviewRow(
+                          label: AppText.ownedPetBefore,
+                          value:
+                              state.hasOwnedPetBefore == true
+                                  ? AppText.yes
+                                  : AppText.no,
+                        ),
+                        if (state.hasOwnedPetBefore == true)
+                          _ReviewRow(
+                            label: AppText.typeOfPet,
+                            value: state.petType ?? '—',
+                          ),
+                      ],
             ),
             SizedBox(height: 28.h),
 
             // Submit Button — shows spinner while API is in progress
-            _SubmitButton(isSubmitting: state.status == AdoptionStatus.submitting),
+            _SubmitButton(
+              isSubmitting: state.status == AdoptionStatus.submitting,
+            ),
           ],
         );
       },
@@ -456,7 +499,11 @@ class _ReviewCard extends StatelessWidget {
                     color: AppColors.current.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
-                  child: Icon(icon, size: 16.w, color: AppColors.current.primary),
+                  child: Icon(
+                    icon,
+                    size: 16.w,
+                    color: AppColors.current.primary,
+                  ),
                 ),
                 SizedBox(width: 10.w),
                 Expanded(
@@ -472,15 +519,20 @@ class _ReviewCard extends StatelessWidget {
                 IconButton(
                   onPressed: isEnabled ? onEditToggle : null,
                   icon: Icon(
-                    isEditing ? Icons.check_circle_rounded : Icons.edit_outlined,
+                    isEditing
+                        ? Icons.check_circle_rounded
+                        : Icons.edit_outlined,
                     size: 20.w,
-                    color: isEditing
-                        ? (isEnabled ? Colors.green : Colors.grey.withValues(alpha: 0.4))
-                        : AppColors.current.primary,
+                    color:
+                        isEditing
+                            ? (isEnabled
+                                ? Colors.green
+                                : Colors.grey.withValues(alpha: 0.4))
+                            : AppColors.current.primary,
                   ),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
-                  tooltip: isEditing ? 'Done' : 'Edit',
+                  tooltip: isEditing ? AppText.done : AppText.edit,
                 ),
                 SizedBox(width: 8.w),
               ],
@@ -560,13 +612,10 @@ class _InlineTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Widget? finalSuffixIcon = isValid
-        ? Icon(
-            Icons.check_circle_rounded,
-            color: Colors.green,
-            size: 16.w,
-          )
-        : null;
+    final Widget? finalSuffixIcon =
+        isValid
+            ? Icon(Icons.check_circle_rounded, color: Colors.green, size: 16.w)
+            : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -590,7 +639,10 @@ class _InlineTextField extends StatelessWidget {
                 fontSize: 13.sp,
                 color: AppColors.current.midGray,
               ),
-              contentPadding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 10.w,
+                vertical: 8.h,
+              ),
               filled: true,
               fillColor: AppColors.current.lightBlue.withValues(alpha: 0.2),
               border: OutlineInputBorder(
@@ -599,15 +651,24 @@ class _InlineTextField extends StatelessWidget {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8.r),
-                borderSide: BorderSide(color: AppColors.current.primary, width: 1.r),
+                borderSide: BorderSide(
+                  color: AppColors.current.primary,
+                  width: 1.r,
+                ),
               ),
               errorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8.r),
-                borderSide: BorderSide(color: AppColors.current.red, width: 1.r),
+                borderSide: BorderSide(
+                  color: AppColors.current.red,
+                  width: 1.r,
+                ),
               ),
               focusedErrorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8.r),
-                borderSide: BorderSide(color: AppColors.current.red, width: 1.r),
+                borderSide: BorderSide(
+                  color: AppColors.current.red,
+                  width: 1.r,
+                ),
               ),
               suffixIcon: finalSuffixIcon,
             ),
@@ -665,34 +726,48 @@ class _InlineSelectRow extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
           child: Row(
-            children: options.map((item) {
-              final isSelected = item.id == selectedId;
-              return GestureDetector(
-                onTap: () => onSelect(item.id),
-                child: Container(
-                  margin: EdgeInsets.only(right: 8.w),
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? AppColors.current.primary
-                        : AppColors.current.lightBlue.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(20.r),
-                    border: Border.all(
-                      color: isSelected ? Colors.transparent : AppColors.current.lightGray,
-                      width: 1.r,
+            children:
+                options.map((item) {
+                  final isSelected = item.id == selectedId;
+                  return GestureDetector(
+                    onTap: () => onSelect(item.id),
+                    child: Container(
+                      margin: EdgeInsets.only(right: 8.w),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 6.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color:
+                            isSelected
+                                ? AppColors.current.primary
+                                : AppColors.current.lightBlue.withValues(
+                                  alpha: 0.2,
+                                ),
+                        borderRadius: BorderRadius.circular(20.r),
+                        border: Border.all(
+                          color:
+                              isSelected
+                                  ? Colors.transparent
+                                  : AppColors.current.lightGray,
+                          width: 1.r,
+                        ),
+                      ),
+                      child: Text(
+                        item.name,
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight:
+                              isSelected ? FontWeight.w700 : FontWeight.w500,
+                          color:
+                              isSelected
+                                  ? Colors.white
+                                  : AppColors.current.text,
+                        ),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    item.name,
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                      color: isSelected ? Colors.white : AppColors.current.text,
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
+                  );
+                }).toList(),
           ),
         ),
       ],
@@ -720,12 +795,14 @@ class _ChoiceChip extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.current.primary
-              : AppColors.current.lightBlue.withValues(alpha: 0.2),
+          color:
+              isSelected
+                  ? AppColors.current.primary
+                  : AppColors.current.lightBlue.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(20.r),
           border: Border.all(
-            color: isSelected ? Colors.transparent : AppColors.current.lightGray,
+            color:
+                isSelected ? Colors.transparent : AppColors.current.lightGray,
             width: 1.r,
           ),
         ),
@@ -795,40 +872,44 @@ class _SubmitButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 250),
-      child: isSubmitting
-          ? Container(
-              key: const ValueKey('loading'),
-              height: MediaQuery.of(context).size.height * 0.065,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: AppColors.current.primary,
-                borderRadius: BorderRadius.circular(14.r),
-              ),
-              child: Center(
-                child: SizedBox(
-                  width: 24.w,
-                  height: 24.w,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.5,
-                    valueColor:
-                        const AlwaysStoppedAnimation<Color>(Colors.white),
+      child:
+          isSubmitting
+              ? Container(
+                key: const ValueKey('loading'),
+                height: MediaQuery.of(context).size.height * 0.065,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: AppColors.current.primary,
+                  borderRadius: BorderRadius.circular(14.r),
+                ),
+                child: Center(
+                  child: SizedBox(
+                    width: 24.w,
+                    height: 24.w,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        Colors.white,
+                      ),
+                    ),
                   ),
                 ),
+              )
+              : CustomFilledButton(
+                key: const ValueKey('button'),
+                onPressed:
+                    () => context.read<AdoptionBloc>().add(
+                      const SubmitAdoptionForm(),
+                    ),
+                text: AppText.submitApplication,
+                heightFactor: 0.065,
+                backgroundColor: AppColors.current.primary,
+                textStyle: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.current.white,
+                ),
               ),
-            )
-          : CustomFilledButton(
-              key: const ValueKey('button'),
-              onPressed: () =>
-                  context.read<AdoptionBloc>().add(const SubmitAdoptionForm()),
-              text: 'Submit Application',
-              heightFactor: 0.065,
-              backgroundColor: AppColors.current.primary,
-              textStyle: TextStyle(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w700,
-                color: AppColors.current.white,
-              ),
-            ),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 import 'package:pettix/features/my_pets/presentation/widgets/pet_passport.dart';
@@ -144,7 +145,7 @@ class _PetCardInfo extends StatelessWidget {
             Icon(Icons.pets_rounded, color: AppColors.current.gold, size: 10.w),
             SizedBox(width: 4.w),
             Text(
-              'PETTIX PET ID',
+              AppText.pettixPetId,
               style: TextStyle(
                 color: AppColors.current.gold,
                 fontSize: 8.sp,
@@ -197,7 +198,7 @@ class _PetCardInfo extends StatelessWidget {
           children: [
             if (pet.age != null)
               Text(
-                'Age: ${pet.age}',
+                '${AppText.age}: ${pet.age}',
                 style: TextStyle(
                   color: Colors.white.withAlpha(160),
                   fontSize: 9.sp,

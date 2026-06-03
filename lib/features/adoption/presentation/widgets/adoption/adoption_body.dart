@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/config/router/routes.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/sized_box.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_bloc.dart';
@@ -23,7 +24,8 @@ class AdoptionBody extends StatelessWidget {
     final metrics = notification.metrics;
     if (metrics.pixels < metrics.maxScrollExtent - 300) return;
     final bloc = context.read<AdoptionBrowseBloc>();
-    if (bloc.state.hasMore && bloc.state.status == AdoptionBrowseStatus.loaded) {
+    if (bloc.state.hasMore &&
+        bloc.state.status == AdoptionBrowseStatus.loaded) {
       bloc.add(const LoadMorePetsEvent());
     }
   }
@@ -100,7 +102,7 @@ class _AdoptionHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                'Find Your Pet Partner',
+                AppText.findYourPetPartner,
                 style: TextStyle(
                   color: AppColors.current.primary,
                   fontSize: 24.sp,
@@ -148,21 +150,25 @@ class _SearchField extends StatelessWidget {
       ),
       child: TextField(
         controller: controller,
-        onChanged: (q) =>
-            context.read<AdoptionBrowseBloc>().add(SearchPetsEvent(q)),
+        onChanged:
+            (q) => context.read<AdoptionBrowseBloc>().add(SearchPetsEvent(q)),
         style: TextStyle(color: AppColors.current.text, fontSize: 13.sp),
         decoration: InputDecoration(
-          hintText: 'Search by name...',
-          hintStyle: TextStyle(color: AppColors.current.midGray, fontSize: 13.sp),
+          hintText: AppText.searchByName,
+          hintStyle: TextStyle(
+            color: AppColors.current.midGray,
+            fontSize: 13.sp,
+          ),
           prefixIcon: Icon(
             Icons.search_rounded,
             color: AppColors.current.midGray,
             size: 18.w,
           ),
           suffixIcon: BlocBuilder<AdoptionBrowseBloc, AdoptionBrowseState>(
-            buildWhen: (p, c) =>
-                (p.searchQuery?.isNotEmpty ?? false) !=
-                (c.searchQuery?.isNotEmpty ?? false),
+            buildWhen:
+                (p, c) =>
+                    (p.searchQuery?.isNotEmpty ?? false) !=
+                    (c.searchQuery?.isNotEmpty ?? false),
             builder: (context, state) {
               final hasQuery =
                   state.searchQuery != null && state.searchQuery!.isNotEmpty;
@@ -175,9 +181,9 @@ class _SearchField extends StatelessWidget {
                 ),
                 onPressed: () {
                   controller.clear();
-                  context
-                      .read<AdoptionBrowseBloc>()
-                      .add(const SearchPetsEvent(''));
+                  context.read<AdoptionBrowseBloc>().add(
+                    const SearchPetsEvent(''),
+                  );
                 },
               );
             },
@@ -204,22 +210,25 @@ class _FilterButton extends StatelessWidget {
             width: 44.w,
             height: 44.h,
             decoration: BoxDecoration(
-              color: state.hasActiveFilters
-                  ? AppColors.current.gold
-                  : AppColors.current.white,
+              color:
+                  state.hasActiveFilters
+                      ? AppColors.current.gold
+                      : AppColors.current.white,
               borderRadius: BorderRadius.circular(14.r),
               border: Border.all(
-                color: state.hasActiveFilters
-                    ? AppColors.current.gold
-                    : AppColors.current.lightGray,
+                color:
+                    state.hasActiveFilters
+                        ? AppColors.current.gold
+                        : AppColors.current.lightGray,
                 width: 1,
               ),
             ),
             child: Icon(
               Icons.tune_rounded,
-              color: state.hasActiveFilters
-                  ? AppColors.current.white
-                  : AppColors.current.midGray,
+              color:
+                  state.hasActiveFilters
+                      ? AppColors.current.white
+                      : AppColors.current.midGray,
               size: 20.w,
             ),
           ),
@@ -237,9 +246,10 @@ class _CategoryFilterSliver extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AdoptionBrowseBloc, AdoptionBrowseState>(
-      buildWhen: (p, c) =>
-          p.categories != c.categories ||
-          p.selectedCategoryId != c.selectedCategoryId,
+      buildWhen:
+          (p, c) =>
+              p.categories != c.categories ||
+              p.selectedCategoryId != c.selectedCategoryId,
       builder: (context, state) {
         if (state.categories.isEmpty) return const SliverToBoxAdapter();
         return SliverToBoxAdapter(
@@ -253,21 +263,23 @@ class _CategoryFilterSliver extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 4.h),
                 children: [
                   _CategoryChip(
-                    label: 'All Pets',
+                    label: AppText.allPets,
                     icon: Icons.grid_view_rounded,
                     selected: state.selectedCategoryId == null,
-                    onTap: () => context
-                        .read<AdoptionBrowseBloc>()
-                        .add(const FilterByCategoryEvent(null)),
+                    onTap:
+                        () => context.read<AdoptionBrowseBloc>().add(
+                          const FilterByCategoryEvent(null),
+                        ),
                   ),
                   ...state.categories.map(
                     (cat) => _CategoryChip(
                       label: cat.name,
                       icon: _getIconForCategory(cat.name),
                       selected: state.selectedCategoryId == cat.id,
-                      onTap: () => context
-                          .read<AdoptionBrowseBloc>()
-                          .add(FilterByCategoryEvent(cat.id)),
+                      onTap:
+                          () => context.read<AdoptionBrowseBloc>().add(
+                            FilterByCategoryEvent(cat.id),
+                          ),
                     ),
                   ),
                 ],
@@ -334,13 +346,17 @@ class _CategoryChip extends StatelessWidget {
             Icon(
               icon,
               size: 16.sp,
-              color: selected ? AppColors.current.white : AppColors.current.primary,
+              color:
+                  selected
+                      ? AppColors.current.white
+                      : AppColors.current.primary,
             ),
             SizedBox(width: 8.w),
             Text(
               label,
               style: TextStyle(
-                color: selected ? AppColors.current.white : AppColors.current.text,
+                color:
+                    selected ? AppColors.current.white : AppColors.current.text,
                 fontSize: 13.sp,
                 fontWeight: FontWeight.w700,
               ),
@@ -360,10 +376,10 @@ class _ResultsCountSliver extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AdoptionBrowseBloc, AdoptionBrowseState>(
-      buildWhen: (p, c) =>
-          p.totalCount != c.totalCount || p.status != c.status,
+      buildWhen: (p, c) => p.totalCount != c.totalCount || p.status != c.status,
       builder: (context, state) {
-        final isLoaded = state.status == AdoptionBrowseStatus.loaded ||
+        final isLoaded =
+            state.status == AdoptionBrowseStatus.loaded ||
             state.status == AdoptionBrowseStatus.loadingMore;
         if (!isLoaded) return const SliverToBoxAdapter();
         return SliverToBoxAdapter(
@@ -373,7 +389,7 @@ class _ResultsCountSliver extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${state.totalCount} pets available',
+                  '${state.totalCount} ${AppText.petsAvailable}',
                   style: TextStyle(
                     color: AppColors.current.midGray,
                     fontSize: 12.sp,
@@ -382,11 +398,12 @@ class _ResultsCountSliver extends StatelessWidget {
                 ),
                 if (state.hasActiveFilters)
                   GestureDetector(
-                    onTap: () => context
-                        .read<AdoptionBrowseBloc>()
-                        .add(const ResetFiltersEvent()),
+                    onTap:
+                        () => context.read<AdoptionBrowseBloc>().add(
+                          const ResetFiltersEvent(),
+                        ),
                     child: Text(
-                      'Clear filters',
+                      AppText.clearFilters,
                       style: TextStyle(
                         color: AppColors.current.primary,
                         fontSize: 12.sp,
@@ -419,9 +436,10 @@ class _PetGridSliver extends StatelessWidget {
         if (state.status == AdoptionBrowseStatus.error && state.pets.isEmpty) {
           return _ErrorSliver(
             message: state.errorMessage,
-            onRetry: () => context
-                .read<AdoptionBrowseBloc>()
-                .add(const RefreshPetsEvent()),
+            onRetry:
+                () => context.read<AdoptionBrowseBloc>().add(
+                  const RefreshPetsEvent(),
+                ),
           );
         }
         if (state.pets.isEmpty && state.status == AdoptionBrowseStatus.loaded) {
@@ -436,17 +454,14 @@ class _PetGridSliver extends StatelessWidget {
               mainAxisSpacing: 12.h,
               childAspectRatio: 0.72,
             ),
-            delegate: SliverChildBuilderDelegate(
-              (context, i) {
-                final pet = state.pets[i];
-                return PetBrowseCard(
-                  pet: pet,
-                  onViewProfile: () =>
-                      context.push(AppRoutes.petProfile, extra: pet),
-                );
-              },
-              childCount: state.pets.length,
-            ),
+            delegate: SliverChildBuilderDelegate((context, i) {
+              final pet = state.pets[i];
+              return PetBrowseCard(
+                pet: pet,
+                onViewProfile:
+                    () => context.push(AppRoutes.petProfile, extra: pet),
+              );
+            }, childCount: state.pets.length),
           ),
         );
       },
@@ -568,11 +583,14 @@ class _EmptySliver extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.search_off_rounded,
-                size: 64.w, color: AppColors.current.blueGray),
+            Icon(
+              Icons.search_off_rounded,
+              size: 64.w,
+              color: AppColors.current.blueGray,
+            ),
             SizedBoxConstants.verticalMedium,
             Text(
-              'No pets found',
+              AppText.noPetsFound,
               style: TextStyle(
                 color: AppColors.current.midGray,
                 fontSize: 14.sp,
@@ -598,20 +616,25 @@ class _ErrorSliver extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.error_outline_rounded,
-                size: 48.w, color: AppColors.current.red),
+            Icon(
+              Icons.error_outline_rounded,
+              size: 48.w,
+              color: AppColors.current.red,
+            ),
             SizedBoxConstants.verticalSmall,
             Text(
-              message ?? 'Something went wrong',
+              message ?? AppText.error,
               style: TextStyle(
-                  color: AppColors.current.midGray, fontSize: 13.sp),
+                color: AppColors.current.midGray,
+                fontSize: 13.sp,
+              ),
               textAlign: TextAlign.center,
             ),
             SizedBoxConstants.verticalMedium,
             TextButton(
               onPressed: onRetry,
               child: Text(
-                'Retry',
+                AppText.retry,
                 style: TextStyle(
                   color: AppColors.current.primary,
                   fontWeight: FontWeight.w700,

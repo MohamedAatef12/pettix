@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_bloc.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_event.dart';
@@ -15,8 +16,7 @@ class PetImagePickerRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<MyPetsBloc, MyPetsState>(
-      buildWhen: (prev, curr) =>
-          prev.pickedImageBytes != curr.pickedImageBytes,
+      buildWhen: (prev, curr) => prev.pickedImageBytes != curr.pickedImageBytes,
       builder: (context, state) {
         final images = state.pickedImageBytes;
         return SizedBox(
@@ -25,13 +25,14 @@ class PetImagePickerRow extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             children: [
               ...images.asMap().entries.map(
-                    (entry) => _ImageThumb(
-                      bytes: entry.value,
-                      onRemove: () => context
-                          .read<MyPetsBloc>()
-                          .add(RemovePetImageEvent(entry.key)),
-                    ),
-                  ),
+                (entry) => _ImageThumb(
+                  bytes: entry.value,
+                  onRemove:
+                      () => context.read<MyPetsBloc>().add(
+                        RemovePetImageEvent(entry.key),
+                      ),
+                ),
+              ),
               if (images.length < 3) _AddImageCard(),
             ],
           ),
@@ -88,8 +89,7 @@ class _AddImageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () =>
-          context.read<MyPetsBloc>().add(const PickPetImageEvent()),
+      onTap: () => context.read<MyPetsBloc>().add(const PickPetImageEvent()),
       child: Container(
         width: 80.w,
         height: 80.w,
@@ -104,11 +104,14 @@ class _AddImageCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.add_a_photo_outlined,
-                color: AppColors.current.primary, size: 22.w),
+            Icon(
+              Icons.add_a_photo_outlined,
+              color: AppColors.current.primary,
+              size: 22.w,
+            ),
             SizedBox(height: 4.h),
             Text(
-              'Photo',
+              AppText.photo,
               style: TextStyle(
                 color: AppColors.current.primary,
                 fontSize: 9.sp,

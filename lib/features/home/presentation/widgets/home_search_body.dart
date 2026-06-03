@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 
 class HomeSearchBody extends StatelessWidget {
@@ -31,7 +32,7 @@ class HomeSearchBody extends StatelessWidget {
                 child: CustomTextFormField(
                   fillColor: true,
                   fillColorValue: AppColors.current.lightGray,
-                  hintText: 'Search',
+                  hintText: AppText.search,
                   border: InputBorder.none,        // ⬅️ مفيش border أساسي
                   enabledBorder: InputBorder.none, // ⬅️ مفيش border لما يبقى enabled
                   focusedBorder: InputBorder.none,

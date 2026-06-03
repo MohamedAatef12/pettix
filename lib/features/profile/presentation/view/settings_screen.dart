@@ -1,8 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:pettix/config/router/routes.dart';
+import 'package:pettix/core/bloc/theme/theme_cubit.dart';
+import 'package:pettix/core/bloc/theme/theme_option.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -21,7 +23,11 @@ class SettingsScreen extends StatelessWidget {
         centerTitle: true,
         leading: IconButton(
           onPressed: () => context.pop(),
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.current.text, size: 20.sp),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: AppColors.current.text,
+            size: 20.sp,
+          ),
         ),
         title: Text(
           AppText.settings,
@@ -39,14 +45,14 @@ class SettingsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionHeader('Account Settings'),
+              _buildSectionHeader(AppText.accountSettings),
               SizedBox(height: 12.h),
               _SettingsGroup(
                 tiles: [
                   _SettingsTile(
                     icon: Icons.notifications_none_rounded,
                     iconColor: const Color(0xFF5EA8DF),
-                    title: 'Notification Settings',
+                    title: AppText.notificationSettings,
                     onTap: () {
                       // Navigate to notification settings
                     },
@@ -70,23 +76,25 @@ class SettingsScreen extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 24.h),
-              _buildSectionHeader('App Settings'),
+              _buildSectionHeader(AppText.appSettings),
               SizedBox(height: 12.h),
               _SettingsGroup(
                 tiles: [
-                  _SettingsTile(
-                    icon: Icons.color_lens_outlined,
-                    iconColor: const Color(0xFFE8A838),
-                    title: 'Themes',
-                    trailing: Text(
-                      'Light',
-                      style: AppTextStyles.smallDescription.copyWith(
-                        color: AppColors.current.midGray,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    onTap: () {
-                      // Change theme
+                  BlocBuilder<ThemeCubit, AppThemeOption>(
+                    builder: (context, themeOption) {
+                      return _SettingsTile(
+                        icon: Icons.color_lens_outlined,
+                        iconColor: themeOption.previewColor,
+                        title: AppText.themes,
+                        trailing: Text(
+                          themeOption.label,
+                          style: AppTextStyles.smallDescription.copyWith(
+                            color: AppColors.current.midGray,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        onTap: () => _showThemePicker(context),
+                      );
                     },
                   ),
                   _SettingsTile(
@@ -94,13 +102,13 @@ class SettingsScreen extends StatelessWidget {
                     iconColor: const Color(0xFF3AAFA9),
                     title: AppText.language,
                     trailing: Text(
-                      context.locale.languageCode.toUpperCase(),
+                      _languageLabel(context, context.locale),
                       style: AppTextStyles.smallDescription.copyWith(
                         color: AppColors.current.midGray,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    onTap: () => context.push(AppRoutes.selectLanguage),
+                    onTap: () => _showLanguagePicker(context),
                   ),
                 ],
               ),
@@ -126,10 +134,386 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
   }
+
+  void _showThemePicker(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const _ThemePickerSheet(),
+    );
+  }
+
+  void _showLanguagePicker(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const _LanguagePickerSheet(),
+    );
+  }
+}
+
+String _languageLabel(BuildContext context, Locale locale) {
+  return switch (locale.languageCode) {
+    'ar' => AppText.arabic,
+    'en' => AppText.english,
+    _ => locale.languageCode.toUpperCase(),
+  };
+}
+
+class _LanguagePickerSheet extends StatelessWidget {
+  const _LanguagePickerSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    final currentLocale = context.locale;
+    final options = context.supportedLocales;
+
+    return FractionallySizedBox(
+      heightFactor: 0.5,
+      child: Container(
+        padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 24.h),
+        decoration: BoxDecoration(
+          color: AppColors.current.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28.r)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 42.w,
+                  height: 4.h,
+                  decoration: BoxDecoration(
+                    color: AppColors.current.lightGray,
+                    borderRadius: BorderRadius.circular(99.r),
+                  ),
+                ),
+              ),
+              SizedBox(height: 18.h),
+              Text(
+                AppText.language,
+                style: AppTextStyles.title.copyWith(
+                  color: AppColors.current.text,
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              SizedBox(height: 16.h),
+              Expanded(
+                child: ListView.separated(
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.zero,
+                  itemCount: options.length,
+                  separatorBuilder: (_, __) => SizedBox(height: 12.h),
+                  itemBuilder: (context, index) {
+                    final locale = options[index];
+                    final isSelected =
+                        locale.languageCode == currentLocale.languageCode;
+
+                    return _LanguageOptionCard(
+                      locale: locale,
+                      isSelected: isSelected,
+                      onTap: () async {
+                        await context.setLocale(locale);
+                        if (context.mounted) Navigator.of(context).pop();
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LanguageOptionCard extends StatelessWidget {
+  final Locale locale;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _LanguageOptionCard({
+    required this.locale,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = _languageAccent(locale);
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16.r),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: EdgeInsets.all(14.w),
+        decoration: BoxDecoration(
+          color:
+              isSelected ? accent.withAlpha(26) : AppColors.current.lightBlue,
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(
+            color: isSelected ? accent : AppColors.current.lightGray,
+            width: isSelected ? 1.6 : 1,
+          ),
+          boxShadow:
+              isSelected
+                  ? [
+                    BoxShadow(
+                      color: accent.withAlpha(35),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ]
+                  : null,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 42.w,
+              height: 42.w,
+              decoration: BoxDecoration(
+                color: accent.withAlpha(26),
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                locale.languageCode.toUpperCase(),
+                style: AppTextStyles.description.copyWith(
+                  color: accent,
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Text(
+                _languageLabel(context, locale),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.description.copyWith(
+                  color: AppColors.current.text,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            AnimatedOpacity(
+              duration: const Duration(milliseconds: 180),
+              opacity: isSelected ? 1 : 0,
+              child: Icon(Icons.check_rounded, color: accent, size: 20.sp),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+Color _languageAccent(Locale locale) {
+  return switch (locale.languageCode) {
+    'ar' => const Color(0xFF3AAFA9),
+    'en' => const Color(0xFF5EA8DF),
+    _ => AppColors.current.primary,
+  };
+}
+
+class _ThemePickerSheet extends StatelessWidget {
+  const _ThemePickerSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ThemeCubit, AppThemeOption>(
+      builder: (context, current) {
+        return FractionallySizedBox(
+          heightFactor: 0.82,
+          child: Container(
+            padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 24.h),
+            decoration: BoxDecoration(
+              color: AppColors.current.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28.r)),
+            ),
+            child: SafeArea(
+              top: false,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 42.w,
+                      height: 4.h,
+                      decoration: BoxDecoration(
+                        color: AppColors.current.lightGray,
+                        borderRadius: BorderRadius.circular(99.r),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 18.h),
+                  Text(
+                    AppText.themes,
+                    style: AppTextStyles.title.copyWith(
+                      color: AppColors.current.text,
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+                  Expanded(
+                    child: GridView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      padding: EdgeInsets.only(bottom: 6.h),
+                      itemCount: AppThemeOption.values.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 12.h,
+                        crossAxisSpacing: 12.w,
+                        childAspectRatio: 2.15,
+                      ),
+                      itemBuilder: (context, index) {
+                        final option = AppThemeOption.values[index];
+                        return _ThemeOptionCard(
+                          option: option,
+                          isSelected: option == current,
+                          onTap: () {
+                            context.read<ThemeCubit>().setTheme(option);
+                            Navigator.of(context).pop();
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _ThemeOptionCard extends StatelessWidget {
+  final AppThemeOption option;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _ThemeOptionCard({
+    required this.option,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16.r),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: EdgeInsets.all(10.w),
+        decoration: BoxDecoration(
+          gradient:
+              isSelected
+                  ? LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      option.previewColor.withAlpha(42),
+                      option.previewAccent.withAlpha(30),
+                    ],
+                  )
+                  : null,
+          color: isSelected ? null : AppColors.current.lightBlue,
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(
+            color:
+                isSelected ? option.previewColor : AppColors.current.lightGray,
+            width: isSelected ? 1.6 : 1,
+          ),
+          boxShadow:
+              isSelected
+                  ? [
+                    BoxShadow(
+                      color: option.previewColor.withAlpha(35),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ]
+                  : null,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 38.w,
+              height: 38.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [option.previewColor, option.previewAccent],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: option.previewColor.withAlpha(45),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child:
+                  isSelected
+                      ? Icon(
+                        Icons.check_rounded,
+                        color: Colors.white,
+                        size: 18.sp,
+                      )
+                      : null,
+            ),
+            SizedBox(width: 10.w),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    option.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.description.copyWith(
+                      color: AppColors.current.text,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    option.brightnessLabel,
+                    style: AppTextStyles.smallDescription.copyWith(
+                      color: AppColors.current.lightText,
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _SettingsGroup extends StatelessWidget {
-  final List<_SettingsTile> tiles;
+  final List<Widget> tiles;
   const _SettingsGroup({required this.tiles});
 
   @override
@@ -151,12 +535,13 @@ class _SettingsGroup extends StatelessWidget {
         shrinkWrap: true,
         padding: EdgeInsets.zero,
         itemCount: tiles.length,
-        separatorBuilder: (_, __) => Divider(
-          height: 1,
-          indent: 52.w,
-          endIndent: 16.w,
-          color: AppColors.current.lightGray,
-        ),
+        separatorBuilder:
+            (_, __) => Divider(
+              height: 1,
+              indent: 52.w,
+              endIndent: 16.w,
+              color: AppColors.current.lightGray,
+            ),
         itemBuilder: (_, i) => tiles[i],
       ),
     );
@@ -210,10 +595,7 @@ class _SettingsTile extends StatelessWidget {
                 ),
               ),
             ),
-            if (trailing != null) ...[
-              trailing!,
-              SizedBox(width: 8.w),
-            ],
+            if (trailing != null) ...[trailing!, SizedBox(width: 8.w)],
             if (showArrow)
               Icon(
                 Icons.arrow_forward_ios_rounded,

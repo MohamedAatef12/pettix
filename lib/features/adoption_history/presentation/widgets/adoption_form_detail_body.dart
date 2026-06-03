@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/config/router/routes.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/enums/app_enums.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -34,40 +35,40 @@ class AdoptionFormDetailBody extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _SectionTitle('Applicant'),
+                _SectionTitle(AppText.applicant),
                 SizedBox(height: 10.h),
                 _InfoGroup(
                   rows: [
                     _InfoRow(
                       icon: Icons.person_outline_rounded,
                       iconColor: AppColors.current.primary,
-                      label: 'Full Name',
+                      label: AppText.fullName,
                       value: form.fullName,
                     ),
                     _InfoRow(
                       icon: Icons.email_outlined,
                       iconColor: const Color(0xFF5EA8DF),
-                      label: 'Email',
+                      label: AppText.email,
                       value: form.email,
                     ),
                     if (form.phoneNumber != null)
                       _InfoRow(
                         icon: Icons.phone_outlined,
                         iconColor: const Color(0xFF56C590),
-                        label: 'Phone',
+                        label: AppText.phone,
                         value: form.phoneNumber!,
                       ),
                     if (form.dateOfBirth != null)
                       _InfoRow(
                         icon: Icons.cake_outlined,
                         iconColor: const Color(0xFFE8A838),
-                        label: 'Date of Birth',
+                        label: AppText.dateOfBirth,
                         value: _formatDate(form.dateOfBirth!),
                       ),
                   ],
                 ),
                 SizedBox(height: 16.h),
-                _SectionTitle('Living Situation'),
+                _SectionTitle(AppText.livingSituation),
                 SizedBox(height: 10.h),
                 _InfoGroup(
                   rows: [
@@ -75,27 +76,30 @@ class AdoptionFormDetailBody extends StatelessWidget {
                       _InfoRow(
                         icon: Icons.home_outlined,
                         iconColor: const Color(0xFF7A6FD8),
-                        label: 'Housing',
+                        label: AppText.housing,
                         value: form.livingSituation!,
                       ),
                     if (form.typeOfResidence != null)
                       _InfoRow(
                         icon: Icons.vpn_key_outlined,
                         iconColor: AppColors.current.gold,
-                        label: 'Residence',
+                        label: AppText.residence,
                         value: form.typeOfResidence!,
                       ),
                     _InfoRow(
                       icon: Icons.pets_rounded,
                       iconColor: AppColors.current.teal,
-                      label: 'Owned a pet before',
-                      value: form.hasOwnedOrCaredForPetBefore ? 'Yes' : 'No',
+                      label: AppText.ownedAPetBefore,
+                      value:
+                          form.hasOwnedOrCaredForPetBefore
+                              ? AppText.yes
+                              : AppText.no,
                     ),
                     _InfoRow(
                       icon: Icons.check_circle_outline_rounded,
                       iconColor: AppColors.current.green,
-                      label: 'Agrees to terms',
-                      value: form.agreesToTerms ? 'Yes' : 'No',
+                      label: AppText.agreesToTerms,
+                      value: form.agreesToTerms ? AppText.yes : AppText.no,
                     ),
                   ],
                 ),
@@ -174,7 +178,7 @@ class _DetailHeader extends StatelessWidget {
                       child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 80.w),
                         child: Text(
-                          form.petName ?? 'Unknown Pet',
+                          form.petName ?? AppText.unknownPet,
                           textAlign: TextAlign.center,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -355,22 +359,24 @@ class _ActionButtons extends StatelessWidget {
 
     return Column(
       children: [
-        _SectionTitle('Review Application'),
+        _SectionTitle(AppText.reviewApplication),
         SizedBox(height: 12.h),
         Row(
           children: [
             Expanded(
               child: _ActionButton(
-                label: 'Accept',
+                label: AppText.accept,
                 icon: Icons.check_circle_outline_rounded,
                 color: AppColors.current.green,
                 onTap:
                     () => _confirmAction(
                       context,
-                      title: 'Accept Application',
-                      message:
-                          'Are you sure you want to accept the application for ${form.petName}?',
-                      confirm: 'Accept',
+                      title: AppText.acceptApplication,
+                      message: AppText.acceptApplicationFor(
+                        form.petName ?? AppText.unknownPet,
+                      ),
+                      confirm: AppText.accept,
+                      isAccept: true,
                       confirmColor: AppColors.current.green,
                       onConfirm: () {
                         context.read<AdoptionHistoryBloc>().add(
@@ -387,17 +393,19 @@ class _ActionButtons extends StatelessWidget {
             SizedBox(width: 12.w),
             Expanded(
               child: _ActionButton(
-                label: 'Reject',
+                label: AppText.reject,
                 icon: Icons.cancel_outlined,
                 color: AppColors.current.red,
                 outlined: true,
                 onTap:
                     () => _confirmAction(
                       context,
-                      title: 'Reject Application',
-                      message:
-                          'Are you sure you want to reject the application for ${form.petName}?',
-                      confirm: 'Reject',
+                      title: AppText.rejectApplication,
+                      message: AppText.rejectApplicationFor(
+                        form.petName ?? AppText.unknownPet,
+                      ),
+                      confirm: AppText.reject,
+                      isAccept: false,
                       confirmColor: AppColors.current.red,
                       onConfirm: () {
                         context.read<AdoptionHistoryBloc>().add(
@@ -422,6 +430,7 @@ class _ActionButtons extends StatelessWidget {
     required String title,
     required String message,
     required String confirm,
+    required bool isAccept,
     required Color confirmColor,
     required VoidCallback onConfirm,
   }) {
@@ -454,7 +463,7 @@ class _ActionButtons extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        confirm == 'Accept'
+                        isAccept
                             ? Icons.check_circle_rounded
                             : Icons.cancel_rounded,
                         color: confirmColor,
@@ -494,7 +503,7 @@ class _ActionButtons extends StatelessWidget {
                               ),
                             ),
                             child: Text(
-                              'Cancel',
+                              AppText.cancel,
                               style: TextStyle(
                                 color: AppColors.current.midGray,
                                 fontWeight: FontWeight.w600,
@@ -611,7 +620,7 @@ class _MessageButton extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(bottom: 24.h),
       child: _ActionButton(
-        label: isOwnerView ? 'Message Applicant' : 'Message Owner',
+        label: isOwnerView ? AppText.messageApplicant : AppText.messageOwner,
         icon: Icons.chat_bubble_outline_rounded,
         color: AppColors.current.primary,
         onTap: () {

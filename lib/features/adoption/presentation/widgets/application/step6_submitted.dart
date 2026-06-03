@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 
@@ -56,12 +57,8 @@ class _StepSubmittedState extends State<StepSubmitted>
     _bounceCtrl.forward();
 
     // Confetti
-    _confettiLeft = ConfettiController(
-      duration: const Duration(seconds: 10),
-    );
-    _confettiRight = ConfettiController(
-      duration: const Duration(seconds: 10),
-    );
+    _confettiLeft = ConfettiController(duration: const Duration(seconds: 3));
+    _confettiRight = ConfettiController(duration: const Duration(seconds: 3));
 
     // Fire confetti after icon animation completes
     Future.delayed(const Duration(milliseconds: 400), () {
@@ -212,7 +209,7 @@ class _StepSubmittedState extends State<StepSubmitted>
               SizedBox(height: 28.h),
 
               Text(
-                'Application Submitted!',
+                AppText.applicationSubmitted,
                 style: TextStyle(
                   fontSize: 22.sp,
                   fontWeight: FontWeight.w800,
@@ -222,7 +219,7 @@ class _StepSubmittedState extends State<StepSubmitted>
               ),
               SizedBox(height: 10.h),
               Text(
-                'Thank you! The owner will review your application and may contact you via chat.',
+                AppText.submittedThanks,
                 style: TextStyle(
                   fontSize: 14.sp,
                   color: AppColors.current.lightText,
@@ -235,9 +232,8 @@ class _StepSubmittedState extends State<StepSubmitted>
               _InfoCard(
                 icon: Icons.schedule_rounded,
                 iconColor: AppColors.current.gold,
-                title: 'What happens next?',
-                text:
-                    'The pet owner will review your application. If they\'re interested, they\'ll reach out to you through the chat feature.',
+                title: AppText.whatHappensNext,
+                text: AppText.ownerReviewNext,
               ),
 
               const Spacer(flex: 3),
@@ -245,7 +241,7 @@ class _StepSubmittedState extends State<StepSubmitted>
               // ── View My Application ────────────────────────────────────
               CustomFilledButton(
                 onPressed: widget.onViewApplication,
-                text: 'View My Application',
+                text: AppText.viewMyApplication,
                 heightFactor: 0.065,
                 backgroundColor: AppColors.current.primary,
                 textStyle: TextStyle(
@@ -268,7 +264,7 @@ class _StepSubmittedState extends State<StepSubmitted>
                     borderRadius: BorderRadius.circular(14.r),
                   ),
                   child: Text(
-                    'Browse More Pets',
+                    AppText.browseMorePets,
                     style: TextStyle(
                       fontSize: 15.sp,
                       fontWeight: FontWeight.w600,

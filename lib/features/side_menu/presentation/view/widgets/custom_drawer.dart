@@ -89,7 +89,7 @@ class CustomDrawer extends StatelessWidget {
                   ),
                   _Tile(
                     icon: Icons.pets_rounded,
-                    label: 'Manage My Pets',
+                    label: AppText.myPets,
                     color: AppColors.current.primary,
                     onTap: () {
                       final router = GoRouter.of(context);
@@ -97,27 +97,27 @@ class CustomDrawer extends StatelessWidget {
                       router.push(AppRoutes.myPets);
                     },
                   ),
-                  _Section(AppText.storeOrders),
-                  _Tile(
-                    icon: Icons.inventory_2_rounded,
-                    label: AppText.myOrders,
-                    color: const Color(0xFF5EA8DF),
-                    onTap: () {},
-                  ),
+                  // _Section(AppText.storeOrders),
+                  // _Tile(
+                  //   icon: Icons.inventory_2_rounded,
+                  //   label: AppText.myOrders,
+                  //   color: const Color(0xFF5EA8DF),
+                  //   onTap: () {},
+                  // ),
 
-                  _TileSvg(
-                    path: 'assets/icons/refund.svg',
-                    label: AppText.refundsReturns,
-                    color: AppColors.current.midGray,
-                    onTap: () {},
-                  ),
-                  _Section(AppText.emergency),
-                  _Tile(
-                    icon: Icons.emergency_rounded,
-                    label: AppText.emergencyReports,
-                    color: AppColors.current.red,
-                    onTap: () {},
-                  ),
+                  // _TileSvg(
+                  //   path: 'assets/icons/refund.svg',
+                  //   label: AppText.refundsReturns,
+                  //   color: AppColors.current.midGray,
+                  //   onTap: () {},
+                  // ),
+                  // _Section(AppText.emergency),
+                  // _Tile(
+                  //   icon: Icons.emergency_rounded,
+                  //   label: AppText.emergencyReports,
+                  //   color: AppColors.current.red,
+                  //   onTap: () {},
+                  // ),
                   Padding(
                     padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 4.h),
                     child: Divider(
@@ -213,33 +213,6 @@ class _DrawerHeader extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 16.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _RoleBadge(),
-              GestureDetector(
-                onTap: () {},
-                child: Row(
-                  children: [
-                    Text(
-                      AppText.switchRole,
-                      style: AppTextStyles.smallDescription.copyWith(
-                        color: Colors.white70,
-                        fontSize: 11.sp,
-                      ),
-                    ),
-                    SizedBox(width: 4.w),
-                    Icon(
-                      Icons.swap_horiz_rounded,
-                      color: Colors.white70,
-                      size: 14.w,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );
@@ -319,35 +292,6 @@ class _UserInfo extends StatelessWidget {
           ),
         ],
       ],
-    );
-  }
-}
-
-class _RoleBadge extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-      decoration: BoxDecoration(
-        color: Colors.white.withAlpha(40),
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: Colors.white.withAlpha(60), width: 1),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.pets_rounded, color: Colors.white70, size: 11.w),
-          SizedBox(width: 4.w),
-          Text(
-            AppText.petLover,
-            style: AppTextStyles.smallDescription.copyWith(
-              color: Colors.white,
-              fontSize: 11.sp,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -502,19 +446,69 @@ class _TileBase extends StatelessWidget {
   }
 }
 
+// ─── Logout ───────────────────────────────────────────────────────────────────
+
 class _LogoutTile extends StatelessWidget {
   const _LogoutTile();
+
+  Future<void> _doLogout(BuildContext context) async {
+    DI.find<SignalRService>().stop();
+    DI.find<ICacheManager>().logout();
+    await DI.find<ChatLocalDataSource>().clearCache();
+    await GoogleSignIn().signOut();
+    if (context.mounted) context.pushReplacement('/login');
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder:
+          (d) => AlertDialog(
+            backgroundColor: AppColors.current.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.r),
+            ),
+            title: Text(
+              AppText.logout,
+              style: AppTextStyles.bold.copyWith(fontSize: 18.sp),
+            ),
+            content: Text(
+              AppText.logoutDesc,
+              style: TextStyle(fontSize: 14.sp, color: AppColors.current.text),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(d).pop(),
+                child: Text(
+                  AppText.cancel,
+                  style: TextStyle(color: AppColors.current.midGray),
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.current.red,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(d).pop();
+                  _doLogout(context);
+                },
+                child: Text(
+                  AppText.logOut,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () async {
-        DI.find<SignalRService>().stop();
-        DI.find<ICacheManager>().logout();
-        await DI.find<ChatLocalDataSource>().clearCache();
-        await GoogleSignIn().signOut();
-        if (context.mounted) context.pushReplacement('/login');
-      },
+      onTap: () => _showLogoutDialog(context),
       borderRadius: BorderRadius.circular(10.r),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
@@ -554,5 +548,3 @@ class _LogoutTile extends StatelessWidget {
     );
   }
 }
-
-

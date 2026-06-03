@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/features/adoption_history/domain/entities/adoption_form_entity.dart';
@@ -29,9 +30,12 @@ class AdoptionFormDetailScreen extends StatelessWidget {
           if (state.ownerStatus == AdoptionHistoryStatus.loading) {
             // Optional: Show loading dialog or overlay
           } else if (state.ownerStatus == AdoptionHistoryStatus.error) {
-            AuthToast.showError(context, state.ownerError ?? 'An error occurred');
+            AuthToast.showError(
+              context,
+              state.ownerError ?? AppText.anErrorOccurred,
+            );
           } else if (state.ownerStatus == AdoptionHistoryStatus.loaded) {
-            AuthToast.showSuccess(context, 'Status updated successfully');
+            AuthToast.showSuccess(context, AppText.statusUpdatedSuccessfully);
             Navigator.of(context).pop();
           }
         },

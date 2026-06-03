@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/config/router/routes.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 
@@ -26,7 +27,11 @@ class LegalPage extends StatelessWidget {
                       color: AppColors.current.white,
                       borderRadius: BorderRadius.circular(18.r),
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withAlpha(8), blurRadius: 10, offset: const Offset(0, 3)),
+                        BoxShadow(
+                          color: Colors.black.withAlpha(8),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
                       ],
                     ),
                     child: Column(
@@ -34,8 +39,8 @@ class LegalPage extends StatelessWidget {
                         _LegalTile(
                           icon: Icons.info_outline_rounded,
                           iconColor: AppColors.current.primary,
-                          title: 'About Pettix',
-                          subtitle: 'Our mission, features, and contact info',
+                          title: AppText.aboutPettix,
+                          subtitle: AppText.aboutPettixSubtitle,
                           onTap: () => context.push(AppRoutes.aboutPettix),
                           isFirst: true,
                         ),
@@ -43,24 +48,24 @@ class LegalPage extends StatelessWidget {
                         _LegalTile(
                           icon: Icons.shield_outlined,
                           iconColor: const Color(0xFF10B981),
-                          title: 'Privacy Policy',
-                          subtitle: 'How we collect and protect your data',
+                          title: AppText.privacyPolicyTitle,
+                          subtitle: AppText.privacyPolicySubtitle,
                           onTap: () => context.push(AppRoutes.privacyPolicy),
                         ),
                         _Divider(),
                         _LegalTile(
                           icon: Icons.gavel_rounded,
                           iconColor: const Color(0xFF7A6FD8),
-                          title: 'Terms & Conditions',
-                          subtitle: 'Rules and guidelines for using Pettix',
+                          title: AppText.termsConditions,
+                          subtitle: AppText.termsConditionsSubtitle,
                           onTap: () => context.push(AppRoutes.termsConditions),
                         ),
                         _Divider(),
                         _LegalTile(
                           icon: Icons.assignment_return_outlined,
                           iconColor: const Color(0xFFF97316),
-                          title: 'Refund Policy',
-                          subtitle: 'Returns, refunds, and shipping costs',
+                          title: AppText.refundPolicy,
+                          subtitle: AppText.refundPolicySubtitle,
                           onTap: () => context.push(AppRoutes.refundPolicy),
                           isLast: true,
                         ),
@@ -82,7 +87,7 @@ class LegalPage extends StatelessWidget {
                             ),
                             SizedBox(width: 8.w),
                             Text(
-                              'Pettix',
+                              AppText.appName,
                               style: TextStyle(
                                 fontSize: 24.sp,
                                 fontWeight: FontWeight.bold,
@@ -93,16 +98,18 @@ class LegalPage extends StatelessWidget {
                         ),
                         SizedBox(height: 8.h),
                         Text(
-                          'Version 1.0.0',
+                          AppText.versionNumber('1.0.0'),
                           style: AppTextStyles.smallDescription.copyWith(
-                            fontSize: 12.sp, color: AppColors.current.midGray,
+                            fontSize: 12.sp,
+                            color: AppColors.current.midGray,
                           ),
                         ),
                         SizedBox(height: 4.h),
                         Text(
-                          '© ${DateTime.now().year} Pettix. All rights reserved.',
+                          AppText.copyright(DateTime.now().year.toString()),
                           style: AppTextStyles.smallDescription.copyWith(
-                            fontSize: 11.sp, color: AppColors.current.lightGray,
+                            fontSize: 11.sp,
+                            color: AppColors.current.lightGray,
                           ),
                         ),
                       ],
@@ -121,7 +128,10 @@ class LegalPage extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.current.primary, AppColors.current.primary.withAlpha(210)],
+          colors: [
+            AppColors.current.primary,
+            AppColors.current.primary.withAlpha(210),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -134,13 +144,19 @@ class LegalPage extends StatelessWidget {
             children: [
               IconButton(
                 onPressed: () => context.pop(),
-                icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20.w),
+                icon: Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: Colors.white,
+                  size: 20.w,
+                ),
               ),
               Expanded(
                 child: Text(
-                  'Legal',
+                  AppText.legal,
                   style: AppTextStyles.appbar.copyWith(
-                    color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -201,16 +217,29 @@ class _LegalTile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title,
-                        style: AppTextStyles.bold.copyWith(fontSize: 14.sp, color: AppColors.current.text)),
+                    Text(
+                      title,
+                      style: AppTextStyles.bold.copyWith(
+                        fontSize: 14.sp,
+                        color: AppColors.current.text,
+                      ),
+                    ),
                     SizedBox(height: 2.h),
-                    Text(subtitle,
-                        style: AppTextStyles.smallDescription.copyWith(
-                            fontSize: 11.sp, color: AppColors.current.midGray)),
+                    Text(
+                      subtitle,
+                      style: AppTextStyles.smallDescription.copyWith(
+                        fontSize: 11.sp,
+                        color: AppColors.current.midGray,
+                      ),
+                    ),
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right_rounded, color: AppColors.current.lightGray, size: 20.w),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.current.lightGray,
+                size: 20.w,
+              ),
             ],
           ),
         ),

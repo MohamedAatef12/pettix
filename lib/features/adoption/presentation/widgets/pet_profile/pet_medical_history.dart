@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/sized_box.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -26,7 +27,7 @@ class PetMedicalHistory extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Medical History',
+            AppText.medicalHistory,
             style: AppTextStyles.bodyTitle.copyWith(
               fontSize: 16.sp,
               color: AppColors.current.text,
@@ -36,9 +37,10 @@ class PetMedicalHistory extends StatelessWidget {
           Wrap(
             spacing: 8.w,
             runSpacing: 8.h,
-            children: pet.vaccinations
-                .map((v) => _VaccinationChip(name: v.name))
-                .toList(),
+            children:
+                pet.vaccinations
+                    .map((v) => _VaccinationChip(name: v.name))
+                    .toList(),
           ),
         ],
       ),
@@ -59,13 +61,17 @@ class _VaccinationChip extends StatelessWidget {
         color: AppColors.current.green.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
-            color: AppColors.current.green.withValues(alpha: 0.3)),
+          color: AppColors.current.green.withValues(alpha: 0.3),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.check_circle_rounded,
-              size: 14.w, color: AppColors.current.green),
+          Icon(
+            Icons.check_circle_rounded,
+            size: 14.w,
+            color: AppColors.current.green,
+          ),
           SizedBox(width: 4.w),
           Text(
             name,

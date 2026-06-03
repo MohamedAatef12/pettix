@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 
 class UpdatingBanner extends StatefulWidget {
@@ -67,7 +68,7 @@ class _UpdatingBannerState extends State<UpdatingBanner>
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'Updating',
+            AppText.updating,
             style: TextStyle(
               color: Colors.white,
               fontSize: 13.sp,
