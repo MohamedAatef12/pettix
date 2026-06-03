@@ -1,37 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_shimmer.dart';
 
-class ChatListShimmer extends StatefulWidget {
+class ChatListShimmer extends StatelessWidget {
   const ChatListShimmer({super.key});
-
-  @override
-  State<ChatListShimmer> createState() => _ChatListShimmerState();
-}
-
-class _ChatListShimmerState extends State<ChatListShimmer>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat(reverse: true);
-    _animation = Tween<double>(
-      begin: 0.4,
-      end: 0.7,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   Widget _shimmerBox({
     required double width,
@@ -39,25 +12,14 @@ class _ChatListShimmerState extends State<ChatListShimmer>
     double? borderRadius,
     BoxShape shape = BoxShape.rectangle,
   }) {
-    return AnimatedBuilder(
-      animation: _animation,
-      builder: (context, child) {
-        return Opacity(
-          opacity: _animation.value,
-          child: Container(
-            width: width,
-            height: height,
-            decoration: BoxDecoration(
-              color: AppColors.current.lightGray,
-              borderRadius:
-                  shape == BoxShape.rectangle
-                      ? BorderRadius.circular(borderRadius ?? 8.r)
-                      : null,
-              shape: shape,
-            ),
-          ),
-        );
-      },
+    return AppShimmer(
+      width: width,
+      height: height,
+      shape: shape,
+      borderRadius:
+          shape == BoxShape.rectangle
+              ? BorderRadius.circular(borderRadius ?? 8.r)
+              : null,
     );
   }
 
@@ -91,7 +53,11 @@ class _ChatListShimmerState extends State<ChatListShimmer>
                   children: [
                     _shimmerBox(width: 180.w, height: 12.h, borderRadius: 6.r),
                     const Spacer(),
-                    _shimmerBox(width: 10.r, height: 10.r, shape: BoxShape.circle),
+                    _shimmerBox(
+                      width: 10.r,
+                      height: 10.r,
+                      shape: BoxShape.circle,
+                    ),
                   ],
                 ),
               ],

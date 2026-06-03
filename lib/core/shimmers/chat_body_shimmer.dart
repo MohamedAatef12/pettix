@@ -1,37 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_shimmer.dart';
 
-class ChatBodyShimmer extends StatefulWidget {
+class ChatBodyShimmer extends StatelessWidget {
   const ChatBodyShimmer({super.key});
-
-  @override
-  State<ChatBodyShimmer> createState() => _ChatBodyShimmerState();
-}
-
-class _ChatBodyShimmerState extends State<ChatBodyShimmer>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat(reverse: true);
-    _animation = Tween<double>(
-      begin: 0.4,
-      end: 0.7,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   Widget _shimmerBox({
     required double width,
@@ -39,73 +12,64 @@ class _ChatBodyShimmerState extends State<ChatBodyShimmer>
     required Alignment alignment,
     required BorderRadius borderRadius,
   }) {
-    return AnimatedBuilder(
-      animation: _animation,
-      builder: (context, child) {
-        return Align(
-          alignment: alignment,
-          child: Opacity(
-            opacity: _animation.value,
-            child: Container(
-              width: width,
-              height: height,
-              margin: EdgeInsets.symmetric(vertical: 6.h, horizontal: 12.w),
-              decoration: BoxDecoration(
-                color: AppColors.current.gray,
-                borderRadius: borderRadius,
-              ),
-            ),
-          ),
-        );
-      },
+    return Align(
+      alignment: alignment,
+      child: AppShimmer(
+        width: width,
+        height: height,
+        margin: EdgeInsets.symmetric(vertical: 6.h, horizontal: 12.w),
+        borderRadius: borderRadius,
+      ),
     );
   }
 
   Widget _buildProfileCardShimmer() {
     return Center(
-      child: Container(
-        height: 265.h, // Increased slightly to prevent overflow
-        width: 195.w,
-        margin: EdgeInsets.symmetric(vertical: 20.h),
-        padding: EdgeInsets.all(12.r),
+      child: DecoratedBox(
         decoration: BoxDecoration(
-          color: AppColors.current.white,
           borderRadius: BorderRadius.circular(12.r),
           border: Border.all(color: AppColors.current.lightGray),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min, // Use min size
-          children: [
-            Expanded(
-              child: _shimmerBox(
-                width: double.infinity,
-                height: 120.h,
-                alignment: Alignment.center,
-                borderRadius: BorderRadius.circular(8.r),
-              ),
+        child: SizedBox(
+          height: 265.h,
+          width: 195.w,
+          child: Padding(
+            padding: EdgeInsets.all(12.r),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: _shimmerBox(
+                    width: double.infinity,
+                    height: 120.h,
+                    alignment: Alignment.center,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                ),
+                SizedBox(height: 12.h),
+                _shimmerBox(
+                  width: 120.w,
+                  height: 14.h,
+                  alignment: Alignment.center,
+                  borderRadius: BorderRadius.circular(4.r),
+                ),
+                SizedBox(height: 8.h),
+                _shimmerBox(
+                  width: 160.w,
+                  height: 10.h,
+                  alignment: Alignment.center,
+                  borderRadius: BorderRadius.circular(4.r),
+                ),
+                SizedBox(height: 20.h),
+                _shimmerBox(
+                  width: double.infinity,
+                  height: 38.h,
+                  alignment: Alignment.center,
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+              ],
             ),
-            SizedBox(height: 12.h),
-            _shimmerBox(
-              width: 120.w,
-              height: 14.h,
-              alignment: Alignment.center,
-              borderRadius: BorderRadius.circular(4.r),
-            ),
-            SizedBox(height: 8.h),
-            _shimmerBox(
-              width: 160.w,
-              height: 10.h,
-              alignment: Alignment.center,
-              borderRadius: BorderRadius.circular(4.r),
-            ),
-            SizedBox(height: 20.h),
-            _shimmerBox(
-              width: double.infinity,
-              height: 38.h,
-              alignment: Alignment.center,
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-          ],
+          ),
         ),
       ),
     );

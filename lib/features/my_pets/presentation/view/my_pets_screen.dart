@@ -8,6 +8,7 @@ import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/enums/app_enums.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/app_cached_image.dart';
+import 'package:pettix/core/widgets/app_shimmer.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/features/my_pets/domain/entities/lookup_entity.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
@@ -15,7 +16,6 @@ import 'package:pettix/features/my_pets/domain/entities/pet_request_entity.dart'
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_bloc.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_event.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_state.dart';
-import 'package:shimmer/shimmer.dart';
 
 class MyPetsScreen extends StatelessWidget {
   const MyPetsScreen({super.key});
@@ -488,79 +488,60 @@ class _LoadingList extends StatelessWidget {
             margin: EdgeInsets.only(bottom: 16.h),
             padding: EdgeInsets.all(14.w),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.current.white,
               borderRadius: BorderRadius.circular(20.r),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
+                  color: AppColors.current.text.withValues(alpha: 0.04),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
               ],
             ),
-            child: Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 80.w,
-                    height: 80.w,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(14.r),
-                    ),
-                  ),
-                  SizedBox(width: 14.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 120.w,
-                          height: 16.h,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(4.r),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppShimmer(
+                  width: 80.w,
+                  height: 80.w,
+                  borderRadius: BorderRadius.circular(14.r),
+                ),
+                SizedBox(width: 14.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AppShimmer(
+                        width: 120.w,
+                        height: 16.h,
+                        borderRadius: BorderRadius.circular(4.r),
+                      ),
+                      SizedBox(height: 8.h),
+                      AppShimmer(
+                        width: 80.w,
+                        height: 10.h,
+                        borderRadius: BorderRadius.circular(4.r),
+                      ),
+                      SizedBox(height: 12.h),
+                      Row(
+                        children: [
+                          AppShimmer(
+                            width: 60.w,
+                            height: 18.h,
+                            borderRadius: BorderRadius.circular(6.r),
                           ),
-                        ),
-                        SizedBox(height: 8.h),
-                        Container(
-                          width: 80.w,
-                          height: 10.h,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(4.r),
+                          SizedBox(width: 8.w),
+                          AppShimmer(
+                            width: 50.w,
+                            height: 18.h,
+                            borderRadius: BorderRadius.circular(6.r),
                           ),
-                        ),
-                        SizedBox(height: 12.h),
-                        Row(
-                          children: [
-                            Container(
-                              width: 60.w,
-                              height: 18.h,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(6.r),
-                              ),
-                            ),
-                            SizedBox(width: 8.w),
-                            Container(
-                              width: 50.w,
-                              height: 18.h,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(6.r),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
     );
