@@ -57,22 +57,6 @@ class SettingsScreen extends StatelessWidget {
                       // Navigate to notification settings
                     },
                   ),
-                  _SettingsTile(
-                    icon: Icons.location_on_outlined,
-                    iconColor: AppColors.current.red,
-                    title: AppText.myAddresses,
-                    onTap: () {
-                      // Navigate to addresses
-                    },
-                  ),
-                  _SettingsTile(
-                    icon: Icons.credit_card_rounded,
-                    iconColor: const Color(0xFF56C590),
-                    title: AppText.paymentMethods,
-                    onTap: () {
-                      // Navigate to payment methods
-                    },
-                  ),
                 ],
               ),
               SizedBox(height: 24.h),
