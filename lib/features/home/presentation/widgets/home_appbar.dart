@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -33,7 +34,12 @@ class HomeAppBar extends StatelessWidget {
           SizedBox(width: 10.w),
           SizedBox(
             width: 120.w,
-            child: Text(user!.userName, style: AppTextStyles.bold),
+            child: Text(
+              user?.userName ?? AppText.userFallback,
+              style: AppTextStyles.bold,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
           const Spacer(),
           GestureDetector(

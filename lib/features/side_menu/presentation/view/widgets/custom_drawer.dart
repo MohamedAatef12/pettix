@@ -296,7 +296,6 @@ class _UserInfo extends StatelessWidget {
   }
 }
 
-
 // ─── Section label ────────────────────────────────────────────────────────────
 
 class _Section extends StatelessWidget {
@@ -447,6 +446,8 @@ class _TileBase extends StatelessWidget {
   }
 }
 
+// ─── Logout ───────────────────────────────────────────────────────────────────
+
 class _LogoutTile extends StatelessWidget {
   const _LogoutTile();
 
@@ -461,45 +462,46 @@ class _LogoutTile extends StatelessWidget {
   void _showLogoutDialog(BuildContext context) {
     showDialog<void>(
       context: context,
-      builder: (d) => AlertDialog(
-        backgroundColor: AppColors.current.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.r),
-        ),
-        title: Text(
-          AppText.logout,
-          style: AppTextStyles.bold.copyWith(fontSize: 18.sp),
-        ),
-        content: Text(
-          AppText.logoutDesc,
-          style: TextStyle(fontSize: 14.sp, color: AppColors.current.text),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(d).pop(),
-            child: Text(
-              AppText.cancel,
-              style: TextStyle(color: AppColors.current.midGray),
+      builder:
+          (d) => AlertDialog(
+            backgroundColor: AppColors.current.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.r),
             ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.current.red,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.r),
+            title: Text(
+              AppText.logout,
+              style: AppTextStyles.bold.copyWith(fontSize: 18.sp),
+            ),
+            content: Text(
+              AppText.logoutDesc,
+              style: TextStyle(fontSize: 14.sp, color: AppColors.current.text),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(d).pop(),
+                child: Text(
+                  AppText.cancel,
+                  style: TextStyle(color: AppColors.current.midGray),
+                ),
               ),
-            ),
-            onPressed: () {
-              Navigator.of(d).pop();
-              _doLogout(context);
-            },
-            child: Text(
-              AppText.logOut,
-              style: const TextStyle(color: Colors.white),
-            ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.current.red,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(d).pop();
+                  _doLogout(context);
+                },
+                child: Text(
+                  AppText.logOut,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 

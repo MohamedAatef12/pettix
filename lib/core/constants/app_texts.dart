@@ -787,4 +787,8 @@ abstract class AppText {
 
   static String lastUpdated(String date) =>
       'Last updated: {date}'.tr(namedArgs: {'date': date});
+
+  // Appearance / theme
+  static String get appearance => 'Appearance'.tr();
+  static String get darkMode => 'Dark Mode'.tr();
 }

@@ -1,8 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/config/router/routes.dart';
+import 'package:pettix/core/bloc/theme/theme_cubit.dart';
+import 'package:pettix/core/bloc/theme/theme_option.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -78,19 +81,21 @@ class SettingsScreen extends StatelessWidget {
               SizedBox(height: 12.h),
               _SettingsGroup(
                 tiles: [
-                  _SettingsTile(
-                    icon: Icons.color_lens_outlined,
-                    iconColor: const Color(0xFFE8A838),
-                    title: AppText.themes,
-                    trailing: Text(
-                      AppText.light,
-                      style: AppTextStyles.smallDescription.copyWith(
-                        color: AppColors.current.midGray,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    onTap: () {
-                      // Change theme
+                  BlocBuilder<ThemeCubit, AppThemeOption>(
+                    builder: (context, themeOption) {
+                      return _SettingsTile(
+                        icon: Icons.color_lens_outlined,
+                        iconColor: themeOption.previewColor,
+                        title: AppText.themes,
+                        trailing: Text(
+                          themeOption.label,
+                          style: AppTextStyles.smallDescription.copyWith(
+                            color: AppColors.current.midGray,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        onTap: () => _showThemePicker(context),
+                      );
                     },
                   ),
                   _SettingsTile(
@@ -130,10 +135,206 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
   }
+
+  void _showThemePicker(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const _ThemePickerSheet(),
+    );
+  }
+}
+
+class _ThemePickerSheet extends StatelessWidget {
+  const _ThemePickerSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ThemeCubit, AppThemeOption>(
+      builder: (context, current) {
+        return FractionallySizedBox(
+          heightFactor: 0.82,
+          child: Container(
+            padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 24.h),
+            decoration: BoxDecoration(
+              color: AppColors.current.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28.r)),
+            ),
+            child: SafeArea(
+              top: false,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 42.w,
+                      height: 4.h,
+                      decoration: BoxDecoration(
+                        color: AppColors.current.lightGray,
+                        borderRadius: BorderRadius.circular(99.r),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 18.h),
+                  Text(
+                    AppText.themes,
+                    style: AppTextStyles.title.copyWith(
+                      color: AppColors.current.text,
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+                  Expanded(
+                    child: GridView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      padding: EdgeInsets.only(bottom: 6.h),
+                      itemCount: AppThemeOption.values.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 12.h,
+                        crossAxisSpacing: 12.w,
+                        childAspectRatio: 2.15,
+                      ),
+                      itemBuilder: (context, index) {
+                        final option = AppThemeOption.values[index];
+                        return _ThemeOptionCard(
+                          option: option,
+                          isSelected: option == current,
+                          onTap: () {
+                            context.read<ThemeCubit>().setTheme(option);
+                            Navigator.of(context).pop();
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _ThemeOptionCard extends StatelessWidget {
+  final AppThemeOption option;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _ThemeOptionCard({
+    required this.option,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16.r),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: EdgeInsets.all(10.w),
+        decoration: BoxDecoration(
+          gradient:
+              isSelected
+                  ? LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      option.previewColor.withAlpha(42),
+                      option.previewAccent.withAlpha(30),
+                    ],
+                  )
+                  : null,
+          color: isSelected ? null : AppColors.current.lightBlue,
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(
+            color:
+                isSelected ? option.previewColor : AppColors.current.lightGray,
+            width: isSelected ? 1.6 : 1,
+          ),
+          boxShadow:
+              isSelected
+                  ? [
+                    BoxShadow(
+                      color: option.previewColor.withAlpha(35),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ]
+                  : null,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 38.w,
+              height: 38.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [option.previewColor, option.previewAccent],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: option.previewColor.withAlpha(45),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child:
+                  isSelected
+                      ? Icon(
+                        Icons.check_rounded,
+                        color: Colors.white,
+                        size: 18.sp,
+                      )
+                      : null,
+            ),
+            SizedBox(width: 10.w),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    option.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.description.copyWith(
+                      color: AppColors.current.text,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    option.brightnessLabel,
+                    style: AppTextStyles.smallDescription.copyWith(
+                      color: AppColors.current.lightText,
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _SettingsGroup extends StatelessWidget {
-  final List<_SettingsTile> tiles;
+  final List<Widget> tiles;
   const _SettingsGroup({required this.tiles});
 
   @override

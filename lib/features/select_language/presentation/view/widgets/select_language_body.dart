@@ -25,11 +25,12 @@ class SelectLanguageBody extends StatelessWidget {
           Expanded(
             child: Stack(
               children: [
-                SvgPicture.asset(
-                  'assets/images/on_boarding_background.svg',
-                  fit: BoxFit.cover,
-                  width: 766.w,
-                ),
+                if (Theme.of(context).brightness == Brightness.light)
+                  SvgPicture.asset(
+                    'assets/images/on_boarding_background.svg',
+                    fit: BoxFit.cover,
+                    width: 766.w,
+                  ),
                 Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
