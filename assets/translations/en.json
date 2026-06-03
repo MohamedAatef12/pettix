@@ -161,6 +161,8 @@
   "Help us keep the community safe. Please select a reason why you are reporting this pet.": "Help us keep the community safe. Please select a reason why you are reporting this pet.",
   "Please provide details about why you want to report this pet listing.": "Please provide details about why you want to report this pet listing.",
   "Apply to Adopt": "Apply to Adopt",
+  "You cannot apply to adopt your own pet": "You cannot apply to adopt your own pet",
+  "This pet belongs to your account, so the adoption application is not available.": "This pet belongs to your account, so the adoption application is not available.",
   "Medical History": "Medical History",
   "About": "About",
   "Set up your information": "Set up your information",

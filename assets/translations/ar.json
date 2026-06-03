@@ -163,6 +163,8 @@
 "Help us keep the community safe. Please select a reason why you are reporting this pet.": "ساعدنا في الحفاظ على أمان المجتمع. يرجى اختيار سبب الإبلاغ عن هذا الحيوان.",
 "Please provide details about why you want to report this pet listing.": "يرجى توضيح سبب رغبتك في الإبلاغ عن إعلان هذا الحيوان.",
 "Apply to Adopt": "تقديم طلب تبني",
+"You cannot apply to adopt your own pet": "لا يمكنك التقديم لتبني حيوانك الخاص",
+"This pet belongs to your account, so the adoption application is not available.": "هذا الحيوان تابع لحسابك، لذلك طلب التبني غير متاح.",
 "Medical History": "السجل الطبي",
 "About": "نبذة عن",
 "Set up your information": "أدخل معلوماتك",
