@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
+import 'package:pettix/core/enums/app_enums.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:pettix/features/my_pets/domain/entities/lookup_entity.dart';
@@ -654,7 +655,10 @@ class _EditPetSheetState extends State<_EditPetSheet> {
     _catId = _findById(widget.categories, widget.pet.categoryName)?.id;
     _colorId = _findById(widget.colors, widget.pet.colorName)?.id;
     final g = widget.pet.genderName?.toLowerCase();
-    _genderId = g == 'male' ? 1 : (g == 'female' ? 2 : null);
+    _genderId =
+        g == 'male'
+            ? Gender.male.value
+            : (g == 'female' ? Gender.female.value : null);
   }
 
   @override
@@ -775,8 +779,14 @@ class _EditPetSheetState extends State<_EditPetSheet> {
               iconColor: const Color(0xFF3AAFA9),
               value: _genderId,
               items: [
-                DropdownMenuItem(value: 1, child: Text(AppText.male)),
-                DropdownMenuItem(value: 2, child: Text(AppText.female)),
+                DropdownMenuItem(
+                  value: Gender.male.value,
+                  child: Text(AppText.male),
+                ),
+                DropdownMenuItem(
+                  value: Gender.female.value,
+                  child: Text(AppText.female),
+                ),
               ],
               onChanged: (v) => setState(() => _genderId = v),
             ),

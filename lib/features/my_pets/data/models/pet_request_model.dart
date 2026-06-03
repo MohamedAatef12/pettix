@@ -10,24 +10,21 @@ class PetImageModel extends PetImageEntity {
   });
 
   factory PetImageModel.fromEntity(PetImageEntity entity) => PetImageModel(
-        filename: entity.filename,
-        base64: entity.base64,
-        state: entity.state,
-      );
+    filename: entity.filename,
+    base64: entity.base64,
+    state: entity.state,
+  );
 
   Map<String, dynamic> toJson() => {
-        'filename': filename,
-        'base64': base64,
-        'state': state,
-      };
+    'filename': filename,
+    'base64': base64,
+    'state': state,
+  };
 }
 
 /// JSON serialisable vaccination model for pet upload requests.
 class VaccinationRequestModel extends VaccinationEntity {
-  const VaccinationRequestModel({
-    required super.name,
-    super.vaccinationDate,
-  });
+  const VaccinationRequestModel({required super.name, super.vaccinationDate});
 
   factory VaccinationRequestModel.fromEntity(VaccinationEntity entity) =>
       VaccinationRequestModel(
@@ -36,12 +33,12 @@ class VaccinationRequestModel extends VaccinationEntity {
       );
 
   Map<String, dynamic> toJson() => {
-        'name': name,
-        // Always send a UTC datetime — Npgsql rejects Kind=Unspecified.
-        // Fall back to current UTC time when no date was selected.
-        'vaccinationDate':
-            (vaccinationDate ?? DateTime.now()).toUtc().toIso8601String(),
-      };
+    'name': name,
+    // Always send a UTC datetime — Npgsql rejects Kind=Unspecified.
+    // Fall back to current UTC time when no date was selected.
+    'vaccinationDate':
+        (vaccinationDate ?? DateTime.now()).toUtc().toIso8601String(),
+  };
 }
 
 /// Request model serialised to JSON for POST/PUT /api/Adoption/Pets.
@@ -59,7 +56,8 @@ class PetRequestModel extends PetRequestEntity {
     super.id,
   });
 
-  factory PetRequestModel.fromEntity(PetRequestEntity entity) => PetRequestModel(
+  factory PetRequestModel.fromEntity(PetRequestEntity entity) =>
+      PetRequestModel(
         name: entity.name,
         description: entity.description,
         details: entity.details,
@@ -79,14 +77,14 @@ class PetRequestModel extends PetRequestEntity {
       if (details != null) 'details': details,
       if (age != null) 'age': age,
       if (categoryId != null) 'categoryId': categoryId,
-      if (genderId != null) 'genderId': 3,
+      if (genderId != null) 'genderId': genderId,
       if (colorId != null) 'colorId': colorId,
-      'images': images
-          .map((img) => PetImageModel.fromEntity(img).toJson())
-          .toList(),
-      'vaccinations': vaccinations
-          .map((v) => VaccinationRequestModel.fromEntity(v).toJson())
-          .toList(),
+      'images':
+          images.map((img) => PetImageModel.fromEntity(img).toJson()).toList(),
+      'vaccinations':
+          vaccinations
+              .map((v) => VaccinationRequestModel.fromEntity(v).toJson())
+              .toList(),
     };
     if (id != null) map['id'] = id;
     return map;

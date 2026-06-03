@@ -8,7 +8,12 @@ enum UserRole {
   final int value;
 
   static UserRole? fromValue(int? v) =>
-      v == null ? null : UserRole.values.firstWhere((e) => e.value == v, orElse: () => UserRole.user);
+      v == null
+          ? null
+          : UserRole.values.firstWhere(
+            (e) => e.value == v,
+            orElse: () => UserRole.user,
+          );
 }
 
 enum UserStatus {
@@ -21,7 +26,28 @@ enum UserStatus {
   final int value;
 
   static UserStatus? fromValue(int? v) =>
-      v == null ? null : UserStatus.values.firstWhere((e) => e.value == v, orElse: () => UserStatus.active);
+      v == null
+          ? null
+          : UserStatus.values.firstWhere(
+            (e) => e.value == v,
+            orElse: () => UserStatus.active,
+          );
+}
+
+enum Gender {
+  male(3),
+  female(4);
+
+  const Gender(this.value);
+  final int value;
+
+  static Gender? fromValue(int? v) =>
+      v == null
+          ? null
+          : Gender.values.firstWhere(
+            (e) => e.value == v,
+            orElse: () => Gender.male,
+          );
 }
 
 enum PostsStatus {
@@ -39,7 +65,12 @@ enum PostsStatus {
   final int value;
 
   static PostsStatus? fromValue(int? v) =>
-      v == null ? null : PostsStatus.values.firstWhere((e) => e.value == v, orElse: () => PostsStatus.draft);
+      v == null
+          ? null
+          : PostsStatus.values.firstWhere(
+            (e) => e.value == v,
+            orElse: () => PostsStatus.draft,
+          );
 }
 
 enum ReportReasonEnum {
@@ -63,7 +94,12 @@ enum ReportReasonEnum {
   final int value;
 
   static ReportReasonEnum? fromValue(int? v) =>
-      v == null ? null : ReportReasonEnum.values.firstWhere((e) => e.value == v, orElse: () => ReportReasonEnum.other);
+      v == null
+          ? null
+          : ReportReasonEnum.values.firstWhere(
+            (e) => e.value == v,
+            orElse: () => ReportReasonEnum.other,
+          );
 }
 
 enum CommentStatus {
@@ -76,7 +112,12 @@ enum CommentStatus {
   final int value;
 
   static CommentStatus? fromValue(int? v) =>
-      v == null ? null : CommentStatus.values.firstWhere((e) => e.value == v, orElse: () => CommentStatus.published);
+      v == null
+          ? null
+          : CommentStatus.values.firstWhere(
+            (e) => e.value == v,
+            orElse: () => CommentStatus.published,
+          );
 }
 
 enum ImageFileState {
@@ -88,8 +129,10 @@ enum ImageFileState {
   const ImageFileState(this.value);
   final int value;
 
-  static ImageFileState fromValue(int v) =>
-      ImageFileState.values.firstWhere((e) => e.value == v, orElse: () => ImageFileState.none);
+  static ImageFileState fromValue(int v) => ImageFileState.values.firstWhere(
+    (e) => e.value == v,
+    orElse: () => ImageFileState.none,
+  );
 }
 
 enum NotificationType {
@@ -103,7 +146,12 @@ enum NotificationType {
   final int value;
 
   static NotificationType? fromValue(int? v) =>
-      v == null ? null : NotificationType.values.firstWhere((e) => e.value == v, orElse: () => NotificationType.timeline);
+      v == null
+          ? null
+          : NotificationType.values.firstWhere(
+            (e) => e.value == v,
+            orElse: () => NotificationType.timeline,
+          );
 }
 
 enum AdoptionFormStatus {
@@ -116,7 +164,12 @@ enum AdoptionFormStatus {
   final int value;
 
   static AdoptionFormStatus? fromValue(int? v) =>
-      v == null ? null : AdoptionFormStatus.values.firstWhere((e) => e.value == v, orElse: () => AdoptionFormStatus.pending);
+      v == null
+          ? null
+          : AdoptionFormStatus.values.firstWhere(
+            (e) => e.value == v,
+            orElse: () => AdoptionFormStatus.pending,
+          );
 }
 
 enum PetAdoptionStatus {
@@ -127,5 +180,10 @@ enum PetAdoptionStatus {
   final int value;
 
   static PetAdoptionStatus? fromValue(int? v) =>
-      v == null ? null : PetAdoptionStatus.values.firstWhere((e) => e.value == v, orElse: () => PetAdoptionStatus.private);
+      v == null
+          ? null
+          : PetAdoptionStatus.values.firstWhere(
+            (e) => e.value == v,
+            orElse: () => PetAdoptionStatus.private,
+          );
 }
