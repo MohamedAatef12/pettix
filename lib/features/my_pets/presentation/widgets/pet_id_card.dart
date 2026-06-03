@@ -1,12 +1,12 @@
-import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 import 'package:pettix/features/my_pets/presentation/widgets/pet_passport.dart';
 
-/// National-ID-style card displayed in the horizontal pet list on the profile.
+/// Document-style card displayed in the horizontal pet list on the profile.
 class PetIdCard extends StatelessWidget {
   final PetEntity pet;
   final ValueChanged<int>? onToggleStatus;
@@ -33,32 +33,44 @@ class PetIdCard extends StatelessWidget {
             onDeletePet: onDeletePet,
           ),
       child: Container(
-        width: 220.w,
+        width: 248.w,
         height: 125.h,
         margin: EdgeInsets.only(right: 12.w),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16.r),
-          gradient: LinearGradient(
-            colors: [AppColors.current.primary, const Color(0xFF2A4E8F)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color: AppColors.current.white,
+          borderRadius: BorderRadius.circular(14.r),
+          border: Border.all(color: AppColors.current.lightGray),
           boxShadow: [
             BoxShadow(
-              color: AppColors.current.primary.withAlpha(80),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+              color: Colors.black.withAlpha(18),
+              blurRadius: 14,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
+        clipBehavior: Clip.antiAlias,
         child: Stack(
           children: [
-            _CardBackground(),
+            Positioned(
+              left: 0,
+              top: 0,
+              bottom: 0,
+              child: Container(width: 8.w, color: AppColors.current.primary),
+            ),
+            Positioned(
+              right: -18.w,
+              bottom: -18.w,
+              child: Icon(
+                Icons.pets_rounded,
+                size: 84.w,
+                color: AppColors.current.primary.withAlpha(10),
+              ),
+            ),
             Padding(
-              padding: EdgeInsets.all(12.w),
+              padding: EdgeInsets.fromLTRB(18.w, 10.h, 10.w, 10.h),
               child: Row(
                 children: [
-                  _PetAvatar(imageUrl: pet.imageUrls.firstOrNull),
+                  _PetPhoto(imageUrl: pet.imageUrls.firstOrNull),
                   SizedBox(width: 10.w),
                   Expanded(child: _PetCardInfo(pet: pet)),
                 ],
@@ -71,41 +83,28 @@ class PetIdCard extends StatelessWidget {
   }
 }
 
-/// Decorative diagonal stripe pattern overlay for the card background.
-class _CardBackground extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Positioned.fill(
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16.r),
-        child: CustomPaint(painter: _StripePainter()),
-      ),
-    );
-  }
-}
-
-/// Circular avatar showing the pet's first image or a paw placeholder.
-class _PetAvatar extends StatelessWidget {
+class _PetPhoto extends StatelessWidget {
   final String? imageUrl;
 
-  const _PetAvatar({this.imageUrl});
+  const _PetPhoto({this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 64.w,
-      height: 64.w,
+      width: 72.w,
+      height: 94.h,
       decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.white.withAlpha(30),
-        border: Border.all(color: Colors.white.withAlpha(100), width: 2),
+        color: AppColors.current.lightGray.withAlpha(70),
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(color: AppColors.current.lightGray),
       ),
-      child: ClipOval(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(9.r),
         child: AppCachedImage(
           imageUrl: imageUrl ?? '',
           fit: BoxFit.cover,
           errorWidget: _PawPlaceholder(),
-          backgroundColor: Colors.transparent,
+          backgroundColor: AppColors.current.lightGray.withAlpha(70),
         ),
       ),
     );
@@ -118,14 +117,13 @@ class _PawPlaceholder extends StatelessWidget {
     return Center(
       child: Icon(
         Icons.pets_rounded,
-        color: Colors.white.withAlpha(160),
-        size: 28.w,
+        color: AppColors.current.primary.withAlpha(90),
+        size: 30.w,
       ),
     );
   }
 }
 
-/// Right section of the card: header label, pet name, code, attributes.
 class _PetCardInfo extends StatelessWidget {
   final PetEntity pet;
 
@@ -134,126 +132,159 @@ class _PetCardInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasVaccination = pet.vaccinations.isNotEmpty;
+    final details = [
+      if (pet.categoryName?.isNotEmpty ?? false) pet.categoryName!,
+      if (pet.genderName?.isNotEmpty ?? false) pet.genderName!,
+    ].join(' / ');
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        // Header
-        Row(
-          children: [
-            Icon(Icons.pets_rounded, color: AppColors.current.gold, size: 10.w),
-            SizedBox(width: 4.w),
-            Text(
-              AppText.pettixPetId,
-              style: TextStyle(
-                color: AppColors.current.gold,
-                fontSize: 8.sp,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1,
-              ),
-            ),
-          ],
-        ),
-        // Pet name
-        Text(
-          pet.name.toUpperCase(),
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0.5,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        // Code
-        Text(
-          pet.code,
-          style: TextStyle(
-            color: Colors.white.withAlpha(200),
-            fontSize: 8.sp,
-            letterSpacing: 1.2,
-            fontFamily: 'monospace',
-          ),
-        ),
-        // Attributes row
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                '${pet.categoryName ?? ''} · ${pet.genderName ?? ''}',
-                style: TextStyle(
-                  color: Colors.white.withAlpha(180),
-                  fontSize: 9.sp,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-        // Age + vaccination badge
-        Row(
-          children: [
-            if (pet.age != null)
-              Text(
-                '${AppText.age}: ${pet.age}',
-                style: TextStyle(
-                  color: Colors.white.withAlpha(160),
-                  fontSize: 9.sp,
-                ),
-              ),
-            const Spacer(),
-            if (hasVaccination)
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-                decoration: BoxDecoration(
-                  color: AppColors.current.teal.withAlpha(180),
-                  borderRadius: BorderRadius.circular(6.r),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.vaccines_rounded,
-                      color: Colors.white,
-                      size: 8.w,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SizedBox(
+          width: constraints.maxWidth,
+          height: constraints.maxHeight,
+          child: FittedBox(
+            alignment: Alignment.topLeft,
+            fit: BoxFit.scaleDown,
+            child: SizedBox(
+              width: constraints.maxWidth,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          AppText.pettixPetId,
+                          style: TextStyle(
+                            color: AppColors.current.primary,
+                            fontSize: 8.sp,
+                            fontWeight: FontWeight.w800,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Icon(
+                        Icons.qr_code_2_rounded,
+                        color: AppColors.current.text,
+                        size: 18.w,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    pet.name.toUpperCase(),
+                    style: TextStyle(
+                      color: AppColors.current.text,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w800,
                     ),
-                    SizedBox(width: 2.w),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 3.h),
+                  _CodeStrip(code: pet.code),
+                  SizedBox(height: 4.h),
+                  if (details.isNotEmpty)
                     Text(
-                      '${pet.vaccinations.length}',
-                      style: TextStyle(color: Colors.white, fontSize: 8.sp),
+                      details,
+                      style: TextStyle(
+                        color: AppColors.current.midGray,
+                        fontSize: 9.sp,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ],
-                ),
+                  SizedBox(height: 6.h),
+                  Row(
+                    children: [
+                      if (pet.age != null)
+                        _MiniBadge(
+                          icon: Icons.cake_rounded,
+                          label: '${pet.age} ${AppText.yearsShort}',
+                        ),
+                      if (pet.age != null && hasVaccination)
+                        SizedBox(width: 6.w),
+                      if (hasVaccination)
+                        _MiniBadge(
+                          icon: Icons.verified_rounded,
+                          label: '${pet.vaccinations.length}',
+                          color: AppColors.current.teal,
+                        ),
+                    ],
+                  ),
+                ],
               ),
-          ],
-        ),
-      ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
 
-/// Subtle diagonal stripe decoration painted on the card background.
-class _StripePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = Colors.white.withAlpha(10)
-          ..strokeWidth = 20
-          ..style = PaintingStyle.stroke;
+class _CodeStrip extends StatelessWidget {
+  final String code;
 
-    for (double i = -size.height; i < size.width + size.height; i += 30) {
-      canvas.drawLine(
-        Offset(i, 0),
-        Offset(i + size.height, size.height),
-        paint,
-      );
-    }
+  const _CodeStrip({required this.code});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: AppColors.current.lightGray.withAlpha(70),
+        borderRadius: BorderRadius.circular(6.r),
+        border: Border.all(color: AppColors.current.lightGray),
+      ),
+      child: Text(
+        code,
+        style: TextStyle(
+          color: AppColors.current.text,
+          fontSize: 9.sp,
+          fontWeight: FontWeight.w700,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
   }
+}
+
+class _MiniBadge extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color? color;
+
+  const _MiniBadge({required this.icon, required this.label, this.color});
 
   @override
-  bool shouldRepaint(_StripePainter oldDelegate) => false;
+  Widget build(BuildContext context) {
+    final badgeColor = color ?? AppColors.current.primary;
+    return Container(
+      height: 22.h,
+      padding: EdgeInsets.symmetric(horizontal: 7.w),
+      decoration: BoxDecoration(
+        color: badgeColor.withAlpha(18),
+        borderRadius: BorderRadius.circular(6.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: badgeColor, size: 12.w),
+          SizedBox(width: 4.w),
+          Text(
+            label,
+            style: TextStyle(
+              color: badgeColor,
+              fontSize: 9.sp,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

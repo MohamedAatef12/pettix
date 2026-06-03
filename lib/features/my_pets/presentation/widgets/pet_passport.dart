@@ -1,15 +1,14 @@
 import 'dart:math';
-import 'package:pettix/core/widgets/app_cached_image.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/app_texts.dart';
-import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 
 /// Opens the pet passport overlay.
-/// [onToggleStatus] is called when the owner taps the availability toggle.
-/// Pass null to hide the toggle (e.g., when viewing someone else's pet).
+/// Pass null callbacks to show a read-only passport.
 void showPetPassport(
   BuildContext context,
   PetEntity pet, {
@@ -39,8 +38,6 @@ void showPetPassport(
     },
   );
 }
-
-// ─── Dialog ───────────────────────────────────────────────────────────────────
 
 class _PetPassportDialog extends StatefulWidget {
   final PetEntity pet;
@@ -86,11 +83,7 @@ class _PetPassportDialogState extends State<_PetPassportDialog>
 
   void _flip() {
     if (_controller.isAnimating) return;
-    if (_showingFront) {
-      _controller.forward();
-    } else {
-      _controller.reverse();
-    }
+    _showingFront ? _controller.forward() : _controller.reverse();
     setState(() => _showingFront = !_showingFront);
   }
 
@@ -100,8 +93,8 @@ class _PetPassportDialogState extends State<_PetPassportDialog>
       child: Material(
         color: Colors.transparent,
         child: SizedBox(
-          width: 300.w,
-          height: 480.h,
+          width: 318.w,
+          height: 500.h,
           child: Stack(
             children: [
               AnimatedBuilder(
@@ -129,23 +122,22 @@ class _PetPassportDialogState extends State<_PetPassportDialog>
                   );
                 },
               ),
-              // Close button
               Positioned(
-                top: 8.h,
-                right: 8.w,
+                top: 10.h,
+                right: 10.w,
                 child: GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
                   child: Container(
-                    width: 28.w,
-                    height: 28.w,
+                    width: 30.w,
+                    height: 30.w,
                     decoration: BoxDecoration(
-                      color: Colors.black.withAlpha(100),
+                      color: Colors.black.withAlpha(110),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.close_rounded,
                       color: Colors.white,
-                      size: 16.w,
+                      size: 17.w,
                     ),
                   ),
                 ),
@@ -158,8 +150,6 @@ class _PetPassportDialogState extends State<_PetPassportDialog>
   }
 }
 
-// ─── Front face ───────────────────────────────────────────────────────────────
-
 class _PassportFront extends StatelessWidget {
   final PetEntity pet;
   final VoidCallback onFlip;
@@ -171,26 +161,25 @@ class _PassportFront extends StatelessWidget {
     return GestureDetector(
       onTap: onFlip,
       child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20.r),
-          gradient: LinearGradient(
-            colors: [AppColors.current.primary, const Color(0xFF1E3A6E)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.current.primary.withAlpha(100),
-              blurRadius: 24,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
+        decoration: _pageDecoration(),
+        clipBehavior: Clip.antiAlias,
         child: Column(
           children: [
-            _PassportFrontHeader(),
-            Expanded(child: _PassportFrontBody(pet: pet)),
-            _PassportFrontFooter(pet: pet, onFlip: onFlip),
+            _PassportHeader(),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(18.w, 18.h, 18.w, 12.h),
+                child: Column(
+                  children: [
+                    _IdentityPanel(pet: pet),
+                    SizedBox(height: 14.h),
+                    _FrontFieldGrid(pet: pet),
+                    const Spacer(),
+                    _PassportFooter(code: pet.code),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -198,40 +187,41 @@ class _PassportFront extends StatelessWidget {
   }
 }
 
-class _PassportFrontHeader extends StatelessWidget {
+class _PassportHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Container(
+      height: 82.h,
+      padding: EdgeInsets.fromLTRB(18.w, 16.h, 48.w, 12.h),
+      color: AppColors.current.primary,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Icon(
                 Icons.pets_rounded,
                 color: AppColors.current.gold,
-                size: 16.w,
+                size: 18.w,
               ),
-              SizedBox(width: 6.w),
+              SizedBox(width: 7.w),
               Text(
                 AppText.pettixBrand,
                 style: TextStyle(
                   color: AppColors.current.gold,
-                  fontSize: 13.sp,
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.w800,
-                  letterSpacing: 2,
                 ),
               ),
             ],
           ),
+          const Spacer(),
           Text(
             AppText.petPassportUpper,
             style: TextStyle(
-              color: Colors.white.withAlpha(180),
-              fontSize: 9.sp,
-              letterSpacing: 1.5,
-              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              fontSize: 20.sp,
+              fontWeight: FontWeight.w800,
             ),
           ),
         ],
@@ -240,112 +230,161 @@ class _PassportFrontHeader extends StatelessWidget {
   }
 }
 
-class _PassportFrontBody extends StatelessWidget {
+class _IdentityPanel extends StatelessWidget {
   final PetEntity pet;
 
-  const _PassportFrontBody({required this.pet});
+  const _IdentityPanel({required this.pet});
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = pet.imageUrls.firstOrNull;
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Container(
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: AppColors.current.lightGray.withAlpha(70),
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: AppColors.current.lightGray),
+      ),
+      child: Row(
+        children: [
+          _PassportPhoto(imageUrl: pet.imageUrls.firstOrNull, size: 96.w),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppText.pettixPetId,
+                  style: TextStyle(
+                    color: AppColors.current.primary,
+                    fontSize: 9.sp,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                SizedBox(height: 6.h),
+                Text(
+                  pet.name.toUpperCase(),
+                  style: TextStyle(
+                    color: AppColors.current.text,
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.w800,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: 8.h),
+                _CodePlate(code: pet.code),
+                SizedBox(height: 10.h),
+                _VerifiedStamp(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FrontFieldGrid extends StatelessWidget {
+  final PetEntity pet;
+
+  const _FrontFieldGrid({required this.pet});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
       children: [
-        Container(
-          width: 120.w,
-          height: 120.w,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: AppColors.current.gold, width: 3),
-            boxShadow: [
-              BoxShadow(color: Colors.black.withAlpha(60), blurRadius: 20),
-            ],
-          ),
-          child: ClipOval(
-            child: AppCachedImage(
-              imageUrl: imageUrl ?? '',
-              fit: BoxFit.cover,
-              errorWidget: _PhotoPlaceholder(size: 120.w),
-            ),
+        Expanded(
+          child: _DocumentField(
+            label: AppText.category,
+            value: pet.categoryName ?? '-',
           ),
         ),
-        SizedBox(height: 16.h),
-        Text(
-          pet.name.toUpperCase(),
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 22.sp,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1,
+        SizedBox(width: 8.w),
+        Expanded(
+          child: _DocumentField(
+            label: AppText.gender,
+            value: pet.genderName ?? '-',
           ),
         ),
-        SizedBox(height: 4.h),
-        if (pet.categoryName != null)
-          Text(
-            pet.categoryName!,
-            style: TextStyle(
-              color: Colors.white.withAlpha(180),
-              fontSize: 13.sp,
-            ),
+        SizedBox(width: 8.w),
+        Expanded(
+          child: _DocumentField(
+            label: AppText.age,
+            value: pet.age != null ? '${pet.age} ${AppText.yearsShort}' : '-',
           ),
+        ),
       ],
     );
   }
 }
 
-class _PassportFrontFooter extends StatelessWidget {
-  final PetEntity pet;
-  final VoidCallback onFlip;
+class _PassportFooter extends StatelessWidget {
+  final String code;
 
-  const _PassportFrontFooter({required this.pet, required this.onFlip});
+  const _PassportFooter({required this.code});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: Colors.white.withAlpha(15),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(20.r),
-          bottomRight: Radius.circular(20.r),
-        ),
-      ),
-      child: Column(
-        children: [
-          Text(
-            pet.code,
-            style: TextStyle(
-              color: Colors.white.withAlpha(200),
-              fontSize: 11.sp,
-              letterSpacing: 2,
-            ),
+    return Row(
+      children: [
+        Container(
+          width: 52.w,
+          height: 52.w,
+          decoration: BoxDecoration(
+            color: AppColors.current.white,
+            borderRadius: BorderRadius.circular(8.r),
+            border: Border.all(color: AppColors.current.lightGray),
           ),
-          SizedBox(height: 10.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Icon(
+            Icons.qr_code_2_rounded,
+            color: AppColors.current.text,
+            size: 40.w,
+          ),
+        ),
+        SizedBox(width: 10.w),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                Icons.touch_app_rounded,
-                color: Colors.white.withAlpha(120),
-                size: 14.w,
-              ),
-              SizedBox(width: 6.w),
               Text(
-                AppText.tapFullDetails,
+                code,
                 style: TextStyle(
-                  color: Colors.white.withAlpha(120),
-                  fontSize: 10.sp,
+                  color: AppColors.current.text,
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w800,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              SizedBox(height: 5.h),
+              Row(
+                children: [
+                  Icon(
+                    Icons.touch_app_rounded,
+                    color: AppColors.current.midGray,
+                    size: 14.w,
+                  ),
+                  SizedBox(width: 5.w),
+                  Expanded(
+                    child: Text(
+                      AppText.tapFullDetails,
+                      style: TextStyle(
+                        color: AppColors.current.midGray,
+                        fontSize: 10.sp,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
-
-// ─── Back face ────────────────────────────────────────────────────────────────
 
 class _PassportBack extends StatelessWidget {
   final PetEntity pet;
@@ -367,40 +406,39 @@ class _PassportBack extends StatelessWidget {
     return GestureDetector(
       onTap: onFlip,
       child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20.r),
-          color: AppColors.current.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(40),
-              blurRadius: 24,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
+        decoration: _pageDecoration(),
+        clipBehavior: Clip.antiAlias,
         child: Column(
           children: [
             _BackHeader(pet: pet),
             Expanded(
               child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                padding: EdgeInsets.fromLTRB(16.w, 14.h, 16.w, 14.h),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _InfoRow(label: AppText.code, value: pet.code),
-                    if (pet.age != null)
-                      _InfoRow(
-                        label: AppText.age,
-                        value: '${pet.age} ${AppText.years}',
-                      ),
-                    if (pet.categoryName != null)
-                      _InfoRow(
-                        label: AppText.category,
-                        value: pet.categoryName!,
-                      ),
-                    if (pet.genderName != null)
-                      _InfoRow(label: AppText.gender, value: pet.genderName!),
-                    if (pet.colorName != null)
-                      _InfoRow(label: AppText.color, value: pet.colorName!),
+                    _FieldCard(
+                      children: [
+                        _InfoRow(label: AppText.code, value: pet.code),
+                        if (pet.age != null)
+                          _InfoRow(
+                            label: AppText.age,
+                            value: '${pet.age} ${AppText.years}',
+                          ),
+                        if (pet.categoryName != null)
+                          _InfoRow(
+                            label: AppText.category,
+                            value: pet.categoryName!,
+                          ),
+                        if (pet.genderName != null)
+                          _InfoRow(
+                            label: AppText.gender,
+                            value: pet.genderName!,
+                          ),
+                        if (pet.colorName != null)
+                          _InfoRow(label: AppText.color, value: pet.colorName!),
+                      ],
+                    ),
                     if (pet.description != null && pet.description!.isNotEmpty)
                       _InfoBlock(label: AppText.about, value: pet.description!),
                     if (pet.details != null && pet.details!.isNotEmpty)
@@ -423,66 +461,11 @@ class _PassportBack extends StatelessWidget {
                     ],
                     if (onEditPet != null || onDeletePet != null) ...[
                       SizedBox(height: 12.h),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          if (onEditPet != null)
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: onEditPet,
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(vertical: 12.h),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.current.primary.withAlpha(
-                                      20,
-                                    ),
-                                    borderRadius: BorderRadius.circular(12.r),
-                                    border: Border.all(
-                                      color: AppColors.current.primary
-                                          .withAlpha(80),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Icon(
-                                    Icons.edit_rounded,
-                                    color: AppColors.current.primary,
-                                    size: 20.w,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          if (onEditPet != null && onDeletePet != null)
-                            SizedBox(width: 12.w),
-                          if (onDeletePet != null)
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: onDeletePet,
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(vertical: 12.h),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.current.red.withAlpha(20),
-                                    borderRadius: BorderRadius.circular(12.r),
-                                    border: Border.all(
-                                      color: AppColors.current.red.withAlpha(
-                                        80,
-                                      ),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Icon(
-                                    Icons.delete_rounded,
-                                    color: AppColors.current.red,
-                                    size: 20.w,
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
+                      _ActionRow(
+                        onEditPet: onEditPet,
+                        onDeletePet: onDeletePet,
                       ),
                     ],
-                    SizedBox(height: 8.h),
                   ],
                 ),
               ),
@@ -502,32 +485,12 @@ class _BackHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 12.h),
-      decoration: BoxDecoration(
-        color: AppColors.current.primary,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20.r),
-          topRight: Radius.circular(20.r),
-        ),
-      ),
+      padding: EdgeInsets.fromLTRB(16.w, 14.h, 48.w, 14.h),
+      color: AppColors.current.primary,
       child: Row(
         children: [
-          Container(
-            width: 36.w,
-            height: 36.w,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white.withAlpha(100), width: 2),
-            ),
-            child: ClipOval(
-              child: AppCachedImage(
-                imageUrl: pet.imageUrls.firstOrNull ?? '',
-                fit: BoxFit.cover,
-                errorWidget: _PhotoPlaceholder(size: 36.w),
-              ),
-            ),
-          ),
-          SizedBox(width: 10.w),
+          _PassportPhoto(imageUrl: pet.imageUrls.firstOrNull, size: 54.w),
+          SizedBox(width: 12.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -536,22 +499,51 @@ class _BackHeader extends StatelessWidget {
                   pet.name,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w800,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
+                SizedBox(height: 4.h),
                 Text(
-                  pet.categoryName ?? '',
+                  pet.categoryName ?? AppText.petPassport,
                   style: TextStyle(
-                    color: Colors.white.withAlpha(180),
-                    fontSize: 10.sp,
+                    color: Colors.white.withAlpha(190),
+                    fontSize: 11.sp,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
+          Icon(
+            Icons.verified_rounded,
+            color: AppColors.current.gold,
+            size: 22.w,
+          ),
         ],
       ),
+    );
+  }
+}
+
+class _FieldCard extends StatelessWidget {
+  final List<Widget> children;
+
+  const _FieldCard({required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+      decoration: BoxDecoration(
+        color: AppColors.current.lightGray.withAlpha(70),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: AppColors.current.lightGray),
+      ),
+      child: Column(children: children),
     );
   }
 }
@@ -564,18 +556,24 @@ class _BackSectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.h),
+      padding: EdgeInsets.only(top: 12.h, bottom: 8.h),
       child: Row(
         children: [
-          Container(width: 3.w, height: 14.h, color: AppColors.current.primary),
-          SizedBox(width: 6.w),
+          Container(
+            width: 4.w,
+            height: 16.h,
+            decoration: BoxDecoration(
+              color: AppColors.current.primary,
+              borderRadius: BorderRadius.circular(3.r),
+            ),
+          ),
+          SizedBox(width: 7.w),
           Text(
             title.toUpperCase(),
-            style: AppTextStyles.smallDescription.copyWith(
+            style: TextStyle(
               color: AppColors.current.primary,
-              fontSize: 9.sp,
+              fontSize: 10.sp,
               fontWeight: FontWeight.w800,
-              letterSpacing: 1,
             ),
           ),
         ],
@@ -593,24 +591,31 @@ class _InfoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 5.h),
+      padding: EdgeInsets.symmetric(vertical: 6.h),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: AppColors.current.midGray,
-              fontSize: 11.sp,
-              fontWeight: FontWeight.w500,
+          SizedBox(
+            width: 92.w,
+            child: Text(
+              label,
+              style: TextStyle(
+                color: AppColors.current.midGray,
+                fontSize: 10.sp,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-          Text(
-            value,
-            style: TextStyle(
-              color: AppColors.current.text,
-              fontSize: 11.sp,
-              fontWeight: FontWeight.w600,
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                color: AppColors.current.text,
+                fontSize: 11.sp,
+                fontWeight: FontWeight.w800,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -628,30 +633,37 @@ class _InfoBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(top: 8.h, bottom: 4.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: AppColors.current.midGray,
-              fontSize: 10.sp,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
+      padding: EdgeInsets.only(top: 12.h),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(12.w),
+        decoration: BoxDecoration(
+          color: AppColors.current.white,
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: AppColors.current.lightGray),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label.toUpperCase(),
+              style: TextStyle(
+                color: AppColors.current.primary,
+                fontSize: 9.sp,
+                fontWeight: FontWeight.w800,
+              ),
             ),
-          ),
-          SizedBox(height: 4.h),
-          Text(
-            value,
-            style: TextStyle(
-              color: AppColors.current.text,
-              fontSize: 11.sp,
-              height: 1.4,
+            SizedBox(height: 6.h),
+            Text(
+              value,
+              style: TextStyle(
+                color: AppColors.current.text,
+                fontSize: 11.sp,
+                height: 1.35,
+              ),
             ),
-          ),
-          Divider(height: 12.h, color: AppColors.current.lightGray),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -670,24 +682,30 @@ class _VaccinationTile extends StatelessWidget {
             ? '${date.day}/${date.month}/${date.year}'
             : AppText.dateUnknown;
 
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 4.h),
+    return Container(
+      margin: EdgeInsets.only(bottom: 8.h),
+      padding: EdgeInsets.all(10.w),
+      decoration: BoxDecoration(
+        color: AppColors.current.teal.withAlpha(16),
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(color: AppColors.current.teal.withAlpha(60)),
+      ),
       child: Row(
         children: [
           Container(
-            width: 24.w,
-            height: 24.w,
+            width: 30.w,
+            height: 30.w,
             decoration: BoxDecoration(
-              color: AppColors.current.teal.withAlpha(30),
-              shape: BoxShape.circle,
+              color: AppColors.current.teal.withAlpha(26),
+              borderRadius: BorderRadius.circular(8.r),
             ),
             child: Icon(
               Icons.vaccines_rounded,
               color: AppColors.current.teal,
-              size: 12.w,
+              size: 16.w,
             ),
           ),
-          SizedBox(width: 8.w),
+          SizedBox(width: 10.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -697,9 +715,12 @@ class _VaccinationTile extends StatelessWidget {
                   style: TextStyle(
                     color: AppColors.current.text,
                     fontSize: 11.sp,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w800,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
+                SizedBox(height: 2.h),
                 Text(
                   dateLabel,
                   style: TextStyle(
@@ -715,8 +736,6 @@ class _VaccinationTile extends StatelessWidget {
     );
   }
 }
-
-// ─── Status toggle button ─────────────────────────────────────────────────────
 
 class _StatusToggleButton extends StatefulWidget {
   final int? adoptionStatus;
@@ -742,16 +761,13 @@ class _StatusToggleButtonState extends State<_StatusToggleButton> {
 
   void _handleToggle() {
     final newStatus = currentStatus == 1 ? 0 : 1;
-    setState(() {
-      currentStatus = newStatus;
-    });
+    setState(() => currentStatus = newStatus);
     widget.onToggle(newStatus);
   }
 
   @override
   Widget build(BuildContext context) {
     final isAvailable = currentStatus == 1;
-
     final color = isAvailable ? AppColors.current.red : AppColors.current.green;
     final icon =
         isAvailable ? Icons.visibility_off_rounded : Icons.pets_rounded;
@@ -764,9 +780,9 @@ class _StatusToggleButtonState extends State<_StatusToggleButton> {
         width: double.infinity,
         padding: EdgeInsets.symmetric(vertical: 12.h),
         decoration: BoxDecoration(
-          color: color.withAlpha(20),
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: color.withAlpha(80), width: 1),
+          color: color.withAlpha(18),
+          borderRadius: BorderRadius.circular(10.r),
+          border: Border.all(color: color.withAlpha(80)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -778,7 +794,7 @@ class _StatusToggleButtonState extends State<_StatusToggleButton> {
               style: TextStyle(
                 color: color,
                 fontSize: 12.sp,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w800,
               ),
             ),
           ],
@@ -788,7 +804,205 @@ class _StatusToggleButtonState extends State<_StatusToggleButton> {
   }
 }
 
-/// Generic paw-print placeholder for missing pet images.
+class _ActionRow extends StatelessWidget {
+  final VoidCallback? onEditPet;
+  final VoidCallback? onDeletePet;
+
+  const _ActionRow({this.onEditPet, this.onDeletePet});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        if (onEditPet != null)
+          Expanded(
+            child: _ActionButton(
+              icon: Icons.edit_rounded,
+              color: AppColors.current.primary,
+              onTap: onEditPet!,
+            ),
+          ),
+        if (onEditPet != null && onDeletePet != null) SizedBox(width: 10.w),
+        if (onDeletePet != null)
+          Expanded(
+            child: _ActionButton(
+              icon: Icons.delete_rounded,
+              color: AppColors.current.red,
+              onTap: onDeletePet!,
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ActionButton({
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 44.h,
+        decoration: BoxDecoration(
+          color: color.withAlpha(18),
+          borderRadius: BorderRadius.circular(10.r),
+          border: Border.all(color: color.withAlpha(80)),
+        ),
+        alignment: Alignment.center,
+        child: Icon(icon, color: color, size: 20.w),
+      ),
+    );
+  }
+}
+
+class _DocumentField extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _DocumentField({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 58.h,
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 7.h),
+      decoration: BoxDecoration(
+        color: AppColors.current.white,
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(color: AppColors.current.lightGray),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: AppColors.current.midGray,
+              fontSize: 8.sp,
+              fontWeight: FontWeight.w700,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const Spacer(),
+          Text(
+            value,
+            style: TextStyle(
+              color: AppColors.current.text,
+              fontSize: 11.sp,
+              fontWeight: FontWeight.w800,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CodePlate extends StatelessWidget {
+  final String code;
+
+  const _CodePlate({required this.code});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 5.h),
+      decoration: BoxDecoration(
+        color: AppColors.current.white,
+        borderRadius: BorderRadius.circular(7.r),
+        border: Border.all(color: AppColors.current.lightGray),
+      ),
+      child: Text(
+        code,
+        style: TextStyle(
+          color: AppColors.current.text,
+          fontSize: 10.sp,
+          fontWeight: FontWeight.w800,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+}
+
+class _VerifiedStamp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Transform.rotate(
+      angle: -0.08,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(6.r),
+          border: Border.all(color: AppColors.current.teal, width: 1.3),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.verified_rounded,
+              color: AppColors.current.teal,
+              size: 13.w,
+            ),
+            SizedBox(width: 4.w),
+            Text(
+              AppText.pettixBrand,
+              style: TextStyle(
+                color: AppColors.current.teal,
+                fontSize: 8.sp,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PassportPhoto extends StatelessWidget {
+  final String? imageUrl;
+  final double size;
+
+  const _PassportPhoto({this.imageUrl, required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: AppColors.current.white,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: Colors.white.withAlpha(180), width: 2),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10.r),
+        child: AppCachedImage(
+          imageUrl: imageUrl ?? '',
+          fit: BoxFit.cover,
+          errorWidget: _PhotoPlaceholder(size: size),
+          backgroundColor: AppColors.current.lightGray.withAlpha(70),
+        ),
+      ),
+    );
+  }
+}
+
 class _PhotoPlaceholder extends StatelessWidget {
   final double size;
 
@@ -799,12 +1013,27 @@ class _PhotoPlaceholder extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      color: Colors.white.withAlpha(20),
+      color: AppColors.current.lightGray.withAlpha(70),
       child: Icon(
         Icons.pets_rounded,
-        color: Colors.white.withAlpha(120),
+        color: AppColors.current.primary.withAlpha(90),
         size: size * 0.4,
       ),
     );
   }
+}
+
+BoxDecoration _pageDecoration() {
+  return BoxDecoration(
+    color: AppColors.current.white,
+    borderRadius: BorderRadius.circular(18.r),
+    border: Border.all(color: Colors.white.withAlpha(180)),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withAlpha(45),
+        blurRadius: 28,
+        offset: const Offset(0, 10),
+      ),
+    ],
+  );
 }
