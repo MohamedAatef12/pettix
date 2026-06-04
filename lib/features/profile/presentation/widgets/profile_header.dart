@@ -18,7 +18,7 @@ class ProfileHeader extends StatelessWidget {
       children: [
         if (context.canPop())
           Align(
-            alignment: Alignment.centerLeft,
+            alignment: AlignmentDirectional.centerStart,
             child: Padding(
               padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 0),
               child: AppTopBarBackButton(onPressed: () => context.pop()),

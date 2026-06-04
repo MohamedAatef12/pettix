@@ -161,9 +161,9 @@ class _DetailHeader extends StatelessWidget {
                 width: double.infinity,
                 child: Stack(
                   children: [
-                    // Back button on the far left
+                    // Back button on the far left/start
                     Align(
-                      alignment: Alignment.centerLeft,
+                      alignment: AlignmentDirectional.centerStart,
                       child: AppTopBarBackButton(
                         onPressed: () => Navigator.of(context).pop(),
                       ),

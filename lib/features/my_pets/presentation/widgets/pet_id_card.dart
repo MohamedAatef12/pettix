@@ -143,7 +143,7 @@ class _PetCardInfo extends StatelessWidget {
           width: constraints.maxWidth,
           height: constraints.maxHeight,
           child: FittedBox(
-            alignment: Alignment.topLeft,
+            alignment: AlignmentDirectional.topStart,
             fit: BoxFit.scaleDown,
             child: SizedBox(
               width: constraints.maxWidth,
