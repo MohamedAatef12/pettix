@@ -206,29 +206,29 @@ class _CommentsPageState extends State<CommentsPage> {
       final replyingTo = bloc.state.replyingTo;
       final fullText = text;
 
-      final comment = CommentEntity(
-        id: 0,
-        text: fullText,
-        author: AuthorModel(
-          id: userData.id,
-          email: userData.email,
-          nameAr: '',
-          nameEn: userData.userName,
-          phone: userData.phone,
-          genderId: userData.genderId,
-          genderName: userData.gender,
-          contactTypeId: userData.contactTypeId,
-          statusId: userData.statusId,
-          avatar: userData.avatar,
-          age: userData.age,
-        ),
-        creationDate: DateTime.now().toIso8601String(),
-        postId: widget.post.id,
-        parentCommentId: replyingTo?.id,
-        replies: [],
-        likes: [],
-        status: 1,
-      );
+        final comment = CommentEntity(
+          id: 0,
+          text: fullText,
+          author: AuthorModel(
+            id: userData.id,
+            email: userData.email,
+            nameAr: '',
+            nameEn: userData.userName,
+            phone: userData.phone,
+            genderId: userData.genderId,
+            genderName: userData.gender,
+            contactTypeId: userData.contactTypeId,
+            statusId: userData.statusId,
+            avatar: userData.avatar,
+            age: userData.age,
+          ),
+          creationDate: DateTime.now().toUtc().toIso8601String(),
+          postId: widget.post.id,
+          parentCommentId: replyingTo?.id,
+          replies: [],
+          likes: [],
+          status: 1,
+        );
 
       bloc.add(
         AddCommentEvent(

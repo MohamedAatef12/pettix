@@ -137,9 +137,9 @@ enum ImageFileState {
 
 enum NotificationType {
   timeline(1),
-  store(2),
-  clinic(3),
-  emergency(4),
+  // store(2),
+  // clinic(3),
+  // emergency(4),
   adoption(5);
 
   const NotificationType(this.value);

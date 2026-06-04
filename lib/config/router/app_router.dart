@@ -20,6 +20,7 @@ import '../../features/help_support/presentation/view/faq_page.dart';
 import '../../features/help_support/presentation/view/contact_support_page.dart';
 import '../../features/help_support/presentation/view/report_problem_page.dart';
 import '../../features/help_support/presentation/view/send_feedback_page.dart';
+import '../../features/help_support/presentation/bloc/feedback_bloc.dart';
 import '../../features/legal/presentation/view/legal_page.dart';
 import '../../features/legal/presentation/view/about_pettix_page.dart';
 import '../../features/legal/presentation/view/legal_content_page.dart';
@@ -521,9 +522,13 @@ final List<RouteBase> _supportRoutes = [
   GoRoute(
     path: AppRoutes.sendFeedback,
     name: AppRouteNames.sendFeedback,
-    pageBuilder:
-        (context, state) =>
-            _customTransition(state: state, child: const SendFeedbackPage()),
+    pageBuilder: (context, state) => _customTransition(
+      state: state,
+      child: BlocProvider(
+        create: (_) => DI.find<FeedbackBloc>(),
+        child: const SendFeedbackPage(),
+      ),
+    ),
   ),
 ];
 

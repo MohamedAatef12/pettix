@@ -25,11 +25,21 @@ class AddPostBody extends StatelessWidget {
     final userData = DI.find<ICacheManager>().getUserData();
 
     return BlocListener<HomeBloc, HomeState>(
-      listenWhen:
-          (previous, current) => previous.isPostAdded != current.isPostAdded,
+      listenWhen: (previous, current) =>
+          previous.isPostAdded != current.isPostAdded ||
+          (current.error != null && previous.error != current.error),
       listener: (context, state) {
         if (state.isPostAdded) {
           context.pop();
+        } else if (state.error != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.error!),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: AppColors.current.red,
+            ),
+          );
+          bloc.add(ClearErrorEvent());
         }
       },
       child: BlocBuilder<HomeBloc, HomeState>(

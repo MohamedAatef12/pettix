@@ -220,25 +220,25 @@ class _FaqPageState extends State<FaqPage> {
         ),
       ],
     ),
-    _FaqCategory(
-      title: AppText.storeOrders,
-      icon: Icons.storefront_rounded,
-      color: const Color(0xFFF97316),
-      items: [
-        _FaqItem(
-          question: AppText.faqPlaceOrder,
-          answer: AppText.faqPlaceOrderAnswer,
-        ),
-        _FaqItem(
-          question: AppText.faqPaymentMethods,
-          answer: AppText.faqPaymentMethodsAnswer,
-        ),
-        _FaqItem(
-          question: AppText.faqReturnProduct,
-          answer: AppText.faqReturnProductAnswer,
-        ),
-      ],
-    ),
+    // _FaqCategory(
+    //   title: AppText.storeOrders,
+    //   icon: Icons.storefront_rounded,
+    //   color: const Color(0xFFF97316),
+    //   items: [
+    //     _FaqItem(
+    //       question: AppText.faqPlaceOrder,
+    //       answer: AppText.faqPlaceOrderAnswer,
+    //     ),
+    //     _FaqItem(
+    //       question: AppText.faqPaymentMethods,
+    //       answer: AppText.faqPaymentMethodsAnswer,
+    //     ),
+    //     _FaqItem(
+    //       question: AppText.faqReturnProduct,
+    //       answer: AppText.faqReturnProductAnswer,
+    //     ),
+    //   ],
+    // ),
   ];
 }
 

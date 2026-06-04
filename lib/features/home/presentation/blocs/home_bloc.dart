@@ -118,6 +118,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<AddLikeEvent>(_onLikePost);
     on<DeleteLikeEvent>(_onUnlikePost);
     on<ClearPostDetailsEvent>(_onClearPostDetails);
+    on<ClearErrorEvent>((event, emit) => emit(state.copyWith(error: null)));
     on<PickImagesFromGalleryEvent>(_onPickImagesFromGallery);
     on<AddImageFromCameraEvent>(_onAddImageFromCamera);
     on<RemoveSelectedImageEvent>(_onRemoveSelectedImage);
@@ -624,14 +625,37 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
   }
 
+  bool _isImageFile(File file) {
+    final path = file.path.toLowerCase();
+    final imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.heic', '.heif', '.bmp'];
+    return imageExtensions.any((ext) => path.endsWith(ext));
+  }
+
   Future<void> _onPickImagesFromGallery(
     PickImagesFromGalleryEvent event,
     Emitter<HomeState> emit,
   ) async {
     final pickedFiles = await _picker.pickMultiImage();
     if (pickedFiles.isNotEmpty) {
-      final files = pickedFiles.map((e) => File(e.path)).toList();
-      emit(state.copyWith(selectedImages: [...state.selectedImages, ...files]));
+      final validFiles = <File>[];
+      bool rejectedVideo = false;
+
+      for (final e in pickedFiles) {
+        final file = File(e.path);
+        if (_isImageFile(file)) {
+          validFiles.add(file);
+        } else {
+          rejectedVideo = true;
+        }
+      }
+
+      if (rejectedVideo) {
+        emit(state.copyWith(error: 'Only image files are allowed. Videos are not permitted.'));
+      }
+
+      if (validFiles.isNotEmpty) {
+        emit(state.copyWith(selectedImages: [...state.selectedImages, ...validFiles]));
+      }
     }
   }
 
@@ -639,9 +663,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     AddImageFromCameraEvent event,
     Emitter<HomeState> emit,
   ) async {
-    emit(
-      state.copyWith(selectedImages: [...state.selectedImages, event.image]),
-    );
+    if (_isImageFile(event.image)) {
+      emit(
+        state.copyWith(selectedImages: [...state.selectedImages, event.image]),
+      );
+    } else {
+      emit(state.copyWith(error: 'Only image files are allowed. Videos are not permitted.'));
+    }
   }
 
   void _onRemoveSelectedImage(
@@ -708,7 +736,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           author: author,
           content: contentCopy,
           images: imagePaths,
-          creationDate: DateTime.now().add(const Duration(hours: 2)).toString(),
+          creationDate: DateTime.now().toUtc().toIso8601String(),
           comments: [],
           likes: [],
           statusId: 3,
@@ -862,7 +890,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       parentCommentId: null,
       author: event.comment.author,
       text: 'Posting…',
-      creationDate: DateTime.now().add(const Duration(hours: 2)).toString(),
+      creationDate: DateTime.now().toUtc().toIso8601String(),
       status: 1,
       replies: [],
       likes: [],
@@ -894,17 +922,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
               ..removeWhere((c) => c.id == tempComment.id)
               ..insert(0, event.comment);
 
-        final currentCount =
-            state.postCommentsCount[event.comment.postId] ??
-            event.initialCount ??
-            0;
-        final updatedCountMap = Map<int, int>.from(state.postCommentsCount)
-          ..[event.comment.postId] = currentCount + 1;
-
         emit(
           state.copyWith(
             comments: finalComments,
-            postCommentsCount: updatedCountMap,
             error: null,
           ),
         );
@@ -1000,17 +1020,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
               return comment;
             }).toList();
 
-        final currentCount =
-            state.postCommentsCount[event.reply.postId] ??
-            event.initialCount ??
-            0;
-        final updatedCountMap = Map<int, int>.from(state.postCommentsCount)
-          ..[event.reply.postId] = currentCount + 1;
-
         emit(
           state.copyWith(
             comments: updatedComments,
-            postCommentsCount: updatedCountMap,
             error: null,
           ),
         );
@@ -1174,7 +1186,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final updatedCommentLikes = Map<int, int>.from(state.commentLikesCount);
     final updatedLikedComments = List<int>.from(state.likedCommentId);
 
-    final currentCount = updatedCommentLikes[commentId] ?? 0;
+    final comment = _findCommentById(state.comments, commentId);
+    final initialCount = comment?.likes.length ?? 0;
+    final currentCount = updatedCommentLikes[commentId] ?? initialCount;
     updatedCommentLikes[commentId] = currentCount + 1;
 
     if (!updatedLikedComments.contains(commentId)) {
@@ -1222,7 +1236,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
     final updatedLikedComments = List<int>.from(state.likedCommentId );
 
-    final currentCount = updatedCommentLikes[commentId] ?? 1;
+    final comment = _findCommentById(state.comments, commentId);
+    final initialCount = comment?.likes.length ?? 0;
+    final currentCount = updatedCommentLikes[commentId] ?? initialCount;
     updatedCommentLikes[commentId] = currentCount > 0 ? currentCount - 1 : 0;
     updatedLikedComments.remove(commentId);
 
@@ -1289,6 +1305,21 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         error: null,
       ),
     );
+  }
+
+  CommentEntity? _findCommentById(List<CommentEntity> comments, int commentId) {
+    for (final comment in comments) {
+      if (comment.id == commentId) {
+        return comment;
+      }
+      if (comment.replies.isNotEmpty) {
+        final found = _findCommentById(comment.replies, commentId);
+        if (found != null) {
+          return found;
+        }
+      }
+    }
+    return null;
   }
 
   void _revertCommentLike(int commentId, Emitter<HomeState> emit) {
