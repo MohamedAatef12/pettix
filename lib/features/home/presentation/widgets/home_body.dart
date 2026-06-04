@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
+import 'package:pettix/core/services/app_review_service.dart';
 import 'package:pettix/core/shimmers/home_shimmer.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
@@ -10,6 +11,7 @@ import 'package:pettix/features/home/presentation/blocs/home_state.dart';
 import 'package:pettix/features/home/presentation/widgets/post_card.dart';
 
 import '../blocs/home_event.dart';
+
 class HomeBody extends StatefulWidget {
   const HomeBody({super.key});
 
@@ -19,6 +21,7 @@ class HomeBody extends StatefulWidget {
 
 class _HomeBodyState extends State<HomeBody> {
   final ScrollController _scrollController = ScrollController();
+  bool _checkedTenPostsReviewPrompt = false;
 
   @override
   void initState() {
@@ -51,7 +54,10 @@ class _HomeBodyState extends State<HomeBody> {
               if (state.isUploadingPost)
                 Container(
                   margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                  padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
+                  padding: EdgeInsets.symmetric(
+                    vertical: 12.h,
+                    horizontal: 16.w,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.current.white,
                     borderRadius: BorderRadius.circular(12.r),
@@ -86,15 +92,14 @@ class _HomeBodyState extends State<HomeBody> {
                           minHeight: 4.h,
                           backgroundColor: AppColors.current.lightGray,
                           valueColor: AlwaysStoppedAnimation<Color>(
-                              AppColors.current.primary),
+                            AppColors.current.primary,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
-              Expanded(
-                child: _buildContent(state),
-              ),
+              Expanded(child: _buildContent(state)),
             ],
           );
         },
@@ -128,12 +133,20 @@ class _HomeBodyState extends State<HomeBody> {
             key: const PageStorageKey('posts_list'),
             controller: _scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
-            itemCount: state.isMorePostsLoading
-                ? state.posts.length + 1
-                : state.posts.length,
+            itemCount:
+                state.isMorePostsLoading
+                    ? state.posts.length + 1
+                    : state.posts.length,
             itemBuilder: (context, index) {
               if (index >= state.posts.length) {
                 return HomeShimmer();
+              }
+              if (index == 9 && !_checkedTenPostsReviewPrompt) {
+                _checkedTenPostsReviewPrompt = true;
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (!mounted) return;
+                  AppReviewService.requestAfterTenPosts(context);
+                });
               }
               return Padding(
                 padding: PaddingConstants.verticalSmall,
@@ -146,4 +159,3 @@ class _HomeBodyState extends State<HomeBody> {
     }
   }
 }
-

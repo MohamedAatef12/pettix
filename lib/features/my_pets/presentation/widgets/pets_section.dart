@@ -96,17 +96,7 @@ class PetsSection extends StatelessWidget {
             itemCount: state.pets.length,
             itemBuilder: (context, index) {
               final pet = state.pets[index];
-              return PetIdCard(
-                pet: pet,
-                onToggleStatus:
-                    (newStatus) => context.read<MyPetsBloc>().add(
-                      UpdatePetStatusEvent(petId: pet.id, status: newStatus),
-                    ),
-                onDeletePet:
-                    () =>
-                        context.read<MyPetsBloc>().add(DeletePetEvent(pet.id)),
-                onEditPet: () {},
-              );
+              return PetIdCard(pet: pet);
             },
           ),
         );

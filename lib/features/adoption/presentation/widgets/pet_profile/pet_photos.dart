@@ -2,6 +2,7 @@ import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/data/network/constants.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 
@@ -12,9 +13,10 @@ class PetGallery extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final urls = pet.imageUrls
-        .map((u) => u.startsWith('http') ? u : '${Constants.baseUrl}/$u')
-        .toList();
+    final urls =
+        pet.imageUrls
+            .map((u) => u.startsWith('http') ? u : '${Constants.baseUrl}/$u')
+            .toList();
 
     if (urls.isEmpty) {
       return _placeholder();
@@ -93,30 +95,34 @@ class PetGallery extends StatelessWidget {
     );
   }
 
-
   Widget _placeholder() => Container(
-        height: 280.h,
-        color: AppColors.current.lightGray,
-        child: Icon(Icons.pets_rounded,
-            size: 64.w, color: AppColors.current.blueGray),
-      );
+    height: 280.h,
+    color: AppColors.current.lightGray,
+    child: Icon(
+      Icons.pets_rounded,
+      size: 64.w,
+      color: AppColors.current.blueGray,
+    ),
+  );
 
   void _openFullscreen(BuildContext context, String url) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => Scaffold(
-          backgroundColor: Colors.black,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            iconTheme: const IconThemeData(color: Colors.white),
-          ),
-          body: Center(
-            child: InteractiveViewer(
-              child: AppCachedImage(imageUrl: url, fit: BoxFit.contain),
+        builder:
+            (_) => Scaffold(
+              backgroundColor: Colors.black,
+              appBar: AppTopBar.back(
+                title: '',
+                backgroundColor: Colors.transparent,
+                backButtonColor: Colors.white,
+              ),
+              body: Center(
+                child: InteractiveViewer(
+                  child: AppCachedImage(imageUrl: url, fit: BoxFit.contain),
+                ),
+              ),
             ),
-          ),
-        ),
       ),
     );
   }

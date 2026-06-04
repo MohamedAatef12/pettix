@@ -40,7 +40,7 @@ class FilterByCategoryEvent extends AdoptionBrowseEvent {
   List<Object?> get props => [categoryId];
 }
 
-/// Filter by gender ID (1=Male, 2=Female). Pass null to clear.
+/// Filter by gender ID (3=Male, 4=Female). Pass null to clear.
 class FilterByGenderEvent extends AdoptionBrowseEvent {
   final int? genderId;
   const FilterByGenderEvent(this.genderId);

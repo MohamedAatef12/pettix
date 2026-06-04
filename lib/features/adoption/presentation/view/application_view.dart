@@ -5,9 +5,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/sized_box.dart';
+import 'package:pettix/core/services/app_review_service.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
+import 'package:pettix/data/caching/i_cache_manager.dart';
+import 'package:pettix/features/my_pets/domain/usecases/get_user_pets_usecase.dart';
 import '../../../../config/di/di.dart';
 import '../../../../config/router/routes.dart';
 import '../bloc/adoption_bloc.dart';
@@ -21,7 +25,7 @@ import '../widgets/application/step5_review_application.dart';
 import '../widgets/application/step6_submitted.dart';
 import '../widgets/application/step0_pet_application.dart';
 
-class ApplicationScreens extends StatelessWidget {
+class ApplicationScreens extends StatefulWidget {
   final int petId;
 
   const ApplicationScreens({super.key, required this.petId});
@@ -34,78 +38,173 @@ class ApplicationScreens extends StatelessWidget {
   ];
 
   @override
+  State<ApplicationScreens> createState() => _ApplicationScreensState();
+}
+
+class _ApplicationScreensState extends State<ApplicationScreens> {
+  late final Future<bool> _isOwnPetFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _isOwnPetFuture = _isOwnPet();
+  }
+
+  Future<bool> _isOwnPet() async {
+    final userId = getIt<ICacheManager>().getUserData()?.id;
+    if (userId == null || widget.petId <= 0) return false;
+
+    final result = await getIt<GetUserPetsUseCase>().call(userId);
+    return result.fold(
+      (_) => false,
+      (pets) => pets.any((pet) => pet.id == widget.petId),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create:
-          (context) =>
-              getIt<AdoptionBloc>()
-                ..add(const ResetForm())
-                ..add(SetPetId(petId))
-                ..add(FetchAdoptionOptions()),
-      child: BlocConsumer<AdoptionBloc, AdoptionState>(
-        listener: (context, state) {
-          final msg = state.errorMessage;
-          if (msg != null && msg.isNotEmpty) {
-            AuthToast.showError(context, msg);
-          }
-        },
-        builder: (context, state) {
-          if (state.status == AdoptionStatus.success) {
-            return Scaffold(
-              backgroundColor: AppColors.current.white,
-              appBar: _buildAppBar(context),
-              body: StepSubmitted(
-                onViewApplication: () {
-                  context.goNamed(AppRouteNames.adoptionHistory);
-                },
-                onBrowseMore: () {
-                  context.go(AppRoutes.bottomNav, extra: 1);
-                },
-              ),
-            );
-          }
-
-          if (state.currentStep == 0) {
-            return Scaffold(
-              backgroundColor: AppColors.current.white,
-              body: PetApplication(),
-            );
-          }
-
+    return FutureBuilder<bool>(
+      future: _isOwnPetFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
           return Scaffold(
             backgroundColor: AppColors.current.white,
             appBar: _buildAppBar(context),
-            body: Column(
-              children: [
-                SizedBoxConstants.verticalSmall,
-                _StepHeader(state: state),
-                SizedBoxConstants.verticalMedium,
-                Expanded(child: _StepContent(state: state)),
-                _BottomNav(state: state),
-                SizedBox(height: 30.h),
-              ],
-            ),
+            body: const AppPageShimmer(),
           );
-        },
+        }
+
+        if (snapshot.data == true) {
+          return _buildOwnPetBlocked(context);
+        }
+
+        return BlocProvider(
+          create:
+              (context) =>
+                  getIt<AdoptionBloc>()
+                    ..add(const ResetForm())
+                    ..add(SetPetId(widget.petId))
+                    ..add(FetchAdoptionOptions()),
+          child: BlocConsumer<AdoptionBloc, AdoptionState>(
+            listener: (context, state) async {
+              final msg = state.errorMessage;
+              if (msg != null && msg.isNotEmpty) {
+                AuthToast.showError(context, msg);
+              }
+              if (state.status == AdoptionStatus.success) {
+                await AppReviewService.requestAfterFirstAdoption(context);
+              }
+            },
+            builder: (context, state) {
+              if (state.status == AdoptionStatus.success) {
+                return Scaffold(
+                  backgroundColor: AppColors.current.white,
+                  appBar: _buildAppBar(context),
+                  body: StepSubmitted(
+                    onViewApplication: () {
+                      context.goNamed(AppRouteNames.adoptionHistory);
+                    },
+                    onBrowseMore: () {
+                      context.go(AppRoutes.bottomNav, extra: 1);
+                    },
+                  ),
+                );
+              }
+
+              if (state.currentStep == 0) {
+                return Scaffold(
+                  backgroundColor: AppColors.current.white,
+                  body: PetApplication(),
+                );
+              }
+
+              return Scaffold(
+                backgroundColor: AppColors.current.white,
+                appBar: _buildAppBar(context),
+                body: Column(
+                  children: [
+                    SizedBoxConstants.verticalSmall,
+                    _StepHeader(state: state),
+                    SizedBoxConstants.verticalMedium,
+                    Expanded(child: _StepContent(state: state)),
+                    _BottomNav(state: state),
+                    SizedBox(height: 30.h),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildOwnPetBlocked(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.current.white,
+      appBar: _buildAppBar(context),
+      body: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24.w),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 72.w,
+                height: 72.w,
+                decoration: BoxDecoration(
+                  color: AppColors.current.primary.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.pets_rounded,
+                  color: AppColors.current.primary,
+                  size: 34.w,
+                ),
+              ),
+              SizedBox(height: 18.h),
+              Text(
+                AppText.cannotApplyOwnPet,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: AppColors.current.text,
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                AppText.cannotApplyOwnPetDescription,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: AppColors.current.midGray,
+                  fontSize: 13.sp,
+                  height: 1.5,
+                ),
+              ),
+              SizedBox(height: 24.h),
+              CustomFilledButton(
+                onPressed: () => context.pop(),
+                text: AppText.done,
+                backgroundColor: AppColors.current.primary,
+                textStyle: TextStyle(
+                  color: AppColors.current.white,
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      title: Text(
-        AppText.adoptAPet,
-        style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
-      ),
-      centerTitle: true,
+    return AppTopBar.back(
+      title: AppText.adoptAPet,
       backgroundColor: AppColors.current.white,
-      surfaceTintColor: AppColors.current.white,
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new_rounded),
-        onPressed: () => Navigator.pop(context),
-      ),
+      onBack: () => Navigator.pop(context),
     );
   }
 }
@@ -273,11 +372,7 @@ class _BackButton extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(12.r)),
           border: Border.all(color: AppColors.current.primary, width: 1.5),
         ),
-        child: Icon(
-          Icons.arrow_back_ios_new_rounded,
-          color: AppColors.current.text,
-          size: 18.w,
-        ),
+        child: AppTopBarBackButton(onPressed: onTap, size: 18.w),
       ),
     );
   }

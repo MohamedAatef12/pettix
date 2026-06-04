@@ -7,7 +7,9 @@ import 'package:pettix/core/bloc/theme/theme_cubit.dart';
 import 'package:pettix/core/bloc/theme/theme_option.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
+import 'package:pettix/core/services/app_review_service.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -16,27 +18,9 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.current.lightBlue,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        scrolledUnderElevation: 0,
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          onPressed: () => context.pop(),
-          icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: AppColors.current.text,
-            size: 20.sp,
-          ),
-        ),
-        title: Text(
-          AppText.settings,
-          style: AppTextStyles.title.copyWith(
-            color: AppColors.current.text,
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
+      appBar: AppTopBar.back(
+        title: AppText.settings,
+        onBack: () => context.pop(),
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -55,22 +39,6 @@ class SettingsScreen extends StatelessWidget {
                     title: AppText.notificationSettings,
                     onTap: () {
                       // Navigate to notification settings
-                    },
-                  ),
-                  _SettingsTile(
-                    icon: Icons.location_on_outlined,
-                    iconColor: AppColors.current.red,
-                    title: AppText.myAddresses,
-                    onTap: () {
-                      // Navigate to addresses
-                    },
-                  ),
-                  _SettingsTile(
-                    icon: Icons.credit_card_rounded,
-                    iconColor: const Color(0xFF56C590),
-                    title: AppText.paymentMethods,
-                    onTap: () {
-                      // Navigate to payment methods
                     },
                   ),
                 ],
@@ -110,6 +78,12 @@ class SettingsScreen extends StatelessWidget {
                     ),
                     onTap: () => _showLanguagePicker(context),
                   ),
+                  _SettingsTile(
+                    icon: Icons.star_outline_rounded,
+                    iconColor: const Color(0xFFFFB547),
+                    title: AppText.ratePettix,
+                    onTap: () => _requestReview(context),
+                  ),
                 ],
               ),
               SizedBox(height: 24.h),
@@ -136,11 +110,16 @@ class SettingsScreen extends StatelessWidget {
   }
 
   void _showThemePicker(BuildContext context) {
+    final themeCubit = context.read<ThemeCubit>();
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => const _ThemePickerSheet(),
+      builder:
+          (_) => BlocProvider.value(
+            value: themeCubit,
+            child: const _ThemePickerSheet(),
+          ),
     );
   }
 
@@ -151,6 +130,20 @@ class SettingsScreen extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (_) => const _LanguagePickerSheet(),
     );
+  }
+
+  Future<void> _requestReview(BuildContext context) async {
+    try {
+      await AppReviewService.requestFromSettings();
+    } catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppText.reviewUnavailable),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 }
 

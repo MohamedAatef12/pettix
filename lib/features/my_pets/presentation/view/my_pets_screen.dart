@@ -5,15 +5,17 @@ import 'package:go_router/go_router.dart';
 import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
+import 'package:pettix/core/enums/app_enums.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/app_cached_image.dart';
+import 'package:pettix/core/widgets/app_shimmer.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/features/my_pets/domain/entities/lookup_entity.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_request_entity.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_bloc.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_event.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_state.dart';
-import 'package:shimmer/shimmer.dart';
 
 class MyPetsScreen extends StatelessWidget {
   const MyPetsScreen({super.key});
@@ -191,42 +193,16 @@ class _MyPetsHeader extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: EdgeInsets.fromLTRB(4.w, 4.h, 4.w, 20.h),
-          child: SizedBox(
-            height: 30.h,
-            width: double.infinity,
-            child: Stack(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: IconButton(
-                    onPressed: () {
-                      if (context.canPop()) {
-                        context.pop();
-                      } else {
-                        context.goNamed(AppRouteNames.bottomNav);
-                      }
-                    },
-                    icon: Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      color: AppColors.current.text,
-                      size: 20.w,
-                    ),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    AppText.myPets,
-                    style: AppTextStyles.bold.copyWith(
-                      fontSize: 18.sp,
-                      color: AppColors.current.text,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          padding: EdgeInsets.only(bottom: 8.h),
+          child: AppTopBar.back(
+            title: AppText.myPets,
+            onBack: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.goNamed(AppRouteNames.bottomNav);
+              }
+            },
           ),
         ),
       ),
@@ -491,79 +467,60 @@ class _LoadingList extends StatelessWidget {
             margin: EdgeInsets.only(bottom: 16.h),
             padding: EdgeInsets.all(14.w),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.current.white,
               borderRadius: BorderRadius.circular(20.r),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
+                  color: AppColors.current.text.withValues(alpha: 0.04),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
               ],
             ),
-            child: Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 80.w,
-                    height: 80.w,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(14.r),
-                    ),
-                  ),
-                  SizedBox(width: 14.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 120.w,
-                          height: 16.h,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(4.r),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppShimmer(
+                  width: 80.w,
+                  height: 80.w,
+                  borderRadius: BorderRadius.circular(14.r),
+                ),
+                SizedBox(width: 14.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AppShimmer(
+                        width: 120.w,
+                        height: 16.h,
+                        borderRadius: BorderRadius.circular(4.r),
+                      ),
+                      SizedBox(height: 8.h),
+                      AppShimmer(
+                        width: 80.w,
+                        height: 10.h,
+                        borderRadius: BorderRadius.circular(4.r),
+                      ),
+                      SizedBox(height: 12.h),
+                      Row(
+                        children: [
+                          AppShimmer(
+                            width: 60.w,
+                            height: 18.h,
+                            borderRadius: BorderRadius.circular(6.r),
                           ),
-                        ),
-                        SizedBox(height: 8.h),
-                        Container(
-                          width: 80.w,
-                          height: 10.h,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(4.r),
+                          SizedBox(width: 8.w),
+                          AppShimmer(
+                            width: 50.w,
+                            height: 18.h,
+                            borderRadius: BorderRadius.circular(6.r),
                           ),
-                        ),
-                        SizedBox(height: 12.h),
-                        Row(
-                          children: [
-                            Container(
-                              width: 60.w,
-                              height: 18.h,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(6.r),
-                              ),
-                            ),
-                            SizedBox(width: 8.w),
-                            Container(
-                              width: 50.w,
-                              height: 18.h,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(6.r),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
     );
@@ -654,7 +611,10 @@ class _EditPetSheetState extends State<_EditPetSheet> {
     _catId = _findById(widget.categories, widget.pet.categoryName)?.id;
     _colorId = _findById(widget.colors, widget.pet.colorName)?.id;
     final g = widget.pet.genderName?.toLowerCase();
-    _genderId = g == 'male' ? 1 : (g == 'female' ? 2 : null);
+    _genderId =
+        g == 'male'
+            ? Gender.male.value
+            : (g == 'female' ? Gender.female.value : null);
   }
 
   @override
@@ -775,8 +735,14 @@ class _EditPetSheetState extends State<_EditPetSheet> {
               iconColor: const Color(0xFF3AAFA9),
               value: _genderId,
               items: [
-                DropdownMenuItem(value: 1, child: Text(AppText.male)),
-                DropdownMenuItem(value: 2, child: Text(AppText.female)),
+                DropdownMenuItem(
+                  value: Gender.male.value,
+                  child: Text(AppText.male),
+                ),
+                DropdownMenuItem(
+                  value: Gender.female.value,
+                  child: Text(AppText.female),
+                ),
               ],
               onChanged: (v) => setState(() => _genderId = v),
             ),
