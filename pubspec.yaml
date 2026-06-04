@@ -3,7 +3,7 @@ description: "Pet Care App"
 
 publish_to: 'none'
 
-version: 2.0.1+7
+version: 2.0.2+8
 environment:
   sdk: ">=3.7.2 <4.0.0"
 
