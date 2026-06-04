@@ -77,27 +77,6 @@ class LegalPage extends StatelessWidget {
                   Center(
                     child: Column(
                       children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image.asset(
-                              'assets/images/logo1.png',
-                              height: 25.h,
-                              width: 25.w,
-                              fit: BoxFit.contain,
-                            ),
-                            SizedBox(width: 8.w),
-                            Text(
-                              AppText.appName,
-                              style: TextStyle(
-                                fontSize: 24.sp,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.current.primary,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8.h),
                         Text(
                           AppText.versionNumber('1.0.0'),
                           style: AppTextStyles.smallDescription.copyWith(

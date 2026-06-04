@@ -74,9 +74,9 @@ class ForgotPasswordPage extends StatelessWidget {
                             fit: BoxFit.fill,
                             width: MediaQuery.sizeOf(context).width,
                           ),
-                          Positioned(
+                          PositionedDirectional(
                             top: 40.h,
-                            left: 20.w,
+                            start: 20.w,
                             child: AppTopBarBackButton(
                               onPressed: () => context.pop(),
                               size: 34.r,

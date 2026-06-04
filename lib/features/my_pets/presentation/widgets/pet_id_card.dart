@@ -51,14 +51,14 @@ class PetIdCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: Stack(
           children: [
-            Positioned(
-              left: 0,
+            PositionedDirectional(
+              start: 0,
               top: 0,
               bottom: 0,
               child: Container(width: 8.w, color: AppColors.current.primary),
             ),
-            Positioned(
-              right: -18.w,
+            PositionedDirectional(
+              end: -18.w,
               bottom: -18.w,
               child: Icon(
                 Icons.pets_rounded,
@@ -67,7 +67,7 @@ class PetIdCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.fromLTRB(18.w, 10.h, 10.w, 10.h),
+              padding: EdgeInsetsDirectional.fromSTEB(18.w, 10.h, 10.w, 10.h),
               child: Row(
                 children: [
                   _PetPhoto(imageUrl: pet.imageUrls.firstOrNull),
