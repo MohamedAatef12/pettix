@@ -8,6 +8,7 @@ import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/shimmers/report_shimmer.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/date_formatter.dart';
 import 'package:pettix/core/widgets/app_profile_image.dart';
 import 'package:pettix/features/home/domain/entities/post_entity.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
@@ -37,20 +38,7 @@ IconData _getReasonIcon(String name) {
   return Icons.flag_outlined;
 }
 
-String _formatCreationDate(String rawDate) {
-  try {
-    final dateTime = DateTime.parse(rawDate).toLocal();
-    final now = DateTime.now();
-    final diff = now.difference(dateTime);
-    if (diff.inSeconds < 60) return AppText.justNow;
-    if (diff.inMinutes < 60) return AppText.minutesAgo(diff.inMinutes);
-    if (diff.inHours < 24) return AppText.hoursAgo(diff.inHours);
-    if (diff.inDays < 7) return AppText.daysAgo(diff.inDays);
-    return DateFormat('MMM d, yyyy').format(dateTime);
-  } catch (_) {
-    return rawDate;
-  }
-}
+
 
 class PostCardHeader extends StatelessWidget {
   const PostCardHeader({
@@ -79,7 +67,7 @@ class PostCardHeader extends StatelessWidget {
               ),
             ),
             Text(
-              _formatCreationDate(post.creationDate),
+              DateFormatter.formatRelativeTime(context, post.creationDate),
               style: AppTextStyles.description.copyWith(fontSize: 12.sp),
             ),
           ],

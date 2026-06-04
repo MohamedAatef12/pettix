@@ -238,7 +238,7 @@ class _CommentsPageState extends State<CommentsPage> {
             avatar: userData.avatar,
             age: userData.age,
           ),
-          creationDate: DateTime.now().toIso8601String(),
+          creationDate: DateTime.now().toUtc().toIso8601String(),
           postId: widget.post.id,
           parentCommentId: replyingTo?.id,
           replies: [],

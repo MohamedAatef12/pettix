@@ -68,6 +68,7 @@ class Constants {
 
   // ── Support ───────────────────────────────────────────────────────────────
   static const String contactEndpoint = '/api/Security/Contact';
+  static const String submitFeedbackEndpoint = '/api/Settings/Feedback/submit';
 
   // ── Headers ───────────────────────────────────────────────────────────────
   static const String contentTypeHeader = 'Content-Type';
