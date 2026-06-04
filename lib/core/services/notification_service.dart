@@ -95,6 +95,19 @@ class NotificationService {
   }
 
   static void displayNotification(RemoteMessage message) {
+    final cache = DI.find<ICacheManager>();
+
+    if (!cache.isNotificationsEnabled()) {
+      log('🚫 Notifications are disabled in app settings. Skipping display.');
+      return;
+    }
+
+    final mutedUntil = cache.getNotificationsMutedUntil();
+    if (mutedUntil != null && DateTime.now().isBefore(mutedUntil)) {
+      log('🚫 Notifications are muted until $mutedUntil. Skipping display.');
+      return;
+    }
+
     log('🔔 PREPARING TO DISPLAY: ${message.data}');
 
     RemoteNotification? notification = message.notification;

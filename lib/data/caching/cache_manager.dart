@@ -139,4 +139,32 @@ class CacheManager implements ICacheManager {
   Future<String?> getFcmToken() async {
     return _prefs?.getString('fcm_token');
   }
+
+  @override
+  Future<void> setNotificationsEnabled(bool enabled) async {
+    await _prefs?.setBool('notifications_enabled', enabled);
+  }
+
+  @override
+  bool isNotificationsEnabled() {
+    return _prefs?.getBool('notifications_enabled') ?? true;
+  }
+
+  @override
+  Future<void> setNotificationsMutedUntil(DateTime? dateTime) async {
+    if (dateTime == null) {
+      await _prefs?.remove('notifications_muted_until');
+    } else {
+      await _prefs?.setString('notifications_muted_until', dateTime.toIso8601String());
+    }
+  }
+
+  @override
+  DateTime? getNotificationsMutedUntil() {
+    final str = _prefs?.getString('notifications_muted_until');
+    if (str != null) {
+      return DateTime.tryParse(str);
+    }
+    return null;
+  }
 }

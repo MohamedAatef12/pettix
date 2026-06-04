@@ -791,4 +791,26 @@ abstract class AppText {
   // Appearance / theme
   static String get appearance => 'Appearance'.tr();
   static String get darkMode => 'Dark Mode'.tr();
+
+  // Remove / Delete account
+  static String get removeAccount => 'Remove Account'.tr();
+  static String get deleteAccount => 'Delete Account'.tr();
+  static String get deleteAccountConfirmation =>
+      'Are you sure you want to delete your account? This action is permanent and all your data will be removed.'
+          .tr();
+  static String get accountDeletedSuccessfully =>
+      'Account deleted successfully'.tr();
+  static String get dangerZone => 'Danger Zone'.tr();
+
+  // Notifications settings
+  static String get allowNotifications => 'Allow Notifications'.tr();
+  static String get muteNotifications => 'Mute Notifications'.tr();
+  static String get muteFor1Hour => 'For 1 hour'.tr();
+  static String get muteFor2Hours => 'For 2 hours'.tr();
+  static String get muteFor8Hours => 'For 8 hours'.tr();
+  static String get muteFor24Hours => 'For 24 hours'.tr();
+  static String get muteIndefinitely => 'Mute Indefinitely'.tr();
+  static String get notificationsMutedSuccess => 'Notifications muted'.tr();
+  static String get notificationsUnmutedSuccess => 'Notifications unmuted'.tr();
+  static String mutedUntilText(String date) => 'Muted until {date}'.tr(namedArgs: {'date': date});
 }

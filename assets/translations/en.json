@@ -1,4 +1,4 @@
-﻿{
+{
   "Connect with Pet Lovers": "Connect with Pet Lovers",
   "Share your petâ€™s daily adventures, post cute pictures, and engage with a loving pet community \u2028just like you!": "Share your petâ€™s daily adventures, post cute pictures, and engage with a loving pet community \u2028just like you!",
   "Care. Safety. Second Chances.": "Care. Safety. Second Chances.",
@@ -559,5 +559,26 @@
   "Sun": "Sun",
   "Appearance": "Appearance",
   "Dark Mode": "Dark Mode",
-  "Adopt": "Adopt"
+  "Adopt": "Adopt",
+  "Remove Account": "Remove Account",
+  "Delete Account": "Delete Account",
+  "Are you sure you want to delete your account? This action is permanent and all your data will be removed.": "Are you sure you want to delete your account? This action is permanent and all your data will be removed.",
+  "Account deleted successfully": "Account deleted successfully",
+  "Danger Zone": "Danger Zone",
+  "Allow Notifications": "Allow Notifications",
+  "Mute Notifications": "Mute Notifications",
+  "For 1 hour": "For 1 hour",
+  "For 2 hours": "For 2 hours",
+  "For 8 hours": "For 8 hours",
+  "For 24 hours": "For 24 hours",
+  "Mute Indefinitely": "Mute Indefinitely",
+  "Notifications muted": "Notifications muted",
+  "Notifications unmuted": "Notifications unmuted",
+  "Muted until {date}": "Muted until {date}",
+  "Receive app notifications": "Receive app notifications",
+  "None (Unmute)": "None (Unmute)",
+  "Off": "Off",
+  "On": "On",
+  "Muted ({hours}h)": "Muted ({hours}h)",
+  "Muted ({mins}m)": "Muted ({mins}m)"
 }

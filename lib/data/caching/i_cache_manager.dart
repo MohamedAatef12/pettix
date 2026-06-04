@@ -27,4 +27,9 @@ abstract class ICacheManager {
   Future<void> setThemeDark(bool isDark);
   Future<bool> isThemeDark();
   Future<bool> isLoggedIn();
+
+  Future<void> setNotificationsEnabled(bool enabled);
+  bool isNotificationsEnabled();
+  Future<void> setNotificationsMutedUntil(DateTime? dateTime);
+  DateTime? getNotificationsMutedUntil();
 }

@@ -23,4 +23,8 @@ class ProfileRepositoryImpl implements ProfileRepository {
   ) => _remoteDataSource.updateProfile(
         UpdateProfileRequestModel.fromEntity(request),
       );
+
+  @override
+  Future<Either<Failure, void>> deleteAccount(int id) =>
+      _remoteDataSource.deleteAccount(id);
 }

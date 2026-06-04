@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +8,7 @@ import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ContactSupportPage extends StatefulWidget {
   const ContactSupportPage({super.key});
@@ -39,6 +41,33 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
     AuthToast.showSuccess(context, AppText.messageSentSupport);
   }
 
+  void _openWhatsApp(BuildContext context) {
+    final isArabic = context.locale.languageCode == 'ar';
+    final message = isArabic
+        ? 'مرحبًا فريق بيتكس، أحتاج مساعدة بخصوص التطبيق.'
+        : 'Hello Pettix team, I need help with the app.';
+    final phone = '201025143723'; // Egypt country code + number
+    final url = Uri.parse('https://wa.me/$phone?text=${Uri.encodeComponent(message)}');
+    launchUrl(url, mode: LaunchMode.externalApplication);
+  }
+
+  void _openEmail(BuildContext context) {
+    final isArabic = context.locale.languageCode == 'ar';
+    final subject = isArabic ? 'دعم تطبيق بيتكس' : 'Pettix App Support';
+    final body = isArabic
+        ? 'مرحبًا فريق بيتكس،\n\nأحتاج مساعدة بخصوص التطبيق.\n\nشكرًا لكم.'
+        : 'Hello Pettix team,\n\nI need help with the app.\n\nThank you.';
+    final url = Uri(
+      scheme: 'mailto',
+      path: 'pettix007@gmail.com',
+      queryParameters: {
+        'subject': subject,
+        'body': body,
+      },
+    );
+    launchUrl(url);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,33 +84,23 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
                   _SectionLabel(AppText.reachUsDirectly),
                   SizedBox(height: 12.h),
                   _ContactCard(
-                    icon: Icons.chat_bubble_rounded,
-                    iconColor: const Color(0xFF10B981),
-                    iconBg: const Color(0xFFECFDF5),
-                    title: AppText.liveChat,
-                    subtitle: AppText.liveChatSubtitle,
-                    actionLabel: AppText.chatNow,
-                    onAction: () {},
-                  ),
-                  SizedBox(height: 12.h),
-                  _ContactCard(
                     icon: Icons.email_outlined,
                     iconColor: const Color(0xFF5379B2),
                     iconBg: const Color(0xFFEEF2FF),
                     title: AppText.emailSupport,
-                    subtitle: AppText.emailSupportSubtitle,
+                    subtitle: 'pettix007@gmail.com',
                     actionLabel: AppText.sendEmail,
-                    onAction: () {},
+                    onAction: () => _openEmail(context),
                   ),
                   SizedBox(height: 12.h),
                   _ContactCard(
                     icon: Icons.phone_outlined,
-                    iconColor: const Color(0xFFF97316),
-                    iconBg: const Color(0xFFFFF7ED),
+                    iconColor: const Color(0xFF25D366),
+                    iconBg: const Color(0xFFEDFFF5),
                     title: AppText.phoneSupport,
-                    subtitle: AppText.phoneSupportSubtitle,
-                    actionLabel: AppText.call,
-                    onAction: () {},
+                    subtitle: '01025143723',
+                    actionLabel: 'WhatsApp',
+                    onAction: () => _openWhatsApp(context),
                   ),
                   SizedBox(height: 28.h),
                   _SectionLabel(AppText.sendUsMessage),

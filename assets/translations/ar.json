@@ -562,5 +562,26 @@
   "Sun": "الأحد",
   "Appearance": "المظهر",
   "Dark Mode": "الوضع الداكن",
-  "Adopt": "تبني"
-} 
+  "Adopt": "تبني",
+  "Remove Account": "إزالة الحساب",
+  "Delete Account": "حذف الحساب",
+  "Are you sure you want to delete your account? This action is permanent and all your data will be removed.": "هل أنت متأكد أنك تريد حذف حسابك؟ هذا الإجراء نهائي وسيتم حذف جميع بياناتك.",
+  "Account deleted successfully": "تم حذف الحساب بنجاح",
+  "Danger Zone": "منطقة الخطر",
+  "Allow Notifications": "السماح بالإشعارات",
+  "Mute Notifications": "كتم الإشعارات",
+  "For 1 hour": "لمدة ساعة واحدة",
+  "For 2 hours": "لمدة ساعتين",
+  "For 8 hours": "لمدة 8 ساعات",
+  "For 24 hours": "لمدة 24 ساعة",
+  "Mute Indefinitely": "كتم لأجل غير مسمى",
+  "Notifications muted": "تم كتم الإشعارات",
+  "Notifications unmuted": "تم إلغاء كتم الإشعارات",
+  "Muted until {date}": "مكتوم حتى {date}",
+  "Receive app notifications": "استقبال إشعارات التطبيق",
+  "None (Unmute)": "بلا (إلغاء الكتم)",
+  "Off": "إيقاف",
+  "On": "تشغيل",
+  "Muted ({hours}h)": "مكتوم ({hours} س)",
+  "Muted ({mins}m)": "مكتوم ({mins} د)"
+}

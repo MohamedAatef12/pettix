@@ -412,7 +412,10 @@ final List<RouteBase> _profileRoutes = [
     name: AppRouteNames.settings,
     pageBuilder: (context, state) => _customTransition(
       state: state,
-      child: const SettingsScreen(),
+      child: BlocProvider(
+        create: (_) => DI.find<ProfileBloc>()..add(LoadNotificationSettingsEvent()),
+        child: const SettingsScreen(),
+      ),
     ),
   ),
 ];
