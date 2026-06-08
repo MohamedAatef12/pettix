@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 
@@ -9,12 +11,14 @@ class ChatAppBar extends StatelessWidget {
   final String text;
   final String? avatarUrl;
   final int? conversationId;
+  final int? contactId;
 
   const ChatAppBar({
     super.key,
     required this.text,
     this.avatarUrl,
     this.conversationId,
+    this.contactId,
   });
 
   @override
@@ -37,20 +41,32 @@ class ChatAppBar extends StatelessWidget {
       }
     }
 
+    final profileHeader = GestureDetector(
+      onTap:
+          contactId == null || contactId == 0
+              ? null
+              : () => context.push(AppRoutes.userProfile, extra: contactId),
+      behavior: HitTestBehavior.translucent,
+      child: Row(
+        children: [
+          if (avatarWidget != null) avatarWidget,
+          SizedBox(width: avatarWidget == null ? 0 : 12.w),
+          Expanded(
+            child: Text(
+              text,
+              style: AppTextStyles.appbar,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+
     return Row(
       children: [
         AppTopBarBackButton(onPressed: () => Navigator.pop(context)),
         SizedBox(width: 8.w),
-        if (avatarWidget != null) avatarWidget,
-        SizedBox(width: 12.w),
-        Expanded(
-          child: Text(
-            text,
-            style: AppTextStyles.appbar,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-
+        Expanded(child: profileHeader),
         SizedBox(width: 15.w),
       ],
     );

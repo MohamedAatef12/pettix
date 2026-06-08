@@ -87,6 +87,12 @@ class AdoptionHistoryBloc
         );
       },
       (_) {
+        emit(
+          state.copyWith(
+            updatedFormId: event.formId,
+            updatedStatus: event.status,
+          ),
+        );
         // Fetch to update the UI
         add(const FetchOwnerFormsEvent());
       },

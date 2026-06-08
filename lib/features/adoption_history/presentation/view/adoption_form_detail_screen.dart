@@ -25,22 +25,63 @@ class AdoptionFormDetailScreen extends StatelessWidget {
       backgroundColor: AppColors.current.lightBlue,
       body: BlocListener<AdoptionHistoryBloc, AdoptionHistoryState>(
         listenWhen:
-            (previous, current) => previous.ownerStatus != current.ownerStatus,
+            (previous, current) =>
+                previous.updatedFormId != current.updatedFormId ||
+                previous.updatedStatus != current.updatedStatus,
         listener: (context, state) {
-          if (state.ownerStatus == AdoptionHistoryStatus.loading) {
-            // Optional: Show loading dialog or overlay
-          } else if (state.ownerStatus == AdoptionHistoryStatus.error) {
-            AuthToast.showError(
-              context,
-              state.ownerError ?? AppText.anErrorOccurred,
-            );
-          } else if (state.ownerStatus == AdoptionHistoryStatus.loaded) {
+          if (state.updatedFormId == form.id) {
             AuthToast.showSuccess(context, AppText.statusUpdatedSuccessfully);
             Navigator.of(context).pop();
           }
         },
-        child: AdoptionFormDetailBody(form: form, isOwnerView: isOwnerView),
+        child: BlocBuilder<AdoptionHistoryBloc, AdoptionHistoryState>(
+          buildWhen:
+              (previous, current) =>
+                  previous.ownerForms != current.ownerForms ||
+                  previous.updatedFormId != current.updatedFormId ||
+                  previous.updatedStatus != current.updatedStatus,
+          builder: (context, state) {
+            final latestForm = state.ownerForms
+                .cast<AdoptionFormEntity>()
+                .firstWhere(
+                  (item) => item.id == form.id,
+                  orElse:
+                      () =>
+                          state.updatedFormId == form.id &&
+                                  state.updatedStatus != null
+                              ? _copyFormWithStatus(form, state.updatedStatus!)
+                              : form,
+                );
+
+            return AdoptionFormDetailBody(
+              form: latestForm,
+              isOwnerView: isOwnerView,
+            );
+          },
+        ),
       ),
+    );
+  }
+
+  AdoptionFormEntity _copyFormWithStatus(AdoptionFormEntity form, int status) {
+    return AdoptionFormEntity(
+      id: form.id,
+      fullName: form.fullName,
+      email: form.email,
+      phoneNumber: form.phoneNumber,
+      dateOfBirth: form.dateOfBirth,
+      livingSituationId: form.livingSituationId,
+      typeOfResidenceId: form.typeOfResidenceId,
+      livingSituation: form.livingSituation,
+      typeOfResidence: form.typeOfResidence,
+      hasOwnedOrCaredForPetBefore: form.hasOwnedOrCaredForPetBefore,
+      petType: form.petType,
+      agreesToTerms: form.agreesToTerms,
+      petId: form.petId,
+      petName: form.petName,
+      status: status,
+      clientContactId: form.clientContactId,
+      ownerContactId: form.ownerContactId,
     );
   }
 }
