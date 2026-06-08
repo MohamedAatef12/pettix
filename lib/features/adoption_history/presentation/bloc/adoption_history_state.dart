@@ -10,6 +10,8 @@ class AdoptionHistoryState extends Equatable {
   final List<AdoptionFormEntity> ownerForms;
   final String? clientError;
   final String? ownerError;
+  final int? updatedFormId;
+  final int? updatedStatus;
 
   const AdoptionHistoryState({
     this.clientStatus = AdoptionHistoryStatus.initial,
@@ -18,6 +20,8 @@ class AdoptionHistoryState extends Equatable {
     this.ownerForms = const [],
     this.clientError,
     this.ownerError,
+    this.updatedFormId,
+    this.updatedStatus,
   });
 
   AdoptionHistoryState copyWith({
@@ -27,6 +31,8 @@ class AdoptionHistoryState extends Equatable {
     List<AdoptionFormEntity>? ownerForms,
     String? clientError,
     String? ownerError,
+    int? updatedFormId,
+    int? updatedStatus,
   }) {
     return AdoptionHistoryState(
       clientStatus: clientStatus ?? this.clientStatus,
@@ -35,6 +41,8 @@ class AdoptionHistoryState extends Equatable {
       ownerForms: ownerForms ?? this.ownerForms,
       clientError: clientError,
       ownerError: ownerError,
+      updatedFormId: updatedFormId ?? this.updatedFormId,
+      updatedStatus: updatedStatus ?? this.updatedStatus,
     );
   }
 
@@ -46,5 +54,7 @@ class AdoptionHistoryState extends Equatable {
     ownerForms,
     clientError,
     ownerError,
+    updatedFormId,
+    updatedStatus,
   ];
 }

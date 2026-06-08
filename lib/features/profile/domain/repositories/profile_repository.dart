@@ -6,4 +6,5 @@ import 'package:pettix/features/profile/domain/entities/update_profile_entity.da
 abstract class ProfileRepository {
   Future<Either<Failure, UserEntity>> getProfile(int id);
   Future<Either<Failure, void>> updateProfile(UpdateProfileEntity request);
+  Future<Either<Failure, void>> deleteAccount(int id);
 }

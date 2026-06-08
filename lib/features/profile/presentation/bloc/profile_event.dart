@@ -34,3 +34,24 @@ class UpdateGenderEvent extends ProfileEvent {
   @override
   List<Object?> get props => [genderId];
 }
+
+class DeleteAccountEvent extends ProfileEvent {}
+
+class LoadNotificationSettingsEvent extends ProfileEvent {}
+
+class ToggleNotificationsEvent extends ProfileEvent {
+  final bool enabled;
+  ToggleNotificationsEvent(this.enabled);
+
+  @override
+  List<Object?> get props => [enabled];
+}
+
+class MuteNotificationsEvent extends ProfileEvent {
+  final Duration? duration;
+  MuteNotificationsEvent(this.duration);
+
+  @override
+  List<Object?> get props => [duration];
+}
+

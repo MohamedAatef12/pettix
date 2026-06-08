@@ -70,6 +70,9 @@ class Constants {
   static const String contactEndpoint = '/api/Security/Contact';
   static const String submitFeedbackEndpoint = '/api/Settings/Feedback/submit';
 
+  // ── Account ──────────────────────────────────────────────────────────────
+  static const String deleteAccountEndpoint = '/api/Security/Users';
+
   // ── Headers ───────────────────────────────────────────────────────────────
   static const String contentTypeHeader = 'Content-Type';
   static const String applicationJson = 'application/json';

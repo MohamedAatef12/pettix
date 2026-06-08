@@ -103,6 +103,16 @@ import '../../features/chat/domain/use_cases/send_message_use_case.dart'
     as _i460;
 import '../../features/chat/presentation/bloc/chat_bloc.dart' as _i65;
 import '../../features/chat/presentation/bloc/chat_list_bloc.dart' as _i2;
+import '../../features/help_support/data/datasources/help_support_remote_data_source.dart'
+    as _i995;
+import '../../features/help_support/data/repositories/help_support_repository_impl.dart'
+    as _i38;
+import '../../features/help_support/domain/repositories/help_support_repository.dart'
+    as _i69;
+import '../../features/help_support/domain/usecases/submit_feedback_usecase.dart'
+    as _i419;
+import '../../features/help_support/presentation/bloc/feedback_bloc.dart'
+    as _i611;
 import '../../features/home/data/repo/home_repo_impl.dart' as _i1024;
 import '../../features/home/data/sources/local/local_data_source.dart' as _i526;
 import '../../features/home/data/sources/local/local_data_source_impl.dart'
@@ -173,6 +183,8 @@ import '../../features/profile/data/repositories/profile_repo_impl.dart'
     as _i988;
 import '../../features/profile/domain/repositories/profile_repository.dart'
     as _i894;
+import '../../features/profile/domain/usecases/delete_account_usecase.dart'
+    as _i1056;
 import '../../features/profile/domain/usecases/get_profile_usecase.dart'
     as _i965;
 import '../../features/profile/domain/usecases/update_profile_usecase.dart'
@@ -222,6 +234,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i835.MyPetsRepository>(
       () => _i601.MyPetsRepositoryImpl(gh<_i1050.MyPetsRemoteDataSource>()),
     );
+    gh.lazySingleton<_i847.ProfileRemoteDataSource>(
+      () => _i847.ProfileRemoteDataSourceImpl(
+        gh<_i655.ApiService>(),
+        gh<_i694.ICacheManager>(),
+      ),
+    );
     gh.lazySingleton<_i221.AdoptionHistoryRemoteDataSource>(
       () => _i221.AdoptionHistoryRemoteDataSourceImpl(gh<_i655.ApiService>()),
     );
@@ -235,6 +253,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i617.ChatLocalDataSource>(),
       ),
       dispose: (i) => i.dispose(),
+    );
+    gh.lazySingleton<_i995.HelpSupportRemoteDataSource>(
+      () => _i995.HelpSupportRemoteDataSourceImpl(gh<_i655.ApiService>()),
     );
     gh.factory<_i578.AddPetUseCase>(
       () => _i578.AddPetUseCase(gh<_i835.MyPetsRepository>()),
@@ -332,9 +353,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i714.AdoptionBrowseDataSource>(
       () => _i714.AdoptionBrowseDataSourceImpl(gh<_i655.ApiService>()),
     );
-    gh.lazySingleton<_i847.ProfileRemoteDataSource>(
-      () => _i847.ProfileRemoteDataSourceImpl(gh<_i655.ApiService>()),
-    );
     gh.lazySingleton<_i894.ProfileRepository>(
       () => _i988.ProfileRepositoryImpl(gh<_i847.ProfileRemoteDataSource>()),
     );
@@ -350,6 +368,11 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i700.AppleLoginUseCase>(
       () => _i700.AppleLoginUseCase(gh<_i787.AuthRepository>()),
+    );
+    gh.lazySingleton<_i69.HelpSupportRepository>(
+      () => _i38.HelpSupportRepositoryImpl(
+        gh<_i995.HelpSupportRemoteDataSource>(),
+      ),
     );
     gh.factory<_i1025.GetPagedPetsUseCase>(
       () => _i1025.GetPagedPetsUseCase(gh<_i838.AdoptionBrowseRepository>()),
@@ -451,6 +474,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i447.ReportPetUseCase>(),
       ),
     );
+    gh.factory<_i419.SubmitFeedbackUseCase>(
+      () => _i419.SubmitFeedbackUseCase(gh<_i69.HelpSupportRepository>()),
+    );
     gh.factory<_i118.GetUserDataUseCase>(
       () => _i118.GetUserDataUseCase(gh<_i986.HomeDomainRepository>()),
     );
@@ -459,6 +485,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i843.SubmitAdoptionFormUseCase>(
       () => _i843.SubmitAdoptionFormUseCase(gh<_i133.AdoptionRepository>()),
+    );
+    gh.factory<_i1056.DeleteAccountUseCase>(
+      () => _i1056.DeleteAccountUseCase(gh<_i894.ProfileRepository>()),
     );
     gh.factory<_i965.GetProfileUseCase>(
       () => _i965.GetProfileUseCase(gh<_i894.ProfileRepository>()),
@@ -494,13 +523,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i975.VerifyOtp>(
       () => _i975.VerifyOtp(gh<_i787.AuthRepository>()),
     );
-    gh.factory<_i469.ProfileBloc>(
-      () => _i469.ProfileBloc(
-        gh<_i965.GetProfileUseCase>(),
-        gh<_i478.UpdateProfileUseCase>(),
-        gh<_i694.ICacheManager>(),
-      ),
-    );
     gh.factory<_i943.AdoptionBloc>(
       () => _i943.AdoptionBloc(
         gh<_i756.GetAdoptionOptionsUseCase>(),
@@ -528,6 +550,17 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i225.GetCachedConversationByIdUseCase>(),
         gh<_i118.GetUserDataUseCase>(),
         gh<_i797.SignalRService>(),
+      ),
+    );
+    gh.factory<_i611.FeedbackBloc>(
+      () => _i611.FeedbackBloc(gh<_i419.SubmitFeedbackUseCase>()),
+    );
+    gh.factory<_i469.ProfileBloc>(
+      () => _i469.ProfileBloc(
+        gh<_i965.GetProfileUseCase>(),
+        gh<_i478.UpdateProfileUseCase>(),
+        gh<_i1056.DeleteAccountUseCase>(),
+        gh<_i694.ICacheManager>(),
       ),
     );
     return this;

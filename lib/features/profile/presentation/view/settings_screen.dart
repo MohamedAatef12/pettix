@@ -3,93 +3,221 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/core/bloc/theme/theme_cubit.dart';
 import 'package:pettix/core/bloc/theme/theme_option.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
-import 'package:pettix/core/services/app_review_service.dart';
+import 'package:pettix/core/services/signalr_service.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/widgets/app_top_bar.dart';
+import 'package:pettix/data/caching/i_cache_manager.dart';
+import 'package:pettix/features/chat/data/data_source/chat_local_data_source.dart';
+import 'package:pettix/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:pettix/features/profile/presentation/bloc/profile_event.dart';
+import 'package:pettix/features/profile/presentation/bloc/profile_state.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.current.lightBlue,
-      appBar: AppTopBar.back(
-        title: AppText.settings,
-        onBack: () => context.pop(),
-      ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return BlocListener<ProfileBloc, ProfileState>(
+      listener: (context, state) async {
+        if (state.status == ProfileStatus.deleteSuccess) {
+          DI.find<SignalRService>().stop();
+          final cache = DI.find<ICacheManager>();
+          cache.logout();
+          await DI.find<ChatLocalDataSource>().clearCache();
+          await GoogleSignIn().signOut();
+          if (context.mounted) {
+            context.pushReplacement('/login');
+          }
+        } else if (state.status == ProfileStatus.error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.errorMessage ?? AppText.error),
+              backgroundColor: AppColors.current.red,
+            ),
+          );
+        }
+      },
+      child: BlocBuilder<ProfileBloc, ProfileState>(
+        builder: (context, state) {
+          final isLoading = state.status == ProfileStatus.loading;
+          return Stack(
             children: [
-              _buildSectionHeader(AppText.accountSettings),
-              SizedBox(height: 12.h),
-              _SettingsGroup(
-                tiles: [
-                  _SettingsTile(
-                    icon: Icons.notifications_none_rounded,
-                    iconColor: const Color(0xFF5EA8DF),
-                    title: AppText.notificationSettings,
-                    onTap: () {
-                      // Navigate to notification settings
-                    },
+              Scaffold(
+                backgroundColor: AppColors.current.lightBlue,
+                appBar: AppBar(
+                  backgroundColor: Colors.transparent,
+                  scrolledUnderElevation: 0,
+                  elevation: 0,
+                  centerTitle: true,
+                  leading: IconButton(
+                    onPressed: () => context.pop(),
+                    icon: Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: AppColors.current.text,
+                      size: 20.sp,
+                    ),
                   ),
-                ],
-              ),
-              SizedBox(height: 24.h),
-              _buildSectionHeader(AppText.appSettings),
-              SizedBox(height: 12.h),
-              _SettingsGroup(
-                tiles: [
-                  BlocBuilder<ThemeCubit, AppThemeOption>(
-                    builder: (context, themeOption) {
-                      return _SettingsTile(
-                        icon: Icons.color_lens_outlined,
-                        iconColor: themeOption.previewColor,
-                        title: AppText.themes,
-                        trailing: Text(
-                          themeOption.label,
-                          style: AppTextStyles.smallDescription.copyWith(
-                            color: AppColors.current.midGray,
-                            fontWeight: FontWeight.w600,
-                          ),
+                  title: Text(
+                    AppText.settings,
+                    style: AppTextStyles.title.copyWith(
+                      color: AppColors.current.text,
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                body: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSectionHeader(AppText.accountSettings),
+                        SizedBox(height: 12.h),
+                        _SettingsGroup(
+                          tiles: [
+                            _SettingsTile(
+                              icon: Icons.notifications_none_rounded,
+                              iconColor: const Color(0xFF5EA8DF),
+                              title: AppText.notificationSettings,
+                              trailing: _buildNotificationStatusText(state),
+                              onTap: () => _showNotificationSettings(context),
+                            ),
+                            // _SettingsTile(
+                            //   icon: Icons.location_on_outlined,
+                            //   iconColor: AppColors.current.red,
+                            //   title: AppText.myAddresses,
+                            //   onTap: () {
+                            //     // Navigate to addresses
+                            //   },
+                            // ),
+                            // _SettingsTile(
+                            //   icon: Icons.credit_card_rounded,
+                            //   iconColor: const Color(0xFF56C590),
+                            //   title: AppText.paymentMethods,
+                            //   onTap: () {
+                            //     // Navigate to payment methods
+                            //   },
+                            // ),
+                          ],
                         ),
-                        onTap: () => _showThemePicker(context),
-                      );
-                    },
+                        SizedBox(height: 24.h),
+                        _buildSectionHeader(AppText.appSettings),
+                        SizedBox(height: 12.h),
+                        _SettingsGroup(
+                          tiles: [
+                            BlocBuilder<ThemeCubit, AppThemeOption>(
+                              builder: (context, themeOption) {
+                                return _SettingsTile(
+                                  icon: Icons.color_lens_outlined,
+                                  iconColor: themeOption.previewColor,
+                                  title: AppText.themes,
+                                  trailing: Text(
+                                    themeOption.label,
+                                    style: AppTextStyles.smallDescription.copyWith(
+                                      color: AppColors.current.midGray,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  onTap: () => _showThemePicker(context),
+                                );
+                              },
+                            ),
+                            _SettingsTile(
+                              icon: Icons.language_rounded,
+                              iconColor: const Color(0xFF3AAFA9),
+                              title: AppText.language,
+                              trailing: Text(
+                                _languageLabel(context, context.locale),
+                                style: AppTextStyles.smallDescription.copyWith(
+                                  color: AppColors.current.midGray,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              onTap: () => _showLanguagePicker(context),
+                            ),
+                          ],
+                        ),
+                        // SizedBox(height: 24.h),
+                        // _buildSectionHeader(AppText.dangerZone),
+                        // SizedBox(height: 12.h),
+                        // _SettingsGroup(
+                        //   tiles: [
+                        //     _SettingsTile(
+                        //       icon: Icons.delete_forever_rounded,
+                        //       iconColor: AppColors.current.red,
+                        //       title: AppText.removeAccount,
+                        //       showArrow: true,
+                        //       onTap: () => _showDeleteAccountDialog(context),
+                        //     ),
+                        //   ],
+                        // ),
+                        SizedBox(height: 24.h),
+                      ],
+                    ),
                   ),
-                  _SettingsTile(
-                    icon: Icons.language_rounded,
-                    iconColor: const Color(0xFF3AAFA9),
-                    title: AppText.language,
-                    trailing: Text(
-                      _languageLabel(context, context.locale),
-                      style: AppTextStyles.smallDescription.copyWith(
-                        color: AppColors.current.midGray,
-                        fontWeight: FontWeight.w600,
+                ),
+              ),
+              if (isLoading)
+                Positioned.fill(
+                  child: Container(
+                    color: Colors.black.withAlpha(90),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.current.primary,
                       ),
                     ),
-                    onTap: () => _showLanguagePicker(context),
                   ),
-                  _SettingsTile(
-                    icon: Icons.star_outline_rounded,
-                    iconColor: const Color(0xFFFFB547),
-                    title: AppText.ratePettix,
-                    onTap: () => _requestReview(context),
-                  ),
-                ],
-              ),
-              SizedBox(height: 24.h),
+                ),
             ],
-          ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildNotificationStatusText(ProfileState state) {
+    if (!state.notificationsEnabled) {
+      return Text(
+        'Off'.tr(),
+        style: AppTextStyles.smallDescription.copyWith(
+          color: AppColors.current.red,
+          fontWeight: FontWeight.w600,
         ),
+      );
+    }
+    final mutedUntil = state.notificationsMutedUntil;
+    if (mutedUntil != null && DateTime.now().isBefore(mutedUntil)) {
+      final difference = mutedUntil.difference(DateTime.now());
+      if (difference.inHours > 0) {
+        return Text(
+          'Muted ({hours}h)'.tr(namedArgs: {'hours': difference.inHours.toString()}),
+          style: AppTextStyles.smallDescription.copyWith(
+            color: AppColors.current.midGray,
+            fontWeight: FontWeight.w600,
+          ),
+        );
+      } else {
+        return Text(
+          'Muted ({mins}m)'.tr(namedArgs: {'mins': difference.inMinutes.toString()}),
+          style: AppTextStyles.smallDescription.copyWith(
+            color: AppColors.current.midGray,
+            fontWeight: FontWeight.w600,
+          ),
+        );
+      }
+    }
+    return Text(
+      'On'.tr(),
+      style: AppTextStyles.smallDescription.copyWith(
+        color: const Color(0xFF5EA8DF),
+        fontWeight: FontWeight.w600,
       ),
     );
   }
@@ -110,16 +238,11 @@ class SettingsScreen extends StatelessWidget {
   }
 
   void _showThemePicker(BuildContext context) {
-    final themeCubit = context.read<ThemeCubit>();
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder:
-          (_) => BlocProvider.value(
-            value: themeCubit,
-            child: const _ThemePickerSheet(),
-          ),
+      builder: (_) => const _ThemePickerSheet(),
     );
   }
 
@@ -132,18 +255,85 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _requestReview(BuildContext context) async {
-    try {
-      await AppReviewService.requestFromSettings();
-    } catch (_) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppText.reviewUnavailable),
-          behavior: SnackBarBehavior.floating,
+  void _showNotificationSettings(BuildContext context) {
+    final profileBloc = context.read<ProfileBloc>();
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => BlocProvider.value(
+        value: profileBloc,
+        child: const _NotificationSettingsSheet(),
+      ),
+    );
+  }
+
+  void _doDeleteAccount(BuildContext context) {
+    context.read<ProfileBloc>().add(DeleteAccountEvent());
+  }
+
+  void _showDeleteAccountDialog(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (d) => AlertDialog(
+        backgroundColor: AppColors.current.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
         ),
-      );
-    }
+        title: Row(
+          children: [
+            Icon(
+              Icons.warning_amber_rounded,
+              color: AppColors.current.red,
+              size: 22.sp,
+            ),
+            SizedBox(width: 8.w),
+            Expanded(
+              child: Text(
+                AppText.deleteAccount,
+                style: AppTextStyles.bold.copyWith(
+                  fontSize: 18.sp,
+                  color: AppColors.current.text,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          AppText.deleteAccountConfirmation,
+          style: TextStyle(
+            fontSize: 14.sp,
+            color: AppColors.current.text,
+            height: 1.5,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(d).pop(),
+            child: Text(
+              AppText.cancel,
+              style: TextStyle(color: AppColors.current.midGray),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.current.red,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+            ),
+            onPressed: () {
+              Navigator.of(d).pop();
+              _doDeleteAccount(context);
+            },
+            child: Text(
+              AppText.delete,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -595,6 +785,276 @@ class _SettingsTile extends StatelessWidget {
                 color: AppColors.current.midGray.withAlpha(100),
                 size: 14.sp,
               ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NotificationSettingsSheet extends StatelessWidget {
+  const _NotificationSettingsSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    final accentColor = const Color(0xFF5EA8DF);
+
+    return BlocBuilder<ProfileBloc, ProfileState>(
+      builder: (context, state) {
+        final isCurrentlyMuted = state.notificationsMutedUntil != null &&
+            DateTime.now().isBefore(state.notificationsMutedUntil!);
+
+        return FractionallySizedBox(
+          heightFactor: 0.65,
+          child: Container(
+            padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 24.h),
+            decoration: BoxDecoration(
+              color: AppColors.current.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28.r)),
+            ),
+            child: SafeArea(
+              top: false,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 42.w,
+                      height: 4.h,
+                      decoration: BoxDecoration(
+                        color: AppColors.current.lightGray,
+                        borderRadius: BorderRadius.circular(99.r),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 18.h),
+                  Text(
+                    AppText.notificationSettings,
+                    style: AppTextStyles.title.copyWith(
+                      color: AppColors.current.text,
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+                  
+                  // Allow Notifications toggle
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
+                    decoration: BoxDecoration(
+                      color: AppColors.current.lightBlue,
+                      borderRadius: BorderRadius.circular(16.r),
+                      border: Border.all(
+                        color: AppColors.current.lightGray,
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                AppText.allowNotifications,
+                                style: AppTextStyles.description.copyWith(
+                                  color: AppColors.current.text,
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              SizedBox(height: 2.h),
+                              Text(
+                                'Receive app notifications'.tr(),
+                                style: AppTextStyles.smallDescription.copyWith(
+                                  color: AppColors.current.midGray,
+                                  fontSize: 11.sp,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Switch(
+                          value: state.notificationsEnabled && !isCurrentlyMuted,
+                          onChanged: (val) {
+                            context.read<ProfileBloc>().add(ToggleNotificationsEvent(val));
+                            if (val && isCurrentlyMuted) {
+                              context.read<ProfileBloc>().add(MuteNotificationsEvent(null));
+                            }
+                          },
+                          activeThumbColor: accentColor,
+                          activeTrackColor: accentColor.withAlpha(128),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 20.h),
+                  
+                  // Mute Options Header
+                  Text(
+                    AppText.muteNotifications,
+                    style: AppTextStyles.description.copyWith(
+                      color: AppColors.current.midGray,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: 10.h),
+                  
+                  // Mute Options List
+                  Expanded(
+                    child: ListView(
+                      physics: const BouncingScrollPhysics(),
+                      padding: EdgeInsets.zero,
+                      children: [
+                        _buildMuteOption(
+                          context,
+                          title: 'None (Unmute)'.tr(),
+                          isSelected: state.notificationsEnabled && !isCurrentlyMuted,
+                          onTap: () {
+                            context.read<ProfileBloc>().add(ToggleNotificationsEvent(true));
+                            context.read<ProfileBloc>().add(MuteNotificationsEvent(null));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(AppText.notificationsUnmutedSuccess),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          },
+                        ),
+                        SizedBox(height: 8.h),
+                        _buildMuteOption(
+                          context,
+                          title: AppText.muteFor1Hour,
+                          isSelected: isCurrentlyMuted &&
+                              state.notificationsMutedUntil!.difference(DateTime.now()).inHours <= 1,
+                          onTap: () {
+                            context.read<ProfileBloc>().add(MuteNotificationsEvent(const Duration(hours: 1)));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(AppText.notificationsMutedSuccess),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          },
+                        ),
+                        SizedBox(height: 8.h),
+                        _buildMuteOption(
+                          context,
+                          title: AppText.muteFor2Hours,
+                          isSelected: isCurrentlyMuted &&
+                              state.notificationsMutedUntil!.difference(DateTime.now()).inHours > 1 &&
+                              state.notificationsMutedUntil!.difference(DateTime.now()).inHours <= 2,
+                          onTap: () {
+                            context.read<ProfileBloc>().add(MuteNotificationsEvent(const Duration(hours: 2)));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(AppText.notificationsMutedSuccess),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          },
+                        ),
+                        SizedBox(height: 8.h),
+                        _buildMuteOption(
+                          context,
+                          title: AppText.muteFor8Hours,
+                          isSelected: isCurrentlyMuted &&
+                              state.notificationsMutedUntil!.difference(DateTime.now()).inHours > 2 &&
+                              state.notificationsMutedUntil!.difference(DateTime.now()).inHours <= 8,
+                          onTap: () {
+                            context.read<ProfileBloc>().add(MuteNotificationsEvent(const Duration(hours: 8)));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(AppText.notificationsMutedSuccess),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          },
+                        ),
+                        SizedBox(height: 8.h),
+                        _buildMuteOption(
+                          context,
+                          title: AppText.muteFor24Hours,
+                          isSelected: isCurrentlyMuted &&
+                              state.notificationsMutedUntil!.difference(DateTime.now()).inHours > 8 &&
+                              state.notificationsMutedUntil!.difference(DateTime.now()).inHours <= 24,
+                          onTap: () {
+                            context.read<ProfileBloc>().add(MuteNotificationsEvent(const Duration(hours: 24)));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(AppText.notificationsMutedSuccess),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          },
+                        ),
+                        SizedBox(height: 8.h),
+                        _buildMuteOption(
+                          context,
+                          title: AppText.muteIndefinitely,
+                          isSelected: !state.notificationsEnabled,
+                          onTap: () {
+                            context.read<ProfileBloc>().add(ToggleNotificationsEvent(false));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(AppText.notificationsMutedSuccess),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildMuteOption(
+    BuildContext context, {
+    required String title,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    final accentColor = const Color(0xFF5EA8DF);
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16.r),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        decoration: BoxDecoration(
+          color: isSelected ? accentColor.withAlpha(26) : AppColors.current.lightBlue,
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(
+            color: isSelected ? accentColor : AppColors.current.lightGray,
+            width: isSelected ? 1.6 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: AppTextStyles.description.copyWith(
+                  color: AppColors.current.text,
+                  fontSize: 13.sp,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                ),
+              ),
+            ),
+            AnimatedOpacity(
+              duration: const Duration(milliseconds: 180),
+              opacity: isSelected ? 1 : 0,
+              child: Icon(Icons.check_rounded, color: accentColor, size: 18.sp),
+            ),
           ],
         ),
       ),

@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:equatable/equatable.dart';
 import 'package:pettix/features/auth/domain/entities/user_entity.dart';
 
-enum ProfileStatus { initial, loading, loaded, updating, success, error }
+enum ProfileStatus { initial, loading, loaded, updating, success, error, deleteSuccess }
 
 class ProfileState extends Equatable {
   final ProfileStatus status;
@@ -12,6 +12,8 @@ class ProfileState extends Equatable {
   final String? pickedAvatarFilename;
   final int? selectedGenderId;
   final String? errorMessage;
+  final bool notificationsEnabled;
+  final DateTime? notificationsMutedUntil;
 
   const ProfileState({
     this.status = ProfileStatus.initial,
@@ -20,6 +22,8 @@ class ProfileState extends Equatable {
     this.pickedAvatarFilename,
     this.selectedGenderId,
     this.errorMessage,
+    this.notificationsEnabled = true,
+    this.notificationsMutedUntil,
   });
 
   ProfileState copyWith({
@@ -29,8 +33,11 @@ class ProfileState extends Equatable {
     String? pickedAvatarFilename,
     int? selectedGenderId,
     String? errorMessage,
+    bool? notificationsEnabled,
+    DateTime? notificationsMutedUntil,
     bool clearAvatar = false,
     bool clearGender = false,
+    bool clearMute = false,
   }) {
     return ProfileState(
       status: status ?? this.status,
@@ -39,10 +46,20 @@ class ProfileState extends Equatable {
       pickedAvatarFilename: clearAvatar ? null : (pickedAvatarFilename ?? this.pickedAvatarFilename),
       selectedGenderId: clearGender ? null : (selectedGenderId ?? this.selectedGenderId),
       errorMessage: errorMessage,
+      notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+      notificationsMutedUntil: clearMute ? null : (notificationsMutedUntil ?? this.notificationsMutedUntil),
     );
   }
 
   @override
-  List<Object?> get props =>
-      [status, profile, pickedAvatarBytes, pickedAvatarFilename, selectedGenderId, errorMessage];
+  List<Object?> get props => [
+        status,
+        profile,
+        pickedAvatarBytes,
+        pickedAvatarFilename,
+        selectedGenderId,
+        errorMessage,
+        notificationsEnabled,
+        notificationsMutedUntil,
+      ];
 }

@@ -156,63 +156,69 @@ class _DetailHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                height: 30.h,
-                width: double.infinity,
-                child: Stack(
-                  children: [
-                    // Back button on the far left/start
-                    Align(
-                      alignment: AlignmentDirectional.centerStart,
+              Row(
+               children: [
+                 SizedBox(width: 12.w),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: AppColors.current.lightBlue.withValues(
+                        alpha: 0.75,
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: SizedBox(
+                      width: 38.w,
+                      height: 38.w,
                       child: AppTopBarBackButton(
-                        onPressed: () => Navigator.of(context).pop(),
+                        onPressed:
+                            () =>
+                                context.canPop()
+                                    ? context.pop()
+                                    : Navigator.of(context).maybePop(),
+                        size: 17.sp,
                       ),
                     ),
-                    // Perfectly centered Pet Name
-                    Align(
-                      alignment: Alignment.center,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 80.w),
-                        child: Text(
-                          form.petName ?? AppText.unknownPet,
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: AppColors.current.text,
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.w800,
-                          ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        form.petName ?? AppText.unknownPet,
+                        textAlign: TextAlign.start,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: AppColors.current.text,
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                     ),
-                    // Status Badge on the far right
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Padding(
-                        padding: EdgeInsets.only(right: 16.w),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 10.w,
-                            vertical: 5.h,
-                          ),
-                          decoration: BoxDecoration(
-                            color: style.bg,
-                            borderRadius: BorderRadius.circular(20.r),
-                          ),
-                          child: Text(
-                            style.label,
-                            style: TextStyle(
-                              color: style.text,
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
+                  ),
+                  SizedBox(width: 10.w),
+                  Flexible(
+                    flex: 0,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10.w,
+                        vertical: 5.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: style.bg,
+                        borderRadius: BorderRadius.circular(20.r),
+                      ),
+                      child: Text(
+                        style.label,
+                        style: TextStyle(
+                          color: style.text,
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                 SizedBox(width: 12.w),
+                ],
               ),
             ],
           ),
@@ -624,6 +630,10 @@ class _MessageButton extends StatelessWidget {
             AppRouteNames.chat,
             pathParameters: {'index': targetId.toString()},
             queryParameters: {'isUserId': 'true'},
+            extra: {
+              'adoptionForm': form,
+              'adoptionHistoryBloc': context.read<AdoptionHistoryBloc>(),
+            },
           );
         },
       ),

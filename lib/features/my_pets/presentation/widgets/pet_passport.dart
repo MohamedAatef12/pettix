@@ -150,6 +150,98 @@ class _PetPassportDialogState extends State<_PetPassportDialog>
   }
 }
 
+class PetPassportCard extends StatefulWidget {
+  final PetEntity pet;
+  final bool initiallyShowingFront;
+  final ValueChanged<int>? onToggleStatus;
+  final VoidCallback? onEditPet;
+  final VoidCallback? onDeletePet;
+
+  const PetPassportCard({
+    super.key,
+    required this.pet,
+    this.initiallyShowingFront = true,
+    this.onToggleStatus,
+    this.onEditPet,
+    this.onDeletePet,
+  });
+
+  @override
+  State<PetPassportCard> createState() => _PetPassportCardState();
+}
+
+class _PetPassportCardState extends State<PetPassportCard>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _animation;
+  late bool _showingFront;
+
+  @override
+  void initState() {
+    super.initState();
+    _showingFront = widget.initiallyShowingFront;
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
+      value: widget.initiallyShowingFront ? 0 : 1,
+    );
+    _animation = Tween<double>(
+      begin: 0,
+      end: pi,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+  }
+
+  @override
+  void didUpdateWidget(covariant PetPassportCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.pet.id != widget.pet.id) {
+      _showingFront = widget.initiallyShowingFront;
+      _controller.value = widget.initiallyShowingFront ? 0 : 1;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _flip() {
+    if (_controller.isAnimating) return;
+    _showingFront ? _controller.forward() : _controller.reverse();
+    setState(() => _showingFront = !_showingFront);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (_, __) {
+        final angle = _animation.value;
+        final isFrontVisible = angle < pi / 2;
+        return Transform(
+          transform: Matrix4.rotationY(angle),
+          alignment: Alignment.center,
+          child:
+              isFrontVisible
+                  ? _PassportFront(pet: widget.pet, onFlip: _flip)
+                  : Transform(
+                    transform: Matrix4.rotationY(pi),
+                    alignment: Alignment.center,
+                    child: _PassportBack(
+                      pet: widget.pet,
+                      onFlip: _flip,
+                      onToggleStatus: widget.onToggleStatus,
+                      onEditPet: widget.onEditPet,
+                      onDeletePet: widget.onDeletePet,
+                    ),
+                  ),
+        );
+      },
+    );
+  }
+}
+
 class _PassportFront extends StatelessWidget {
   final PetEntity pet;
   final VoidCallback onFlip;
