@@ -153,8 +153,7 @@ abstract class AppText {
       '{count}m ago'.tr(namedArgs: {'count': '$n'});
   static String hoursAgo(int n) =>
       '{count}h ago'.tr(namedArgs: {'count': '$n'});
-  static String daysAgo(int n) =>
-      '{count}d ago'.tr(namedArgs: {'count': '$n'});
+  static String daysAgo(int n) => '{count}d ago'.tr(namedArgs: {'count': '$n'});
 
   // ── Chat ────────────────────────────────────────────────────────────────────
   static String get messagesTitle => 'Messages'.tr();
@@ -246,6 +245,9 @@ abstract class AppText {
   static String get notificationSettings => 'Notification Settings'.tr();
   static String get appSettings => 'App Settings'.tr();
   static String get themes => 'Themes'.tr();
+  static String get ratePettix => 'Rate Pettix'.tr();
+  static String get reviewUnavailable =>
+      'Review is not available right now.'.tr();
   static String get light => 'Light'.tr();
   static String get pets => 'Pets'.tr();
   static String get unknownLocation => 'Unknown location'.tr();
@@ -308,6 +310,11 @@ abstract class AppText {
       'Please provide details about why you want to report this pet listing.'
           .tr();
   static String get applyToAdopt => 'Apply to Adopt'.tr();
+  static String get cannotApplyOwnPet =>
+      'You cannot apply to adopt your own pet'.tr();
+  static String get cannotApplyOwnPetDescription =>
+      'This pet belongs to your account, so the adoption application is not available.'
+          .tr();
   static String get medicalHistory => 'Medical History'.tr();
   static String get about => 'About'.tr();
 

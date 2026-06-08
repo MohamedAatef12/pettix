@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/features/auth/domain/entities/user_entity.dart';
 
 class ProfileHeader extends StatelessWidget {
@@ -17,19 +18,10 @@ class ProfileHeader extends StatelessWidget {
       children: [
         if (context.canPop())
           Align(
-            alignment: Alignment.centerLeft,
+            alignment: AlignmentDirectional.centerStart,
             child: Padding(
               padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 0),
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                alignment: Alignment.centerLeft,
-                onPressed: () => context.pop(),
-                icon: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: AppColors.current.text,
-                  size: 20.w,
-                ),
-              ),
+              child: AppTopBarBackButton(onPressed: () => context.pop()),
             ),
           )
         else

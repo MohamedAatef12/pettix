@@ -7,6 +7,7 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/enums/app_enums.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/features/adoption_history/domain/entities/adoption_form_entity.dart';
 import 'package:pettix/features/adoption_history/presentation/bloc/adoption_history_bloc.dart';
 import 'package:pettix/features/adoption_history/presentation/bloc/adoption_history_event.dart';
@@ -160,16 +161,11 @@ class _DetailHeader extends StatelessWidget {
                 width: double.infinity,
                 child: Stack(
                   children: [
-                    // Back button on the far left
+                    // Back button on the far left/start
                     Align(
-                      alignment: Alignment.centerLeft,
-                      child: IconButton(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: AppTopBarBackButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        icon: Icon(
-                          Icons.arrow_back_ios_new_rounded,
-                          color: AppColors.current.text,
-                          size: 20.w,
-                        ),
                       ),
                     ),
                     // Perfectly centered Pet Name

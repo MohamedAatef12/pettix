@@ -6,9 +6,11 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../../config/di/di.dart';
 import '../../../../core/constants/app_texts.dart';
+import '../../../../core/services/app_review_service.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/utils/auth_toast.dart';
 import '../../../../core/utils/custom_text_form_field.dart';
+import '../../../../core/widgets/app_top_bar.dart';
 import '../../domain/entities/adoption_options_entity.dart';
 import '../bloc/adoption_bloc.dart';
 import '../bloc/adoption_event.dart';
@@ -116,24 +118,19 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppText.adoptionApplication),
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: AppColors.current.text,
-          ),
-          onPressed: () => context.pop(),
-        ),
+      appBar: AppTopBar.back(
+        title: AppText.adoptionApplication,
+        onBack: () => context.pop(),
       ),
       body: BlocConsumer<AdoptionBloc, AdoptionState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state.status == AdoptionStatus.success) {
             AuthToast.showSuccess(
               context,
               AppText.applicationSubmittedSuccessfully,
             );
+            await AppReviewService.requestAfterFirstAdoption(context);
+            if (!context.mounted) return;
             context.pop();
           } else if (state.status == AdoptionStatus.submitError) {
             AuthToast.showError(

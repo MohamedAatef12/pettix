@@ -6,12 +6,13 @@ import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_shimmer.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/features/adoption_history/domain/entities/adoption_form_entity.dart';
 import 'package:pettix/features/adoption_history/presentation/bloc/adoption_history_bloc.dart';
 import 'package:pettix/features/adoption_history/presentation/bloc/adoption_history_event.dart';
 import 'package:pettix/features/adoption_history/presentation/bloc/adoption_history_state.dart';
 import 'package:pettix/features/adoption_history/presentation/widgets/adoption_form_card.dart';
-import 'package:shimmer/shimmer.dart';
 
 class AdoptionHistoryScreen extends StatefulWidget {
   const AdoptionHistoryScreen({super.key});
@@ -88,49 +89,15 @@ class _HistoryHeader extends StatelessWidget {
         bottom: false,
         child: Column(
           children: [
-            // Top bar
-            Padding(
-              padding: EdgeInsets.fromLTRB(4.w, 4.h, 4.w, 15.h),
-              child: SizedBox(
-                height: 30.h,
-                width: double.infinity,
-                child: Stack(
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: IconButton(
-                        onPressed: () {
-                          if (context.canPop()) {
-                            context.pop();
-                          } else {
-                            context.goNamed(AppRouteNames.bottomNav);
-                          }
-                        },
-                        icon: Icon(
-                          Icons.arrow_back_ios_new_rounded,
-                          color: AppColors.current.text,
-                          size: 20.w,
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.center,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 80.w),
-                        child: Text(
-                          AppText.adoptionHistory,
-                          textAlign: TextAlign.center,
-                          style: AppTextStyles.bold.copyWith(
-                            fontSize: 18.sp,
-                            color: AppColors.current.text,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            AppTopBar.back(
+              title: AppText.adoptionHistory,
+              onBack: () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.goNamed(AppRouteNames.bottomNav);
+                }
+              },
             ),
             // Custom Horizontal Tab bar
             Container(
@@ -512,106 +479,71 @@ class _LoadingList extends StatelessWidget {
             margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
             padding: EdgeInsets.all(12.w),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.current.white,
               borderRadius: BorderRadius.circular(20.r),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
+                  color: AppColors.current.text.withValues(alpha: 0.04),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
               ],
             ),
-            child: Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
-              child: Row(
-                children: [
-                  // Avatar placeholder
-                  Container(
-                    width: 64.w,
-                    height: 64.w,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16.r),
-                    ),
-                  ),
-                  SizedBox(width: 14.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // Pet Name Title
-                            Container(
-                              width: 120.w,
-                              height: 16.h,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(4.r),
-                              ),
-                            ),
-                            // Status Badge
-                            Container(
-                              width: 55.w,
-                              height: 18.h,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20.r),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8.h),
-                        // Subtitle / Email
-                        Container(
-                          width: 160.w,
-                          height: 12.h,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
+            child: Row(
+              children: [
+                AppShimmer(
+                  width: 64.w,
+                  height: 64.w,
+                  borderRadius: BorderRadius.circular(16.r),
+                ),
+                SizedBox(width: 14.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          AppShimmer(
+                            width: 120.w,
+                            height: 16.h,
                             borderRadius: BorderRadius.circular(4.r),
                           ),
-                        ),
-                        SizedBox(height: 12.h),
-                        // Tags Row
-                        Row(
-                          children: [
-                            Container(
-                              width: 65.w,
-                              height: 18.h,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(8.r),
-                              ),
-                            ),
-                            SizedBox(width: 8.w),
-                            Container(
-                              width: 85.w,
-                              height: 18.h,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(8.r),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          AppShimmer(
+                            width: 55.w,
+                            height: 18.h,
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8.h),
+                      AppShimmer(
+                        width: 160.w,
+                        height: 12.h,
+                        borderRadius: BorderRadius.circular(4.r),
+                      ),
+                      SizedBox(height: 12.h),
+                      Row(
+                        children: [
+                          AppShimmer(
+                            width: 65.w,
+                            height: 18.h,
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                          SizedBox(width: 8.w),
+                          AppShimmer(
+                            width: 85.w,
+                            height: 18.h,
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  // Trailing Chevron Placeholder
-                  SizedBox(width: 8.w),
-                  Container(
-                    width: 12.w,
-                    height: 12.w,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+                SizedBox(width: 8.w),
+                AppShimmer.circular(radius: 6.w),
+              ],
             ),
           ),
     );

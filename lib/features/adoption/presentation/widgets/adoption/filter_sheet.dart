@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/app_texts.dart';
+import 'package:pettix/core/enums/app_enums.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_bloc.dart';
 import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_event.dart';
@@ -188,8 +189,12 @@ class _GenderChips extends StatelessWidget {
   Widget build(BuildContext context) {
     final options = [
       (id: null, label: AppText.all, icon: Icons.pets_rounded),
-      (id: 1, label: AppText.male, icon: Icons.male_rounded),
-      (id: 2, label: AppText.female, icon: Icons.female_rounded),
+      (id: Gender.male.value, label: AppText.male, icon: Icons.male_rounded),
+      (
+        id: Gender.female.value,
+        label: AppText.female,
+        icon: Icons.female_rounded,
+      ),
     ];
 
     return Wrap(

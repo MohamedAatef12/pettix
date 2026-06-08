@@ -8,12 +8,30 @@ class ThemeCubit extends Cubit<AppThemeOption> {
   ThemeCubit() : super(_loadInitial());
 
   static AppThemeOption _loadInitial() {
+    final savedName = _loadSavedName();
+    if (savedName != null) {
+      for (final option in AppThemeOption.values) {
+        if (option.name == savedName) return option;
+      }
+    }
+
     final index = SharedPrefsHelper.getInt(_key) ?? 0;
-    return AppThemeOption.values[index.clamp(0, AppThemeOption.values.length - 1)];
+    return AppThemeOption.values[index.clamp(
+      0,
+      AppThemeOption.values.length - 1,
+    )];
+  }
+
+  static String? _loadSavedName() {
+    try {
+      return SharedPrefsHelper.getString(_key);
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<void> setTheme(AppThemeOption option) async {
-    await SharedPrefsHelper.setInt(_key, option.index);
+    await SharedPrefsHelper.setString(_key, option.name);
     emit(option);
   }
 

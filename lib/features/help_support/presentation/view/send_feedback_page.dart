@@ -6,6 +6,7 @@ import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
 
 class SendFeedbackPage extends StatefulWidget {
   const SendFeedbackPage({super.key});
@@ -357,14 +358,14 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
   Widget _buildHeader(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.current.primary,
-            AppColors.current.primary.withAlpha(210),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppColors.current.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(8),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: SafeArea(
         bottom: false,
@@ -372,19 +373,12 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
           padding: EdgeInsets.fromLTRB(8.w, 4.h, 16.w, 20.h),
           child: Row(
             children: [
-              IconButton(
-                onPressed: () => context.pop(),
-                icon: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: Colors.white,
-                  size: 20.w,
-                ),
-              ),
+              AppTopBarBackButton(onPressed: () => context.pop()),
               Expanded(
                 child: Text(
                   AppText.sendFeedback,
                   style: AppTextStyles.appbar.copyWith(
-                    color: Colors.white,
+                    color: AppColors.current.text,
                     fontSize: 18.sp,
                     fontWeight: FontWeight.w600,
                   ),
@@ -392,7 +386,7 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
               ),
               Icon(
                 Icons.rate_review_rounded,
-                color: Colors.white70,
+                color: AppColors.current.midGray,
                 size: 26.w,
               ),
             ],

@@ -3,8 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/home/presentation/widgets/home_appbar.dart';
 import 'package:pettix/features/home/presentation/widgets/home_body.dart';
-import 'package:pettix/features/side_menu/presentation/view/widgets/custom_drawer.dart';
-
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -12,7 +10,6 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.current.lightBlue,
-      drawer: const CustomDrawer(),
       body: SafeArea(
         bottom: false,
         child: Column(

@@ -6,6 +6,7 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/features/profile/domain/entities/update_profile_entity.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_event.dart';
@@ -70,14 +71,7 @@ class EditProfileBody extends StatelessWidget {
               padding: EdgeInsets.fromLTRB(8.w, 8.h, 16.w, 0),
               child: Row(
                 children: [
-                  IconButton(
-                    onPressed: () => context.pop(),
-                    icon: Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      color: AppColors.current.text,
-                      size: 20.w,
-                    ),
-                  ),
+                  AppTopBarBackButton(onPressed: () => context.pop()),
                   Expanded(
                     child: Text(
                       AppText.editProfile,
@@ -360,7 +354,7 @@ class _SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: Alignment.centerLeft,
+      alignment: AlignmentDirectional.centerStart,
       child: Text(
         text.toUpperCase(),
         style: AppTextStyles.smallDescription.copyWith(
