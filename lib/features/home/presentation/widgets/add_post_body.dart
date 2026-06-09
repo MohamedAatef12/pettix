@@ -15,9 +15,90 @@ import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 import 'package:pettix/features/home/presentation/blocs/home_state.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/features/auth/data/models/user_model.dart';
+import 'package:pettix/features/home/domain/entities/post_entity.dart';
 
-class AddPostBody extends StatelessWidget {
-  const AddPostBody({super.key});
+class AddPostBody extends StatefulWidget {
+  final PostEntity? editingPost;
+
+  const AddPostBody({super.key, this.editingPost});
+
+  @override
+  State<AddPostBody> createState() => _AddPostBodyState();
+}
+
+class _AddPostBodyState extends State<AddPostBody> {
+  late List<String> _existingImages;
+  late HomeBloc _bloc;
+  final List<String> _deletedImages = [];
+
+  bool get _isEditing => widget.editingPost != null;
+
+  @override
+  void initState() {
+    super.initState();
+    _existingImages = List<String>.from(widget.editingPost?.images ?? []);
+    if (_isEditing) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        context.read<HomeBloc>().add(ClearSelectedImagesEvent());
+        context.read<HomeBloc>().postTextController.text =
+            widget.editingPost!.content;
+      });
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _bloc = context.read<HomeBloc>();
+  }
+
+  @override
+  void dispose() {
+    if (_isEditing) {
+      _bloc.postTextController.clear();
+      _bloc.add(ClearSelectedImagesEvent());
+    }
+    super.dispose();
+  }
+
+  void _submit(BuildContext context, HomeBloc bloc) {
+    if (!_isEditing) {
+      bloc.add(SubmitPostEvent());
+      return;
+    }
+
+    final content = bloc.postTextController.text.trim();
+    final original = widget.editingPost!;
+    final newImagePaths =
+        bloc.state.selectedImages.map((file) => file.path).toList();
+    final hasImageChanges =
+        _deletedImages.isNotEmpty || newImagePaths.isNotEmpty;
+
+    if ((content.isEmpty && _existingImages.isEmpty && newImagePaths.isEmpty) ||
+        (content == original.content.trim() && !hasImageChanges)) {
+      context.pop();
+      return;
+    }
+
+    final editedPost = original.copyWith(
+      content: content,
+      modifyDate: DateTime.now().toUtc().toIso8601String(),
+      images: [..._existingImages, ...newImagePaths],
+    );
+
+    context.pop();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      bloc.add(EditPostEvent(editedPost, deletedImages: _deletedImages));
+    });
+  }
+
+  void _removeExistingImage(String image) {
+    setState(() {
+      _existingImages.remove(image);
+      _deletedImages.add(image);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +132,8 @@ class AddPostBody extends StatelessWidget {
               _Header(
                 isLoading: state.isAddPostLoading,
                 onCancel: () => context.pop(),
-                onPost: () => bloc.add(SubmitPostEvent()),
+                onPost: () => _submit(context, bloc),
+                actionLabel: _isEditing ? AppText.edit : AppText.post,
               ),
 
               Expanded(
@@ -93,6 +175,12 @@ class AddPostBody extends StatelessWidget {
                       SizedBox(height: 20.h),
 
                       // ─── Media Preview ──────────────────────────────────
+                      if (_isEditing && _existingImages.isNotEmpty)
+                        _ExistingImagePreviewGrid(
+                          images: _existingImages,
+                          onRemove: _removeExistingImage,
+                        ),
+
                       if (state.selectedImages.isNotEmpty)
                         _ImagePreviewGrid(
                           images: state.selectedImages,
@@ -132,11 +220,13 @@ class _Header extends StatelessWidget {
   final bool isLoading;
   final VoidCallback onCancel;
   final VoidCallback onPost;
+  final String actionLabel;
 
   const _Header({
     required this.isLoading,
     required this.onCancel,
     required this.onPost,
+    required this.actionLabel,
   });
 
   @override
@@ -169,7 +259,7 @@ class _Header extends StatelessWidget {
               ),
             ),
             child: Text(
-              AppText.post,
+              actionLabel,
               style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w700),
             ),
           ),
@@ -290,6 +380,62 @@ class _ImagePreviewGrid extends StatelessWidget {
                   ),
                   child: AppIcon(
                     token: AppIconToken.close,
+                    color: Colors.white,
+                    size: 16.w,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _ExistingImagePreviewGrid extends StatelessWidget {
+  final List<String> images;
+  final ValueChanged<String> onRemove;
+
+  const _ExistingImagePreviewGrid({
+    required this.images,
+    required this.onRemove,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: images.length == 1 ? 1 : 2,
+        mainAxisSpacing: 10.w,
+        crossAxisSpacing: 10.w,
+        childAspectRatio: 1,
+      ),
+      itemCount: images.length,
+      itemBuilder: (context, index) {
+        final image = images[index];
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16.r),
+              child: AppCachedImage(imageUrl: image, fit: BoxFit.cover),
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: GestureDetector(
+                onTap: () => onRemove(image),
+                child: Container(
+                  padding: EdgeInsets.all(6.w),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withAlpha(120),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.close_rounded,
                     color: Colors.white,
                     size: 16.w,
                   ),

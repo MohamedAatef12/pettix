@@ -9,10 +9,16 @@ import 'package:pettix/features/home/presentation/widgets/post_card_header.dart'
 import 'package:pettix/features/home/presentation/widgets/post_image_gallery.dart';
 
 class PostCard extends StatelessWidget {
-  const PostCard({super.key, required this.post, this.isDetailView = false});
+  const PostCard({
+    super.key,
+    required this.post,
+    this.isDetailView = false,
+    this.showOwnerActions = false,
+  });
 
   final PostEntity post;
   final bool isDetailView;
+  final bool showOwnerActions;
 
   @override
   Widget build(BuildContext context) {
@@ -29,11 +35,16 @@ class PostCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              PostCardHeader(post: post, isDetailView: isDetailView),
+              PostCardHeader(
+                post: post,
+                isDetailView: isDetailView,
+                showOwnerActions: showOwnerActions,
+              ),
               SizedBox(height: 10.h),
               Text(post.content, style: AppTextStyles.description),
+              SizedBox(height: 10.h),
               PostImageGallery(post: post),
-              SizedBox(height: 30.h),
+              SizedBox(height: 20.h),
               PostCardActions(post: post, isDetailView: isDetailView),
             ],
           ),

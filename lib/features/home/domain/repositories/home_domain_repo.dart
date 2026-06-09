@@ -23,7 +23,10 @@ abstract class HomeDomainRepository {
   Future<Either<Failure, PostEntity>> getPostById(int id);
   Future<Either<Failure, void>> addPost(PostEntity post);
   Future<Either<Failure, void>> deletePost(int id);
-  Future<Either<Failure, void>> editPost(PostEntity post);
+  Future<Either<Failure, void>> editPost(
+    PostEntity post, {
+    List<String> deletedImages = const [],
+  });
   Future<Either<Failure, int>> getPostCommentsCount(int postId);
   // Comments
   Future<Either<Failure, List<CommentEntity>>> getPostComments(int id);

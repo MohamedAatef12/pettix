@@ -34,6 +34,14 @@ class DeletePostEvent extends HomeEvent {
   List<Object?> get props => [id];
 }
 
+class EditPostEvent extends HomeEvent {
+  final PostEntity post;
+  final List<String> deletedImages;
+  EditPostEvent(this.post, {this.deletedImages = const []});
+  @override
+  List<Object?> get props => [post, deletedImages];
+}
+
 class FetchPostsCommentsEvent extends HomeEvent {
   final int postId;
   FetchPostsCommentsEvent(this.postId);
@@ -102,6 +110,8 @@ class RemoveSelectedImageEvent extends HomeEvent {
   @override
   List<Object?> get props => [index];
 }
+
+class ClearSelectedImagesEvent extends HomeEvent {}
 
 class AddReplyEvent extends HomeEvent {
   final CommentEntity reply;
