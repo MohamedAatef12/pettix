@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 /// A single grouped card containing multiple [ProfileInfoRow] items.
 /// Wrap your rows inside this to get the bordered card look.
 class ProfileInfoGroup extends StatelessWidget {
@@ -27,11 +29,12 @@ class ProfileInfoGroup extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         itemCount: rows.length,
-        separatorBuilder: (_, __) => Divider(
-          height: 1,
-          indent: 52.w,
-          color: AppColors.current.lightGray,
-        ),
+        separatorBuilder:
+            (_, __) => Divider(
+              height: 1,
+              indent: 52.w,
+              color: AppColors.current.lightGray,
+            ),
         itemBuilder: (_, i) => rows[i],
       ),
     );
@@ -66,7 +69,7 @@ class ProfileInfoRow extends StatelessWidget {
               color: color.withAlpha(20),
               borderRadius: BorderRadius.circular(8.r),
             ),
-            child: Icon(icon, color: color, size: 16.w),
+            child: AppIcon.raw(icon, color: color, size: 16.w),
           ),
           SizedBox(width: 12.w),
           Expanded(

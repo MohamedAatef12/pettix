@@ -11,6 +11,8 @@ import 'package:pettix/features/notification/presentation/view/widgets/notificat
 import 'package:pettix/features/notification/presentation/view/widgets/notification_shimmer.dart';
 import 'package:pettix/features/notification/presentation/view/widgets/empty_notifications.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class AllNotifications extends StatefulWidget {
   const AllNotifications({super.key});
 
@@ -40,11 +42,13 @@ class _AllNotificationsState extends State<AllNotifications> {
       if (state.hasMore && !state.isPaginating) {
         final currentType = NotificationType.values[state.currentIndex].value;
         final nextPage = (state.notifications.length / 10).floor() + 1;
-        
-        context.read<NotificationBloc>().add(GetNotificationsEvent(
-          notificationTypeId: currentType,
-          pageIndex: nextPage,
-        ));
+
+        context.read<NotificationBloc>().add(
+          GetNotificationsEvent(
+            notificationTypeId: currentType,
+            pageIndex: nextPage,
+          ),
+        );
       }
     }
   }
@@ -68,7 +72,11 @@ class _AllNotificationsState extends State<AllNotifications> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.error_outline, size: 48.sp, color: AppColors.current.red),
+                AppIcon.raw(
+                  Icons.error_outline,
+                  size: 48.sp,
+                  color: AppColors.current.red,
+                ),
                 SizedBox(height: 16.h),
                 Text(state.errorMessage, style: AppTextStyles.description),
               ],
@@ -76,25 +84,24 @@ class _AllNotificationsState extends State<AllNotifications> {
           );
         }
         if (state.notifications.isEmpty) {
-          return const Center(
-            child: EmptyNotifications(),
-          );
+          return const Center(child: EmptyNotifications());
         }
         return ListView.builder(
-            controller: _scrollController,
-            itemCount: state.notifications.length + (state.isPaginating ? 1 : 0),
-            padding: EdgeInsets.only(bottom: 20.h),
-            physics: const BouncingScrollPhysics(),
-            itemBuilder: (context, index) {
-              if (index >= state.notifications.length) {
-                return const NotificationItemShimmer();
-              }
-              final notification = state.notifications[index];
-              return NotificationCard(
-                color: AppColors.current.white,
-                notification: notification,
-              );
-            });
+          controller: _scrollController,
+          itemCount: state.notifications.length + (state.isPaginating ? 1 : 0),
+          padding: EdgeInsets.only(bottom: 20.h),
+          physics: const BouncingScrollPhysics(),
+          itemBuilder: (context, index) {
+            if (index >= state.notifications.length) {
+              return const NotificationItemShimmer();
+            }
+            final notification = state.notifications[index];
+            return NotificationCard(
+              color: AppColors.current.white,
+              notification: notification,
+            );
+          },
+        );
       },
     );
   }

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:pettix/core/constants/app_typography.dart';
 
 ThemeData darkTheme = ThemeData(
   useMaterial3: true,
   brightness: Brightness.dark,
-  fontFamily: GoogleFonts.cairo().fontFamily,
+  fontFamily: AppTypography.fontFamily,
+  textTheme: AppTypography.textTheme(textColor: const Color(0xffE4E4F5)),
   scaffoldBackgroundColor: const Color(0xff13131F),
   colorScheme: const ColorScheme.dark(
     primary: Color(0xff7C3AED),

@@ -12,6 +12,8 @@ import 'package:pettix/features/chat/domain/entity/conversation_entity.dart';
 import 'package:pettix/features/chat/presentation/view/widgets/updating_banner.dart';
 import 'package:pettix/core/widgets/app_profile_image.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class ChatListTaps extends StatelessWidget {
   const ChatListTaps({super.key});
 
@@ -26,7 +28,7 @@ class ChatListTaps extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.error_outline, size: 48.r, color: Colors.red),
+                AppIcon.raw(Icons.error_outline, size: 48.r, color: Colors.red),
                 SizedBox(height: 10.h),
                 Text(state.message, style: TextStyle(color: Colors.red)),
               ],
@@ -58,7 +60,8 @@ class ChatListTaps extends StatelessWidget {
               ),
               // Animated "Updating…" banner — slides in from top when refreshing
               AnimatedSlide(
-                offset: state.isRefreshing ? Offset.zero : const Offset(0, -1.5),
+                offset:
+                    state.isRefreshing ? Offset.zero : const Offset(0, -1.5),
                 duration: const Duration(milliseconds: 350),
                 curve: Curves.easeOutCubic,
                 child: AnimatedOpacity(
@@ -96,7 +99,8 @@ class _ConversationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final otherMember = conversation.members
+    final otherMember =
+        conversation.members
             .where((m) => m.user.id != currentUserId)
             .firstOrNull ??
         (conversation.members.isNotEmpty ? conversation.members.first : null);
@@ -186,7 +190,8 @@ class _ConversationCard extends StatelessWidget {
                     ),
                     SizedBox(height: 6.h),
                     Text(
-                      conversation.lastMessage?.content ?? AppText.noMessagesYet,
+                      conversation.lastMessage?.content ??
+                          AppText.noMessagesYet,
                       style: TextStyle(
                         fontSize: 12.sp,
                         color: AppColors.current.lightText,
@@ -209,7 +214,9 @@ class _ConversationCard extends StatelessWidget {
     final difference = now.difference(date);
 
     if (difference.inMinutes < 1) return AppText.justNow;
-    if (difference.inMinutes < 60) return AppText.minutesAgo(difference.inMinutes);
+    if (difference.inMinutes < 60) {
+      return AppText.minutesAgo(difference.inMinutes);
+    }
     if (difference.inHours < 24) {
       return '${date.hour}:${date.minute.toString().padLeft(2, '0')}';
     }

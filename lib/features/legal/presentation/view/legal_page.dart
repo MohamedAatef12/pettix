@@ -7,6 +7,8 @@ import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class LegalPage extends StatelessWidget {
   const LegalPage({super.key});
 
@@ -133,7 +135,7 @@ class LegalPage extends StatelessWidget {
                   ),
                 ),
               ),
-              Icon(
+              AppIcon.raw(
                 Icons.balance_rounded,
                 color: AppColors.current.midGray,
                 size: 26.w,
@@ -187,7 +189,7 @@ class _LegalTile extends StatelessWidget {
                   color: iconColor.withAlpha(20),
                   borderRadius: BorderRadius.circular(11.r),
                 ),
-                child: Icon(icon, color: iconColor, size: 20.w),
+                child: AppIcon.raw(icon, color: iconColor, size: 20.w),
               ),
               SizedBox(width: 14.w),
               Expanded(
@@ -212,7 +214,7 @@ class _LegalTile extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(
+              AppIcon.raw(
                 Icons.chevron_right_rounded,
                 color: AppColors.current.lightGray,
                 size: 20.w,

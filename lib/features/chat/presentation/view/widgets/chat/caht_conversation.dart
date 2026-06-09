@@ -23,6 +23,8 @@ import 'package:pettix/features/my_pets/domain/usecases/get_user_pets_usecase.da
 import 'package:pettix/features/my_pets/presentation/widgets/pet_passport.dart';
 import 'package:pettix/core/widgets/app_cached_image.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class ChatConversation extends StatefulWidget {
   final int userIndex;
   final AdoptionFormEntity? adoptionForm;
@@ -288,7 +290,7 @@ class _AdoptionNotch extends StatelessWidget {
                   behavior: HitTestBehavior.translucent,
                   child: Transform.rotate(
                     angle: -1.5708,
-                    child: Icon(
+                    child: AppIcon.raw(
                       Icons.pets_rounded,
                       color: color,
                       size: 24.w,
@@ -491,7 +493,7 @@ class _AdoptedPetCardState extends State<_AdoptedPetCard> {
                     color: Colors.white.withValues(alpha: 0.5),
                   ),
                 ),
-                child: Icon(
+                child: AppIcon.raw(
                   Icons.close_rounded,
                   color: Colors.white,
                   size: 17.w,
@@ -609,7 +611,7 @@ class ChatBubble extends StatelessWidget {
                       children: [
                         if (isMe) ...[
                           SizedBox(width: 4.w),
-                          Icon(
+                          AppIcon.raw(
                             isFailed
                                 ? Icons.error_outline
                                 : isSending
@@ -645,7 +647,7 @@ class ChatBubble extends StatelessWidget {
               onTap: onResend,
               child: Padding(
                 padding: EdgeInsets.only(bottom: 8.h, right: 4.w),
-                child: Icon(
+                child: AppIcon.raw(
                   Icons.refresh_rounded,
                   size: 18.r,
                   color: Colors.redAccent,
@@ -709,7 +711,7 @@ class ChatBubble extends StatelessWidget {
                         color: Colors.black.withValues(alpha: 0.5),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child: const AppIcon.raw(
                         Icons.close,
                         color: Colors.white,
                         size: 24,

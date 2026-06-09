@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class NotificationsTabButton extends StatelessWidget {
   final String title;
   final IconData icon;
@@ -55,10 +57,13 @@ class NotificationsTabButton extends StatelessWidget {
             Stack(
               clipBehavior: Clip.none,
               children: [
-                Icon(
+                AppIcon.raw(
                   icon,
                   size: 18.sp,
-                  color: isActive ? AppColors.current.white : AppColors.current.primary,
+                  color:
+                      isActive
+                          ? AppColors.current.white
+                          : AppColors.current.primary,
                 ),
                 if (unreadCount > 0)
                   Positioned(
@@ -92,7 +97,8 @@ class NotificationsTabButton extends StatelessWidget {
               title,
               style: AppTextStyles.bold.copyWith(
                 fontSize: 14.sp,
-                color: isActive ? AppColors.current.white : AppColors.current.text,
+                color:
+                    isActive ? AppColors.current.white : AppColors.current.text,
               ),
             ),
           ],

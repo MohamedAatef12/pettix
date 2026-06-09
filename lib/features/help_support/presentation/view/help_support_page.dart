@@ -7,6 +7,8 @@ import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class HelpSupportPage extends StatelessWidget {
   const HelpSupportPage({super.key});
 
@@ -125,7 +127,7 @@ class _Header extends StatelessWidget {
                   ),
                 ),
               ),
-              Icon(
+              AppIcon.raw(
                 Icons.support_agent_rounded,
                 color: AppColors.current.midGray,
                 size: 28.w,
@@ -182,7 +184,7 @@ class _SupportCard extends StatelessWidget {
                 color: iconBg,
                 borderRadius: BorderRadius.circular(12.r),
               ),
-              child: Icon(icon, color: iconColor, size: 22.w),
+              child: AppIcon.raw(icon, color: iconColor, size: 22.w),
             ),
             const Spacer(),
             Text(
@@ -233,7 +235,7 @@ class _QuickHelpBanner extends StatelessWidget {
               color: AppColors.current.primary.withAlpha(20),
               shape: BoxShape.circle,
             ),
-            child: Icon(
+            child: AppIcon.raw(
               Icons.chat_bubble_outline_rounded,
               color: AppColors.current.primary,
               size: 22.w,

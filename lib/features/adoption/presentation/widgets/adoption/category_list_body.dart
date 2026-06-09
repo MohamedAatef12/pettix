@@ -7,6 +7,8 @@ import 'package:pettix/core/widgets/app_logo.dart';
 
 import '../../../../../config/router/routes.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class CategoryListBody extends StatelessWidget {
   const CategoryListBody({super.key});
 
@@ -45,7 +47,7 @@ class CategoryListBody extends StatelessWidget {
                   },
 
                   hasLeading: true,
-                  leading: Icon(
+                  leading: AppIcon.raw(
                     Icons.pets_rounded,
                     color: Colors.white,
                     size: 20,

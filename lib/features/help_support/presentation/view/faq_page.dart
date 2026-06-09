@@ -6,6 +6,8 @@ import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class FaqPage extends StatefulWidget {
   const FaqPage({super.key});
 
@@ -127,7 +129,7 @@ class _FaqPageState extends State<FaqPage> {
                       color: AppColors.current.midGray,
                       fontSize: 13.sp,
                     ),
-                    prefixIcon: Icon(
+                    prefixIcon: AppIcon.raw(
                       Icons.search_rounded,
                       color: AppColors.current.midGray,
                       size: 20.w,
@@ -139,7 +141,7 @@ class _FaqPageState extends State<FaqPage> {
                                 _searchController.clear();
                                 setState(() => _query = '');
                               },
-                              child: Icon(
+                              child: AppIcon.raw(
                                 Icons.close_rounded,
                                 color: AppColors.current.midGray,
                                 size: 18.w,
@@ -280,7 +282,11 @@ class _CategorySection extends StatelessWidget {
                 color: category.color.withAlpha(26),
                 borderRadius: BorderRadius.circular(8.r),
               ),
-              child: Icon(category.icon, color: category.color, size: 16.w),
+              child: AppIcon.raw(
+                category.icon,
+                color: category.color,
+                size: 16.w,
+              ),
             ),
             SizedBox(width: 10.w),
             Text(
@@ -396,7 +402,7 @@ class _FaqTileState extends State<_FaqTile>
                 SizedBox(width: 8.w),
                 RotationTransition(
                   turns: _rotation,
-                  child: Icon(
+                  child: AppIcon.raw(
                     Icons.keyboard_arrow_down_rounded,
                     color: widget.accentColor,
                     size: 20.w,
@@ -437,7 +443,7 @@ class _EmptySearch extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          AppIcon.raw(
             Icons.search_off_rounded,
             size: 56.r,
             color: AppColors.current.lightGray,

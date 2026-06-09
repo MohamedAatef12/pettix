@@ -6,6 +6,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? leading;
   final String title;
@@ -97,7 +99,7 @@ class AppTopBarBackButton extends StatelessWidget {
     final isRtl =
         Directionality.maybeOf(context) == ui.TextDirection.rtl ||
         context.locale.languageCode == 'ar';
-    final icon = Icon(
+    final icon = AppIcon.raw(
       Icons.arrow_back_ios_new_rounded,
       color: color ?? AppColors.current.text,
       size: size ?? 20.sp,

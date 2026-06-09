@@ -14,6 +14,8 @@ import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_state
 import 'package:pettix/features/adoption/presentation/widgets/pet_profile/pet_body.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class PetProfileScreen extends StatelessWidget {
   final PetEntity pet;
 
@@ -78,7 +80,10 @@ class PetProfileScreen extends StatelessWidget {
           onBack: () => context.pop(),
           trailing: IconButton(
             tooltip: AppText.reportPet,
-            icon: Icon(Icons.flag_outlined, color: AppColors.current.red),
+            icon: AppIcon.raw(
+              Icons.flag_outlined,
+              color: AppColors.current.red,
+            ),
             onPressed: () => _showReportSheet(context),
           ),
         ),
@@ -198,7 +203,7 @@ class _ReportPetSheet extends StatelessWidget {
                           backgroundColor: AppColors.current.red.withValues(
                             alpha: 0.08,
                           ),
-                          child: Icon(
+                          child: AppIcon.raw(
                             isOther
                                 ? Icons.edit_note_rounded
                                 : Icons.report_gmailerrorred_rounded,
@@ -213,7 +218,7 @@ class _ReportPetSheet extends StatelessWidget {
                             color: AppColors.current.text,
                           ),
                         ),
-                        trailing: Icon(
+                        trailing: AppIcon.raw(
                           Icons.arrow_forward_ios_rounded,
                           size: 14.r,
                           color: AppColors.current.lightText.withValues(

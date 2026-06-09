@@ -5,6 +5,8 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class PetBrowseCard extends StatelessWidget {
   final PetEntity pet;
   final VoidCallback onViewProfile;
@@ -142,7 +144,7 @@ class _PhotoPlaceholder extends StatelessWidget {
     return Container(
       color: AppColors.current.lightBlue,
       child: Center(
-        child: Icon(
+        child: AppIcon.raw(
           Icons.pets_rounded,
           color: AppColors.current.primary.withAlpha(80),
           size: 48.w,
@@ -173,7 +175,7 @@ class _GenderBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.white, size: 10.w),
+          AppIcon.raw(icon, color: Colors.white, size: 10.w),
           SizedBox(width: 2.w),
           Text(
             gender,

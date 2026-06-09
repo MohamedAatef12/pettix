@@ -17,6 +17,8 @@ import 'package:pettix/features/chat/presentation/bloc/chat_state.dart';
 import 'package:pettix/features/chat/presentation/view/widgets/chat/caht_conversation.dart';
 import 'package:pettix/features/chat/presentation/view/widgets/chat/chat_text_form_fied.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class ChatBody extends StatefulWidget {
   final int index;
   final AdoptionFormEntity? adoptionForm;
@@ -303,7 +305,7 @@ class _ChatAdoptionActions extends StatelessWidget {
               color: AppColors.current.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(
+            child: AppIcon.raw(
               Icons.pets_rounded,
               color: AppColors.current.primary,
               size: 18.w,
@@ -389,7 +391,11 @@ class _DecisionButton extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: isOutlined ? color : Colors.white, size: 16.w),
+              AppIcon.raw(
+                icon,
+                color: isOutlined ? color : Colors.white,
+                size: 16.w,
+              ),
               SizedBox(width: 4.w),
               Text(
                 label,

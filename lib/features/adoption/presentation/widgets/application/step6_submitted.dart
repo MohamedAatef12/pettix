@@ -7,6 +7,8 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class StepSubmitted extends StatefulWidget {
   final VoidCallback onViewApplication;
   final VoidCallback onBrowseMore;
@@ -195,7 +197,7 @@ class _StepSubmittedState extends State<StepSubmitted>
                             ),
                           ],
                         ),
-                        child: Icon(
+                        child: AppIcon.raw(
                           Icons.check_rounded,
                           size: 42.w,
                           color: Colors.white,
@@ -347,7 +349,7 @@ class _InfoCard extends StatelessWidget {
               color: iconColor.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10.r),
             ),
-            child: Icon(icon, size: 18.w, color: iconColor),
+            child: AppIcon.raw(icon, size: 18.w, color: iconColor),
           ),
           SizedBox(width: 12.w),
           Expanded(

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import '../../../../config/di/di.dart';
 import '../../../../core/constants/app_texts.dart';
 import '../../../../core/services/app_review_service.dart';
@@ -58,6 +57,13 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
 
   DateTime? _selectedDate;
 
+  String _formatDateInEnglish(DateTime date) {
+    final year = date.year.toString().padLeft(4, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day.toString().padLeft(2, '0');
+    return '$year-$month-$day';
+  }
+
   @override
   void dispose() {
     _fullNameController.dispose();
@@ -78,7 +84,7 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
     if (picked != null) {
       setState(() {
         _selectedDate = picked;
-        _dateOfBirthController.text = DateFormat('yyyy-MM-dd').format(picked);
+        _dateOfBirthController.text = _formatDateInEnglish(picked);
       });
     }
   }

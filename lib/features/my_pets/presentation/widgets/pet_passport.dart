@@ -7,6 +7,8 @@ import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 /// Opens the pet passport overlay.
 /// Pass null callbacks to show a read-only passport.
 void showPetPassport(
@@ -134,7 +136,7 @@ class _PetPassportDialogState extends State<_PetPassportDialog>
                       color: Colors.black.withAlpha(110),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
+                    child: AppIcon.raw(
                       Icons.close_rounded,
                       color: Colors.white,
                       size: 17.w,
@@ -291,7 +293,7 @@ class _PassportHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
+              AppIcon.raw(
                 Icons.pets_rounded,
                 color: AppColors.current.gold,
                 size: 18.w,
@@ -427,7 +429,7 @@ class _PassportFooter extends StatelessWidget {
             borderRadius: BorderRadius.circular(8.r),
             border: Border.all(color: AppColors.current.lightGray),
           ),
-          child: Icon(
+          child: AppIcon.raw(
             Icons.qr_code_2_rounded,
             color: AppColors.current.text,
             size: 40.w,
@@ -451,7 +453,7 @@ class _PassportFooter extends StatelessWidget {
               SizedBox(height: 5.h),
               Row(
                 children: [
-                  Icon(
+                  AppIcon.raw(
                     Icons.touch_app_rounded,
                     color: AppColors.current.midGray,
                     size: 14.w,
@@ -610,7 +612,7 @@ class _BackHeader extends StatelessWidget {
               ],
             ),
           ),
-          Icon(
+          AppIcon.raw(
             Icons.verified_rounded,
             color: AppColors.current.gold,
             size: 22.w,
@@ -791,7 +793,7 @@ class _VaccinationTile extends StatelessWidget {
               color: AppColors.current.teal.withAlpha(26),
               borderRadius: BorderRadius.circular(8.r),
             ),
-            child: Icon(
+            child: AppIcon.raw(
               Icons.vaccines_rounded,
               color: AppColors.current.teal,
               size: 16.w,
@@ -879,7 +881,7 @@ class _StatusToggleButtonState extends State<_StatusToggleButton> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 16.w),
+            AppIcon.raw(icon, color: color, size: 16.w),
             SizedBox(width: 8.w),
             Text(
               label,
@@ -951,7 +953,7 @@ class _ActionButton extends StatelessWidget {
           border: Border.all(color: color.withAlpha(80)),
         ),
         alignment: Alignment.center,
-        child: Icon(icon, color: color, size: 20.w),
+        child: AppIcon.raw(icon, color: color, size: 20.w),
       ),
     );
   }
@@ -1045,7 +1047,7 @@ class _VerifiedStamp extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            AppIcon.raw(
               Icons.verified_rounded,
               color: AppColors.current.teal,
               size: 13.w,
@@ -1106,7 +1108,7 @@ class _PhotoPlaceholder extends StatelessWidget {
       width: size,
       height: size,
       color: AppColors.current.lightGray.withAlpha(70),
-      child: Icon(
+      child: AppIcon.raw(
         Icons.pets_rounded,
         color: AppColors.current.primary.withAlpha(90),
         size: size * 0.4,

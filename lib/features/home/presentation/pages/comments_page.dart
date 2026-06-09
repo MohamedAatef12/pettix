@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_icon_system.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/features/home/data/models/author_model.dart';
 import 'package:pettix/features/home/domain/entities/comments_entity.dart';
@@ -116,13 +116,14 @@ class _CommentsPageState extends State<CommentsPage> {
                                 ),
                               ),
                               SizedBox(width: 8.w),
-                              GestureDetector(
+                              AppIconButton(
+                                token: AppIconToken.close,
+                                size: 22.r,
+                                iconSize: 14.r,
+                                color: AppColors.current.primary,
+                                backgroundColor: AppColors.current.primary
+                                    .withValues(alpha: 0.1),
                                 onTap: () => bloc.add(SetReplyingToEvent(null)),
-                                child: Icon(
-                                  Icons.cancel,
-                                  size: 16.r,
-                                  color: AppColors.current.primary,
-                                ),
                               ),
                             ],
                           ),
@@ -170,11 +171,13 @@ class _CommentsPageState extends State<CommentsPage> {
                             ),
                           ),
                           SizedBox(width: 10.w),
-                          GestureDetector(
+                          AppIconButton(
+                            token: AppIconToken.send,
+                            size: 42.w,
+                            iconSize: 20.w,
+                            color: AppColors.current.white,
+                            backgroundColor: AppColors.current.primary,
                             onTap: () => _onSubmitComment(context, bloc, user),
-                            child: SvgPicture.asset(
-                              'assets/icons/add_comment.svg',
-                            ),
                           ),
                         ],
                       ),
@@ -206,29 +209,29 @@ class _CommentsPageState extends State<CommentsPage> {
       final replyingTo = bloc.state.replyingTo;
       final fullText = text;
 
-        final comment = CommentEntity(
-          id: 0,
-          text: fullText,
-          author: AuthorModel(
-            id: userData.id,
-            email: userData.email,
-            nameAr: '',
-            nameEn: userData.userName,
-            phone: userData.phone,
-            genderId: userData.genderId,
-            genderName: userData.gender,
-            contactTypeId: userData.contactTypeId,
-            statusId: userData.statusId,
-            avatar: userData.avatar,
-            age: userData.age,
-          ),
-          creationDate: DateTime.now().toUtc().toIso8601String(),
-          postId: widget.post.id,
-          parentCommentId: replyingTo?.id,
-          replies: [],
-          likes: [],
-          status: 1,
-        );
+      final comment = CommentEntity(
+        id: 0,
+        text: fullText,
+        author: AuthorModel(
+          id: userData.id,
+          email: userData.email,
+          nameAr: '',
+          nameEn: userData.userName,
+          phone: userData.phone,
+          genderId: userData.genderId,
+          genderName: userData.gender,
+          contactTypeId: userData.contactTypeId,
+          statusId: userData.statusId,
+          avatar: userData.avatar,
+          age: userData.age,
+        ),
+        creationDate: DateTime.now().toUtc().toIso8601String(),
+        postId: widget.post.id,
+        parentCommentId: replyingTo?.id,
+        replies: [],
+        likes: [],
+        status: 1,
+      );
 
       bloc.add(
         AddCommentEvent(

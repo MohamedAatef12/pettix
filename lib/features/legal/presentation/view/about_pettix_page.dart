@@ -7,6 +7,8 @@ import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/app_logo.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class AboutPettixPage extends StatelessWidget {
   const AboutPettixPage({super.key});
 
@@ -239,7 +241,7 @@ class _InfoCard extends StatelessWidget {
                   color: iconColor.withAlpha(20),
                   borderRadius: BorderRadius.circular(9.r),
                 ),
-                child: Icon(icon, color: iconColor, size: 18.w),
+                child: AppIcon.raw(icon, color: iconColor, size: 18.w),
               ),
               SizedBox(width: 10.w),
               Text(
@@ -278,7 +280,7 @@ class _FeatureRow extends StatelessWidget {
               color: color.withAlpha(20),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: color, size: 14.w),
+            child: AppIcon.raw(icon, color: color, size: 14.w),
           ),
           SizedBox(width: 10.w),
           Expanded(
@@ -305,7 +307,7 @@ class _ContactRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 16.w, color: AppColors.current.midGray),
+        AppIcon.raw(icon, size: 16.w, color: AppColors.current.midGray),
         SizedBox(width: 10.w),
         Text(
           text,

@@ -15,6 +15,8 @@ import 'package:pettix/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_event.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_state.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class LoginForm extends StatelessWidget {
   const LoginForm({super.key});
   bool _isValidEmail(String email) {
@@ -53,9 +55,9 @@ class LoginForm extends StatelessWidget {
                 context,
                 'OTP sent! Please check your email.',
                 onDone: () {
-                   Navigator.of(ctx).pop(); // Close dialog
+                  Navigator.of(ctx).pop(); // Close dialog
                   context.push('/otp_verification', extra: authBloc);
-                }
+                },
               );
             } else if (state is RegisterFailure) {
               AuthToast.showError(context, state.message);
@@ -76,9 +78,12 @@ class LoginForm extends StatelessWidget {
                     color: AppColors.current.primary,
                   ),
                 ),
-                  SizedBox(width: 8.w),
-                Icon(Icons.verified,
-                color: AppColors.current.primary, size: 20.r),
+                SizedBox(width: 8.w),
+                AppIcon.raw(
+                  Icons.verified,
+                  color: AppColors.current.primary,
+                  size: 20.r,
+                ),
               ],
             ),
             content: Form(
@@ -105,8 +110,9 @@ class LoginForm extends StatelessWidget {
                     fillColorValue: AppColors.current.white,
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide:
-                          BorderSide(color: AppColors.current.lightGray),
+                      borderSide: BorderSide(
+                        color: AppColors.current.lightGray,
+                      ),
                     ),
                   ),
                   SizedBox(height: 20.h),
@@ -114,21 +120,21 @@ class LoginForm extends StatelessWidget {
                     bloc: authBloc,
                     builder: (context, state) {
                       final isLoading = state is AuthLoading;
-                      return
-                           Center(
-                            child: CustomFilledButton(
-                              isLoading: isLoading,
-                                onPressed: () {
-                                  if (formKey.currentState!.validate()) {
-                                    authBloc.add(
-                                        ResendOtpEvent(emailController.text));
-                                  }
-                                },
-                                text: AppText.sendOtp,
-                                backgroundColor: AppColors.current.primary,
-                                textColor: AppColors.current.white,
-                              ),
-                          );
+                      return Center(
+                        child: CustomFilledButton(
+                          isLoading: isLoading,
+                          onPressed: () {
+                            if (formKey.currentState!.validate()) {
+                              authBloc.add(
+                                ResendOtpEvent(emailController.text),
+                              );
+                            }
+                          },
+                          text: AppText.sendOtp,
+                          backgroundColor: AppColors.current.primary,
+                          textColor: AppColors.current.white,
+                        ),
+                      );
                     },
                   ),
                 ],
@@ -187,8 +193,11 @@ class LoginForm extends StatelessWidget {
                 child: CustomTextFormField(
                   controller: bloc.passwordLoginController,
                   hintText: AppText.enterPassword,
-                  validator: (value) =>
-                  (value == null || value.isEmpty) ? AppText.passwordRequired : null,
+                  validator:
+                      (value) =>
+                          (value == null || value.isEmpty)
+                              ? AppText.passwordRequired
+                              : null,
                   fillColor: true,
                   fillColorValue: AppColors.current.white,
                   obscureText: bloc.obscurePasswordLogin,
@@ -197,7 +206,7 @@ class LoginForm extends StatelessWidget {
                     onTap: () {
                       bloc.add(LoginTogglePasswordVisibility());
                     },
-                    child: Icon(
+                    child: AppIcon.raw(
                       bloc.obscurePasswordLogin
                           ? Icons.visibility_off
                           : Icons.visibility,
@@ -215,7 +224,7 @@ class LoginForm extends StatelessWidget {
 
           SizedBox(height: 1.h),
 
-        BlocBuilder<AuthBloc, AuthState>(
+          BlocBuilder<AuthBloc, AuthState>(
             buildWhen: (previous, current) => current is LoginRememberMeChanged,
             builder: (context, state) {
               return Padding(
@@ -248,38 +257,44 @@ class LoginForm extends StatelessWidget {
               );
             },
           ),
-        BlocListener<AuthBloc, AuthState>(
-          listener: (context, state) {
-            if (state is LoginSuccess) {
-              bloc.emailLoginController.clear();
-              bloc.passwordLoginController.clear();
-            }
-          },
-          child: BlocBuilder<AuthBloc, AuthState>(
-            builder: (context, state) {
-              final isAnyLoading = state is LoginLoading || state is GoogleLoginLoading || state is AuthLoading;
-              return CustomFilledButton(
-                isLoading: state is LoginLoading,
-                onPressed: isAnyLoading ? null : () {
-                  if (bloc.loginFormKey.currentState!.validate()) {
-                    bloc.add(
-                      LoginSubmitted(
-                        model: LoginModel(
-                          email: bloc.emailLoginController.text,
-                          password: bloc.passwordLoginController.text,
-                        ),
-                        rememberMe: bloc.rememberMe,
-                      ),
-                    );
-                  }
-                },
-                text: AppText.signIn,
-                backgroundColor: AppColors.current.primary,
-                textColor: AppColors.current.white,
-              );
+          BlocListener<AuthBloc, AuthState>(
+            listener: (context, state) {
+              if (state is LoginSuccess) {
+                bloc.emailLoginController.clear();
+                bloc.passwordLoginController.clear();
+              }
             },
+            child: BlocBuilder<AuthBloc, AuthState>(
+              builder: (context, state) {
+                final isAnyLoading =
+                    state is LoginLoading ||
+                    state is GoogleLoginLoading ||
+                    state is AuthLoading;
+                return CustomFilledButton(
+                  isLoading: state is LoginLoading,
+                  onPressed:
+                      isAnyLoading
+                          ? null
+                          : () {
+                            if (bloc.loginFormKey.currentState!.validate()) {
+                              bloc.add(
+                                LoginSubmitted(
+                                  model: LoginModel(
+                                    email: bloc.emailLoginController.text,
+                                    password: bloc.passwordLoginController.text,
+                                  ),
+                                  rememberMe: bloc.rememberMe,
+                                ),
+                              );
+                            }
+                          },
+                  text: AppText.signIn,
+                  backgroundColor: AppColors.current.primary,
+                  textColor: AppColors.current.white,
+                );
+              },
+            ),
           ),
-        ),
 
           SizedBox(height: 10.h),
           Row(
@@ -312,14 +327,20 @@ class LoginForm extends StatelessWidget {
           SizedBox(height: 10.h),
           BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
-              final isAnyLoading = state is LoginLoading || state is GoogleLoginLoading || state is AuthLoading;
+              final isAnyLoading =
+                  state is LoginLoading ||
+                  state is GoogleLoginLoading ||
+                  state is AuthLoading;
               return CustomFilledButton(
                 isLoading: state is GoogleLoginLoading,
-                onPressed: isAnyLoading ? null : () {
-                  context.read<AuthBloc>().add(
-                    GoogleLoginSubmitted(rememberMe: bloc.rememberMe),
-                  );
-                },
+                onPressed:
+                    isAnyLoading
+                        ? null
+                        : () {
+                          context.read<AuthBloc>().add(
+                            GoogleLoginSubmitted(rememberMe: bloc.rememberMe),
+                          );
+                        },
                 text: AppText.continueWithGoogle,
                 backgroundColor: AppColors.current.white,
                 textColor: AppColors.current.lightText,
@@ -370,10 +391,10 @@ class LoginForm extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ),]),
-              SizedBox(
-                height: 10.h,
+                  ),
+                ],
               ),
+              SizedBox(height: 10.h),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

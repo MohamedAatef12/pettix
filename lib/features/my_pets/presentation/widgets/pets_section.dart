@@ -9,6 +9,8 @@ import 'package:pettix/features/my_pets/presentation/bloc/my_pets_state.dart';
 
 import 'package:pettix/features/my_pets/presentation/widgets/pet_id_card.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 /// Horizontal scroll section shown inside the profile screen.
 /// Displays an "Add Pet" card at the start followed by pet ID cards.
 class PetsSection extends StatelessWidget {
@@ -51,7 +53,7 @@ class PetsSection extends StatelessWidget {
                     color: AppColors.current.primary.withAlpha(20),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
+                  child: AppIcon.raw(
                     Icons.pets_rounded,
                     color: AppColors.current.primary,
                     size: 22.w,

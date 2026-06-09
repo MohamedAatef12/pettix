@@ -6,6 +6,7 @@ import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/services/app_review_service.dart';
 import 'package:pettix/core/shimmers/home_shimmer.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_icon_system.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_state.dart';
 import 'package:pettix/features/home/presentation/widgets/post_card.dart';
@@ -117,8 +118,8 @@ class _HomeBodyState extends State<HomeBody> {
         child: CircleAvatar(
           backgroundColor: AppColors.current.lightGray,
           radius: 100.r,
-          child: Icon(
-            Icons.cloud_off_outlined,
+          child: AppIcon(
+            token: AppIconToken.offline,
             color: AppColors.current.primary,
             size: 50.w,
           ),

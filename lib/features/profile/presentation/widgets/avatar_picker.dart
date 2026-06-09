@@ -8,6 +8,8 @@ import 'package:pettix/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_event.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_state.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class AvatarPicker extends StatelessWidget {
   final String? currentAvatarUrl;
   const AvatarPicker({super.key, this.currentAvatarUrl});
@@ -15,7 +17,8 @@ class AvatarPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ProfileBloc, ProfileState>(
-      buildWhen: (prev, curr) => prev.pickedAvatarBytes != curr.pickedAvatarBytes,
+      buildWhen:
+          (prev, curr) => prev.pickedAvatarBytes != curr.pickedAvatarBytes,
       builder: (context, state) {
         return Center(
           child: GestureDetector(
@@ -45,9 +48,10 @@ class AvatarPicker extends StatelessWidget {
                       ),
                     ),
                     child: AppProfileImage(
-                      imageUrl: state.pickedAvatarBytes != null
-                          ? 'data:image/png;base64,${base64Encode(state.pickedAvatarBytes!)}'
-                          : currentAvatarUrl,
+                      imageUrl:
+                          state.pickedAvatarBytes != null
+                              ? 'data:image/png;base64,${base64Encode(state.pickedAvatarBytes!)}'
+                              : currentAvatarUrl,
                       radius: 46.r,
                       backgroundColor: AppColors.current.lightGray,
                     ),
@@ -71,7 +75,7 @@ class AvatarPicker extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: Icon(
+                    child: AppIcon.raw(
                       Icons.camera_alt_rounded,
                       color: Colors.white,
                       size: 14.w,

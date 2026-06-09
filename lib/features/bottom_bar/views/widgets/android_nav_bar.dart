@@ -5,6 +5,8 @@ import 'package:iconsax/iconsax.dart';
 import 'package:pettix/core/constants/radius.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 /// Modern floating bottom navigation bar for Android.
 ///
 /// Displays 4 navigation tabs with an animated pill indicator,
@@ -115,9 +117,10 @@ class _AndroidNavItem extends StatelessWidget {
           vertical: 8.h,
         ),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.current.primary.withValues(alpha: 0.12)
-              : Colors.transparent,
+          color:
+              isSelected
+                  ? AppColors.current.primary.withValues(alpha: 0.12)
+                  : Colors.transparent,
           borderRadius: RadiusConstants.large,
         ),
         child: Row(
@@ -129,35 +132,37 @@ class _AndroidNavItem extends StatelessWidget {
               curve: Curves.easeInOut,
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 220),
-                child: Icon(
+                child: AppIcon.raw(
                   isSelected ? selectedIcon : unselectedIcon,
                   key: ValueKey(isSelected),
                   size: 24.r,
-                  color: isSelected
-                      ? AppColors.current.primary
-                      : AppColors.current.midGray,
+                  color:
+                      isSelected
+                          ? AppColors.current.primary
+                          : AppColors.current.midGray,
                 ),
               ),
             ),
             AnimatedSize(
               duration: const Duration(milliseconds: 280),
               curve: Curves.easeInOut,
-              child: isSelected
-                  ? Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(width: 6.w),
-                        Text(
-                          label,
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.current.primary,
+              child:
+                  isSelected
+                      ? Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(width: 6.w),
+                          Text(
+                            label,
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.current.primary,
+                            ),
                           ),
-                        ),
-                      ],
-                    )
-                  : const SizedBox.shrink(),
+                        ],
+                      )
+                      : const SizedBox.shrink(),
             ),
           ],
         ),
@@ -190,7 +195,7 @@ class _AndroidAddButton extends StatelessWidget {
             ),
           ],
         ),
-        child: Icon(
+        child: AppIcon.raw(
           Iconsax.add,
           color: AppColors.current.white,
           size: 22.r,
@@ -218,7 +223,7 @@ class _AndroidChatButton extends StatelessWidget {
           color: AppColors.current.blueGray.withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
-        child: Icon(
+        child: AppIcon.raw(
           Iconsax.messages,
           color: AppColors.current.primary,
           size: 22.r,

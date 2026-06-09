@@ -7,6 +7,8 @@ import '../../bloc/adoption_bloc.dart';
 import '../../bloc/adoption_event.dart';
 import '../../bloc/adoption_state.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class Step4Agreements extends StatelessWidget {
   const Step4Agreements({super.key});
 
@@ -86,7 +88,7 @@ class _SectionCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, size: 18.w, color: iconColor),
+              AppIcon.raw(icon, size: 18.w, color: iconColor),
               SizedBox(width: 8.w),
               Text(
                 title,
@@ -195,7 +197,7 @@ class _CheckCard extends StatelessWidget {
               ),
               child:
                   value
-                      ? Icon(
+                      ? AppIcon.raw(
                         Icons.check_rounded,
                         size: 14.w,
                         color: AppColors.current.white,

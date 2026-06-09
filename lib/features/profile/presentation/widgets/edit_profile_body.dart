@@ -16,6 +16,8 @@ import 'package:pettix/features/profile/presentation/widgets/avatar_picker.dart'
 import 'package:pettix/features/profile/presentation/widgets/edit_profile_shimmer.dart';
 import 'package:pettix/features/profile/presentation/widgets/gender_dropdown.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class EditProfileBody extends StatelessWidget {
   const EditProfileBody({super.key});
 
@@ -253,7 +255,7 @@ class _AddressPickerField extends StatelessWidget {
         ),
         prefixIcon: Padding(
           padding: EdgeInsets.symmetric(horizontal: 14.w),
-          child: Icon(
+          child: AppIcon.raw(
             Icons.location_on_outlined,
             color: AppColors.current.red,
             size: 20.w,
@@ -262,7 +264,7 @@ class _AddressPickerField extends StatelessWidget {
         prefixIconConstraints: BoxConstraints(minWidth: 52.w),
         suffixIcon: Padding(
           padding: EdgeInsets.symmetric(horizontal: 12.w),
-          child: Icon(
+          child: AppIcon.raw(
             Icons.map_outlined,
             color: AppColors.current.primary,
             size: 20.w,
@@ -324,7 +326,7 @@ class _FilledField extends StatelessWidget {
         ),
         prefixIcon: Padding(
           padding: EdgeInsets.symmetric(horizontal: 14.w),
-          child: Icon(icon, color: iconColor, size: 20.w),
+          child: AppIcon.raw(icon, color: iconColor, size: 20.w),
         ),
         prefixIconConstraints: BoxConstraints(minWidth: 52.w),
         filled: true,

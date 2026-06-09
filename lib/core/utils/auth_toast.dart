@@ -2,12 +2,14 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class AuthToast {
   static void showSuccess(
-      BuildContext context,
-      String message, {
-        VoidCallback? onDone,
-      }) {
+    BuildContext context,
+    String message, {
+    VoidCallback? onDone,
+  }) {
     _showTopToast(
       context,
       message,
@@ -17,10 +19,7 @@ class AuthToast {
     );
   }
 
-  static void showError(
-      BuildContext context,
-      String message,
-      ) {
+  static void showError(BuildContext context, String message) {
     _showTopToast(
       context,
       message,
@@ -30,34 +29,35 @@ class AuthToast {
   }
 
   static void _showTopToast(
-      BuildContext context,
-      String message, {
-        required IconData icon,
-        required Color color,
-        VoidCallback? onDone,
-      }) {
+    BuildContext context,
+    String message, {
+    required IconData icon,
+    required Color color,
+    VoidCallback? onDone,
+  }) {
     final overlay = Overlay.of(context);
 
     late OverlayEntry overlayEntry;
 
     overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: MediaQuery.of(context).padding.top + 20,
-        left: 16,
-        right: 16,
-        child: Material(
-          color: Colors.transparent,
-          child: _AnimatedToast(
-            message: message,
-            icon: icon,
-            color: color,
-            onDismiss: () {
-              overlayEntry.remove();
-              onDone?.call();
-            },
+      builder:
+          (context) => Positioned(
+            top: MediaQuery.of(context).padding.top + 20,
+            left: 16,
+            right: 16,
+            child: Material(
+              color: Colors.transparent,
+              child: _AnimatedToast(
+                message: message,
+                icon: icon,
+                color: color,
+                onDismiss: () {
+                  overlayEntry.remove();
+                  onDone?.call();
+                },
+              ),
+            ),
           ),
-        ),
-      ),
     );
 
     overlay.insert(overlayEntry);
@@ -121,10 +121,7 @@ class _AnimatedToastState extends State<_AnimatedToast>
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 14,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
                 color: widget.color.withValues(alpha: 0.25),
                 borderRadius: BorderRadius.circular(16),
@@ -132,12 +129,12 @@ class _AnimatedToastState extends State<_AnimatedToast>
               ),
               child: Row(
                 children: [
-                  Icon(widget.icon, color: widget.color),
+                  AppIcon.raw(widget.icon, color: widget.color),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       widget.message,
-                      style:  TextStyle(color: AppColors.current.primary),
+                      style: TextStyle(color: AppColors.current.primary),
                     ),
                   ),
                 ],
