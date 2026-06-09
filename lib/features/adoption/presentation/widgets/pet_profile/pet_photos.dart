@@ -5,6 +5,8 @@ import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class PetGallery extends StatelessWidget {
   final PetEntity pet;
 
@@ -94,7 +96,7 @@ class PetGallery extends StatelessWidget {
   Widget _placeholder() => Container(
     height: 280.h,
     color: AppColors.current.lightGray,
-    child: Icon(
+    child: AppIcon.raw(
       Icons.pets_rounded,
       size: 64.w,
       color: AppColors.current.blueGray,

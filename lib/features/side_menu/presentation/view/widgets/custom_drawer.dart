@@ -14,6 +14,8 @@ import 'package:pettix/features/auth/data/models/user_model.dart';
 import 'package:pettix/core/services/signalr_service.dart';
 import 'package:pettix/features/chat/data/data_source/chat_local_data_source.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
 
@@ -203,7 +205,7 @@ class _DrawerHeader extends StatelessWidget {
               Expanded(child: _UserInfo(user: user)),
               IconButton(
                 onPressed: () => Navigator.of(context).pop(),
-                icon: Icon(
+                icon: AppIcon.raw(
                   Icons.close_rounded,
                   color: Colors.white60,
                   size: 20.w,
@@ -269,7 +271,11 @@ class _UserInfo extends StatelessWidget {
               ),
             ),
             SizedBox(width: 4.w),
-            Icon(Icons.verified_rounded, color: Colors.white70, size: 14.w),
+            AppIcon.raw(
+              Icons.verified_rounded,
+              color: Colors.white70,
+              size: 14.w,
+            ),
           ],
         ),
         SizedBox(height: 3.h),
@@ -336,7 +342,7 @@ class _Tile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _TileBase(
-    iconWidget: Icon(icon, color: color, size: 18.w),
+    iconWidget: AppIcon.raw(icon, color: color, size: 18.w),
     iconBg: color.withAlpha(26),
     label: label,
     onTap: onTap,
@@ -434,7 +440,7 @@ class _TileBase extends StatelessWidget {
                 ),
               ),
             ),
-            Icon(
+            AppIcon.raw(
               Icons.chevron_right_rounded,
               color: AppColors.current.midGray,
               size: 18.w,

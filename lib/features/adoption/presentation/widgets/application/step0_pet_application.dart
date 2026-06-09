@@ -12,6 +12,8 @@ import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/features/adoption/presentation/bloc/adoption_bloc.dart';
 import 'package:pettix/features/adoption/presentation/bloc/adoption_event.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class PetApplication extends StatelessWidget {
   const PetApplication({super.key});
 
@@ -143,7 +145,11 @@ class _ExpectationItem extends StatelessWidget {
               color: AppColors.current.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10.r),
             ),
-            child: Icon(icon, size: 18.w, color: AppColors.current.primary),
+            child: AppIcon.raw(
+              icon,
+              size: 18.w,
+              color: AppColors.current.primary,
+            ),
           ),
           SizedBox(width: 12.w),
           Expanded(

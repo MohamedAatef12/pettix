@@ -14,6 +14,8 @@ import 'package:pettix/features/adoption_history/presentation/bloc/adoption_hist
 import 'package:pettix/features/adoption_history/presentation/bloc/adoption_history_state.dart';
 import 'package:pettix/features/adoption_history/presentation/widgets/adoption_form_card.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class AdoptionHistoryScreen extends StatefulWidget {
   const AdoptionHistoryScreen({super.key});
 
@@ -194,7 +196,7 @@ class _TabButton extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            AppIcon.raw(
               icon,
               size: 18.sp,
               color:
@@ -342,7 +344,7 @@ class _FormsTabState extends State<_FormsTab>
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            AppIcon.raw(
               icon,
               size: 16.sp,
               color:
@@ -560,7 +562,7 @@ class _EmptyView extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
+          AppIcon.raw(
             Icons.pets_rounded,
             size: 64.w,
             color: AppColors.current.blueGray,
@@ -595,7 +597,7 @@ class _ErrorView extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
+          AppIcon.raw(
             Icons.error_outline_rounded,
             size: 48.w,
             color: AppColors.current.red,

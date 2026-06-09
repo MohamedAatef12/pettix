@@ -9,6 +9,8 @@ import '../../bloc/adoption_bloc.dart';
 import '../../bloc/adoption_event.dart';
 import '../../bloc/adoption_state.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class StepReviewApplication extends StatelessWidget {
   const StepReviewApplication({super.key});
 
@@ -505,7 +507,7 @@ class _ReviewCard extends StatelessWidget {
                     color: AppColors.current.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
-                  child: Icon(
+                  child: AppIcon.raw(
                     icon,
                     size: 16.w,
                     color: AppColors.current.primary,
@@ -524,7 +526,7 @@ class _ReviewCard extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: isEnabled ? onEditToggle : null,
-                  icon: Icon(
+                  icon: AppIcon.raw(
                     isEditing
                         ? Icons.check_circle_rounded
                         : Icons.edit_outlined,
@@ -620,7 +622,11 @@ class _InlineTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     final Widget? finalSuffixIcon =
         isValid
-            ? Icon(Icons.check_circle_rounded, color: Colors.green, size: 16.w)
+            ? AppIcon.raw(
+              Icons.check_circle_rounded,
+              color: Colors.green,
+              size: 16.w,
+            )
             : null;
 
     return Column(

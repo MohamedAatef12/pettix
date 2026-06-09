@@ -7,6 +7,8 @@ import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/features/auth/domain/entities/user_entity.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class ProfileHeader extends StatelessWidget {
   final UserEntity profile;
   final VoidCallback? onEditTap;
@@ -82,7 +84,7 @@ class ProfileHeader extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: Icon(
+                    child: AppIcon.raw(
                       Icons.edit_rounded,
                       color: Colors.white,
                       size: 14.w,
@@ -126,7 +128,7 @@ class ProfileNameSection extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              AppIcon.raw(
                 Icons.phone_outlined,
                 size: 12.w,
                 color: AppColors.current.midGray,

@@ -9,6 +9,8 @@ import 'package:pettix/features/my_pets/presentation/bloc/my_pets_bloc.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_event.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_state.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 /// Shows the list of added vaccinations + an "Add Vaccination" button.
 class VaccinationBuilder extends StatelessWidget {
   const VaccinationBuilder({super.key});
@@ -60,7 +62,7 @@ class _VaccinationChip extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(
+          AppIcon.raw(
             Icons.vaccines_rounded,
             color: AppColors.current.teal,
             size: 16.w,
@@ -91,7 +93,7 @@ class _VaccinationChip extends StatelessWidget {
           ),
           GestureDetector(
             onTap: onRemove,
-            child: Icon(
+            child: AppIcon.raw(
               Icons.close_rounded,
               color: AppColors.current.midGray,
               size: 16.w,
@@ -126,7 +128,7 @@ class _AddVaccinationButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            AppIcon.raw(
               Icons.add_rounded,
               color: AppColors.current.primary,
               size: 18.w,
@@ -303,7 +305,7 @@ class _VaccinationSheetState extends State<_VaccinationSheet> {
               ),
               child: Row(
                 children: [
-                  Icon(
+                  AppIcon.raw(
                     Icons.calendar_today_rounded,
                     color: AppColors.current.primary,
                     size: 18.w,

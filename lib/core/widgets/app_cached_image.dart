@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/data/network/constants.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class AppCachedImage extends StatelessWidget {
   final String imageUrl;
   final double? height;
@@ -177,7 +179,7 @@ class AppCachedImage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
+                  AppIcon.raw(
                     Icons.image_not_supported_outlined,
                     color: AppColors.current.midGray.withValues(alpha: 0.5),
                     size: isSmall ? 20.r : 32.r,

@@ -24,6 +24,8 @@ import '../widgets/application/step5_review_application.dart';
 import '../widgets/application/step6_submitted.dart';
 import '../widgets/application/step0_pet_application.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class ApplicationScreens extends StatefulWidget {
   final int petId;
 
@@ -147,7 +149,7 @@ class _ApplicationScreensState extends State<ApplicationScreens> {
                   color: AppColors.current.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
+                child: AppIcon.raw(
                   Icons.pets_rounded,
                   color: AppColors.current.primary,
                   size: 34.w,
@@ -323,7 +325,7 @@ class _BottomNav extends StatelessWidget {
             child: CustomFilledButton(
               onPressed: () => bloc.add(NextStep()),
               text: AppText.next,
-              trailing: const Icon(
+              trailing: const AppIcon.raw(
                 Icons.arrow_circle_right_outlined,
                 color: Colors.white,
                 size: 22,

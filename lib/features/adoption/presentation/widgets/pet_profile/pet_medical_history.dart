@@ -6,6 +6,8 @@ import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class PetMedicalHistory extends StatelessWidget {
   final PetEntity pet;
 
@@ -67,7 +69,7 @@ class _VaccinationChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
+          AppIcon.raw(
             Icons.check_circle_rounded,
             size: 14.w,
             color: AppColors.current.green,

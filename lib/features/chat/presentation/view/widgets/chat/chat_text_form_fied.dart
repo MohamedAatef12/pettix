@@ -10,6 +10,8 @@ import 'package:pettix/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:pettix/features/chat/presentation/bloc/chat_event.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class ChatTextFormField extends StatefulWidget {
   final int conversationId;
   const ChatTextFormField({super.key, required this.conversationId});
@@ -37,10 +39,9 @@ class _ChatTextFormFieldState extends State<ChatTextFormField> {
   void _sendMessage() {
     final text = _controller.text.trim();
     if (text.isNotEmpty) {
-      context.read<ChatBloc>().add(SendMessageEvent(
-            conversationId: widget.conversationId,
-            content: text,
-          ));
+      context.read<ChatBloc>().add(
+        SendMessageEvent(conversationId: widget.conversationId, content: text),
+      );
       _controller.clear();
     }
   }
@@ -49,39 +50,40 @@ class _ChatTextFormFieldState extends State<ChatTextFormField> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: AppColors.current.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(30.r)),
-        ),
-        padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 20.w),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40.w,
-              height: 4.h,
-              decoration: BoxDecoration(
-                color: AppColors.current.lightGray,
-                borderRadius: BorderRadius.circular(2.r),
-              ),
+      builder:
+          (context) => Container(
+            decoration: BoxDecoration(
+              color: AppColors.current.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(30.r)),
             ),
-            SizedBox(height: 25.h),
-            _buildPickerOption(
-              icon: Iconsax.camera,
-              label: AppText.camera,
-              onTap: () => _handleImageSelection(ImageSource.camera),
+            padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 20.w),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40.w,
+                  height: 4.h,
+                  decoration: BoxDecoration(
+                    color: AppColors.current.lightGray,
+                    borderRadius: BorderRadius.circular(2.r),
+                  ),
+                ),
+                SizedBox(height: 25.h),
+                _buildPickerOption(
+                  icon: Iconsax.camera,
+                  label: AppText.camera,
+                  onTap: () => _handleImageSelection(ImageSource.camera),
+                ),
+                SizedBox(height: 15.h),
+                _buildPickerOption(
+                  icon: Iconsax.gallery,
+                  label: AppText.gallery,
+                  onTap: () => _handleImageSelection(ImageSource.gallery),
+                ),
+                SizedBox(height: 15.h),
+              ],
             ),
-            SizedBox(height: 15.h),
-            _buildPickerOption(
-              icon: Iconsax.gallery,
-              label: AppText.gallery,
-              onTap: () => _handleImageSelection(ImageSource.gallery),
-            ),
-            SizedBox(height: 15.h),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -100,11 +102,18 @@ class _ChatTextFormFieldState extends State<ChatTextFormField> {
         ),
         child: Row(
           children: [
-            Icon(icon, color: AppColors.current.primary),
+            AppIcon.raw(icon, color: AppColors.current.primary),
             SizedBox(width: 15.w),
-            Text(label, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp)),
+            Text(
+              label,
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
+            ),
             const Spacer(),
-            Icon(Icons.arrow_forward_ios, size: 14.r, color: AppColors.current.gray),
+            AppIcon.raw(
+              Icons.arrow_forward_ios,
+              size: 14.r,
+              color: AppColors.current.gray,
+            ),
           ],
         ),
       ),
@@ -125,11 +134,13 @@ class _ChatTextFormFieldState extends State<ChatTextFormField> {
         // Send images sequentially to avoid flooding memory & network
         for (var image in images) {
           if (!mounted) break;
-          context.read<ChatBloc>().add(SendMessageEvent(
-                conversationId: widget.conversationId,
-                content: '',
-                imagePath: image.path,
-              ));
+          context.read<ChatBloc>().add(
+            SendMessageEvent(
+              conversationId: widget.conversationId,
+              content: '',
+              imagePath: image.path,
+            ),
+          );
           // Small delay between sends to avoid concurrent upload OOM
           await Future.delayed(const Duration(milliseconds: 300));
         }
@@ -143,11 +154,13 @@ class _ChatTextFormFieldState extends State<ChatTextFormField> {
       );
 
       if (image != null && mounted) {
-        context.read<ChatBloc>().add(SendMessageEvent(
-              conversationId: widget.conversationId,
-              content: '',
-              imagePath: image.path,
-            ));
+        context.read<ChatBloc>().add(
+          SendMessageEvent(
+            conversationId: widget.conversationId,
+            content: '',
+            imagePath: image.path,
+          ),
+        );
       }
     }
   }
@@ -158,7 +171,9 @@ class _ChatTextFormFieldState extends State<ChatTextFormField> {
       decoration: BoxDecoration(
         color: AppColors.current.lightGray,
         borderRadius: BorderRadius.circular(15.r),
-        border: Border.all(color: AppColors.current.gray.withValues(alpha: 0.1)),
+        border: Border.all(
+          color: AppColors.current.gray.withValues(alpha: 0.1),
+        ),
       ),
       child: Row(
         children: [

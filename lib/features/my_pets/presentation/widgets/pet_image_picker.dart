@@ -9,6 +9,8 @@ import 'package:pettix/features/my_pets/presentation/bloc/my_pets_bloc.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_event.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_state.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 /// Horizontal row showing picked pet images with a remove button and a + card.
 class PetImagePickerRow extends StatelessWidget {
   const PetImagePickerRow({super.key});
@@ -76,7 +78,11 @@ class _ImageThumb extends StatelessWidget {
                 color: Colors.black.withAlpha(140),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.close_rounded, color: Colors.white, size: 12.w),
+              child: AppIcon.raw(
+                Icons.close_rounded,
+                color: Colors.white,
+                size: 12.w,
+              ),
             ),
           ),
         ),
@@ -104,7 +110,7 @@ class _AddImageCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            AppIcon.raw(
               Icons.add_a_photo_outlined,
               color: AppColors.current.primary,
               size: 22.w,

@@ -7,6 +7,8 @@ import '../../bloc/adoption_bloc.dart';
 import '../../bloc/adoption_event.dart';
 import '../../bloc/adoption_state.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class Step2LivingSituation extends StatelessWidget {
   const Step2LivingSituation({super.key});
 
@@ -166,7 +168,7 @@ class _SelectCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(
+            AppIcon.raw(
               icon,
               size: 18.w,
               color:
@@ -191,7 +193,7 @@ class _SelectCard extends StatelessWidget {
               ),
             ),
             if (selected)
-              Icon(
+              AppIcon.raw(
                 Icons.check_circle_rounded,
                 size: 16.w,
                 color: AppColors.current.primary,

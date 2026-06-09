@@ -5,6 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class PettixLoadingDialog extends StatefulWidget {
   final String message;
   const PettixLoadingDialog({super.key, this.message = 'Loading...'});
@@ -29,13 +31,17 @@ class _PettixLoadingDialogState extends State<PettixLoadingDialog>
 
     _scaleAnimation = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.0, end: 1.2)
-            .chain(CurveTween(curve: Curves.easeInOut)),
+        tween: Tween<double>(
+          begin: 1.0,
+          end: 1.2,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
         weight: 50,
       ),
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.2, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeInOut)),
+        tween: Tween<double>(
+          begin: 1.2,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
         weight: 50,
       ),
     ]).animate(_controller);
@@ -93,8 +99,10 @@ class _PettixLoadingDialogState extends State<PettixLoadingDialog>
                             children: List.generate(8, (index) {
                               final double angle = index * math.pi / 4;
                               final double radius = 32.r;
-                              final double x = 40.r + radius * math.cos(angle) - 4.r;
-                              final double y = 40.r + radius * math.sin(angle) - 4.r;
+                              final double x =
+                                  40.r + radius * math.cos(angle) - 4.r;
+                              final double y =
+                                  40.r + radius * math.sin(angle) - 4.r;
                               final double opacity = 0.2 + (index / 8.0) * 0.8;
                               return Positioned(
                                 left: x,
@@ -103,7 +111,9 @@ class _PettixLoadingDialogState extends State<PettixLoadingDialog>
                                   width: 8.r,
                                   height: 8.r,
                                   decoration: BoxDecoration(
-                                     color: AppColors.current.primary.withValues(alpha: opacity),
+                                    color: AppColors.current.primary.withValues(
+                                      alpha: opacity,
+                                    ),
                                     shape: BoxShape.circle,
                                   ),
                                 ),
@@ -117,7 +127,7 @@ class _PettixLoadingDialogState extends State<PettixLoadingDialog>
                   // Bouncing/Pulsing center paw icon
                   ScaleTransition(
                     scale: _scaleAnimation,
-                    child: Icon(
+                    child: AppIcon.raw(
                       Icons.pets_rounded,
                       size: 40.r,
                       color: AppColors.current.primary,

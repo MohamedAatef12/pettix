@@ -10,6 +10,8 @@ import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class ReportProblemPage extends StatefulWidget {
   const ReportProblemPage({super.key});
 
@@ -112,7 +114,7 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(
+                              AppIcon.raw(
                                 _categories[i].icon,
                                 size: 14.w,
                                 color:
@@ -216,7 +218,7 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
                   ),
                 ),
               ),
-              Icon(
+              AppIcon.raw(
                 Icons.bug_report_rounded,
                 color: AppColors.current.midGray,
                 size: 26.w,
@@ -330,7 +332,7 @@ class _DeviceInfoCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
+              AppIcon.raw(
                 Icons.info_outline_rounded,
                 size: 16.w,
                 color: AppColors.current.primary,

@@ -6,6 +6,7 @@ import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
 // ─── Reusable page for Privacy Policy, Terms & Conditions, Refund Policy ───────
 
 class LegalContentPage extends StatelessWidget {
@@ -38,7 +39,7 @@ class LegalContentPage extends StatelessWidget {
                 // Last updated badge
                 Row(
                   children: [
-                    Icon(
+                    AppIcon.raw(
                       Icons.update_rounded,
                       size: 13.w,
                       color: AppColors.current.midGray,
@@ -92,7 +93,7 @@ class LegalContentPage extends StatelessWidget {
                   ),
                 ),
               ),
-              Icon(icon, color: AppColors.current.midGray, size: 24.w),
+              AppIcon.raw(icon, color: AppColors.current.midGray, size: 24.w),
             ],
           ),
         ),
@@ -181,7 +182,7 @@ class _SectionCardState extends State<_SectionCard>
                     ),
                     RotationTransition(
                       turns: _rotation,
-                      child: Icon(
+                      child: AppIcon.raw(
                         Icons.keyboard_arrow_down_rounded,
                         color: AppColors.current.primary,
                         size: 20.w,

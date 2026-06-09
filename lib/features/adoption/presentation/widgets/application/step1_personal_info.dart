@@ -8,6 +8,8 @@ import '../../bloc/adoption_bloc.dart';
 import '../../bloc/adoption_event.dart';
 import '../../bloc/adoption_state.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class Step1PersonalInfo extends StatelessWidget {
   const Step1PersonalInfo({super.key});
 
@@ -162,7 +164,7 @@ class Step1PersonalInfo extends StatelessWidget {
                 onChanged: (_) {},
                 hint: AppText.tapToSelect,
                 readOnly: true,
-                suffixIcon: Icon(
+                suffixIcon: AppIcon.raw(
                   Icons.calendar_today_rounded,
                   size: 18.w,
                   color: AppColors.current.primary,
@@ -307,7 +309,7 @@ class _FieldLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 16.w, color: AppColors.current.primary),
+        AppIcon.raw(icon, size: 16.w, color: AppColors.current.primary),
         SizedBox(width: 6.w),
         Text(
           label,
@@ -363,7 +365,11 @@ class _AdoptionField extends StatelessWidget {
     // Dynamic Suffix Icon based on validation status
     final Widget? finalSuffixIcon =
         isValid
-            ? Icon(Icons.check_circle_rounded, color: Colors.green, size: 20.w)
+            ? AppIcon.raw(
+              Icons.check_circle_rounded,
+              color: Colors.green,
+              size: 20.w,
+            )
             : suffixIcon;
 
     return TextField(

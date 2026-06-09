@@ -11,6 +11,8 @@ import 'package:go_router/go_router.dart';
 import 'package:pettix/config/router/routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class PetBody extends StatelessWidget {
   final PetEntity pet;
 
@@ -59,7 +61,7 @@ class _AdoptBottomBar extends StatelessWidget {
       ),
       child: ElevatedButton.icon(
         onPressed: () => context.push(AppRoutes.applications, extra: pet.id),
-        icon: const Icon(Icons.pets_rounded, size: 20),
+        icon: const AppIcon.raw(Icons.pets_rounded, size: 20),
         label: Text(AppText.applyToAdopt),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.current.primary,

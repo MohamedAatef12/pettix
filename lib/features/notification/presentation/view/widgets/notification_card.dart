@@ -15,6 +15,8 @@ import 'package:pettix/features/notification/presentation/bloc/notification_bloc
 import 'package:pettix/features/notification/presentation/bloc/notification_event.dart';
 import '../../../domain/entities/notification_entity.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class NotificationCard extends StatelessWidget {
   final Color color;
   final NotificationEntity notification;
@@ -29,10 +31,16 @@ class NotificationCard extends StatelessWidget {
     final title = notification.title.toLowerCase();
     final body = notification.body.toLowerCase();
 
-    if (title.contains('like') || body.contains('like') || title.contains('love') || body.contains('love')) {
+    if (title.contains('like') ||
+        body.contains('like') ||
+        title.contains('love') ||
+        body.contains('love')) {
       return Icons.favorite_rounded;
     }
-    if (title.contains('comment') || body.contains('comment') || title.contains('reply') || body.contains('reply')) {
+    if (title.contains('comment') ||
+        body.contains('comment') ||
+        title.contains('reply') ||
+        body.contains('reply')) {
       return Icons.chat_bubble_rounded;
     }
 
@@ -56,10 +64,16 @@ class NotificationCard extends StatelessWidget {
     final title = notification.title.toLowerCase();
     final body = notification.body.toLowerCase();
 
-    if (title.contains('like') || body.contains('like') || title.contains('love') || body.contains('love')) {
+    if (title.contains('like') ||
+        body.contains('like') ||
+        title.contains('love') ||
+        body.contains('love')) {
       return const Color(0xFFFF4081); // Pink
     }
-    if (title.contains('comment') || body.contains('comment') || title.contains('reply') || body.contains('reply')) {
+    if (title.contains('comment') ||
+        body.contains('comment') ||
+        title.contains('reply') ||
+        body.contains('reply')) {
       return const Color(0xFF2196F3); // Blue
     }
 
@@ -84,32 +98,40 @@ class NotificationCard extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         if (!notification.isRead) {
-          context.read<NotificationBloc>().add(MarkAsReadEvent(notification.id));
+          context.read<NotificationBloc>().add(
+            MarkAsReadEvent(notification.id),
+          );
         }
 
         final metadataStr = notification.metadata;
         if (metadataStr != null && metadataStr.isNotEmpty) {
           try {
-            final Map<String, String> metadataMap = Uri.splitQueryString(metadataStr);
+            final Map<String, String> metadataMap = Uri.splitQueryString(
+              metadataStr,
+            );
             final String? type = metadataMap['type'];
             final String? postId = metadataMap['id'];
 
-            if ((type == 'post' || type == 'comment' || type == 'like') && postId != null) {
+            if ((type == 'post' || type == 'comment' || type == 'like') &&
+                postId != null) {
               final int parsedId = int.tryParse(postId) ?? 0;
               if (parsedId > 0) {
                 showDialog(
                   context: context,
                   barrierDismissible: false,
-                  builder: (context) => const PettixLoadingDialog(
-                    message: 'Loading post...',
-                  ),
+                  builder:
+                      (context) =>
+                          const PettixLoadingDialog(message: 'Loading post...'),
                 );
 
                 PostEntity? post;
                 try {
-                  final result = await DI.find<GetPostByIdUseCase>().call(parsedId);
+                  final result = await DI.find<GetPostByIdUseCase>().call(
+                    parsedId,
+                  );
                   result.fold(
-                    (failure) => debugPrint('Failed to fetch post: ${failure.message}'),
+                    (failure) =>
+                        debugPrint('Failed to fetch post: ${failure.message}'),
                     (fetchedPost) => post = fetchedPost,
                   );
                 } catch (e) {
@@ -133,12 +155,16 @@ class NotificationCard extends StatelessWidget {
         duration: const Duration(milliseconds: 300),
         margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
         decoration: BoxDecoration(
-          color: notification.isRead ? color : AppColors.current.primary.withValues(alpha: 0.03),
+          color:
+              notification.isRead
+                  ? color
+                  : AppColors.current.primary.withValues(alpha: 0.03),
           borderRadius: BorderRadius.circular(20.r),
           border: Border.all(
-            color: notification.isRead 
-                ? Colors.transparent 
-                : AppColors.current.primary.withValues(alpha: 0.2),
+            color:
+                notification.isRead
+                    ? Colors.transparent
+                    : AppColors.current.primary.withValues(alpha: 0.2),
             width: 1.5,
           ),
           boxShadow: [
@@ -187,7 +213,7 @@ class NotificationCard extends StatelessWidget {
                           width: 1,
                         ),
                       ),
-                      child: Icon(
+                      child: AppIcon.raw(
                         _getIcon(),
                         size: 24.sp,
                         color: _getIconColor(),
@@ -218,7 +244,9 @@ class NotificationCard extends StatelessWidget {
                                 DateFormatter.formatTimeAgo(notification.date),
                                 style: AppTextStyles.smallDescription.copyWith(
                                   fontSize: 11.sp,
-                                  color: AppColors.current.lightText.withValues(alpha: 0.6),
+                                  color: AppColors.current.lightText.withValues(
+                                    alpha: 0.6,
+                                  ),
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -229,7 +257,9 @@ class NotificationCard extends StatelessWidget {
                             notification.body,
                             style: AppTextStyles.description.copyWith(
                               fontSize: 14.sp,
-                              color: AppColors.current.text.withValues(alpha: 0.7),
+                              color: AppColors.current.text.withValues(
+                                alpha: 0.7,
+                              ),
                               height: 1.4,
                             ),
                           ),
@@ -237,7 +267,7 @@ class NotificationCard extends StatelessWidget {
                             SizedBox(height: 12.h),
                             Row(
                               children: [
-                                Icon(
+                                AppIcon.raw(
                                   Icons.circle,
                                   size: 8.sp,
                                   color: AppColors.current.primary,

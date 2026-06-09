@@ -15,6 +15,8 @@ import 'package:pettix/features/my_pets/presentation/bloc/my_pets_state.dart';
 import 'package:pettix/features/my_pets/presentation/widgets/pet_image_picker.dart';
 import 'package:pettix/features/my_pets/presentation/widgets/vaccination_builder.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 /// Scrollable form body for adding a new pet.
 class AddPetForm extends StatelessWidget {
   const AddPetForm({super.key});
@@ -335,7 +337,7 @@ class _FilledField extends StatelessWidget {
         ),
         prefixIcon: Padding(
           padding: EdgeInsets.symmetric(horizontal: 14.w),
-          child: Icon(icon, color: iconColor, size: 20.w),
+          child: AppIcon.raw(icon, color: iconColor, size: 20.w),
         ),
         prefixIconConstraints: BoxConstraints(minWidth: 52.w),
         filled: true,
@@ -389,7 +391,7 @@ class _LookupDropdown extends StatelessWidget {
           value: selectedId,
           hint: Row(
             children: [
-              Icon(icon, color: iconColor, size: 20.w),
+              AppIcon.raw(icon, color: iconColor, size: 20.w),
               SizedBox(width: 12.w),
               Text(
                 label,
@@ -400,7 +402,7 @@ class _LookupDropdown extends StatelessWidget {
               ),
             ],
           ),
-          icon: Icon(
+          icon: AppIcon.raw(
             Icons.expand_more_rounded,
             color: AppColors.current.midGray,
             size: 20.w,
@@ -424,7 +426,7 @@ class _LookupDropdown extends StatelessWidget {
                   items.map((item) {
                     return Row(
                       children: [
-                        Icon(icon, color: iconColor, size: 20.w),
+                        AppIcon.raw(icon, color: iconColor, size: 20.w),
                         SizedBox(width: 12.w),
                         Text(
                           item.name as String,
@@ -468,7 +470,7 @@ class _GenderDropdown extends StatelessWidget {
           value: selectedId,
           hint: Row(
             children: [
-              Icon(
+              AppIcon.raw(
                 Icons.wc_rounded,
                 color: const Color(0xFF3AAFA9),
                 size: 20.w,
@@ -483,7 +485,7 @@ class _GenderDropdown extends StatelessWidget {
               ),
             ],
           ),
-          icon: Icon(
+          icon: AppIcon.raw(
             Icons.expand_more_rounded,
             color: AppColors.current.midGray,
             size: 20.w,
@@ -510,7 +512,7 @@ class _GenderDropdown extends StatelessWidget {
                       .map(
                         (g) => Row(
                           children: [
-                            Icon(
+                            AppIcon.raw(
                               Icons.wc_rounded,
                               color: const Color(0xFF3AAFA9),
                               size: 20.w,

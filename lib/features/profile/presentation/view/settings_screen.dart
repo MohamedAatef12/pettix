@@ -17,6 +17,8 @@ import 'package:pettix/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_event.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_state.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
@@ -56,7 +58,7 @@ class SettingsScreen extends StatelessWidget {
                   centerTitle: true,
                   leading: IconButton(
                     onPressed: () => context.pop(),
-                    icon: Icon(
+                    icon: AppIcon.raw(
                       Icons.arrow_back_ios_new_rounded,
                       color: AppColors.current.text,
                       size: 20.sp,
@@ -74,7 +76,10 @@ class SettingsScreen extends StatelessWidget {
                 body: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20.w,
+                      vertical: 10.h,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -120,10 +125,11 @@ class SettingsScreen extends StatelessWidget {
                                   title: AppText.themes,
                                   trailing: Text(
                                     themeOption.label,
-                                    style: AppTextStyles.smallDescription.copyWith(
-                                      color: AppColors.current.midGray,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                    style: AppTextStyles.smallDescription
+                                        .copyWith(
+                                          color: AppColors.current.midGray,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                   ),
                                   onTap: () => _showThemePicker(context),
                                 );
@@ -197,7 +203,9 @@ class SettingsScreen extends StatelessWidget {
       final difference = mutedUntil.difference(DateTime.now());
       if (difference.inHours > 0) {
         return Text(
-          'Muted ({hours}h)'.tr(namedArgs: {'hours': difference.inHours.toString()}),
+          'Muted ({hours}h)'.tr(
+            namedArgs: {'hours': difference.inHours.toString()},
+          ),
           style: AppTextStyles.smallDescription.copyWith(
             color: AppColors.current.midGray,
             fontWeight: FontWeight.w600,
@@ -205,7 +213,9 @@ class SettingsScreen extends StatelessWidget {
         );
       } else {
         return Text(
-          'Muted ({mins}m)'.tr(namedArgs: {'mins': difference.inMinutes.toString()}),
+          'Muted ({mins}m)'.tr(
+            namedArgs: {'mins': difference.inMinutes.toString()},
+          ),
           style: AppTextStyles.smallDescription.copyWith(
             color: AppColors.current.midGray,
             fontWeight: FontWeight.w600,
@@ -261,10 +271,11 @@ class SettingsScreen extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => BlocProvider.value(
-        value: profileBloc,
-        child: const _NotificationSettingsSheet(),
-      ),
+      builder:
+          (_) => BlocProvider.value(
+            value: profileBloc,
+            child: const _NotificationSettingsSheet(),
+          ),
     );
   }
 
@@ -275,64 +286,65 @@ class SettingsScreen extends StatelessWidget {
   void _showDeleteAccountDialog(BuildContext context) {
     showDialog<void>(
       context: context,
-      builder: (d) => AlertDialog(
-        backgroundColor: AppColors.current.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.r),
-        ),
-        title: Row(
-          children: [
-            Icon(
-              Icons.warning_amber_rounded,
-              color: AppColors.current.red,
-              size: 22.sp,
+      builder:
+          (d) => AlertDialog(
+            backgroundColor: AppColors.current.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.r),
             ),
-            SizedBox(width: 8.w),
-            Expanded(
-              child: Text(
-                AppText.deleteAccount,
-                style: AppTextStyles.bold.copyWith(
-                  fontSize: 18.sp,
-                  color: AppColors.current.text,
+            title: Row(
+              children: [
+                AppIcon.raw(
+                  Icons.warning_amber_rounded,
+                  color: AppColors.current.red,
+                  size: 22.sp,
+                ),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: Text(
+                    AppText.deleteAccount,
+                    style: AppTextStyles.bold.copyWith(
+                      fontSize: 18.sp,
+                      color: AppColors.current.text,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            content: Text(
+              AppText.deleteAccountConfirmation,
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: AppColors.current.text,
+                height: 1.5,
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(d).pop(),
+                child: Text(
+                  AppText.cancel,
+                  style: TextStyle(color: AppColors.current.midGray),
                 ),
               ),
-            ),
-          ],
-        ),
-        content: Text(
-          AppText.deleteAccountConfirmation,
-          style: TextStyle(
-            fontSize: 14.sp,
-            color: AppColors.current.text,
-            height: 1.5,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(d).pop(),
-            child: Text(
-              AppText.cancel,
-              style: TextStyle(color: AppColors.current.midGray),
-            ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.current.red,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.r),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.current.red,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(d).pop();
+                  _doDeleteAccount(context);
+                },
+                child: Text(
+                  AppText.delete,
+                  style: const TextStyle(color: Colors.white),
+                ),
               ),
-            ),
-            onPressed: () {
-              Navigator.of(d).pop();
-              _doDeleteAccount(context);
-            },
-            child: Text(
-              AppText.delete,
-              style: const TextStyle(color: Colors.white),
-            ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }
@@ -491,7 +503,11 @@ class _LanguageOptionCard extends StatelessWidget {
             AnimatedOpacity(
               duration: const Duration(milliseconds: 180),
               opacity: isSelected ? 1 : 0,
-              child: Icon(Icons.check_rounded, color: accent, size: 20.sp),
+              child: AppIcon.raw(
+                Icons.check_rounded,
+                color: accent,
+                size: 20.sp,
+              ),
             ),
           ],
         ),
@@ -653,7 +669,7 @@ class _ThemeOptionCard extends StatelessWidget {
               ),
               child:
                   isSelected
-                      ? Icon(
+                      ? AppIcon.raw(
                         Icons.check_rounded,
                         color: Colors.white,
                         size: 18.sp,
@@ -765,7 +781,7 @@ class _SettingsTile extends StatelessWidget {
                 color: iconColor.withAlpha(15),
                 borderRadius: BorderRadius.circular(10.r),
               ),
-              child: Icon(icon, color: iconColor, size: 18.sp),
+              child: AppIcon.raw(icon, color: iconColor, size: 18.sp),
             ),
             SizedBox(width: 14.w),
             Expanded(
@@ -780,7 +796,7 @@ class _SettingsTile extends StatelessWidget {
             ),
             if (trailing != null) ...[trailing!, SizedBox(width: 8.w)],
             if (showArrow)
-              Icon(
+              AppIcon.raw(
                 Icons.arrow_forward_ios_rounded,
                 color: AppColors.current.midGray.withAlpha(100),
                 size: 14.sp,
@@ -801,7 +817,8 @@ class _NotificationSettingsSheet extends StatelessWidget {
 
     return BlocBuilder<ProfileBloc, ProfileState>(
       builder: (context, state) {
-        final isCurrentlyMuted = state.notificationsMutedUntil != null &&
+        final isCurrentlyMuted =
+            state.notificationsMutedUntil != null &&
             DateTime.now().isBefore(state.notificationsMutedUntil!);
 
         return FractionallySizedBox(
@@ -837,10 +854,13 @@ class _NotificationSettingsSheet extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 16.h),
-                  
+
                   // Allow Notifications toggle
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 6.h,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.current.lightBlue,
                       borderRadius: BorderRadius.circular(16.r),
@@ -875,11 +895,16 @@ class _NotificationSettingsSheet extends StatelessWidget {
                           ),
                         ),
                         Switch(
-                          value: state.notificationsEnabled && !isCurrentlyMuted,
+                          value:
+                              state.notificationsEnabled && !isCurrentlyMuted,
                           onChanged: (val) {
-                            context.read<ProfileBloc>().add(ToggleNotificationsEvent(val));
+                            context.read<ProfileBloc>().add(
+                              ToggleNotificationsEvent(val),
+                            );
                             if (val && isCurrentlyMuted) {
-                              context.read<ProfileBloc>().add(MuteNotificationsEvent(null));
+                              context.read<ProfileBloc>().add(
+                                MuteNotificationsEvent(null),
+                              );
                             }
                           },
                           activeThumbColor: accentColor,
@@ -889,7 +914,7 @@ class _NotificationSettingsSheet extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 20.h),
-                  
+
                   // Mute Options Header
                   Text(
                     AppText.muteNotifications,
@@ -900,7 +925,7 @@ class _NotificationSettingsSheet extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 10.h),
-                  
+
                   // Mute Options List
                   Expanded(
                     child: ListView(
@@ -910,13 +935,20 @@ class _NotificationSettingsSheet extends StatelessWidget {
                         _buildMuteOption(
                           context,
                           title: 'None (Unmute)'.tr(),
-                          isSelected: state.notificationsEnabled && !isCurrentlyMuted,
+                          isSelected:
+                              state.notificationsEnabled && !isCurrentlyMuted,
                           onTap: () {
-                            context.read<ProfileBloc>().add(ToggleNotificationsEvent(true));
-                            context.read<ProfileBloc>().add(MuteNotificationsEvent(null));
+                            context.read<ProfileBloc>().add(
+                              ToggleNotificationsEvent(true),
+                            );
+                            context.read<ProfileBloc>().add(
+                              MuteNotificationsEvent(null),
+                            );
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(AppText.notificationsUnmutedSuccess),
+                                content: Text(
+                                  AppText.notificationsUnmutedSuccess,
+                                ),
                                 duration: const Duration(seconds: 2),
                               ),
                             );
@@ -926,13 +958,21 @@ class _NotificationSettingsSheet extends StatelessWidget {
                         _buildMuteOption(
                           context,
                           title: AppText.muteFor1Hour,
-                          isSelected: isCurrentlyMuted &&
-                              state.notificationsMutedUntil!.difference(DateTime.now()).inHours <= 1,
+                          isSelected:
+                              isCurrentlyMuted &&
+                              state.notificationsMutedUntil!
+                                      .difference(DateTime.now())
+                                      .inHours <=
+                                  1,
                           onTap: () {
-                            context.read<ProfileBloc>().add(MuteNotificationsEvent(const Duration(hours: 1)));
+                            context.read<ProfileBloc>().add(
+                              MuteNotificationsEvent(const Duration(hours: 1)),
+                            );
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(AppText.notificationsMutedSuccess),
+                                content: Text(
+                                  AppText.notificationsMutedSuccess,
+                                ),
                                 duration: const Duration(seconds: 2),
                               ),
                             );
@@ -942,14 +982,25 @@ class _NotificationSettingsSheet extends StatelessWidget {
                         _buildMuteOption(
                           context,
                           title: AppText.muteFor2Hours,
-                          isSelected: isCurrentlyMuted &&
-                              state.notificationsMutedUntil!.difference(DateTime.now()).inHours > 1 &&
-                              state.notificationsMutedUntil!.difference(DateTime.now()).inHours <= 2,
+                          isSelected:
+                              isCurrentlyMuted &&
+                              state.notificationsMutedUntil!
+                                      .difference(DateTime.now())
+                                      .inHours >
+                                  1 &&
+                              state.notificationsMutedUntil!
+                                      .difference(DateTime.now())
+                                      .inHours <=
+                                  2,
                           onTap: () {
-                            context.read<ProfileBloc>().add(MuteNotificationsEvent(const Duration(hours: 2)));
+                            context.read<ProfileBloc>().add(
+                              MuteNotificationsEvent(const Duration(hours: 2)),
+                            );
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(AppText.notificationsMutedSuccess),
+                                content: Text(
+                                  AppText.notificationsMutedSuccess,
+                                ),
                                 duration: const Duration(seconds: 2),
                               ),
                             );
@@ -959,14 +1010,25 @@ class _NotificationSettingsSheet extends StatelessWidget {
                         _buildMuteOption(
                           context,
                           title: AppText.muteFor8Hours,
-                          isSelected: isCurrentlyMuted &&
-                              state.notificationsMutedUntil!.difference(DateTime.now()).inHours > 2 &&
-                              state.notificationsMutedUntil!.difference(DateTime.now()).inHours <= 8,
+                          isSelected:
+                              isCurrentlyMuted &&
+                              state.notificationsMutedUntil!
+                                      .difference(DateTime.now())
+                                      .inHours >
+                                  2 &&
+                              state.notificationsMutedUntil!
+                                      .difference(DateTime.now())
+                                      .inHours <=
+                                  8,
                           onTap: () {
-                            context.read<ProfileBloc>().add(MuteNotificationsEvent(const Duration(hours: 8)));
+                            context.read<ProfileBloc>().add(
+                              MuteNotificationsEvent(const Duration(hours: 8)),
+                            );
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(AppText.notificationsMutedSuccess),
+                                content: Text(
+                                  AppText.notificationsMutedSuccess,
+                                ),
                                 duration: const Duration(seconds: 2),
                               ),
                             );
@@ -976,14 +1038,25 @@ class _NotificationSettingsSheet extends StatelessWidget {
                         _buildMuteOption(
                           context,
                           title: AppText.muteFor24Hours,
-                          isSelected: isCurrentlyMuted &&
-                              state.notificationsMutedUntil!.difference(DateTime.now()).inHours > 8 &&
-                              state.notificationsMutedUntil!.difference(DateTime.now()).inHours <= 24,
+                          isSelected:
+                              isCurrentlyMuted &&
+                              state.notificationsMutedUntil!
+                                      .difference(DateTime.now())
+                                      .inHours >
+                                  8 &&
+                              state.notificationsMutedUntil!
+                                      .difference(DateTime.now())
+                                      .inHours <=
+                                  24,
                           onTap: () {
-                            context.read<ProfileBloc>().add(MuteNotificationsEvent(const Duration(hours: 24)));
+                            context.read<ProfileBloc>().add(
+                              MuteNotificationsEvent(const Duration(hours: 24)),
+                            );
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(AppText.notificationsMutedSuccess),
+                                content: Text(
+                                  AppText.notificationsMutedSuccess,
+                                ),
                                 duration: const Duration(seconds: 2),
                               ),
                             );
@@ -995,10 +1068,14 @@ class _NotificationSettingsSheet extends StatelessWidget {
                           title: AppText.muteIndefinitely,
                           isSelected: !state.notificationsEnabled,
                           onTap: () {
-                            context.read<ProfileBloc>().add(ToggleNotificationsEvent(false));
+                            context.read<ProfileBloc>().add(
+                              ToggleNotificationsEvent(false),
+                            );
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(AppText.notificationsMutedSuccess),
+                                content: Text(
+                                  AppText.notificationsMutedSuccess,
+                                ),
                                 duration: const Duration(seconds: 2),
                               ),
                             );
@@ -1031,7 +1108,10 @@ class _NotificationSettingsSheet extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         decoration: BoxDecoration(
-          color: isSelected ? accentColor.withAlpha(26) : AppColors.current.lightBlue,
+          color:
+              isSelected
+                  ? accentColor.withAlpha(26)
+                  : AppColors.current.lightBlue,
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
             color: isSelected ? accentColor : AppColors.current.lightGray,
@@ -1053,7 +1133,11 @@ class _NotificationSettingsSheet extends StatelessWidget {
             AnimatedOpacity(
               duration: const Duration(milliseconds: 180),
               opacity: isSelected ? 1 : 0,
-              child: Icon(Icons.check_rounded, color: accentColor, size: 18.sp),
+              child: AppIcon.raw(
+                Icons.check_rounded,
+                color: accentColor,
+                size: 18.sp,
+              ),
             ),
           ],
         ),

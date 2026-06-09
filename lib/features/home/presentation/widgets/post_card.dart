@@ -29,21 +29,12 @@ class PostCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              PostCardHeader(
-                post: post,
-                isDetailView: isDetailView,
-              ),
-              Text(
-                post.content,
-                style: AppTextStyles.description,
-              ),
-              PostImageGallery(
-                post: post,
-              ),
-              PostCardActions(
-                post: post,
-                isDetailView: isDetailView,
-              ),
+              PostCardHeader(post: post, isDetailView: isDetailView),
+              SizedBox(height: 10.h),
+              Text(post.content, style: AppTextStyles.description),
+              PostImageGallery(post: post),
+              SizedBox(height: 30.h),
+              PostCardActions(post: post, isDetailView: isDetailView),
             ],
           ),
         ),

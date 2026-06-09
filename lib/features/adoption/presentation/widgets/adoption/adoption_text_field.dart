@@ -4,6 +4,8 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class AdoptionTextField extends StatelessWidget {
   const AdoptionTextField({super.key});
 
@@ -36,7 +38,7 @@ class AdoptionTextField extends StatelessWidget {
             BlendMode.srcIn,
           ),
         ),
-        suffixIcon: Icon(
+        suffixIcon: AppIcon.raw(
           Icons.filter_alt_rounded,
           color: AppColors.current.lightText,
         ),
