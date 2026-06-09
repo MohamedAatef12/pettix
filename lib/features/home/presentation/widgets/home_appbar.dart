@@ -32,7 +32,6 @@ class HomeAppBar extends StatelessWidget {
             child: AppProfileImage(
               imageUrl: user?.avatar ?? user?.image,
               radius: 27.r,
-              heroTag: 'user_avatar_${user?.id}',
             ),
           ),
           SizedBox(width: 10.w),

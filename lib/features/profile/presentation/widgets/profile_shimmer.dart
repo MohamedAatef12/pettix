@@ -1,92 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/app_shimmer.dart';
+import 'package:pettix/data/caching/i_cache_manager.dart';
 
 class ProfileShimmer extends StatelessWidget {
   const ProfileShimmer({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      physics: const NeverScrollableScrollPhysics(),
+    return ColoredBox(
+      color: AppColors.current.lightBlue,
       child: Column(
         children: [
-          SizedBox(height: 48.h),
-
-          // Avatar — centered, mirrors ProfileHeader ring layout
-          Center(child: AppShimmer.circular(radius: 52.r)),
-          SizedBox(height: 16.h),
-
-          // Name
-          Center(
-            child: AppShimmer(
-              width: 140.w,
-              height: 18.h,
-              borderRadius: BorderRadius.circular(9.r),
-            ),
-          ),
-          SizedBox(height: 6.h),
-
-          // Email
-          Center(
-            child: AppShimmer(
-              width: 110.w,
-              height: 12.h,
-              borderRadius: BorderRadius.circular(6.r),
-            ),
-          ),
-          SizedBox(height: 4.h),
-
-          // Phone
-          Center(
-            child: AppShimmer(
-              width: 80.w,
-              height: 12.h,
-              borderRadius: BorderRadius.circular(6.r),
-            ),
-          ),
-          SizedBox(height: 28.h),
-
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // "PERSONAL INFO" label
-                AppShimmer(
-                  width: 90.w,
-                  height: 11.h,
-                  borderRadius: BorderRadius.circular(5.r),
-                ),
-                SizedBox(height: 8.h),
-                const _ProfileInfoCardShimmer(rows: 3),
-                SizedBox(height: 16.h),
-
-                // "DETAILS" label
-                AppShimmer(
-                  width: 60.w,
-                  height: 11.h,
-                  borderRadius: BorderRadius.circular(5.r),
-                ),
-                SizedBox(height: 8.h),
-                const _ProfileInfoCardShimmer(rows: 3),
-                SizedBox(height: 24.h),
-
-                // "MY PETS" label
-                AppShimmer(
-                  width: 60.w,
-                  height: 11.h,
-                  borderRadius: BorderRadius.circular(5.r),
-                ),
-                SizedBox(height: 8.h),
-                AppShimmer(
-                  width: double.infinity,
-                  height: 100.h,
-                  borderRadius: BorderRadius.circular(16.r),
-                ),
-                SizedBox(height: 32.h),
-              ],
+          const _ProfileHeaderShimmer(),
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.fromLTRB(16.w, 18.h, 16.w, 28.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const _SectionLabelShimmer(width: 92),
+                  const _ProfileTileShimmer(),
+                  const _ProfileTileShimmer(),
+                  const _ProfileTileShimmer(),
+                  SizedBox(height: 8.h),
+                  const _SectionLabelShimmer(width: 58),
+                  const _ProfileTileShimmer(),
+                  const _ProfileTileShimmer(),
+                  const _ProfileTileShimmer(),
+                  SizedBox(height: 10.h),
+                  const _SectionLabelShimmer(width: 62),
+                  SizedBox(height: 8.h),
+                  AppShimmer(
+                    width: double.infinity,
+                    height: 94.h,
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -95,69 +49,151 @@ class ProfileShimmer extends StatelessWidget {
   }
 }
 
-class _ProfileInfoCardShimmer extends StatelessWidget {
-  final int rows;
-  const _ProfileInfoCardShimmer({required this.rows});
+class _ProfileHeaderShimmer extends StatelessWidget {
+  const _ProfileHeaderShimmer();
 
   @override
   Widget build(BuildContext context) {
+    final topInset = MediaQuery.paddingOf(context).top;
+    final user = DI.find<ICacheManager>().getUserData();
+    final heroTag = user?.id == null ? null : 'user_avatar_${user!.id}';
     return Container(
+      height: topInset + 232.h,
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(14.w, topInset + 4.h, 14.w, 0),
       decoration: BoxDecoration(
-        color: AppColors.current.white,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.current.text.withAlpha(10),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: AppColors.current.primary,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28.r)),
       ),
       child: Column(
         children: [
-          for (int i = 0; i < rows; i++) ...[
-            if (i > 0)
-              Divider(
-                height: 1,
-                indent: 52.w,
-                color: AppColors.current.lightGray,
-              ),
-            const _ProfileInfoRowShimmer(),
-          ],
+          SizedBox(height: 48.h),
+          _ShimmerAvatar(heroTag: heroTag),
+          SizedBox(height: 14.h),
+          AppShimmer(
+            width: 142.w,
+            height: 20.h,
+            borderRadius: BorderRadius.circular(10.r),
+          ),
+          SizedBox(height: 6.h),
+          AppShimmer(
+            width: 176.w,
+            height: 11.h,
+            borderRadius: BorderRadius.circular(6.r),
+          ),
         ],
       ),
     );
   }
 }
 
-class _ProfileInfoRowShimmer extends StatelessWidget {
-  const _ProfileInfoRowShimmer();
+class _ShimmerAvatar extends StatelessWidget {
+  final String? heroTag;
+
+  const _ShimmerAvatar({required this.heroTag});
+
+  @override
+  Widget build(BuildContext context) {
+    final avatar = Container(
+      width: 104.w,
+      height: 104.w,
+      padding: EdgeInsets.all(4.w),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+      ),
+      child: AppShimmer.circular(radius: 48.r),
+    );
+
+    if (heroTag == null) return avatar;
+    return Hero(
+      tag: heroTag!,
+      createRectTween: (begin, end) {
+        return MaterialRectCenterArcTween(begin: begin, end: end);
+      },
+      flightShuttleBuilder: (
+        _,
+        __,
+        flightDirection,
+        fromHeroContext,
+        toHeroContext,
+      ) {
+        final hero =
+            (flightDirection == HeroFlightDirection.push
+                    ? toHeroContext.widget
+                    : fromHeroContext.widget)
+                as Hero;
+
+        return Material(
+          color: Colors.transparent,
+          child: ClipOval(child: hero.child),
+        );
+      },
+      child: avatar,
+    );
+  }
+}
+
+class _SectionLabelShimmer extends StatelessWidget {
+  final double width;
+
+  const _SectionLabelShimmer({required this.width});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+      padding: EdgeInsets.only(bottom: 8.h),
+      child: AppShimmer(
+        width: width.w,
+        height: 12.h,
+        borderRadius: BorderRadius.circular(6.r),
+      ),
+    );
+  }
+}
+
+class _ProfileTileShimmer extends StatelessWidget {
+  const _ProfileTileShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: BoxConstraints(minHeight: 96.h),
+      margin: EdgeInsets.only(bottom: 10.h),
+      padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 14.h),
+      decoration: BoxDecoration(
+        color: AppColors.current.white,
+        borderRadius: BorderRadius.circular(10.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(10),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
       child: Row(
         children: [
           AppShimmer(
-            width: 32.w,
-            height: 32.w,
+            width: 40.w,
+            height: 40.w,
             borderRadius: BorderRadius.circular(8.r),
           ),
-          SizedBox(width: 12.w),
+          SizedBox(width: 18.w),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               AppShimmer(
-                width: 56.w,
+                width: 58.w,
                 height: 10.h,
                 borderRadius: BorderRadius.circular(5.r),
               ),
-              SizedBox(height: 4.h),
+              SizedBox(height: 8.h),
               AppShimmer(
-                width: 110.w,
-                height: 14.h,
-                borderRadius: BorderRadius.circular(7.r),
+                width: 150.w,
+                height: 15.h,
+                borderRadius: BorderRadius.circular(8.r),
               ),
             ],
           ),

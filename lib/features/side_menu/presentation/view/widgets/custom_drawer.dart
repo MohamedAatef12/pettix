@@ -44,22 +44,6 @@ class CustomDrawer extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 8.h),
-                  _Section(AppText.myProfile),
-                  _Tile(
-                    icon: Icons.person_outline_rounded,
-                    label: AppText.viewProfile,
-                    color: AppColors.current.primary,
-                    onTap: () => context.push(AppRoutes.profile),
-                  ),
-                  _Tile(
-                    icon: Icons.edit_rounded,
-                    label: AppText.editProfile,
-                    color: const Color(0xFF7A6FD8),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      context.push(AppRoutes.editProfile);
-                    },
-                  ),
                   _Section(AppText.activity),
                   _Tile(
                     icon: Icons.article_rounded,
@@ -182,23 +166,24 @@ class _DrawerHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final topPad = MediaQuery.of(context).padding.top;
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.current.primary,
-            AppColors.current.primary.withAlpha(210),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      padding: EdgeInsets.fromLTRB(20.w, topPad + 20.h, 20.w, 20.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => context.push(AppRoutes.profile),
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppColors.current.primary,
+                AppColors.current.primary.withAlpha(210),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          padding: EdgeInsets.fromLTRB(20.w, topPad + 20.h, 20.w, 20.h),
+          child: Row(
             children: [
               _Avatar(url: user?.avatar ?? user?.image, id: user?.id),
               SizedBox(width: 14.w),
@@ -215,7 +200,7 @@ class _DrawerHeader extends StatelessWidget {
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -244,6 +229,7 @@ class _Avatar extends StatelessWidget {
         imageUrl: url,
         radius: 28.r,
         backgroundColor: AppColors.current.lightGray,
+        heroTag: id == null ? null : 'user_avatar_$id',
       ),
     );
   }

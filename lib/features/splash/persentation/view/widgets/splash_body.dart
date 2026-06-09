@@ -1,12 +1,9 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/app_logo.dart';
-import 'package:pettix/features/splash/persentation/bloc/splash_bloc.dart';
-import 'package:pettix/features/splash/persentation/bloc/splash_states.dart';
 
 class SplashBody extends StatefulWidget {
   const SplashBody({super.key});
@@ -16,19 +13,19 @@ class SplashBody extends StatefulWidget {
 }
 
 class _SplashBodyState extends State<SplashBody> with TickerProviderStateMixin {
-  late final AnimationController _entryController;
+  late final AnimationController _introController;
   late final AnimationController _loopController;
-  bool _met = false;
+  bool _introCompleted = false;
 
   @override
   void initState() {
     super.initState();
-    _entryController = AnimationController(
+    _introController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 2200),
     )..addStatusListener((status) {
-      if (status == AnimationStatus.completed && !_met && mounted) {
-        setState(() => _met = true);
+      if (status == AnimationStatus.completed && !_introCompleted && mounted) {
+        setState(() => _introCompleted = true);
       }
     });
     _loopController = AnimationController(
@@ -44,13 +41,8 @@ class _SplashBodyState extends State<SplashBody> with TickerProviderStateMixin {
   }
 
   void _playEntryAnimation() {
-    setState(() => _met = false);
-    _entryController.value = 0;
-    Future<void>.delayed(const Duration(milliseconds: 350), () {
-      if (mounted) {
-        _entryController.forward(from: 0);
-      }
-    });
+    setState(() => _introCompleted = false);
+    _introController.forward(from: 0);
   }
 
   @override
@@ -63,61 +55,51 @@ class _SplashBodyState extends State<SplashBody> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _entryController.dispose();
+    _introController.dispose();
     _loopController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SplashBloc, SplashState>(
-      builder: (context, state) {
-        final colors = AppColors.current;
+    final colors = AppColors.current;
 
-        return DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [colors.white, colors.lightBlue, colors.white],
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [colors.white, colors.lightBlue, colors.white],
+        ),
+      ),
+      child: Stack(
+        children: [
+          _FloatingPawBackground(animation: _loopController, colors: colors),
+          Center(
+            child: AnimatedBuilder(
+              animation: _introController,
+              builder: (context, _) {
+                return _MeetingLogo(
+                  colors: colors,
+                  progress: _introController.value,
+                );
+              },
             ),
           ),
-          child: Stack(
-            children: [
-              _FloatingPawBackground(
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: MediaQuery.sizeOf(context).height * 0.05,
+            child: Center(
+              child: _PawCircleIndicator(
                 animation: _loopController,
                 colors: colors,
+                enabled: _introCompleted,
               ),
-              Center(
-                child: AnimatedBuilder(
-                  animation: Listenable.merge([
-                    _entryController,
-                    _loopController,
-                  ]),
-                  builder: (context, _) {
-                    final progress = Curves.easeOutCubic.transform(
-                      _entryController.value,
-                    );
-
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _MeetingLogo(colors: colors, progress: progress),
-                        SizedBox(height: 18.h),
-                        _PawCircleIndicator(
-                          animation: _loopController,
-                          colors: colors,
-                          enabled: _met,
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-            ],
+            ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 }
@@ -210,10 +192,49 @@ class _MeetingLogo extends StatelessWidget {
   final AppColors colors;
   final double progress;
 
+  static final Animatable<double> _logoScale = TweenSequence<double>([
+    TweenSequenceItem(
+      tween: Tween<double>(
+        begin: 0.76,
+        end: 1.18,
+      ).chain(CurveTween(curve: Curves.easeOutBack)),
+      weight: 22,
+    ),
+    TweenSequenceItem(
+      tween: Tween<double>(
+        begin: 1.18,
+        end: 0.94,
+      ).chain(CurveTween(curve: Curves.easeInOutCubic)),
+      weight: 16,
+    ),
+    TweenSequenceItem(
+      tween: Tween<double>(
+        begin: 0.94,
+        end: 1.16,
+      ).chain(CurveTween(curve: Curves.easeOutBack)),
+      weight: 20,
+    ),
+    TweenSequenceItem(
+      tween: Tween<double>(
+        begin: 1.16,
+        end: 1.02,
+      ).chain(CurveTween(curve: Curves.easeInOutCubic)),
+      weight: 16,
+    ),
+    TweenSequenceItem(
+      tween: Tween<double>(
+        begin: 1.02,
+        end: 1.1,
+      ).chain(CurveTween(curve: Curves.easeOutCubic)),
+      weight: 26,
+    ),
+  ]);
+
   @override
   Widget build(BuildContext context) {
-    final logoOffset = Offset.lerp(Offset(-520.w, 0), Offset.zero, progress)!;
-    final textOffset = Offset.lerp(Offset(420.w, 0), Offset.zero, progress)!;
+    final textProgress = Curves.easeOutCubic.transform(
+      ((progress - 0.36) / 0.48).clamp(0.0, 1.0),
+    );
 
     return RepaintBoundary(
       child: Container(
@@ -221,25 +242,50 @@ class _MeetingLogo extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Transform.translate(
-              offset: logoOffset,
+            Transform.scale(
+              scale: _logoScale.transform(progress),
               child: AppLogo(size: 118.w, color: colors.primary),
             ),
             SizedBox(height: 2.h),
-            Transform.translate(
-              offset: textOffset,
-              child: Text(
-                'Pettix',
-                style: TextStyle(
-                  fontSize: 34.sp,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0,
-                  color: colors.primary,
-                ),
-              ),
-            ),
+            _WrittenPettixWord(progress: textProgress, color: colors.primary),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _WrittenPettixWord extends StatelessWidget {
+  const _WrittenPettixWord({required this.progress, required this.color});
+
+  static const _brandName = 'Pettix';
+
+  final double progress;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final textStyle = TextStyle(
+      fontSize: 34.sp,
+      fontWeight: FontWeight.w900,
+      letterSpacing: 0,
+      color: color,
+    );
+    final visibleLetters =
+        (progress * _brandName.length).clamp(0, _brandName.length).floor();
+
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: _brandName.substring(0, visibleLetters),
+            style: textStyle,
+          ),
+          TextSpan(
+            text: _brandName.substring(visibleLetters),
+            style: textStyle.copyWith(color: Colors.transparent),
+          ),
+        ],
       ),
     );
   }
