@@ -3,8 +3,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/utils/custom_button.dart';
+import 'package:pettix/core/widgets/app_logo.dart';
 
 import '../../../../../config/router/routes.dart';
+
+import 'package:pettix/core/widgets/app_icon_system.dart';
 
 class CategoryListBody extends StatelessWidget {
   const CategoryListBody({super.key});
@@ -32,12 +35,7 @@ class CategoryListBody extends StatelessWidget {
             ),
             child: Column(
               children: [
-                Expanded(
-                  child: Image.asset(
-                    'assets/images/logo1.png',
-                    fit: BoxFit.contain,
-                  ),
-                ),
+                Expanded(child: Center(child: AppLogo(size: 86.w))),
                 ListTile(
                   title: Center(child: Text(AppText.demoPetName)),
                   subtitle: Text(AppText.demoPetDescription),
@@ -49,7 +47,7 @@ class CategoryListBody extends StatelessWidget {
                   },
 
                   hasLeading: true,
-                  leading: Icon(
+                  leading: AppIcon.raw(
                     Icons.pets_rounded,
                     color: Colors.white,
                     size: 20,

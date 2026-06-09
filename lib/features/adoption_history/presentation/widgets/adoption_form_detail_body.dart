@@ -13,6 +13,8 @@ import 'package:pettix/features/adoption_history/presentation/bloc/adoption_hist
 import 'package:pettix/features/adoption_history/presentation/bloc/adoption_history_event.dart';
 import 'package:pettix/features/adoption_history/presentation/widgets/adoption_form_card.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 /// Full detail view for a single adoption form.
 /// [isOwnerView] controls whether Accept / Reject action buttons are shown.
 class AdoptionFormDetailBody extends StatelessWidget {
@@ -157,8 +159,8 @@ class _DetailHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-               children: [
-                 SizedBox(width: 12.w),
+                children: [
+                  SizedBox(width: 12.w),
                   DecoratedBox(
                     decoration: BoxDecoration(
                       color: AppColors.current.lightBlue.withValues(
@@ -217,7 +219,7 @@ class _DetailHeader extends StatelessWidget {
                       ),
                     ),
                   ),
-                 SizedBox(width: 12.w),
+                  SizedBox(width: 12.w),
                 ],
               ),
             ],
@@ -314,7 +316,7 @@ class _InfoRow extends StatelessWidget {
               color: iconColor.withAlpha(20),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: iconColor, size: 16.w),
+            child: AppIcon.raw(icon, color: iconColor, size: 16.w),
           ),
           SizedBox(width: 12.w),
           Expanded(
@@ -464,7 +466,7 @@ class _ActionButtons extends StatelessWidget {
                         color: confirmColor.withAlpha(20),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
+                      child: AppIcon.raw(
                         isAccept
                             ? Icons.check_circle_rounded
                             : Icons.cancel_rounded,
@@ -590,7 +592,11 @@ class _ActionButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: outlined ? color : Colors.white, size: 18.w),
+            AppIcon.raw(
+              icon,
+              color: outlined ? color : Colors.white,
+              size: 18.w,
+            ),
             SizedBox(width: 6.w),
             Text(
               label,

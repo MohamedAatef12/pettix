@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
+import 'package:pettix/core/widgets/app_icon_system.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 
 class HomeSearchBody extends StatelessWidget {
@@ -34,7 +34,11 @@ class HomeSearchBody extends StatelessWidget {
                       InputBorder.none, // ⬅️ مفيش border لما يبقى enabled
                   focusedBorder: InputBorder.none,
                   contentPadding: EdgeInsets.all(12.w),
-                  leading: SvgPicture.asset('assets/icons/search_grey.svg'),
+                  leading: AppIcon(
+                    token: AppIconToken.search,
+                    size: 20.w,
+                    color: AppColors.current.midGray,
+                  ),
                 ),
               ),
             ],

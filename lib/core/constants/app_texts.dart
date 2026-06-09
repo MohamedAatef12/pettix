@@ -142,6 +142,15 @@ abstract class AppText {
   static String get publicLabel => 'Public'.tr();
   static String get camera => 'Camera'.tr();
   static String get uploadingPost => 'Uploading your post...'.tr();
+  static String get postUploadedSuccessfully =>
+      'Post uploaded successfully!'.tr();
+  static String get failedToUploadPost => 'Failed to upload post'.tr();
+  static String get postUpdatedSuccessfully => 'Post updated successfully'.tr();
+  static String get failedToUpdatePost => 'Failed to update post'.tr();
+  static String get postDeletedSuccessfully => 'Post deleted successfully'.tr();
+  static String get failedToDeletePost => 'Failed to delete post'.tr();
+  static String get deletePostConfirmation =>
+      'Are you sure you want to delete this post?'.tr();
   static String get userFallback => 'User'.tr();
   static String replyCount(int n) =>
       'Reply ({count})'.tr(namedArgs: {'count': '$n'});
@@ -819,5 +828,6 @@ abstract class AppText {
   static String get muteIndefinitely => 'Mute Indefinitely'.tr();
   static String get notificationsMutedSuccess => 'Notifications muted'.tr();
   static String get notificationsUnmutedSuccess => 'Notifications unmuted'.tr();
-  static String mutedUntilText(String date) => 'Muted until {date}'.tr(namedArgs: {'date': date});
+  static String mutedUntilText(String date) =>
+      'Muted until {date}'.tr(namedArgs: {'date': date});
 }

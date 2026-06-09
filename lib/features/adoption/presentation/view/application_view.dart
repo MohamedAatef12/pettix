@@ -1,4 +1,3 @@
-import 'package:pettix/core/widgets/app_page_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -24,6 +23,8 @@ import '../widgets/application/step4_agreements.dart';
 import '../widgets/application/step5_review_application.dart';
 import '../widgets/application/step6_submitted.dart';
 import '../widgets/application/step0_pet_application.dart';
+
+import 'package:pettix/core/widgets/app_icon_system.dart';
 
 class ApplicationScreens extends StatefulWidget {
   final int petId;
@@ -63,29 +64,21 @@ class _ApplicationScreensState extends State<ApplicationScreens> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: _isOwnPetFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return Scaffold(
-            backgroundColor: AppColors.current.white,
-            appBar: _buildAppBar(context),
-            body: const AppPageShimmer(),
-          );
-        }
+    return BlocProvider(
+      create:
+          (context) =>
+              getIt<AdoptionBloc>()
+                ..add(const ResetForm())
+                ..add(SetPetId(widget.petId))
+                ..add(FetchAdoptionOptions()),
+      child: FutureBuilder<bool>(
+        future: _isOwnPetFuture,
+        builder: (context, snapshot) {
+          if (snapshot.data == true) {
+            return _buildOwnPetBlocked(context);
+          }
 
-        if (snapshot.data == true) {
-          return _buildOwnPetBlocked(context);
-        }
-
-        return BlocProvider(
-          create:
-              (context) =>
-                  getIt<AdoptionBloc>()
-                    ..add(const ResetForm())
-                    ..add(SetPetId(widget.petId))
-                    ..add(FetchAdoptionOptions()),
-          child: BlocConsumer<AdoptionBloc, AdoptionState>(
+          return BlocConsumer<AdoptionBloc, AdoptionState>(
             listener: (context, state) async {
               final msg = state.errorMessage;
               if (msg != null && msg.isNotEmpty) {
@@ -133,9 +126,9 @@ class _ApplicationScreensState extends State<ApplicationScreens> {
                 ),
               );
             },
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
@@ -156,7 +149,7 @@ class _ApplicationScreensState extends State<ApplicationScreens> {
                   color: AppColors.current.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
+                child: AppIcon.raw(
                   Icons.pets_rounded,
                   color: AppColors.current.primary,
                   size: 34.w,
@@ -294,10 +287,6 @@ class _StepContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (state.status == AdoptionStatus.loading) {
-      return const AppPageShimmer();
-    }
-
     final index = (state.currentStep - 1).clamp(0, 4);
     return IndexedStack(
       index: index,
@@ -336,7 +325,7 @@ class _BottomNav extends StatelessWidget {
             child: CustomFilledButton(
               onPressed: () => bloc.add(NextStep()),
               text: AppText.next,
-              trailing: const Icon(
+              trailing: const AppIcon.raw(
                 Icons.arrow_circle_right_outlined,
                 color: Colors.white,
                 size: 22,

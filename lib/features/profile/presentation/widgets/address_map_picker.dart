@@ -13,6 +13,8 @@ import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/app_shimmer.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 // Combined address state — single notifier avoids two separate rebuilds.
 @immutable
 class _AddressState {
@@ -389,7 +391,7 @@ class _CenterPin extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: Icon(
+                child: AppIcon.raw(
                   Icons.location_on_rounded,
                   color: Colors.white,
                   size: 22.w,
@@ -483,7 +485,7 @@ class _LocationFab extends StatelessWidget {
                       color: AppColors.current.primary,
                     ),
                   )
-                  : Icon(
+                  : AppIcon.raw(
                     Icons.my_location_rounded,
                     size: 22.w,
                     color: AppColors.current.primary,
@@ -543,7 +545,7 @@ class _ZoomButton extends StatelessWidget {
       child: SizedBox(
         width: 44.w,
         height: 44.w,
-        child: Icon(icon, size: 20.w, color: AppColors.current.text),
+        child: AppIcon.raw(icon, size: 20.w, color: AppColors.current.text),
       ),
     );
   }
@@ -625,7 +627,7 @@ class _AddressRow extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsets.only(top: 1.h),
-          child: Icon(
+          child: AppIcon.raw(
             Icons.location_on_outlined,
             color: AppColors.current.red,
             size: 18.w,

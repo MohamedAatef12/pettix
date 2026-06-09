@@ -3,7 +3,7 @@ description: "Pet Care App"
 
 publish_to: 'none'
 
-version: 2.0.3+9
+version: 2.0.4+10
 environment:
   sdk: ">=3.7.2 <4.0.0"
 
@@ -23,7 +23,7 @@ dependencies:
   # UI & Design
   cupertino_icons: ^1.0.8
   google_fonts: ^6.2.1
-  font_awesome_flutter: ^10.8.0
+  font_awesome_flutter: ^11.0.0
   carousel_slider: ^5.0.0
   shimmer: ^3.0.0
   flex_color_scheme: ^8.2.0
@@ -117,12 +117,12 @@ flavorizr:
         name: "Pettix Dev"
       android:
         applicationId: "com.pettix.up"
-        icon: "assets/images/logo1.png"
+        icon: "assets/images/app_logo_launcher.png"
         firebase:
           config: "config/development/android/google-services.json"
       ios:
         bundleId: "com.pettix.up"
-        icon: "assets/images/logo1.png"
+        icon: "assets/images/app_logo_launcher.png"
         # firebase:
         #   config: "config/development/ios/GoogleService-Info.plist"
     production:
@@ -130,12 +130,12 @@ flavorizr:
         name: "Pettix"
       android:
         applicationId: "com.pettix.up"
-        icon: "assets/images/logo1.png"
+        icon: "assets/images/app_logo_launcher.png"
         firebase:
           config: "config/production/android/google-services.json"
       ios:
         bundleId: "com.pettix.up"
-        icon: "assets/images/logo1.png"
+        icon: "assets/images/app_logo_launcher.png"
         # firebase:
         #   config: "config/production/ios/GoogleService-Info.plist"
 
@@ -147,7 +147,8 @@ flutter:
     - assets/fonts/
     - assets/translations/
     - assets/notification_key/
-flutter_icons:
+flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/images/logo1.png"
+  image_path: "assets/images/app_logo_launcher.png"
+  remove_alpha_ios: true

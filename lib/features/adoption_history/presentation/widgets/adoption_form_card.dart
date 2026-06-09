@@ -5,6 +5,8 @@ import 'package:pettix/core/enums/app_enums.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/adoption_history/domain/entities/adoption_form_entity.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 /// Returns colour and label for each [AdoptionFormStatus] value.
 ({Color bg, Color text, String label}) adoptionStatusStyle(int statusValue) {
   final status = AdoptionFormStatus.fromValue(statusValue);
@@ -103,7 +105,7 @@ class AdoptionFormCard extends StatelessWidget {
                     SizedBox(height: 4.h),
                     Row(
                       children: [
-                        Icon(
+                        AppIcon.raw(
                           isOwnerView
                               ? Icons.person_outline_rounded
                               : Icons.email_outlined,
@@ -147,7 +149,7 @@ class AdoptionFormCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(
+              AppIcon.raw(
                 Icons.chevron_right_rounded,
                 color: AppColors.current.blueGray,
                 size: 24.w,
@@ -197,7 +199,7 @@ class _AvatarBlock extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            AppIcon.raw(
               Icons.pets_rounded,
               color: AppColors.current.white.withValues(alpha: 0.6),
               size: 16.sp,
@@ -261,7 +263,7 @@ class _TagRow extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
+                        AppIcon.raw(
                           item.icon,
                           size: 12.sp,
                           color: AppColors.current.primary,

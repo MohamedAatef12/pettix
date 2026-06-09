@@ -4,6 +4,7 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_logo.dart';
 import 'package:pettix/features/auth/presentation/widgets/register/register_form.dart';
 
 class RegisterBody extends StatelessWidget {
@@ -19,12 +20,7 @@ class RegisterBody extends StatelessWidget {
           children: [
             Row(
               children: [
-                Image.asset(
-                  'assets/images/logo1.png',
-                  height: 30.h,
-                  width: 30.w,
-                  fit: BoxFit.contain,
-                ),
+                AppLogo(size: 30.w),
                 SizedBox(width: 8.w),
                 Text(
                   'Pettix',
@@ -36,13 +32,15 @@ class RegisterBody extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 20.h,),
-            Text(AppText.signUp,
-              style: AppTextStyles.title,),
+            SizedBox(height: 20.h),
+            Text(AppText.signUp, style: AppTextStyles.title),
 
-            Text(AppText.createAccountToContinue,style: AppTextStyles.smallDescription,),
-            SizedBox(height: 50.h,),
-            RegisterForm()
+            Text(
+              AppText.createAccountToContinue,
+              style: AppTextStyles.smallDescription,
+            ),
+            SizedBox(height: 50.h),
+            RegisterForm(),
           ],
         ),
       ),

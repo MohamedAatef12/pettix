@@ -24,7 +24,7 @@ class AppProfileImage extends StatelessWidget {
     final effectiveRadius = radius;
     final size = effectiveRadius * 2;
 
-    return Container(
+    final image = Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
@@ -38,7 +38,6 @@ class AppProfileImage extends StatelessWidget {
         width: size,
         fit: fit,
         backgroundColor: backgroundColor ?? AppColors.current.blueGray,
-        heroTag: heroTag,
         placeholder: AppShimmer.circular(radius: radius),
         errorWidget: Image.asset(
           'assets/images/no_user.png',
@@ -47,6 +46,34 @@ class AppProfileImage extends StatelessWidget {
           fit: BoxFit.cover,
         ),
       ),
+    );
+
+    if (heroTag == null) return image;
+
+    return Hero(
+      tag: heroTag!,
+      createRectTween: (begin, end) {
+        return MaterialRectCenterArcTween(begin: begin, end: end);
+      },
+      flightShuttleBuilder: (
+        _,
+        __,
+        flightDirection,
+        fromHeroContext,
+        toHeroContext,
+      ) {
+        final hero =
+            (flightDirection == HeroFlightDirection.push
+                    ? toHeroContext.widget
+                    : fromHeroContext.widget)
+                as Hero;
+
+        return Material(
+          color: Colors.transparent,
+          child: ClipOval(child: hero.child),
+        );
+      },
+      child: image,
     );
   }
 }

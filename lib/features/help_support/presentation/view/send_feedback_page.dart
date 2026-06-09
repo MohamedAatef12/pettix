@@ -8,6 +8,8 @@ import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class SendFeedbackPage extends StatefulWidget {
   const SendFeedbackPage({super.key});
 
@@ -131,7 +133,7 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(
+                              AppIcon.raw(
                                 _types[i].icon,
                                 size: 14.w,
                                 color:
@@ -180,7 +182,7 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
                               padding: EdgeInsets.symmetric(horizontal: 4.w),
                               child: AnimatedSwitcher(
                                 duration: const Duration(milliseconds: 150),
-                                child: Icon(
+                                child: AppIcon.raw(
                                   i < _rating
                                       ? Icons.star_rounded
                                       : Icons.star_border_rounded,
@@ -235,7 +237,7 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
                           child: DropdownButton<int>(
                             value: _selectedArea,
                             isExpanded: true,
-                            icon: Icon(
+                            icon: AppIcon.raw(
                               Icons.keyboard_arrow_down_rounded,
                               color: AppColors.current.midGray,
                             ),
@@ -384,7 +386,7 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
                   ),
                 ),
               ),
-              Icon(
+              AppIcon.raw(
                 Icons.rate_review_rounded,
                 color: AppColors.current.midGray,
                 size: 26.w,

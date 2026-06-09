@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:pettix/core/widgets/app_cached_image.dart';
-import 'package:pettix/core/widgets/rtl_aware_icon.dart';
+import 'package:pettix/core/widgets/app_icon_system.dart';
 import 'package:pettix/features/home/domain/entities/post_entity.dart';
 
 void _openImagesPreview(BuildContext context, List<String> images) {
@@ -68,15 +68,13 @@ void _openImagesPreview(BuildContext context, List<String> images) {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         SizedBox(width: 10.w),
-                        IconButton(
-                          icon: RtlAwareIcon(
-                            child: const Icon(
-                              Icons.arrow_back_ios_new_rounded,
-                              color: Colors.white,
-                              size: 26,
-                            ),
-                          ),
-                          onPressed: () {
+                        AppIconButton(
+                          token: AppIconToken.chevronBack,
+                          size: 44.w,
+                          iconSize: 22.w,
+                          color: Colors.white,
+                          backgroundColor: Colors.white.withValues(alpha: 0.12),
+                          onTap: () {
                             if (controller.page! > 0) {
                               controller.previousPage(
                                 duration: const Duration(milliseconds: 300),
@@ -96,15 +94,13 @@ void _openImagesPreview(BuildContext context, List<String> images) {
                             expansionFactor: 3,
                           ),
                         ),
-                        IconButton(
-                          icon: RtlAwareIcon(
-                            child: const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              color: Colors.white,
-                              size: 26,
-                            ),
-                          ),
-                          onPressed: () {
+                        AppIconButton(
+                          token: AppIconToken.chevronForward,
+                          size: 44.w,
+                          iconSize: 22.w,
+                          color: Colors.white,
+                          backgroundColor: Colors.white.withValues(alpha: 0.12),
+                          onTap: () {
                             if (controller.page! < images.length - 1) {
                               controller.nextPage(
                                 duration: const Duration(milliseconds: 300),
@@ -157,20 +153,26 @@ class PostImageGallery extends StatelessWidget {
   Widget build(BuildContext context) {
     if (post.images.isEmpty) return const SizedBox.shrink();
 
-    final validImages = post.images.where((e) {
-      if (e.isEmpty) return false;
-      if (e == 'data:image/png;base64,string') {
-        debugPrint('⚠️ Filtered out placeholder image: $e');
-        return false;
-      }
-      return e.startsWith('http') || e.startsWith('data:image') || File(e).existsSync();
-    }).toList();
+    final validImages =
+        post.images.where((e) {
+          if (e.isEmpty) return false;
+          if (e == 'data:image/png;base64,string') {
+            debugPrint('⚠️ Filtered out placeholder image: $e');
+            return false;
+          }
+          return e.startsWith('http') ||
+              e.startsWith('data:image') ||
+              File(e).existsSync();
+        }).toList();
 
-    debugPrint('📸 Post ${post.id} has ${post.images.length} images, ${validImages.length} valid');
+    debugPrint(
+      '📸 Post ${post.id} has ${post.images.length} images, ${validImages.length} valid',
+    );
 
     if (validImages.isEmpty) return const SizedBox.shrink();
 
-    final imagesToShow = validImages.length > 4 ? validImages.take(4).toList() : validImages;
+    final imagesToShow =
+        validImages.length > 4 ? validImages.take(4).toList() : validImages;
 
     if (imagesToShow.length == 2) {
       return Padding(
@@ -182,15 +184,10 @@ class PostImageGallery extends StatelessWidget {
               child: GestureDetector(
                 onTap: () => _openSingleImagePreview(context, image),
                 child: Padding(
-                  padding: EdgeInsets.only(
-                    right: index == 0 ? 8.w : 0,
-                  ),
+                  padding: EdgeInsets.only(right: index == 0 ? 8.w : 0),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(15.r),
-                    child: AppCachedImage(
-                      imageUrl: image,
-                      height: 200.h,
-                    ),
+                    child: AppCachedImage(imageUrl: image, height: 200.h),
                   ),
                 ),
               ),
@@ -219,76 +216,84 @@ class PostImageGallery extends StatelessWidget {
           if (imagesToShow.length > 1) ...[
             SizedBox(height: 8.h),
             Row(
-              children: List.generate(
-                imagesToShow.length == 2
-                    ? 2
-                    : imagesToShow.length > 3
-                        ? 3
-                        : imagesToShow.length - 1,
-                (index) {
-                  final actualIndex = index + 1;
-                  final image = imagesToShow[actualIndex];
-                  final isLastWithMore = actualIndex == 3 && validImages.length > 4;
+              children:
+                  List.generate(
+                      imagesToShow.length == 2
+                          ? 2
+                          : imagesToShow.length > 3
+                          ? 3
+                          : imagesToShow.length - 1,
+                      (index) {
+                        final actualIndex = index + 1;
+                        final image = imagesToShow[actualIndex];
+                        final isLastWithMore =
+                            actualIndex == 3 && validImages.length > 4;
 
-                  return Expanded(
-                    child: SizedBox(
-                      height: 100.h,
-                      child: GestureDetector(
-                        onTap: () {
-                          if (isLastWithMore) {
-                            _openImagesPreview(context, validImages);
-                          } else {
-                            _openSingleImagePreview(context, image);
-                          }
-                        },
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(15.r),
-                              child: AppCachedImage(
-                                imageUrl: image,
-                                height: 100.h,
-                                heroTag: 'post_image_${post.id}_$actualIndex',
+                        return Expanded(
+                          child: SizedBox(
+                            height: 100.h,
+                            child: GestureDetector(
+                              onTap: () {
+                                if (isLastWithMore) {
+                                  _openImagesPreview(context, validImages);
+                                } else {
+                                  _openSingleImagePreview(context, image);
+                                }
+                              },
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(15.r),
+                                    child: AppCachedImage(
+                                      imageUrl: image,
+                                      height: 100.h,
+                                      heroTag:
+                                          'post_image_${post.id}_$actualIndex',
+                                    ),
+                                  ),
+                                  if (isLastWithMore) ...[
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(15.r),
+                                      child: BackdropFilter(
+                                        filter: ImageFilter.blur(
+                                          sigmaX: 2,
+                                          sigmaY: 2,
+                                        ),
+                                        child: Container(
+                                          color: Colors.transparent,
+                                        ),
+                                      ),
+                                    ),
+                                    Center(
+                                      child: Text(
+                                        '+${validImages.length - 3}',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 24.sp,
+                                          fontWeight: FontWeight.bold,
+                                          shadows: const [
+                                            Shadow(
+                                              blurRadius: 6,
+                                              color: Colors.black54,
+                                              offset: Offset(1, 1),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
                               ),
                             ),
-                            if (isLastWithMore) ...[
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(15.r),
-                                child: BackdropFilter(
-                                  filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-                                  child: Container(color: Colors.transparent),
-                                ),
-                              ),
-                              Center(
-                                child: Text(
-                                  '+${validImages.length - 3}',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 24.sp,
-                                    fontWeight: FontWeight.bold,
-                                    shadows: const [
-                                      Shadow(
-                                        blurRadius: 6,
-                                        color: Colors.black54,
-                                        offset: Offset(1, 1),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ).expand((w) sync* {
-                yield w;
-                yield SizedBox(width: 8.w);
-              }).toList()
-                ..removeLast(),
+                          ),
+                        );
+                      },
+                    ).expand((w) sync* {
+                      yield w;
+                      yield SizedBox(width: 8.w);
+                    }).toList()
+                    ..removeLast(),
             ),
           ],
         ],

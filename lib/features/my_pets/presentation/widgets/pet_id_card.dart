@@ -6,6 +6,8 @@ import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 import 'package:pettix/features/my_pets/presentation/widgets/pet_passport.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 /// Document-style card displayed in the horizontal pet list on the profile.
 class PetIdCard extends StatelessWidget {
   final PetEntity pet;
@@ -60,7 +62,7 @@ class PetIdCard extends StatelessWidget {
             PositionedDirectional(
               end: -18.w,
               bottom: -18.w,
-              child: Icon(
+              child: AppIcon.raw(
                 Icons.pets_rounded,
                 size: 84.w,
                 color: AppColors.current.primary.withAlpha(10),
@@ -115,7 +117,7 @@ class _PawPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Icon(
+      child: AppIcon.raw(
         Icons.pets_rounded,
         color: AppColors.current.primary.withAlpha(90),
         size: 30.w,
@@ -165,7 +167,7 @@ class _PetCardInfo extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      Icon(
+                      AppIcon.raw(
                         Icons.qr_code_2_rounded,
                         color: AppColors.current.text,
                         size: 18.w,
@@ -273,7 +275,7 @@ class _MiniBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: badgeColor, size: 12.w),
+          AppIcon.raw(icon, color: badgeColor, size: 12.w),
           SizedBox(width: 4.w),
           Text(
             label,

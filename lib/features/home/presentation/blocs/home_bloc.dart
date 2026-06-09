@@ -14,6 +14,7 @@ import 'package:pettix/features/home/domain/usecases/add_post.dart';
 import 'package:pettix/features/home/domain/usecases/add_report.dart';
 import 'package:pettix/features/home/domain/usecases/delete_post.dart';
 import 'package:pettix/features/home/domain/usecases/dislike_post.dart';
+import 'package:pettix/features/home/domain/usecases/edit_post.dart';
 import 'package:pettix/features/home/domain/usecases/get_comment_likes.dart';
 import 'package:pettix/features/home/domain/usecases/get_comments_id.dart';
 import 'package:pettix/features/home/domain/usecases/get_post_comments_count.dart';
@@ -35,6 +36,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final GetPostsUseCase getPostsUseCase;
   final AddPostUseCase addPostUseCase;
   final DeletePostUseCase deletePostUseCase;
+  final EditPostUseCase editPostUseCase;
   final AddCommentUseCase addCommentUseCase;
   final GetPostCommentsUseCase getCommentsIdUseCase;
   final GetPostLikesUseCase getPostsLikesUseCase;
@@ -65,6 +67,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       getPostsUseCase: getIt<GetPostsUseCase>(),
       addPostUseCase: getIt<AddPostUseCase>(),
       deletePostUseCase: getIt<DeletePostUseCase>(),
+      editPostUseCase: EditPostUseCase(getIt()),
       addCommentUseCase: getIt<AddCommentUseCase>(),
       getCommentsIdUseCase: getIt<GetPostCommentsUseCase>(),
       getPostsLikesUseCase: getIt<GetPostLikesUseCase>(),
@@ -89,6 +92,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required this.getPostsUseCase,
     required this.addPostUseCase,
     required this.deletePostUseCase,
+    required this.editPostUseCase,
     required this.addCommentUseCase,
     required this.getCommentsIdUseCase,
     required this.getPostsLikesUseCase,
@@ -112,6 +116,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<GetSavedPostsEvent>(_onGetSavedPosts);
     on<AddPostEvent>(_onAddPost);
     on<DeletePostEvent>(_onDeletePost);
+    on<EditPostEvent>(_onEditPost);
     on<FetchPostsCommentsEvent>(_onFetchPostsComments);
     on<AddCommentEvent>(_onAddComment);
     on<FetchPostsLikesEvent>(_onFetchPostsLikes);
@@ -122,6 +127,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<PickImagesFromGalleryEvent>(_onPickImagesFromGallery);
     on<AddImageFromCameraEvent>(_onAddImageFromCamera);
     on<RemoveSelectedImageEvent>(_onRemoveSelectedImage);
+    on<ClearSelectedImagesEvent>(
+      (event, emit) => emit(state.copyWith(selectedImages: [])),
+    );
     on<SubmitPostEvent>(_onSubmitPost);
     on<AddReplyEvent>(_onAddReply);
     on<SetReplyingToEvent>(_onSetReplyingTo);
@@ -627,7 +635,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   bool _isImageFile(File file) {
     final path = file.path.toLowerCase();
-    final imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.heic', '.heif', '.bmp'];
+    final imageExtensions = [
+      '.jpg',
+      '.jpeg',
+      '.png',
+      '.gif',
+      '.webp',
+      '.heic',
+      '.heif',
+      '.bmp',
+    ];
     return imageExtensions.any((ext) => path.endsWith(ext));
   }
 
@@ -650,11 +667,19 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       }
 
       if (rejectedVideo) {
-        emit(state.copyWith(error: 'Only image files are allowed. Videos are not permitted.'));
+        emit(
+          state.copyWith(
+            error: 'Only image files are allowed. Videos are not permitted.',
+          ),
+        );
       }
 
       if (validFiles.isNotEmpty) {
-        emit(state.copyWith(selectedImages: [...state.selectedImages, ...validFiles]));
+        emit(
+          state.copyWith(
+            selectedImages: [...state.selectedImages, ...validFiles],
+          ),
+        );
       }
     }
   }
@@ -668,7 +693,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         state.copyWith(selectedImages: [...state.selectedImages, event.image]),
       );
     } else {
-      emit(state.copyWith(error: 'Only image files are allowed. Videos are not permitted.'));
+      emit(
+        state.copyWith(
+          error: 'Only image files are allowed. Videos are not permitted.',
+        ),
+      );
     }
   }
 
@@ -698,7 +727,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       (user) async {
         final imagePaths =
             state.selectedImages.map((file) => file.path).toList();
-        final selectedImagesCopy = List<File>.from(state.selectedImages);
         final contentCopy = text;
 
         // Reset local input state
@@ -777,17 +805,51 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     DeletePostEvent event,
     Emitter<HomeState> emit,
   ) async {
-    emit(state.copyWith(isPostsLoading: true, error: null));
+    final isUserPosts = state.postFetchType == PostFetchType.userPosts;
+    final previousPosts = List<PostEntity>.from(state.posts);
+    final updatedPosts =
+        state.posts.where((post) => post.id != event.id).toList();
+
+    emit(state.copyWith(posts: updatedPosts, error: null));
+
     final result = await deletePostUseCase.call(event.id);
 
     result.fold(
-      (failure) =>
-          emit(state.copyWith(isPostsLoading: false, error: failure.message)),
+      (failure) {
+        emit(
+          state.copyWith(
+            posts: previousPosts,
+            error: failure.message,
+            postOwnerActionResult: PostOwnerActionResult.deleteFailure,
+            postOwnerActionError: failure.message,
+            postOwnerActionVersion: state.postOwnerActionVersion + 1,
+          ),
+        );
+      },
       (_) async {
+        if (isUserPosts) {
+          emit(
+            state.copyWith(
+              posts: List<PostEntity>.from(state.posts),
+              error: null,
+              postOwnerActionResult: PostOwnerActionResult.deleteSuccess,
+              postOwnerActionError: null,
+              postOwnerActionVersion: state.postOwnerActionVersion + 1,
+            ),
+          );
+          return;
+        }
+
         final postsResult = await getPostsUseCase.call(pageIndex: 1);
         postsResult.fold(
           (failure) => emit(
-            state.copyWith(isPostsLoading: false, error: failure.message),
+            state.copyWith(
+              isPostsLoading: false,
+              error: failure.message,
+              postOwnerActionResult: PostOwnerActionResult.deleteFailure,
+              postOwnerActionError: failure.message,
+              postOwnerActionVersion: state.postOwnerActionVersion + 1,
+            ),
           ),
           (paginated) => emit(
             state.copyWith(
@@ -796,9 +858,57 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
               totalCount: paginated.totalCount,
               isPostsLoading: false,
               error: null,
+              postOwnerActionResult: PostOwnerActionResult.deleteSuccess,
+              postOwnerActionError: null,
+              postOwnerActionVersion: state.postOwnerActionVersion + 1,
             ),
           ),
         );
+      },
+    );
+  }
+
+  Future<void> _onEditPost(EditPostEvent event, Emitter<HomeState> emit) async {
+    final previousPosts = List<PostEntity>.from(state.posts);
+    final updatedPosts =
+        state.posts
+            .map((post) => post.id == event.post.id ? event.post : post)
+            .toList();
+
+    emit(state.copyWith(posts: updatedPosts, error: null));
+
+    final result = await editPostUseCase.call(
+      event.post,
+      deletedImages: event.deletedImages,
+    );
+
+    result.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            posts: previousPosts,
+            selectedImages: [],
+            error: failure.message,
+            postOwnerActionResult: PostOwnerActionResult.editFailure,
+            postOwnerActionError: failure.message,
+            postOwnerActionVersion: state.postOwnerActionVersion + 1,
+          ),
+        );
+      },
+      (_) {
+        emit(
+          state.copyWith(
+            posts: List<PostEntity>.from(state.posts),
+            selectedImages: [],
+            error: null,
+            postOwnerActionResult: PostOwnerActionResult.editSuccess,
+            postOwnerActionError: null,
+            postOwnerActionVersion: state.postOwnerActionVersion + 1,
+          ),
+        );
+        if (state.postFetchType == PostFetchType.userPosts) {
+          add(GetUserPostsEvent());
+        }
       },
     );
   }
@@ -922,12 +1032,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
               ..removeWhere((c) => c.id == tempComment.id)
               ..insert(0, event.comment);
 
-        emit(
-          state.copyWith(
-            comments: finalComments,
-            error: null,
-          ),
-        );
+        emit(state.copyWith(comments: finalComments, error: null));
 
         add(RefreshCommentsSilentlyEvent(event.comment.postId));
       },
@@ -1020,12 +1125,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
               return comment;
             }).toList();
 
-        emit(
-          state.copyWith(
-            comments: updatedComments,
-            error: null,
-          ),
-        );
+        emit(state.copyWith(comments: updatedComments, error: null));
         add(RefreshCommentsSilentlyEvent(event.reply.postId));
       },
     );
@@ -1145,7 +1245,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   void _revertUnlike(int postId, Emitter<HomeState> emit, {String? error}) {
     if (error != null) {
-      print(
+      debugPrint(
         '❌ [HomeBloc] _revertUnlike triggered for post $postId due to error: $error',
       );
     }
@@ -1231,10 +1331,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     if (throttledPostIds.contains(commentId)) return;
     throttledPostIds.add(commentId);
 
-    final updatedCommentLikes = Map<int, int>.from(
-      state.commentLikesCount ,
-    );
-    final updatedLikedComments = List<int>.from(state.likedCommentId );
+    final updatedCommentLikes = Map<int, int>.from(state.commentLikesCount);
+    final updatedLikedComments = List<int>.from(state.likedCommentId);
 
     final comment = _findCommentById(state.comments, commentId);
     final initialCount = comment?.likes.length ?? 0;
@@ -1277,7 +1375,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     final likes = result.getOrElse(() => []);
 
-    final updatedMap = Map<int, int>.from(state.commentLikesCount );
+    final updatedMap = Map<int, int>.from(state.commentLikesCount);
     updatedMap[commentId] = likes.length;
 
     final userResult = await getUserDataUseCase.call();
@@ -1323,7 +1421,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   void _revertCommentLike(int commentId, Emitter<HomeState> emit) {
-    final updatedLikedComments = List<int>.from(state.likedCommentId )
+    final updatedLikedComments = List<int>.from(state.likedCommentId)
       ..remove(commentId);
     final updatedCounts = Map<int, int>.from(state.commentLikesCount);
     final currentCount = updatedCounts[commentId] ?? 1;
@@ -1338,7 +1436,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   void _revertCommentUnlike(int commentId, Emitter<HomeState> emit) {
-    final updatedLikedComments = List<int>.from(state.likedCommentId )
+    final updatedLikedComments = List<int>.from(state.likedCommentId)
       ..add(commentId);
     final updatedCounts = Map<int, int>.from(state.commentLikesCount);
     final currentCount = updatedCounts[commentId] ?? 0;

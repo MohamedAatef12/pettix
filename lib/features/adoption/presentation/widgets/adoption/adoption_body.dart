@@ -13,6 +13,8 @@ import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_state
 import 'package:pettix/features/adoption/presentation/widgets/adoption/filter_sheet.dart';
 import 'package:pettix/features/adoption/presentation/widgets/adoption/pet_browse_card.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class AdoptionBody extends StatelessWidget {
   const AdoptionBody({super.key});
 
@@ -159,7 +161,7 @@ class _SearchField extends StatelessWidget {
             color: AppColors.current.midGray,
             fontSize: 13.sp,
           ),
-          prefixIcon: Icon(
+          prefixIcon: AppIcon.raw(
             Icons.search_rounded,
             color: AppColors.current.midGray,
             size: 18.w,
@@ -174,7 +176,7 @@ class _SearchField extends StatelessWidget {
                   state.searchQuery != null && state.searchQuery!.isNotEmpty;
               if (!hasQuery) return const SizedBox.shrink();
               return IconButton(
-                icon: Icon(
+                icon: AppIcon.raw(
                   Icons.close_rounded,
                   color: AppColors.current.midGray,
                   size: 16.w,
@@ -223,7 +225,7 @@ class _FilterButton extends StatelessWidget {
                 width: 1,
               ),
             ),
-            child: Icon(
+            child: AppIcon.raw(
               Icons.tune_rounded,
               color:
                   state.hasActiveFilters
@@ -343,7 +345,7 @@ class _CategoryChip extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            AppIcon.raw(
               icon,
               size: 16.sp,
               color:
@@ -583,7 +585,7 @@ class _EmptySliver extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            AppIcon.raw(
               Icons.search_off_rounded,
               size: 64.w,
               color: AppColors.current.blueGray,
@@ -616,7 +618,7 @@ class _ErrorSliver extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            AppIcon.raw(
               Icons.error_outline_rounded,
               size: 48.w,
               color: AppColors.current.red,

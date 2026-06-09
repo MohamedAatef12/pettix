@@ -17,6 +17,8 @@ import 'package:pettix/features/my_pets/presentation/bloc/my_pets_bloc.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_event.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_state.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class MyPetsScreen extends StatelessWidget {
   const MyPetsScreen({super.key});
 
@@ -32,7 +34,7 @@ class MyPetsScreen extends StatelessWidget {
             ),
         backgroundColor: AppColors.current.primary,
         elevation: 4,
-        icon: Icon(Icons.add_rounded, color: Colors.white, size: 22.w),
+        icon: AppIcon.raw(Icons.add_rounded, color: Colors.white, size: 22.w),
         label: Text(
           AppText.addNewPet,
           style: TextStyle(
@@ -447,7 +449,7 @@ class _ActionBtn extends StatelessWidget {
           color: color.withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: color, size: 16.w),
+        child: AppIcon.raw(icon, color: color, size: 16.w),
       ),
     );
   }
@@ -538,7 +540,7 @@ class _EmptyView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            AppIcon.raw(
               Icons.pets_rounded,
               size: 64.w,
               color: AppColors.current.blueGray,
@@ -815,7 +817,7 @@ class _EditPetSheetState extends State<_EditPetSheet> {
             color: AppColors.current.midGray,
             fontSize: 13.sp,
           ),
-          prefixIcon: Icon(icon, color: iconColor, size: 20.w),
+          prefixIcon: AppIcon.raw(icon, color: iconColor, size: 20.w),
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(
             horizontal: 16.w,
@@ -846,7 +848,7 @@ class _EditPetSheetState extends State<_EditPetSheet> {
           value: value,
           hint: Row(
             children: [
-              Icon(icon, color: iconColor, size: 20.w),
+              AppIcon.raw(icon, color: iconColor, size: 20.w),
               SizedBox(width: 12.w),
               Text(
                 label,
@@ -857,7 +859,7 @@ class _EditPetSheetState extends State<_EditPetSheet> {
               ),
             ],
           ),
-          icon: Icon(
+          icon: AppIcon.raw(
             Icons.expand_more_rounded,
             color: AppColors.current.midGray,
             size: 20.w,

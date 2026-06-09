@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:pettix/core/constants/app_typography.dart';
 
 // ── Warm Rose — light theme ────────────────────────────────────────────────────
 ThemeData roseLightTheme = ThemeData(
   useMaterial3: true,
   brightness: Brightness.light,
-  fontFamily: GoogleFonts.cairo().fontFamily,
+  fontFamily: AppTypography.fontFamily,
+  textTheme: AppTypography.textTheme(textColor: const Color(0xff1A0812)),
   scaffoldBackgroundColor: const Color(0xffFFF9FC),
   colorScheme: const ColorScheme.light(
     primary: Color(0xffF43F5E),
@@ -41,7 +42,8 @@ ThemeData roseLightTheme = ThemeData(
 ThemeData oceanDarkTheme = ThemeData(
   useMaterial3: true,
   brightness: Brightness.dark,
-  fontFamily: GoogleFonts.cairo().fontFamily,
+  fontFamily: AppTypography.fontFamily,
+  textTheme: AppTypography.textTheme(textColor: const Color(0xffE0F0FF)),
   scaffoldBackgroundColor: const Color(0xff0A1A2E),
   colorScheme: const ColorScheme.dark(
     primary: Color(0xff06B6D4),
@@ -77,7 +79,8 @@ ThemeData oceanDarkTheme = ThemeData(
 ThemeData emeraldLightTheme = ThemeData(
   useMaterial3: true,
   brightness: Brightness.light,
-  fontFamily: GoogleFonts.cairo().fontFamily,
+  fontFamily: AppTypography.fontFamily,
+  textTheme: AppTypography.textTheme(textColor: const Color(0xff05251A)),
   scaffoldBackgroundColor: const Color(0xffF7FFFB),
   colorScheme: const ColorScheme.light(
     primary: Color(0xff00A676),
@@ -113,7 +116,8 @@ ThemeData emeraldLightTheme = ThemeData(
 ThemeData sunriseLightTheme = ThemeData(
   useMaterial3: true,
   brightness: Brightness.light,
-  fontFamily: GoogleFonts.cairo().fontFamily,
+  fontFamily: AppTypography.fontFamily,
+  textTheme: AppTypography.textTheme(textColor: const Color(0xff261407)),
   scaffoldBackgroundColor: const Color(0xffFFFBF3),
   colorScheme: const ColorScheme.light(
     primary: Color(0xffF97316),
@@ -149,7 +153,8 @@ ThemeData sunriseLightTheme = ThemeData(
 ThemeData forestDarkTheme = ThemeData(
   useMaterial3: true,
   brightness: Brightness.dark,
-  fontFamily: GoogleFonts.cairo().fontFamily,
+  fontFamily: AppTypography.fontFamily,
+  textTheme: AppTypography.textTheme(textColor: const Color(0xffE6FFF0)),
   scaffoldBackgroundColor: const Color(0xff071A12),
   colorScheme: const ColorScheme.dark(
     primary: Color(0xff22C55E),
@@ -185,7 +190,8 @@ ThemeData forestDarkTheme = ThemeData(
 ThemeData emberDarkTheme = ThemeData(
   useMaterial3: true,
   brightness: Brightness.dark,
-  fontFamily: GoogleFonts.cairo().fontFamily,
+  fontFamily: AppTypography.fontFamily,
+  textTheme: AppTypography.textTheme(textColor: const Color(0xffFFF1E8)),
   scaffoldBackgroundColor: const Color(0xff190D08),
   colorScheme: const ColorScheme.dark(
     primary: Color(0xffF97316),
@@ -250,7 +256,8 @@ ThemeData _extraTheme({
   return ThemeData(
     useMaterial3: true,
     brightness: brightness,
-    fontFamily: GoogleFonts.cairo().fontFamily,
+    fontFamily: AppTypography.fontFamily,
+    textTheme: AppTypography.textTheme(textColor: onSurface),
     scaffoldBackgroundColor: background,
     colorScheme: scheme,
     appBarTheme: AppBarTheme(

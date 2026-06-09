@@ -7,6 +7,8 @@ import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_bloc.dart';
 import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_event.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 void showFilterSheet(BuildContext context) {
   showModalBottomSheet(
     context: context,
@@ -206,7 +208,7 @@ class _GenderChips extends StatelessWidget {
               label: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
+                  AppIcon.raw(
                     o.icon,
                     size: 14.w,
                     color: active ? Colors.white : AppColors.current.midGray,
@@ -348,7 +350,7 @@ class _OrderChip extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 12.w, color: color),
+            AppIcon.raw(icon, size: 12.w, color: color),
             SizedBox(width: 4.w),
             Text(
               label,

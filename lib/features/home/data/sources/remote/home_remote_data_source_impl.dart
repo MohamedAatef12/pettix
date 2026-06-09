@@ -115,12 +115,14 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   }
 
   @override
-  Future<Either<Failure, void>> editPost(PostModel post) async {
+  Future<Either<Failure, void>> editPost(
+    PostModel post, {
+    List<String> deletedImages = const [],
+  }) async {
     try {
-      final jsonData = await post.toJson();
       final response = await apiService.put(
-        endPoint: '${Constants.postsEndpoint}/${post.id}',
-        data: jsonData,
+        endPoint: '${Constants.addPostsEndpoint}/${post.id}',
+        data: await post.toEditJson(deletedImages: deletedImages),
       );
       if (!response.success) {
         return Left(Failure(response.message));
@@ -154,7 +156,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   Future<Either<Failure, void>> deletePost(int id) async {
     try {
       final response = await apiService.delete(
-        endPoint: '${Constants.postsEndpoint}/$id',
+        endPoint: '${Constants.addPostsEndpoint}/$id',
       );
       if (!response.success) {
         return Left(Failure(response.message));

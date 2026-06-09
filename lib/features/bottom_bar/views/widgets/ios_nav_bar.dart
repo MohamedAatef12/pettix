@@ -6,6 +6,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 /// Native-style iOS bottom navigation bar with frosted glass effect.
 ///
 /// Displays 4 navigation tabs with filled/outlined icon crossfade and
@@ -57,10 +59,7 @@ class IosNavBar extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.current.white.withValues(alpha: 0.88),
             border: Border(
-              top: BorderSide(
-                color: AppColors.current.lightGray,
-                width: 0.5,
-              ),
+              top: BorderSide(color: AppColors.current.lightGray, width: 0.5),
             ),
           ),
           child: SafeArea(
@@ -124,13 +123,14 @@ class _IosNavItem extends StatelessWidget {
             curve: Curves.easeOutBack,
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
-              child: Icon(
+              child: AppIcon.raw(
                 isSelected ? selectedIcon : unselectedIcon,
                 key: ValueKey(isSelected),
                 size: 26.r,
-                color: isSelected
-                    ? AppColors.current.primary
-                    : AppColors.current.midGray,
+                color:
+                    isSelected
+                        ? AppColors.current.primary
+                        : AppColors.current.midGray,
               ),
             ),
           ),
@@ -140,9 +140,10 @@ class _IosNavItem extends StatelessWidget {
             style: TextStyle(
               fontSize: 10.sp,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-              color: isSelected
-                  ? AppColors.current.primary
-                  : AppColors.current.midGray,
+              color:
+                  isSelected
+                      ? AppColors.current.primary
+                      : AppColors.current.midGray,
             ),
             child: Text(label),
           ),
@@ -178,7 +179,7 @@ class _IosAddButton extends StatelessWidget {
               ),
             ],
           ),
-          child: Icon(
+          child: AppIcon.raw(
             Iconsax.add,
             color: AppColors.current.white,
             size: 18.r,
@@ -208,7 +209,7 @@ class _IosChatButton extends StatelessWidget {
             color: AppColors.current.blueGray.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
-          child: Icon(
+          child: AppIcon.raw(
             Iconsax.messages,
             color: AppColors.current.primary,
             size: 18.r,

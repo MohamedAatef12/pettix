@@ -1,170 +1,177 @@
-import 'package:pettix/features/profile/presentation/widgets/profile_shimmer.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
-import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/core/constants/app_texts.dart';
-import 'package:pettix/core/constants/text_styles.dart';
-import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/features/auth/domain/entities/user_entity.dart';
-import 'package:pettix/features/my_pets/presentation/widgets/pets_section.dart';
+import 'package:pettix/features/profile/domain/entities/update_profile_entity.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:pettix/features/profile/presentation/bloc/profile_event.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_state.dart';
-import 'package:pettix/features/profile/presentation/widgets/profile_header.dart';
-import 'package:pettix/features/profile/presentation/widgets/profile_info_card.dart';
+import 'package:pettix/features/profile/presentation/widgets/animated_profile/profile_animated_content.dart';
+import 'package:pettix/features/profile/presentation/widgets/profile_shimmer.dart';
 
-class ProfileBody extends StatelessWidget {
+class ProfileBody extends StatefulWidget {
   final bool isCurrentUser;
   final int? userId;
+
   const ProfileBody({super.key, this.isCurrentUser = true, this.userId});
 
   @override
+  State<ProfileBody> createState() => _ProfileBodyState();
+}
+
+class _ProfileBodyState extends State<ProfileBody> {
+  final ValueNotifier<bool> _isEditing = ValueNotifier(false);
+  final ValueNotifier<bool> _showSuccess = ValueNotifier(false);
+  Timer? _successTimer;
+
+  void _startEditing() {
+    context.read<ProfileBloc>().add(InitEditFormEvent());
+    _isEditing.value = true;
+  }
+
+  void _cancelEditing() {
+    _isEditing.value = false;
+  }
+
+  void _pickAvatar() {
+    context.read<ProfileBloc>().add(PickAvatarEvent());
+  }
+
+  void _submit(ProfileState state) {
+    if (state.status == ProfileStatus.updating) return;
+    final profile = state.profile;
+    if (profile == null) return;
+
+    final bloc = context.read<ProfileBloc>();
+    final phone = bloc.phoneController.text.trim();
+    bloc.add(
+      UpdateProfileEvent(
+        UpdateProfileEntity(
+          id: profile.id,
+          nameEn: bloc.nameEnController.text.trim(),
+          nameAr: bloc.nameArController.text.trim(),
+          phone: phone.isEmpty ? null : phone,
+          age: int.tryParse(bloc.ageController.text.trim()),
+          address: bloc.addressController.text.trim(),
+          genderId: state.selectedGenderId,
+          contactTypeId: profile.contactTypeId,
+          statusId: profile.statusId,
+        ),
+      ),
+    );
+  }
+
+  void _showSavedOverlay() {
+    _isEditing.value = false;
+    _showSuccess.value = true;
+    _successTimer?.cancel();
+    _successTimer = Timer(const Duration(milliseconds: 1450), () {
+      _showSuccess.value = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _successTimer?.cancel();
+    _isEditing.dispose();
+    _showSuccess.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ProfileBloc, ProfileState>(
+    return BlocConsumer<ProfileBloc, ProfileState>(
+      listenWhen: (previous, current) => previous.status != current.status,
+      listener: (context, state) {
+        if (!_isEditing.value) return;
+        if (state.status == ProfileStatus.success) {
+          _showSavedOverlay();
+        } else if (state.status == ProfileStatus.error) {
+          AuthToast.showError(context, state.errorMessage ?? AppText.error);
+        }
+      },
       builder: (context, state) {
         if (state.status == ProfileStatus.loading ||
             state.status == ProfileStatus.initial) {
           return const ProfileShimmer();
         }
-        if (state.status == ProfileStatus.error) {
+
+        if (state.status == ProfileStatus.error && state.profile == null) {
           return Center(child: Text(state.errorMessage ?? AppText.error));
         }
+
         final profile = state.profile;
-        if (profile == null) {
-          return const ProfileShimmer();
-        }
-        return _ProfileContent(
+        if (profile == null) return const ProfileShimmer();
+
+        return _ProfileBodyView(
           profile: profile,
-          isCurrentUser: isCurrentUser,
-          userId: userId,
+          state: state,
+          isCurrentUser: widget.isCurrentUser,
+          userId: widget.userId,
+          isEditing: _isEditing,
+          showSuccess: _showSuccess,
+          onEditTap: _startEditing,
+          onAvatarTap: _pickAvatar,
+          onCancelEdit: _cancelEditing,
+          onSubmit: () => _submit(state),
         );
       },
     );
   }
 }
 
-class _ProfileContent extends StatelessWidget {
+class _ProfileBodyView extends StatelessWidget {
   final UserEntity profile;
+  final ProfileState state;
   final bool isCurrentUser;
   final int? userId;
-  const _ProfileContent({
+  final ValueNotifier<bool> isEditing;
+  final ValueNotifier<bool> showSuccess;
+  final VoidCallback onEditTap;
+  final VoidCallback onAvatarTap;
+  final VoidCallback onCancelEdit;
+  final VoidCallback onSubmit;
+
+  const _ProfileBodyView({
     required this.profile,
+    required this.state,
     required this.isCurrentUser,
-    this.userId,
+    required this.userId,
+    required this.isEditing,
+    required this.showSuccess,
+    required this.onEditTap,
+    required this.onAvatarTap,
+    required this.onCancelEdit,
+    required this.onSubmit,
   });
 
-  String _genderLabel(int? id) {
-    if (id == 1) return AppText.male;
-    if (id == 2) return AppText.female;
-    return '-';
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        SingleChildScrollView(
-          child: Column(
-            children: [
-              ProfileHeader(
-                profile: profile,
-                onEditTap:
-                    isCurrentUser
-                        ? () => context.push(
-                          AppRoutes.editProfile,
-                          extra: context.read<ProfileBloc>(),
-                        )
-                        : null,
-              ),
-              ProfileNameSection(profile: profile),
-              SizedBox(height: 24.h),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _SectionLabel(AppText.personalInfo),
-                    SizedBox(height: 8.h),
-                    ProfileInfoGroup(
-                      rows: [
-                        ProfileInfoRow(
-                          icon: Icons.person_outline_rounded,
-                          label: AppText.fullName,
-                          value: profile.nameEn ?? profile.userName,
-                        ),
-
-                        ProfileInfoRow(
-                          icon: Icons.email_outlined,
-                          label: AppText.email,
-                          value: profile.email,
-                          iconColor: const Color(0xFF5EA8DF),
-                        ),
-                        ProfileInfoRow(
-                          icon: Icons.phone_outlined,
-                          label: AppText.phone,
-                          value: profile.phone ?? '-',
-                          iconColor: const Color(0xFF56C590),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16.h),
-                    _SectionLabel(AppText.details),
-                    SizedBox(height: 8.h),
-                    ProfileInfoGroup(
-                      rows: [
-                        ProfileInfoRow(
-                          icon: Icons.cake_outlined,
-                          label: AppText.age,
-                          value: profile.age?.toString() ?? '-',
-                          iconColor: const Color(0xFFE8A838),
-                        ),
-                        ProfileInfoRow(
-                          icon: Icons.wc_rounded,
-                          label: AppText.gender,
-                          value: _genderLabel(profile.genderId),
-                          iconColor: const Color(0xFF3AAFA9),
-                        ),
-                        ProfileInfoRow(
-                          icon: Icons.location_on_outlined,
-                          label: AppText.address,
-                          value: profile.address ?? '-',
-                          iconColor: AppColors.current.red,
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 24.h),
-                    _SectionLabel(
-                      isCurrentUser ? AppText.myPets : AppText.pets,
-                    ),
-                    SizedBox(height: 8.h),
-                    PetsSection(isCurrentUser: isCurrentUser, userId: userId),
-                    SizedBox(height: 32.h),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _SectionLabel extends StatelessWidget {
-  final String text;
-  const _SectionLabel(this.text);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text.toUpperCase(),
-      style: AppTextStyles.smallDescription.copyWith(
-        color: AppColors.current.midGray,
-        fontSize: 10.sp,
-        fontWeight: FontWeight.w700,
-        letterSpacing: 0.8,
-      ),
+    return ValueListenableBuilder<bool>(
+      valueListenable: isEditing,
+      builder: (context, editing, _) {
+        return ValueListenableBuilder<bool>(
+          valueListenable: showSuccess,
+          builder: (context, successVisible, _) {
+            return ProfileAnimatedContent(
+              profile: profile,
+              isCurrentUser: isCurrentUser,
+              userId: userId,
+              isEditing: editing,
+              isUpdating: state.status == ProfileStatus.updating,
+              showSuccess: successVisible,
+              pickedAvatarBytes: state.pickedAvatarBytes,
+              onEditTap: onEditTap,
+              onAvatarTap: onAvatarTap,
+              onCancelEdit: onCancelEdit,
+              onSubmit: onSubmit,
+            );
+          },
+        );
+      },
     );
   }
 }

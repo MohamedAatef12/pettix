@@ -9,6 +9,8 @@ import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class ContactSupportPage extends StatefulWidget {
   const ContactSupportPage({super.key});
 
@@ -183,7 +185,7 @@ class _ContactCard extends StatelessWidget {
               color: iconBg,
               borderRadius: BorderRadius.circular(13.r),
             ),
-            child: Icon(icon, color: iconColor, size: 22.w),
+            child: AppIcon.raw(icon, color: iconColor, size: 22.w),
           ),
           SizedBox(width: 12.w),
           Expanded(
