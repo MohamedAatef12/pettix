@@ -104,9 +104,9 @@ class _HeroSection extends StatelessWidget {
           fit: BoxFit.fill,
           width: MediaQuery.of(context).size.width,
         ),
-        Positioned(
+        PositionedDirectional(
           top: MediaQuery.of(context).size.height * 0.03,
-          left: 10,
+          start: 10,
           child: InkWell(
             onTap: () => context.pop(),
             highlightColor: Colors.transparent,

@@ -3,42 +3,43 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/shimmers/report_shimmer.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
 import 'package:pettix/core/utils/date_formatter.dart';
+import 'package:pettix/core/widgets/app_icon_system.dart';
 import 'package:pettix/core/widgets/app_profile_image.dart';
+import 'package:pettix/core/widgets/rtl_aware_icon.dart';
 import 'package:pettix/features/home/domain/entities/post_entity.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 import 'package:pettix/features/home/presentation/blocs/home_state.dart';
 
-IconData _getReasonIcon(String name) {
+AppIconToken _getReasonIcon(String name) {
   final n = name.toLowerCase();
-  if (n.contains('spam')) return Icons.mail_outline_rounded;
-  if (n.contains('harass') || n.contains('abuse')) return Icons.gavel_rounded;
-  if (n.contains('hate')) return Icons.sentiment_very_dissatisfied_rounded;
+  if (n.contains('spam')) return AppIconToken.reportSpam;
+  if (n.contains('harass') || n.contains('abuse')) {
+    return AppIconToken.reportHarassment;
+  }
+  if (n.contains('hate')) return AppIconToken.reportHate;
   if (n.contains('nudity') ||
       n.contains('inappropriate') ||
       n.contains('sexual')) {
-    return Icons.visibility_off_outlined;
+    return AppIconToken.reportHidden;
   }
   if (n.contains('violence') || n.contains('harm')) {
-    return Icons.warning_amber_rounded;
+    return AppIconToken.reportWarning;
   }
   if (n.contains('intellectual') || n.contains('copyright')) {
-    return Icons.copyright_rounded;
+    return AppIconToken.reportCopyright;
   }
   if (n.contains('false') || n.contains('misleading')) {
-    return Icons.error_outline_rounded;
+    return AppIconToken.reportFalse;
   }
-  if (n.contains('other')) return Icons.more_horiz_rounded;
-  return Icons.flag_outlined;
+  if (n.contains('other')) return AppIconToken.reportOther;
+  return AppIconToken.report;
 }
-
-
 
 class PostCardHeader extends StatelessWidget {
   const PostCardHeader({
@@ -80,6 +81,7 @@ class PostCardHeader extends StatelessWidget {
             showModalBottomSheet(
               backgroundColor: AppColors.current.white,
               context: context,
+              isScrollControlled: true,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
               ),
@@ -94,329 +96,420 @@ class PostCardHeader extends StatelessWidget {
                     builder: (context, state) {
                       return DraggableScrollableSheet(
                         expand: false,
-                        initialChildSize: 0.8,
-                        minChildSize: 0.5,
-                        maxChildSize: 0.95,
+                        initialChildSize: 0.65,
+                        minChildSize: 0.45,
+                        maxChildSize: 0.9,
                         builder: (_, controller) {
                           if (state.isReportLoading) {
-                            return const ReportShimmer();
+                            return SizedBox(
+                              height: 500.h,
+                              child: const ReportShimmer(),
+                            );
                           }
 
-                          return Column(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 8.h),
-                                child: Container(
-                                  width: 40.w,
-                                  height: 4.h,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.current.lightGray,
-                                    borderRadius: BorderRadius.circular(2.r),
+                          return SafeArea(
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 8.h),
+                                  child: Container(
+                                    width: 40.w,
+                                    height: 4.h,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.current.lightGray,
+                                      borderRadius: BorderRadius.circular(2.r),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(
-                                  20.w,
-                                  4.h,
-                                  12.w,
-                                  12.h,
-                                ),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        SizedBox(width: 28.w),
-                                        Text(
-                                          AppText.reportPost,
-                                          style: AppTextStyles.bold.copyWith(
-                                            fontSize: 18.sp,
-                                            color: AppColors.current.text,
-                                          ),
-                                        ),
-                                        IconButton(
-                                          constraints: const BoxConstraints(),
-                                          padding: EdgeInsets.zero,
-                                          onPressed:
-                                              () => Navigator.pop(context),
-                                          icon: Icon(
-                                            Icons.close_rounded,
-                                            color: AppColors.current.midGray,
-                                            size: 24.w,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 10.h),
-                                    Container(
-                                      padding: EdgeInsets.all(12.r),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.current.red.withValues(
-                                          alpha: 0.05,
-                                        ),
-                                        borderRadius: BorderRadius.circular(
-                                          12.r,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            Icons.info_outline_rounded,
-                                            color: AppColors.current.red,
-                                            size: 20.r,
-                                          ),
-                                          SizedBox(width: 10.w),
-                                          Expanded(
-                                            child: Text(
-                                              AppText.reportAnonymousNote,
-                                              style: AppTextStyles.description
-                                                  .copyWith(
-                                                    fontSize: 12.sp,
-                                                    color:
-                                                        AppColors.current.text,
-                                                  ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Expanded(
-                                child: ListView.separated(
-                                  controller: controller,
-                                  itemCount: state.reportReasons.length,
-                                  separatorBuilder:
-                                      (_, __) => Divider(
-                                        height: 1.h,
-                                        thickness: 1.h,
-                                        color: AppColors.current.lightGray
-                                            .withValues(alpha: 0.3),
-                                      ),
-                                  itemBuilder: (context, index) {
-                                    final reason = state.reportReasons[index];
-                                    final isOther = reason.name
-                                        .toLowerCase()
-                                        .contains('other');
-                                    final textController =
-                                        TextEditingController();
-
-                                    return ListTile(
-                                      contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 20.w,
-                                        vertical: 4.h,
-                                      ),
-                                      leading: Container(
-                                        padding: EdgeInsets.all(8.r),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.current.red
-                                              .withValues(alpha: 0.08),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Icon(
-                                          _getReasonIcon(reason.name),
-                                          color: AppColors.current.red,
-                                          size: 20.r,
-                                        ),
-                                      ),
-                                      title: Text(
-                                        reason.name.tr(),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 20.w,
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        AppText.reportPost,
+                                        textAlign: TextAlign.center,
                                         style: AppTextStyles.bold.copyWith(
-                                          fontSize: 14.sp,
+                                          fontSize: 18.sp,
                                           color: AppColors.current.text,
                                         ),
                                       ),
-                                      trailing: Icon(
-                                        Icons.arrow_forward_ios_rounded,
-                                        size: 14.r,
-                                        color: AppColors.current.midGray
-                                            .withValues(alpha: 0.6),
+                                      SizedBox(height: 6.h),
+                                      Text(
+                                        AppText.reportAnonymousNote,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 13.sp,
+                                          color: AppColors.current.lightText,
+                                          height: 1.4,
+                                        ),
                                       ),
-                                      onTap: () {
-                                        if (isOther) {
-                                          showDialog(
-                                            context: context,
-                                            builder: (ctx) {
-                                              return AlertDialog(
-                                                backgroundColor:
-                                                    AppColors.current.white,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                        16.r,
-                                                      ),
-                                                ),
-                                                title: Row(
-                                                  children: [
-                                                    Icon(
-                                                      Icons
-                                                          .report_gmailerrorred_rounded,
-                                                      color:
-                                                          AppColors.current.red,
-                                                      size: 24.r,
-                                                    ),
-                                                    SizedBox(width: 10.w),
-                                                    Text(
-                                                      AppText
-                                                          .specifyReportReason,
-                                                      style: AppTextStyles.bold
-                                                          .copyWith(
-                                                            fontSize: 16.sp,
-                                                            color:
-                                                                AppColors
-                                                                    .current
-                                                                    .text,
-                                                          ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                content: TextField(
-                                                  controller: textController,
-                                                  maxLines: 3,
-                                                  style: TextStyle(
-                                                    fontSize: 13.sp,
-                                                    color:
-                                                        AppColors.current.text,
-                                                  ),
-                                                  decoration: InputDecoration(
-                                                    hintText:
-                                                        AppText.typeReasonHere,
-                                                    hintStyle: TextStyle(
-                                                      color:
-                                                          AppColors
-                                                              .current
-                                                              .midGray,
-                                                      fontSize: 12.sp,
-                                                    ),
-                                                    filled: true,
-                                                    fillColor:
-                                                        AppColors
-                                                            .current
-                                                            .lightBlue,
-                                                    border: OutlineInputBorder(
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: 16.h),
+                                Expanded(
+                                  child: ListView.builder(
+                                    controller: controller,
+                                    padding: EdgeInsets.only(bottom: 24.h),
+                                    itemCount: state.reportReasons.length,
+                                    itemBuilder: (context, index) {
+                                      final reason = state.reportReasons[index];
+                                      final isOther = reason.name
+                                          .toLowerCase()
+                                          .contains('other');
+                                      final textController =
+                                          TextEditingController();
+
+                                      return Container(
+                                        margin: EdgeInsets.symmetric(
+                                          vertical: 6.h,
+                                          horizontal: 20.w,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.current.white,
+                                          borderRadius: BorderRadius.circular(
+                                            14.r,
+                                          ),
+                                          border: Border.all(
+                                            color: AppColors.current.lightGray
+                                                .withValues(alpha: 0.4),
+                                            width: 1.r,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withValues(
+                                                alpha: 0.015,
+                                              ),
+                                              blurRadius: 6,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        child: ListTile(
+                                          contentPadding: EdgeInsets.symmetric(
+                                            horizontal: 16.w,
+                                            vertical: 2.h,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              14.r,
+                                            ),
+                                          ),
+                                          leading: CircleAvatar(
+                                            radius: 18.r,
+                                            backgroundColor: AppColors
+                                                .current
+                                                .red
+                                                .withValues(alpha: 0.08),
+                                            child: AppIcon(
+                                              token: _getReasonIcon(
+                                                reason.name,
+                                              ),
+                                              color: AppColors.current.red
+                                                  .withValues(alpha: 0.8),
+                                              size: 20.r,
+                                            ),
+                                          ),
+                                          title: Text(
+                                            reason.name.tr(),
+                                            style: AppTextStyles.bold.copyWith(
+                                              fontSize: 14.sp,
+                                              color: AppColors.current.text,
+                                            ),
+                                          ),
+                                          trailing: RtlAwareIcon(
+                                            child: AppIcon(
+                                              token:
+                                                  AppIconToken.chevronForward,
+                                              size: 14.r,
+                                              color: AppColors.current.lightText
+                                                  .withValues(alpha: 0.6),
+                                            ),
+                                          ),
+                                          onTap: () {
+                                            if (isOther) {
+                                              Navigator.pop(context);
+                                              showDialog(
+                                                context: context,
+                                                builder: (ctx) {
+                                                  return Dialog(
+                                                    backgroundColor:
+                                                        AppColors.current.white,
+                                                    shape: RoundedRectangleBorder(
                                                       borderRadius:
                                                           BorderRadius.circular(
-                                                            12.r,
+                                                            20.r,
                                                           ),
-                                                      borderSide:
-                                                          BorderSide.none,
                                                     ),
-                                                    enabledBorder:
-                                                        OutlineInputBorder(
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                12.r,
-                                                              ),
-                                                          borderSide: BorderSide(
-                                                            color:
-                                                                AppColors
-                                                                    .current
-                                                                    .lightGray,
+                                                    child: Padding(
+                                                      padding: EdgeInsets.all(
+                                                        20.r,
+                                                      ),
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .stretch,
+                                                        children: [
+                                                          Text(
+                                                            AppText
+                                                                .reportAnonymousNote,
+                                                            style: AppTextStyles
+                                                                .bold
+                                                                .copyWith(
+                                                                  fontSize:
+                                                                      18.sp,
+                                                                  color:
+                                                                      AppColors
+                                                                          .current
+                                                                          .text,
+                                                                ),
+                                                            textAlign:
+                                                                TextAlign
+                                                                    .center,
                                                           ),
-                                                        ),
-                                                    focusedBorder:
-                                                        OutlineInputBorder(
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                12.r,
-                                                              ),
-                                                          borderSide: BorderSide(
-                                                            color:
-                                                                AppColors
-                                                                    .current
-                                                                    .primary,
-                                                            width: 1.5,
+                                                          SizedBox(height: 8.h),
+                                                          Text(
+                                                            AppText
+                                                                .specifyReportReason,
+                                                            style: TextStyle(
+                                                              fontSize: 13.sp,
+                                                              color:
+                                                                  AppColors
+                                                                      .current
+                                                                      .lightText,
+                                                              height: 1.4,
+                                                            ),
+                                                            textAlign:
+                                                                TextAlign
+                                                                    .center,
                                                           ),
-                                                        ),
-                                                    contentPadding:
-                                                        EdgeInsets.all(12.w),
-                                                  ),
-                                                ),
-                                                actions: [
-                                                  TextButton(
-                                                    onPressed:
-                                                        () =>
-                                                            Navigator.pop(ctx),
-                                                    child: Text(
-                                                      AppText.cancel,
-                                                      style: TextStyle(
-                                                        color:
-                                                            AppColors
-                                                                .current
-                                                                .red,
-                                                        fontWeight:
-                                                            FontWeight.w600,
+                                                          SizedBox(
+                                                            height: 16.h,
+                                                          ),
+                                                          TextField(
+                                                            controller:
+                                                                textController,
+                                                            maxLines: 3,
+                                                            style: TextStyle(
+                                                              fontSize: 14.sp,
+                                                              color:
+                                                                  AppColors
+                                                                      .current
+                                                                      .text,
+                                                            ),
+                                                            decoration: InputDecoration(
+                                                              hintText:
+                                                                  AppText
+                                                                      .typeReasonHere,
+                                                              hintStyle: TextStyle(
+                                                                fontSize: 14.sp,
+                                                                color: AppColors
+                                                                    .current
+                                                                    .lightText
+                                                                    .withValues(
+                                                                      alpha:
+                                                                          0.6,
+                                                                    ),
+                                                              ),
+                                                              filled: true,
+                                                              fillColor: AppColors
+                                                                  .current
+                                                                  .lightBlue
+                                                                  .withValues(
+                                                                    alpha: 0.3,
+                                                                  ),
+                                                              contentPadding:
+                                                                  EdgeInsets.all(
+                                                                    12.r,
+                                                                  ),
+                                                              border: OutlineInputBorder(
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      12.r,
+                                                                    ),
+                                                                borderSide: BorderSide(
+                                                                  color:
+                                                                      AppColors
+                                                                          .current
+                                                                          .lightGray,
+                                                                  width: 1.r,
+                                                                ),
+                                                              ),
+                                                              enabledBorder: OutlineInputBorder(
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      12.r,
+                                                                    ),
+                                                                borderSide: BorderSide(
+                                                                  color: AppColors
+                                                                      .current
+                                                                      .lightGray
+                                                                      .withValues(
+                                                                        alpha:
+                                                                            0.5,
+                                                                      ),
+                                                                  width: 1.r,
+                                                                ),
+                                                              ),
+                                                              focusedBorder: OutlineInputBorder(
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      12.r,
+                                                                    ),
+                                                                borderSide: BorderSide(
+                                                                  color:
+                                                                      AppColors
+                                                                          .current
+                                                                          .primary,
+                                                                  width: 1.5,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          SizedBox(
+                                                            height: 20.h,
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              Expanded(
+                                                                child: OutlinedButton(
+                                                                  onPressed:
+                                                                      () =>
+                                                                          Navigator.pop(
+                                                                            ctx,
+                                                                          ),
+                                                                  style: OutlinedButton.styleFrom(
+                                                                    side: BorderSide(
+                                                                      color:
+                                                                          AppColors
+                                                                              .current
+                                                                              .lightGray,
+                                                                    ),
+                                                                    padding: EdgeInsets.symmetric(
+                                                                      vertical:
+                                                                          12.h,
+                                                                    ),
+                                                                    shape: RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                            12.r,
+                                                                          ),
+                                                                    ),
+                                                                  ),
+                                                                  child: Text(
+                                                                    AppText
+                                                                        .cancel,
+                                                                    style: TextStyle(
+                                                                      color:
+                                                                          AppColors
+                                                                              .current
+                                                                              .text,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              SizedBox(
+                                                                width: 12.w,
+                                                              ),
+                                                              Expanded(
+                                                                child: ElevatedButton(
+                                                                  onPressed: () {
+                                                                    final customReason =
+                                                                        textController
+                                                                            .text
+                                                                            .trim();
+                                                                    if (customReason
+                                                                        .isNotEmpty) {
+                                                                      context
+                                                                          .read<
+                                                                            HomeBloc
+                                                                          >()
+                                                                          .add(
+                                                                            ReportPostEvent(
+                                                                              post.id,
+                                                                              reason.id,
+                                                                              customReason,
+                                                                            ),
+                                                                          );
+                                                                      Navigator.pop(
+                                                                        ctx,
+                                                                      );
+                                                                      AuthToast.showSuccess(
+                                                                        context,
+                                                                        AppText
+                                                                            .reportSentSuccessfully,
+                                                                      );
+                                                                    }
+                                                                  },
+                                                                  style: ElevatedButton.styleFrom(
+                                                                    backgroundColor:
+                                                                        AppColors
+                                                                            .current
+                                                                            .primary,
+                                                                    elevation:
+                                                                        0,
+                                                                    padding: EdgeInsets.symmetric(
+                                                                      vertical:
+                                                                          12.h,
+                                                                    ),
+                                                                    shape: RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                            12.r,
+                                                                          ),
+                                                                    ),
+                                                                  ),
+                                                                  child: Text(
+                                                                    AppText
+                                                                        .submit,
+                                                                    style: const TextStyle(
+                                                                      color:
+                                                                          Colors
+                                                                              .white,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
                                                       ),
                                                     ),
-                                                  ),
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      final customReason =
-                                                          textController.text
-                                                              .trim();
-                                                      if (customReason
-                                                          .isNotEmpty) {
-                                                        context
-                                                            .read<HomeBloc>()
-                                                            .add(
-                                                              ReportPostEvent(
-                                                                post.id,
-                                                                reason.id,
-                                                                customReason,
-                                                              ),
-                                                            );
-                                                        Navigator.pop(
-                                                          ctx,
-                                                        ); // close dialog
-                                                        Navigator.pop(
-                                                          context,
-                                                        ); // close sheet
-                                                        AuthToast.showSuccess(
-                                                          context,
-                                                          AppText
-                                                              .reportSentSuccessfully,
-                                                        );
-                                                      }
-                                                    },
-                                                    child: Text(
-                                                      AppText.submit,
-                                                      style: TextStyle(
-                                                        color:
-                                                            AppColors
-                                                                .current
-                                                                .primary,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
+                                                  );
+                                                },
                                               );
-                                            },
-                                          );
-                                        } else {
-                                          context.read<HomeBloc>().add(
-                                            ReportPostEvent(
-                                              post.id,
-                                              reason.id,
-                                              reason.name,
-                                            ),
-                                          );
-                                          Navigator.pop(context);
-                                          AuthToast.showSuccess(
-                                            context,
-                                            AppText.reportSentSuccessfully,
-                                          );
-                                        }
-                                      },
-                                    );
-                                  },
+                                            } else {
+                                              context.read<HomeBloc>().add(
+                                                ReportPostEvent(
+                                                  post.id,
+                                                  reason.id,
+                                                  reason.name,
+                                                ),
+                                              );
+                                              Navigator.pop(context);
+                                              AuthToast.showSuccess(
+                                                context,
+                                                AppText.reportSentSuccessfully,
+                                              );
+                                            }
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           );
                         },
                       );
@@ -433,13 +526,7 @@ class PostCardHeader extends StatelessWidget {
               color: AppColors.current.lightBlue,
               shape: BoxShape.circle,
             ),
-            child: Center(
-              child: SvgPicture.asset(
-                'assets/icons/more.svg',
-                width: 18.w,
-                height: 18.w,
-              ),
-            ),
+            child: Center(child: AppIcon(token: AppIconToken.more, size: 18.w)),
           ),
         ),
       ],

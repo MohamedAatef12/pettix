@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import '../../bloc/adoption_bloc.dart';
@@ -11,6 +10,13 @@ import '../../bloc/adoption_state.dart';
 
 class Step1PersonalInfo extends StatelessWidget {
   const Step1PersonalInfo({super.key});
+
+  String _formatDateInEnglish(DateTime date) {
+    final year = date.year.toString().padLeft(4, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day.toString().padLeft(2, '0');
+    return '$year-$month-$day';
+  }
 
   // Validation methods
   String? _getNameError(String value, bool isSubmitted) {
@@ -236,7 +242,7 @@ class Step1PersonalInfo extends StatelessWidget {
                       ),
                       GestureDetector(
                         onTap: () {
-                          final fmt = DateFormat('yyyy-MM-dd').format(selected);
+                          final fmt = _formatDateInEnglish(selected);
                           bloc.dobController.text = fmt;
                           bloc.add(UpdateDateOfBirth(fmt));
                           Navigator.pop(context);

@@ -4,11 +4,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_icon_system.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
@@ -25,9 +25,10 @@ class AddPostBody extends StatelessWidget {
     final userData = DI.find<ICacheManager>().getUserData();
 
     return BlocListener<HomeBloc, HomeState>(
-      listenWhen: (previous, current) =>
-          previous.isPostAdded != current.isPostAdded ||
-          (current.error != null && previous.error != current.error),
+      listenWhen:
+          (previous, current) =>
+              previous.isPostAdded != current.isPostAdded ||
+              (current.error != null && previous.error != current.error),
       listener: (context, state) {
         if (state.isPostAdded) {
           context.pop();
@@ -52,7 +53,7 @@ class AddPostBody extends StatelessWidget {
                 onCancel: () => context.pop(),
                 onPost: () => bloc.add(SubmitPostEvent()),
               ),
-          
+
               Expanded(
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
@@ -63,9 +64,9 @@ class AddPostBody extends StatelessWidget {
                       SizedBox(height: 16.h),
                       // ─── User Profile Info ──────────────────────────────
                       _UserHeader(userData: userData),
-          
+
                       SizedBox(height: 24.h),
-          
+
                       // ─── Content Input ──────────────────────────────────
                       TextField(
                         controller: bloc.postTextController,
@@ -88,9 +89,9 @@ class AddPostBody extends StatelessWidget {
                           focusedBorder: InputBorder.none,
                         ),
                       ),
-          
+
                       SizedBox(height: 20.h),
-          
+
                       // ─── Media Preview ──────────────────────────────────
                       if (state.selectedImages.isNotEmpty)
                         _ImagePreviewGrid(
@@ -98,13 +99,13 @@ class AddPostBody extends StatelessWidget {
                           onRemove:
                               (i) => bloc.add(RemoveSelectedImageEvent(i)),
                         ),
-          
+
                       SizedBox(height: 100.h), // Space for bottom toolbar
                     ],
                   ),
                 ),
               ),
-          
+
               // ─── Bottom Toolbar ─────────────────────────────────────────
               _MediaToolbar(
                 onPickGallery: () => bloc.add(PickImagesFromGalleryEvent()),
@@ -168,12 +169,9 @@ class _Header extends StatelessWidget {
               ),
             ),
             child: Text(
-                      AppText.post,
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+              AppText.post,
+              style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w700),
+            ),
           ),
         ],
       ),
@@ -224,8 +222,8 @@ class _UserHeader extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.public_rounded,
+                  AppIcon(
+                    token: AppIconToken.public,
                     size: 12.sp,
                     color: AppColors.current.midGray,
                   ),
@@ -290,8 +288,8 @@ class _ImagePreviewGrid extends StatelessWidget {
                     color: Colors.black.withAlpha(120),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    Icons.close_rounded,
+                  child: AppIcon(
+                    token: AppIconToken.close,
                     color: Colors.white,
                     size: 16.w,
                   ),
@@ -330,14 +328,14 @@ class _MediaToolbar extends StatelessWidget {
       child: Row(
         children: [
           _ToolbarIcon(
-            iconPath: 'assets/icons/add_photo.svg',
+            token: AppIconToken.photo,
             color: const Color(0xFF34A853),
             label: AppText.photo,
             onTap: onPickGallery,
           ),
           SizedBox(width: 16.w),
           _ToolbarIcon(
-            iconPath: 'assets/icons/camera.svg',
+            token: AppIconToken.camera,
             color: AppColors.current.primary,
             label: AppText.camera,
             onTap: onPickCamera,
@@ -350,13 +348,13 @@ class _MediaToolbar extends StatelessWidget {
 }
 
 class _ToolbarIcon extends StatelessWidget {
-  final String iconPath;
+  final AppIconToken token;
   final Color color;
   final String label;
   final VoidCallback onTap;
 
   const _ToolbarIcon({
-    required this.iconPath,
+    required this.token,
     required this.color,
     required this.label,
     required this.onTap,
@@ -364,35 +362,6 @@ class _ToolbarIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12.r),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-        decoration: BoxDecoration(
-          color: color.withAlpha(20),
-          borderRadius: BorderRadius.circular(12.r),
-        ),
-        child: Row(
-          children: [
-            SvgPicture.asset(
-              iconPath,
-              width: 20.w,
-              height: 20.w,
-              colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-            ),
-            SizedBox(width: 8.w),
-            Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+    return AppIconPill(token: token, label: label, color: color, onTap: onTap);
   }
 }

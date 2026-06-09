@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_icon_system.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/features/notification/presentation/bloc/notification_bloc.dart';
 import 'package:pettix/features/notification/presentation/bloc/notification_state.dart';
@@ -24,7 +24,11 @@ class HomeAppBar extends StatelessWidget {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => context.findRootAncestorStateOfType<ScaffoldState>()?.openDrawer(),
+            onTap:
+                () =>
+                    context
+                        .findRootAncestorStateOfType<ScaffoldState>()
+                        ?.openDrawer(),
             child: AppProfileImage(
               imageUrl: user?.avatar ?? user?.image,
               radius: 27.r,
@@ -51,14 +55,12 @@ class HomeAppBar extends StatelessWidget {
                 return Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    CircleAvatar(
-                      radius: 20.r,
+                    AppIconButton(
+                      token: AppIconToken.notification,
+                      size: 40.r,
+                      iconSize: 20.r,
+                      color: AppColors.current.text,
                       backgroundColor: AppColors.current.white,
-                      child: Icon(
-                        Iconsax.notification_bing,
-                        size: 20.r,
-                        color: AppColors.current.text,
-                      ),
                     ),
                     if (state.totalUnreadCount > 0)
                       Positioned(

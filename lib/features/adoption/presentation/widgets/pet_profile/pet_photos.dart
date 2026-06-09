@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
-import 'package:pettix/data/network/constants.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
 
 class PetGallery extends StatelessWidget {
@@ -13,10 +12,7 @@ class PetGallery extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final urls =
-        pet.imageUrls
-            .map((u) => u.startsWith('http') ? u : '${Constants.baseUrl}/$u')
-            .toList();
+    final urls = pet.imageUrls;
 
     if (urls.isEmpty) {
       return _placeholder();
