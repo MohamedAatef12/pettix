@@ -10,7 +10,7 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
   SplashBloc() : super(SplashInitial()) {
     on<StartAnimation>((event, emit) async {
       emit(SplashAnimating());
-      await Future.delayed(const Duration(seconds: 3));
+      await Future.delayed(const Duration(seconds: 5));
 
       final cache = DI.find<ICacheManager>();
       final isRemembered = await cache.isRemembered();
@@ -19,13 +19,11 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
       if (isLoggedIn && isRemembered) {
         DI.find<SignalRService>().start();
         emit(SplashNavigateToHome());
-      } else if(isLoggedIn && !isRemembered) {
+      } else if (isLoggedIn && !isRemembered) {
         emit(SplashNavigateToLogin());
+      } else if (isFirstOpen || !isLoggedIn) {
+        emit(SplashNavigateToOnBoarding());
       }
-      else if (isFirstOpen || !isLoggedIn) {
-          emit(SplashNavigateToOnBoarding());
-        }
     });
   }
 }
-

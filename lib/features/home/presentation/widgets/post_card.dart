@@ -9,10 +9,16 @@ import 'package:pettix/features/home/presentation/widgets/post_card_header.dart'
 import 'package:pettix/features/home/presentation/widgets/post_image_gallery.dart';
 
 class PostCard extends StatelessWidget {
-  const PostCard({super.key, required this.post, this.isDetailView = false});
+  const PostCard({
+    super.key,
+    required this.post,
+    this.isDetailView = false,
+    this.showOwnerActions = false,
+  });
 
   final PostEntity post;
   final bool isDetailView;
+  final bool showOwnerActions;
 
   @override
   Widget build(BuildContext context) {
@@ -32,18 +38,11 @@ class PostCard extends StatelessWidget {
               PostCardHeader(
                 post: post,
                 isDetailView: isDetailView,
+                showOwnerActions: showOwnerActions,
               ),
-              Text(
-                post.content,
-                style: AppTextStyles.description,
-              ),
-              PostImageGallery(
-                post: post,
-              ),
-              PostCardActions(
-                post: post,
-                isDetailView: isDetailView,
-              ),
+              Text(post.content, style: AppTextStyles.description),
+              PostImageGallery(post: post),
+              PostCardActions(post: post, isDetailView: isDetailView),
             ],
           ),
         ),

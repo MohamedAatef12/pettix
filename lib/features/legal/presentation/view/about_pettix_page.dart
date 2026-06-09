@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_logo.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 
 class AboutPettixPage extends StatelessWidget {
@@ -41,12 +42,7 @@ class AboutPettixPage extends StatelessWidget {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Image.asset(
-                              'assets/images/logo1.png',
-                              height: 36.h,
-                              width: 36.w,
-                              fit: BoxFit.contain,
-                            ),
+                            AppLogo(size: 36.w),
                             SizedBox(width: 8.w),
                             Text(
                               AppText.appName,

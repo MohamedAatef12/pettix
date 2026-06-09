@@ -13,7 +13,9 @@ import 'package:pettix/features/home/presentation/widgets/post_card.dart';
 import '../blocs/home_event.dart';
 
 class HomeBody extends StatefulWidget {
-  const HomeBody({super.key});
+  final bool showPostOwnerActions;
+
+  const HomeBody({super.key, this.showPostOwnerActions = false});
 
   @override
   State<HomeBody> createState() => _HomeBodyState();
@@ -150,7 +152,10 @@ class _HomeBodyState extends State<HomeBody> {
               }
               return Padding(
                 padding: PaddingConstants.verticalSmall,
-                child: PostCard(post: state.posts[index]),
+                child: PostCard(
+                  post: state.posts[index],
+                  showOwnerActions: widget.showPostOwnerActions,
+                ),
               );
             },
           ),
