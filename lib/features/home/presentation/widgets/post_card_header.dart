@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/shimmers/report_shimmer.dart';
 import 'package:pettix/core/themes/app_colors.dart';
@@ -38,17 +40,17 @@ IconData _getReasonIcon(String name) {
   return Icons.flag_outlined;
 }
 
-
-
 class PostCardHeader extends StatelessWidget {
   const PostCardHeader({
     super.key,
     required this.post,
     required this.isDetailView,
+    this.showOwnerActions = false,
   });
 
   final PostEntity post;
   final bool isDetailView;
+  final bool showOwnerActions;
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +77,11 @@ class PostCardHeader extends StatelessWidget {
         const Spacer(),
         GestureDetector(
           onTap: () {
+            if (showOwnerActions) {
+              _showOwnerActions(context);
+              return;
+            }
+
             final homeBloc = context.read<HomeBloc>();
             homeBloc.add(GetReportReasonsEvent());
             showModalBottomSheet(
@@ -443,6 +450,153 @@ class PostCardHeader extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  void _showOwnerActions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.current.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 20.h),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40.w,
+                  height: 4.h,
+                  decoration: BoxDecoration(
+                    color: AppColors.current.lightGray,
+                    borderRadius: BorderRadius.circular(2.r),
+                  ),
+                ),
+                SizedBox(height: 14.h),
+                _OwnerActionTile(
+                  icon: Icons.edit_rounded,
+                  label: AppText.edit,
+                  color: AppColors.current.primary,
+                  onTap: () {
+                    final homeBloc = context.read<HomeBloc>();
+                    Navigator.pop(sheetContext);
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      context.pushNamed(
+                        AppRouteNames.addPost,
+                        extra: {'bloc': homeBloc, 'editingPost': post},
+                      );
+                    });
+                  },
+                ),
+                SizedBox(height: 8.h),
+                _OwnerActionTile(
+                  icon: Icons.delete_outline_rounded,
+                  label: AppText.delete,
+                  color: AppColors.current.red,
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    _confirmDeletePost(context);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _confirmDeletePost(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: AppColors.current.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18.r),
+          ),
+          title: Text(
+            AppText.delete,
+            style: AppTextStyles.bold.copyWith(color: AppColors.current.text),
+          ),
+          content: Text(
+            AppText.deletePostConfirmation,
+            style: AppTextStyles.description.copyWith(
+              color: AppColors.current.midGray,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(
+                AppText.cancel,
+                style: TextStyle(color: AppColors.current.midGray),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final homeBloc = context.read<HomeBloc>();
+                final postId = post.id;
+                Navigator.pop(dialogContext);
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  homeBloc.add(DeletePostEvent(postId));
+                });
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.current.red,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+              ),
+              child: Text(AppText.delete),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _OwnerActionTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _OwnerActionTile({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16.r),
+      child: Ink(
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: color, size: 20.r),
+            SizedBox(width: 12.w),
+            Text(
+              label,
+              style: AppTextStyles.bold.copyWith(color: color, fontSize: 14.sp),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

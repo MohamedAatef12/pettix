@@ -12,6 +12,13 @@ const _copyWithSentinel = Object();
 
 enum PostFetchType { timeline, userPosts, savedPosts }
 
+enum PostOwnerActionResult {
+  editSuccess,
+  editFailure,
+  deleteSuccess,
+  deleteFailure,
+}
+
 class HomeState extends Equatable {
   final List<PostEntity> posts;
   final List<CommentEntity> comments;
@@ -44,6 +51,9 @@ class HomeState extends Equatable {
   final int postId;
   final bool isSaved;
   final PostFetchType postFetchType;
+  final PostOwnerActionResult? postOwnerActionResult;
+  final String? postOwnerActionError;
+  final int postOwnerActionVersion;
   const HomeState({
     this.posts = const [],
     this.comments = const [],
@@ -76,6 +86,9 @@ class HomeState extends Equatable {
     this.postId = 0,
     this.isSaved = false,
     this.postFetchType = PostFetchType.timeline,
+    this.postOwnerActionResult,
+    this.postOwnerActionError,
+    this.postOwnerActionVersion = 0,
   });
 
   HomeState copyWith({
@@ -111,6 +124,9 @@ class HomeState extends Equatable {
     int? postId,
     bool? isSaved,
     PostFetchType? postFetchType,
+    Object? postOwnerActionResult = _copyWithSentinel,
+    Object? postOwnerActionError = _copyWithSentinel,
+    int? postOwnerActionVersion,
   }) {
     return HomeState(
       posts: posts ?? this.posts,
@@ -148,6 +164,16 @@ class HomeState extends Equatable {
       postId: postId ?? this.postId,
       isSaved: isSaved ?? this.isSaved,
       postFetchType: postFetchType ?? this.postFetchType,
+      postOwnerActionResult:
+          postOwnerActionResult == _copyWithSentinel
+              ? this.postOwnerActionResult
+              : postOwnerActionResult as PostOwnerActionResult?,
+      postOwnerActionError:
+          postOwnerActionError == _copyWithSentinel
+              ? this.postOwnerActionError
+              : postOwnerActionError as String?,
+      postOwnerActionVersion:
+          postOwnerActionVersion ?? this.postOwnerActionVersion,
     );
   }
 
@@ -184,5 +210,8 @@ class HomeState extends Equatable {
     postId,
     isSaved,
     postFetchType,
+    postOwnerActionResult,
+    postOwnerActionError,
+    postOwnerActionVersion,
   ];
 }

@@ -6,6 +6,7 @@ import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/core/bloc/theme/theme_cubit.dart';
 import 'package:pettix/core/bloc/theme/theme_option.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/features/adoption/presentation/view/adoption_screen.dart';
 import 'package:pettix/features/home/presentation/pages/home_page.dart';
 import 'package:pettix/features/notification/presentation/bloc/notification_bloc.dart';
@@ -73,12 +74,12 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
                     curr.isPostUploadSuccess || curr.isPostUploadError,
             listener: (context, state) {
               if (state.isPostUploadSuccess) {
-                AuthToast.showSuccess(context, "Post uploaded successfully!");
-              } else if (state.isPostUploadError) {
-                AuthToast.showError(
+                AuthToast.showSuccess(
                   context,
-                  state.error ?? "Failed to upload post",
+                  AppText.postUploadedSuccessfully,
                 );
+              } else if (state.isPostUploadError) {
+                AuthToast.showError(context, AppText.failedToUploadPost);
               }
             },
           ),

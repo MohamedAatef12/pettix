@@ -18,7 +18,10 @@ abstract class RemoteDataSource {
   Future<Either<Failure, PostModel>> getPostById(int id);
   Future<Either<Failure, void>> addPost(PostModel post);
   Future<Either<Failure, void>> deletePost(int id);
-  Future<Either<Failure, void>> editPost(PostModel post);
+  Future<Either<Failure, void>> editPost(
+    PostModel post, {
+    List<String> deletedImages = const [],
+  });
   Future<Either<Failure, int>> getPostCommentsCount(int postId);
   // Comments
   Future<Either<Failure, List<CommentModel>>> getPostComments(int id);

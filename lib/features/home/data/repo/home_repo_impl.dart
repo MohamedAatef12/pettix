@@ -109,9 +109,12 @@ class HomeRepositoryImpl implements HomeDomainRepository {
   }
 
   @override
-  Future<Either<Failure, void>> editPost(PostEntity post) async {
+  Future<Either<Failure, void>> editPost(
+    PostEntity post, {
+    List<String> deletedImages = const [],
+  }) async {
     final postModel = PostModel.fromEntity(post);
-    return remoteDataSource.editPost(postModel);
+    return remoteDataSource.editPost(postModel, deletedImages: deletedImages);
   }
 
   /// Comments

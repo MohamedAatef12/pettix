@@ -584,5 +584,12 @@
   "Off": "Off",
   "On": "On",
   "Muted ({hours}h)": "Muted ({hours}h)",
-  "Muted ({mins}m)": "Muted ({mins}m)"
+  "Muted ({mins}m)": "Muted ({mins}m)",
+  "Post uploaded successfully!": "Post uploaded successfully!",
+  "Failed to upload post": "Failed to upload post",
+  "Post updated successfully": "Post updated successfully",
+  "Failed to update post": "Failed to update post",
+  "Post deleted successfully": "Post deleted successfully",
+  "Failed to delete post": "Failed to delete post",
+  "Are you sure you want to delete this post?": "Are you sure you want to delete this post?"
 }
