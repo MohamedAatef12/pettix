@@ -8,6 +8,7 @@ import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/widgets/app_logo.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_state.dart';
 import 'package:pettix/features/auth/presentation/widgets/login/login_form.dart';
@@ -25,10 +26,7 @@ class LoginBody extends StatelessWidget {
           children: [
             Row(
               children: [
-                Image.asset('assets/images/logo1.png',
-                  height: 50.h,width: 50.w,
-                fit: BoxFit.fill,
-                ),
+                AppLogo(size: 50.w),
                 Text(
                   'Pettix',
                   style: TextStyle(
@@ -42,30 +40,26 @@ class LoginBody extends StatelessWidget {
 
             SizedBox(
               width: 250.w,
-              child: Text(AppText.loginTitle,
-              style: AppTextStyles.title,
-              ),
+              child: Text(AppText.loginTitle, style: AppTextStyles.title),
             ),
-        
-            Text(AppText.loginSubtitle,style: AppTextStyles.smallDescription,),
-            SizedBox(height: 50.h,),
+
+            Text(AppText.loginSubtitle, style: AppTextStyles.smallDescription),
+            SizedBox(height: 50.h),
             BlocListener<AuthBloc, AuthState>(
-              listenWhen: (previous, current) =>
-                  current is GoogleLoginSuccess ||
-                  current is AppleLoginSuccess ||
-                  current is LoginSuccess ||
-                  current is LoginFailure ||
-                  current is GoogleLoginFailure ||
-                  current is AppleLoginFailure,
+              listenWhen:
+                  (previous, current) =>
+                      current is GoogleLoginSuccess ||
+                      current is AppleLoginSuccess ||
+                      current is LoginSuccess ||
+                      current is LoginFailure ||
+                      current is GoogleLoginFailure ||
+                      current is AppleLoginFailure,
               listener: (context, state) {
                 if (state is GoogleLoginSuccess ||
                     state is AppleLoginSuccess ||
                     state is LoginSuccess) {
                   context.go(AppRoutes.bottomNav);
-                  AuthToast.showSuccess(
-                    context,
-                    'Login Successful!',
-                  );
+                  AuthToast.showSuccess(context, 'Login Successful!');
                 } else if (state is LoginFailure) {
                   AuthToast.showError(context, state.error);
                 } else if (state is GoogleLoginFailure) {
@@ -75,7 +69,7 @@ class LoginBody extends StatelessWidget {
                 }
               },
               child: const LoginForm(),
-            )
+            ),
           ],
         ),
       ),

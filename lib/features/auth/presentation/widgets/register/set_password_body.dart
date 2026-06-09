@@ -4,6 +4,7 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_logo.dart';
 import 'package:pettix/features/auth/presentation/widgets/register/set_password_form.dart';
 
 class SetPasswordBody extends StatelessWidget {
@@ -19,12 +20,7 @@ class SetPasswordBody extends StatelessWidget {
           children: [
             Row(
               children: [
-                Image.asset(
-                  'assets/images/logo1.png',
-                  height: 30.h,
-                  width: 30.w,
-                  fit: BoxFit.contain,
-                ),
+                AppLogo(size: 30.w),
                 SizedBox(width: 8.w),
                 Text(
                   'Pettix',
@@ -36,11 +32,10 @@ class SetPasswordBody extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 20.h,),
-            Text(AppText.setPassword,
-              style: AppTextStyles.title,),
-  SizedBox(height: 30.h,),
-            SetPasswordForm()
+            SizedBox(height: 20.h),
+            Text(AppText.setPassword, style: AppTextStyles.title),
+            SizedBox(height: 30.h),
+            SetPasswordForm(),
           ],
         ),
       ),

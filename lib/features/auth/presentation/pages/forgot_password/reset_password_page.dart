@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/config/di/di.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_logo.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/data/network/email_auth_service.dart';
 import 'package:pettix/features/auth/domain/usecases/apple_login_use_case.dart';
@@ -35,12 +36,7 @@ class ResetPassword extends StatelessWidget {
           fontWeight: FontWeight.bold,
           color: AppColors.current.primary,
         ),
-        trailing: Image.asset(
-          'assets/images/logo1.png',
-          height: 30.h,
-          width: 30.w,
-          fit: BoxFit.contain,
-        ),
+        trailing: AppLogo(size: 30.w),
       ),
       body: BlocProvider(
         create:
