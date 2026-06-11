@@ -5,7 +5,7 @@ import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/enums/app_enums.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/features/adoption_history/domain/entities/adoption_form_entity.dart';
 import 'package:pettix/features/adoption_history/domain/usecases/get_owner_forms_usecase.dart';
@@ -141,7 +141,7 @@ class _ChatBodyState extends State<ChatBody> {
     result.fold(
       (failure) {
         setState(() => _isUpdatingFormStatus = false);
-        AuthToast.showError(context, failure.message);
+        PetToast.showError(context, failure.message);
       },
       (_) {
         setState(() {
@@ -149,7 +149,7 @@ class _ChatBodyState extends State<ChatBody> {
           _isUpdatingFormStatus = false;
         });
         widget.adoptionHistoryBloc?.add(const FetchOwnerFormsEvent());
-        AuthToast.showSuccess(context, AppText.statusUpdatedSuccessfully);
+        PetToast.showSuccess(context, AppText.statusUpdatedSuccessfully);
       },
     );
   }

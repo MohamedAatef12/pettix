@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/features/help_support/domain/entities/problem_report_entity.dart';
@@ -56,7 +56,7 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
   void _submit() {
     if (_titleController.text.trim().isEmpty ||
         _descController.text.trim().isEmpty) {
-      AuthToast.showError(context, AppText.fillTitleDescription);
+      PetToast.showError(context, AppText.fillTitleDescription);
       return;
     }
     context.read<ProblemReportBloc>().add(
@@ -69,6 +69,7 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
         ),
       ),
     );
+    PetToast.showSuccess(context, AppText.reportSubmittedThanks);
   }
 
   @override

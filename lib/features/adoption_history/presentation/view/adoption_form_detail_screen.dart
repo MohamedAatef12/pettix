@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/features/adoption_history/domain/entities/adoption_form_entity.dart';
 import 'package:pettix/features/adoption_history/presentation/bloc/adoption_history_bloc.dart';
 import 'package:pettix/features/adoption_history/presentation/bloc/adoption_history_state.dart';
@@ -30,7 +30,7 @@ class AdoptionFormDetailScreen extends StatelessWidget {
                 previous.updatedStatus != current.updatedStatus,
         listener: (context, state) {
           if (state.updatedFormId == form.id) {
-            AuthToast.showSuccess(context, AppText.statusUpdatedSuccessfully);
+            PetToast.showSuccess(context, AppText.statusUpdatedSuccessfully);
             Navigator.of(context).pop();
           }
         },

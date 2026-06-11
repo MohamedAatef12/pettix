@@ -6,7 +6,7 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/enums/app_enums.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_request_entity.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_bloc.dart';
@@ -54,11 +54,11 @@ class AddPetForm extends StatelessWidget {
       listenWhen: (prev, curr) => prev.status != curr.status,
       listener: (context, state) {
         if (state.status == MyPetsStatus.success) {
-          AuthToast.showSuccess(context, AppText.petAddedSuccessfully);
+          PetToast.showSuccess(context, AppText.petAddedSuccessfully);
           context.pop();
         }
         if (state.status == MyPetsStatus.error) {
-          AuthToast.showError(context, state.errorMessage ?? AppText.error);
+          PetToast.showError(context, state.errorMessage ?? AppText.error);
         }
       },
       builder: (context, state) {

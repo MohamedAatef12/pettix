@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/widgets/app_icon_system.dart';
+import 'package:pettix/core/widgets/rtl_aware_icon.dart';
 
 class ProfileHeaderTopRow extends StatelessWidget {
   final bool isEditing;
@@ -22,10 +23,12 @@ class ProfileHeaderTopRow extends StatelessWidget {
         children: [
           IconButton(
             onPressed: context.canPop() ? () => context.pop() : null,
-            icon: AppIcon(
-              token: AppIconToken.back,
-              color: Colors.white,
-              size: 20.w,
+            icon: RtlAwareIcon(
+              child: AppIcon(
+                token: AppIconToken.back,
+                color: Colors.white,
+                size: 20.w,
+              ),
             ),
           ),
           Expanded(

@@ -40,35 +40,119 @@ class ProfileHeaderPanel extends StatelessWidget {
       duration: ProfileAnimationTokens.medium,
       curve: ProfileAnimationTokens.curve,
       height: topInset + (isEditing ? 158.h : 232.h),
-      padding: EdgeInsets.fromLTRB(14.w, topInset + 4.h, 14.w, 0),
       decoration: BoxDecoration(
         color: AppColors.current.primary,
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(28.r)),
       ),
-      child: Column(
-        children: [
-          ProfileHeaderTopRow(isEditing: isEditing, onCancelEdit: onCancelEdit),
-          _HeaderAvatar(
-            profile: profile,
-            isEditing: isEditing,
-            canEdit: canEdit,
-            pickedAvatarBytes: pickedAvatarBytes,
-            onEditTap: onEditTap,
-            onAvatarTap: onAvatarTap,
-          ),
-          AnimatedSize(
-            duration: ProfileAnimationTokens.medium,
-            curve: ProfileAnimationTokens.curve,
-            child:
-                isEditing
-                    ? const SizedBox.shrink()
-                    : _HeaderIdentity(
-                      displayName: _displayName,
-                      subtitle: profile.email,
-                    ),
-          ),
-          const Spacer(),
-        ],
+      child: ClipRRect(
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28.r)),
+        child: Stack(
+          children: [
+            Positioned(
+              top: topInset + 6.h,
+              right: -12.w,
+              child: Transform.rotate(
+                angle: 0.45,
+                child: Icon(
+                  Icons.pets,
+                  color: Colors.white.withAlpha(22),
+                  size: 72.r,
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 18.h,
+              left: -14.w,
+              child: Transform.rotate(
+                angle: -0.3,
+                child: Icon(
+                  Icons.pets,
+                  color: Colors.white.withAlpha(16),
+                  size: 56.r,
+                ),
+              ),
+            ),
+            Positioned(
+              top: topInset + 52.h,
+              right: 22.w,
+              child: Transform.rotate(
+                angle: 0.7,
+                child: Icon(
+                  Icons.pets,
+                  color: Colors.white.withAlpha(12),
+                  size: 26.r,
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 48.h,
+              right: 40.w,
+              child: Transform.rotate(
+                angle: -0.5,
+                child: Icon(
+                  Icons.pets,
+                  color: Colors.white.withAlpha(10),
+                  size: 20.r,
+                ),
+              ),
+            ),
+            Positioned(
+              top: topInset + 18.h,
+              left: 30.w,
+              child: Transform.rotate(
+                angle: 0.25,
+                child: Icon(
+                  Icons.pets,
+                  color: Colors.white.withAlpha(14),
+                  size: 32.r,
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 80.h,
+              left: 60.w,
+              child: Transform.rotate(
+                angle: -0.8,
+                child: Icon(
+                  Icons.pets,
+                  color: Colors.white.withAlpha(9),
+                  size: 18.r,
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(14.w, topInset + 4.h, 14.w, 0),
+              child: Column(
+                children: [
+                  ProfileHeaderTopRow(
+                    isEditing: isEditing,
+                    onCancelEdit: onCancelEdit,
+                  ),
+                  _HeaderAvatar(
+                    profile: profile,
+                    isEditing: isEditing,
+                    canEdit: canEdit,
+                    pickedAvatarBytes: pickedAvatarBytes,
+                    onEditTap: onEditTap,
+                    onAvatarTap: onAvatarTap,
+                  ),
+                  AnimatedSize(
+                    duration: ProfileAnimationTokens.medium,
+                    curve: ProfileAnimationTokens.curve,
+                    child:
+                        isEditing
+                            ? const SizedBox.shrink()
+                            : _HeaderIdentity(
+                              displayName: _displayName,
+                              subtitle: profile.email,
+                            ),
+                  ),
+                  const Spacer(),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

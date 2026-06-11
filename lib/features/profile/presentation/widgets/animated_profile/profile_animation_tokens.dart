@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:pettix/core/themes/app_colors.dart';
 
 abstract final class ProfileAnimationTokens {
-  static const Color screenBackground = Color(0xFFF4F4F8);
-  static const Color headerBackground = Color(0xFF171522);
-  static const Color cardBackground = Color(0xFFFFFFFF);
-  static const Color mutedText = Color(0xFF9A98A6);
-  static const Color titleText = Color(0xFF171522);
-  static const Color iconBox = Color(0xFFF0F0F3);
+  static Color get screenBackground => AppColors.current.lightBlue;
+  static Color get headerBackground => AppColors.current.primary;
+  static Color get cardBackground => AppColors.current.white;
+  static Color get mutedText => AppColors.current.lightText;
+  static Color get titleText => AppColors.current.text;
+  static Color get iconBox => AppColors.current.lightBlue;
   static const Color success = Color(0xFF36D75F);
 
   static const Duration fast = Duration(milliseconds: 260);

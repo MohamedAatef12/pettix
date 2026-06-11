@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 
@@ -58,14 +58,14 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
 
   void _submit() async {
     if (_feedbackController.text.trim().isEmpty) {
-      AuthToast.showError(context, AppText.writeFeedbackBeforeSubmitting);
+      PetToast.showError(context, AppText.writeFeedbackBeforeSubmitting);
       return;
     }
     setState(() => _submitting = true);
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
     setState(() => _submitting = false);
-    AuthToast.showSuccess(context, AppText.thankYouForFeedback);
+    PetToast.showSuccess(context, AppText.thankYouForFeedback);
     context.pop();
   }
 
