@@ -237,8 +237,22 @@ class _StepSubmittedState extends State<StepSubmitted>
                 title: AppText.whatHappensNext,
                 text: AppText.ownerReviewNext,
               ),
+              SizedBox(height: 10.h),
+              _InfoCard(
+                icon: Icons.check_circle_outline_rounded,
+                iconColor: AppColors.current.green,
+                title: AppText.yourPartIsDone,
+                text: AppText.yourPartIsDoneDescription,
+              ),
+              SizedBox(height: 10.h),
+              _InfoCard(
+                icon: Icons.notifications_active_outlined,
+                iconColor: AppColors.current.primary,
+                title: AppText.stayAvailable,
+                text: AppText.stayAvailableDescription,
+              ),
 
-              const Spacer(flex: 3),
+              const Spacer(flex: 2),
 
               // ── View My Application ────────────────────────────────────
               CustomFilledButton(
