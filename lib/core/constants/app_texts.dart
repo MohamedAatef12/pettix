@@ -614,7 +614,7 @@ abstract class AppText {
   static String get chatNow => 'Chat Now'.tr();
   static String get emailSupport => 'Email Support'.tr();
   static String get emailSupportSubtitle =>
-      'support@pettix.com - Response within 24 hours'.tr();
+      'pettix007@gmail.com - Response within 24 hours'.tr();
   static String get sendEmail => 'Send Email'.tr();
   static String get phoneSupport => 'Phone Support'.tr();
   static String get phoneSupportSubtitle =>
