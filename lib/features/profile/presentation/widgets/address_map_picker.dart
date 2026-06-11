@@ -8,6 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:pettix/core/constants/app_texts.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/app_shimmer.dart';
@@ -232,15 +233,7 @@ class _AddressMapPickerPageState extends State<AddressMapPickerPage> {
 
   void _showSnackBar(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
-        ),
-      ),
-    );
+    PetToast.showInfo(context, message);
   }
 
   void _onMapMoved(MapCamera camera, bool hasGesture) {

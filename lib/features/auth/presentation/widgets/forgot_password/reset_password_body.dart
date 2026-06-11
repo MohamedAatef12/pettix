@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_bloc.dart';
@@ -31,7 +31,7 @@ class ResetPasswordBody extends StatelessWidget {
             // navigate to password reset done
             context.pushNamed('password_reset_done');
           } else if (state is AuthError) {
-            AuthToast.showError(context, state.message);
+            PetToast.showError(context, state.message);
           }
         },
         builder: (context, state) {

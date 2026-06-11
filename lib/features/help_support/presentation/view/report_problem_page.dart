@@ -1,14 +1,19 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
+import 'package:pettix/features/help_support/domain/entities/problem_report_entity.dart';
+import 'package:pettix/features/help_support/presentation/bloc/problem_report_bloc.dart';
+import 'package:pettix/features/help_support/presentation/bloc/problem_report_event.dart';
+import 'package:pettix/features/help_support/presentation/bloc/problem_report_state.dart';
 
 import 'package:pettix/core/widgets/app_icon_system.dart';
 
@@ -24,17 +29,20 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
   final _titleController = TextEditingController();
   final _descController = TextEditingController();
   final _stepsController = TextEditingController();
-  bool _submitting = false;
 
   List<_Category> get _categories => [
-    _Category(AppText.appCrash, Icons.error_outline_rounded),
-    _Category(AppText.featureIssue, Icons.tune_rounded),
-    _Category(AppText.performance, Icons.speed_rounded),
-    _Category(AppText.uiDisplay, Icons.phone_android_rounded),
-    _Category(AppText.notificationsText, Icons.notifications_none_rounded),
-    _Category(AppText.accountLogin, Icons.lock_outline_rounded),
-    _Category(AppText.payments, Icons.payment_rounded),
-    _Category(AppText.other, Icons.more_horiz_rounded),
+    _Category('AppCrash', AppText.appCrash, Icons.error_outline_rounded),
+    _Category('FeatureIssue', AppText.featureIssue, Icons.tune_rounded),
+    _Category('Performance', AppText.performance, Icons.speed_rounded),
+    _Category('UiDisplay', AppText.uiDisplay, Icons.phone_android_rounded),
+    _Category(
+      'Notification',
+      AppText.notificationsText,
+      Icons.notifications_none_rounded,
+    ),
+    _Category('AccountLogin', AppText.accountLogin, Icons.lock_outline_rounded),
+    _Category('Payments', AppText.payments, Icons.payment_rounded),
+    _Category('Other', AppText.other, Icons.more_horiz_rounded),
   ];
 
   @override
@@ -45,147 +53,170 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
     super.dispose();
   }
 
-  void _submit() async {
+  void _submit() {
     if (_titleController.text.trim().isEmpty ||
         _descController.text.trim().isEmpty) {
-      AuthToast.showError(context, AppText.fillTitleDescription);
+      PetToast.showError(context, AppText.fillTitleDescription);
       return;
     }
-    setState(() => _submitting = true);
-    await Future.delayed(const Duration(seconds: 2));
-    if (!mounted) return;
-    setState(() => _submitting = false);
-    AuthToast.showSuccess(context, AppText.reportSubmittedThanks);
-    context.pop();
+    context.read<ProblemReportBloc>().add(
+      SubmitProblemReportEvent(
+        ProblemReportEntity(
+          problemCategory: _categories[_selectedCategory].value,
+          problemTitle: _titleController.text.trim(),
+          description: _descController.text.trim(),
+          stepsToReproduce: _stepsController.text.trim(),
+        ),
+      ),
+    );
+    PetToast.showSuccess(context, AppText.reportSubmittedThanks);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.current.lightBlue,
-      body: Column(
-        children: [
-          _buildHeader(context),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 32.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _SectionLabel(AppText.problemCategory),
-                  SizedBox(height: 12.h),
-                  Wrap(
-                    spacing: 8.w,
-                    runSpacing: 8.h,
-                    children: List.generate(_categories.length, (i) {
-                      final selected = _selectedCategory == i;
-                      return GestureDetector(
-                        onTap: () => setState(() => _selectedCategory = i),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 150),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 12.w,
-                            vertical: 8.h,
-                          ),
-                          decoration: BoxDecoration(
-                            color:
-                                selected
-                                    ? AppColors.current.primary
-                                    : AppColors.current.white,
-                            borderRadius: BorderRadius.circular(20.r),
-                            border: Border.all(
-                              color:
-                                  selected
-                                      ? AppColors.current.primary
-                                      : AppColors.current.lightGray,
-                            ),
-                            boxShadow:
-                                selected
-                                    ? [
-                                      BoxShadow(
-                                        color: AppColors.current.primary
-                                            .withAlpha(40),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ]
-                                    : [],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              AppIcon.raw(
-                                _categories[i].icon,
-                                size: 14.w,
+    return BlocConsumer<ProblemReportBloc, ProblemReportState>(
+      listener: (context, state) {
+        if (state.status == ProblemReportStatus.success) {
+          AuthToast.showSuccess(context, AppText.reportSubmittedThanks);
+          context.pop();
+        } else if (state.status == ProblemReportStatus.error) {
+          AuthToast.showError(
+            context,
+            state.errorMessage ?? AppText.somethingWentWrong,
+          );
+        }
+      },
+      builder: (context, state) {
+        final submitting = state.status == ProblemReportStatus.loading;
+
+        return Scaffold(
+          backgroundColor: AppColors.current.lightBlue,
+          body: Column(
+            children: [
+              _buildHeader(context),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 32.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _SectionLabel(AppText.problemCategory),
+                      SizedBox(height: 12.h),
+                      Wrap(
+                        spacing: 8.w,
+                        runSpacing: 8.h,
+                        children: List.generate(_categories.length, (i) {
+                          final selected = _selectedCategory == i;
+                          return GestureDetector(
+                            onTap: () => setState(() => _selectedCategory = i),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 150),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12.w,
+                                vertical: 8.h,
+                              ),
+                              decoration: BoxDecoration(
                                 color:
                                     selected
-                                        ? Colors.white
-                                        : AppColors.current.midGray,
-                              ),
-                              SizedBox(width: 6.w),
-                              Text(
-                                _categories[i].label,
-                                style: AppTextStyles.smallDescription.copyWith(
-                                  fontSize: 12.sp,
+                                        ? AppColors.current.primary
+                                        : AppColors.current.white,
+                                borderRadius: BorderRadius.circular(20.r),
+                                border: Border.all(
                                   color:
                                       selected
-                                          ? Colors.white
-                                          : AppColors.current.text,
-                                  fontWeight:
-                                      selected
-                                          ? FontWeight.w600
-                                          : FontWeight.w400,
+                                          ? AppColors.current.primary
+                                          : AppColors.current.lightGray,
                                 ),
+                                boxShadow:
+                                    selected
+                                        ? [
+                                          BoxShadow(
+                                            color: AppColors.current.primary
+                                                .withAlpha(40),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ]
+                                        : [],
                               ),
-                            ],
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  AppIcon.raw(
+                                    _categories[i].icon,
+                                    size: 14.w,
+                                    color:
+                                        selected
+                                            ? Colors.white
+                                            : AppColors.current.midGray,
+                                  ),
+                                  SizedBox(width: 6.w),
+                                  Text(
+                                    _categories[i].label,
+                                    style: AppTextStyles.smallDescription
+                                        .copyWith(
+                                          fontSize: 12.sp,
+                                          color:
+                                              selected
+                                                  ? Colors.white
+                                                  : AppColors.current.text,
+                                          fontWeight:
+                                              selected
+                                                  ? FontWeight.w600
+                                                  : FontWeight.w400,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
+                      SizedBox(height: 24.h),
+                      _FormCard(
+                        children: [
+                          _FieldLabel(AppText.problemTitle),
+                          SizedBox(height: 8.h),
+                          _InputField(
+                            controller: _titleController,
+                            hint: AppText.briefIssueSummary,
                           ),
-                        ),
-                      );
-                    }),
-                  ),
-                  SizedBox(height: 24.h),
-                  _FormCard(
-                    children: [
-                      _FieldLabel(AppText.problemTitle),
-                      SizedBox(height: 8.h),
-                      _InputField(
-                        controller: _titleController,
-                        hint: AppText.briefIssueSummary,
+                          SizedBox(height: 16.h),
+                          _FieldLabel(AppText.describeProblem),
+                          SizedBox(height: 8.h),
+                          _InputField(
+                            controller: _descController,
+                            hint: AppText.whatHappenedHint,
+                            maxLines: 4,
+                          ),
+                          SizedBox(height: 16.h),
+                          _FieldLabel(AppText.stepsToReproduceOptional),
+                          SizedBox(height: 8.h),
+                          _InputField(
+                            controller: _stepsController,
+                            hint: AppText.stepsToReproduceHint,
+                            maxLines: 4,
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 16.h),
-                      _FieldLabel(AppText.describeProblem),
-                      SizedBox(height: 8.h),
-                      _InputField(
-                        controller: _descController,
-                        hint: AppText.whatHappenedHint,
-                        maxLines: 4,
-                      ),
-                      SizedBox(height: 16.h),
-                      _FieldLabel(AppText.stepsToReproduceOptional),
-                      SizedBox(height: 8.h),
-                      _InputField(
-                        controller: _stepsController,
-                        hint: AppText.stepsToReproduceHint,
-                        maxLines: 4,
+                      SizedBox(height: 20.h),
+                      _DeviceInfoCard(),
+                      SizedBox(height: 24.h),
+                      CustomFilledButton(
+                        isLoading: submitting,
+                        onPressed: submitting ? null : _submit,
+                        text: AppText.submitReport,
+                        backgroundColor: AppColors.current.primary,
+                        textColor: AppColors.current.white,
                       ),
                     ],
                   ),
-                  SizedBox(height: 20.h),
-                  _DeviceInfoCard(),
-                  SizedBox(height: 24.h),
-                  CustomFilledButton(
-                    isLoading: _submitting,
-                    onPressed: _submit,
-                    text: AppText.submitReport,
-                    backgroundColor: AppColors.current.primary,
-                    textColor: AppColors.current.white,
-                  ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -232,9 +263,10 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
 }
 
 class _Category {
+  final String value;
   final String label;
   final IconData icon;
-  const _Category(this.label, this.icon);
+  const _Category(this.value, this.label, this.icon);
 }
 
 class _FormCard extends StatelessWidget {

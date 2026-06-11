@@ -15,6 +15,7 @@ import 'package:pettix/core/services/signalr_service.dart';
 import 'package:pettix/features/chat/data/data_source/chat_local_data_source.dart';
 
 import 'package:pettix/core/widgets/app_icon_system.dart';
+import 'package:pettix/core/widgets/rtl_aware_icon.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -426,10 +427,12 @@ class _TileBase extends StatelessWidget {
                 ),
               ),
             ),
-            AppIcon.raw(
-              Icons.chevron_right_rounded,
-              color: AppColors.current.midGray,
-              size: 18.w,
+            RtlAwareIcon(
+              child: AppIcon.raw(
+                Icons.chevron_right_rounded,
+                color: AppColors.current.midGray,
+                size: 18.w,
+              ),
             ),
           ],
         ),

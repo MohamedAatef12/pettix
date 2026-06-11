@@ -5,17 +5,24 @@ class Constants {
 
   // ── Authentication ────────────────────────────────────────────────────────
   static const String loginEndpoint = '/api/Security/Authentication/login';
-  static const String registerEndpoint = '/api/Security/Authentication/register';
-  static const String googleLoginEndpoint = '/api/Security/Authentication/google-login';
-  static const String appleLoginEndpoint = '/api/Security/Authentication/apple-login';
-  static const String verifyOtpEndpoint = '/api/Security/Authentication/verify-otp';
-  static const String resendOtpEndpoint = '/api/Security/Authentication/resend-otp';
-  static const String forgotPasswordEndpoint = '/api/Security/Authentication/forgot-password';
-  static const String resetPasswordEndpoint = '/api/Security/Authentication/reset-password-otp';
+  static const String registerEndpoint =
+      '/api/Security/Authentication/register';
+  static const String googleLoginEndpoint =
+      '/api/Security/Authentication/google-login';
+  static const String appleLoginEndpoint =
+      '/api/Security/Authentication/apple-login';
+  static const String verifyOtpEndpoint =
+      '/api/Security/Authentication/verify-otp';
+  static const String resendOtpEndpoint =
+      '/api/Security/Authentication/resend-otp';
+  static const String forgotPasswordEndpoint =
+      '/api/Security/Authentication/forgot-password';
+  static const String resetPasswordEndpoint =
+      '/api/Security/Authentication/reset-password-otp';
 
   // ── Timeline / Community ──────────────────────────────────────────────────
 
-  //// Posts 
+  //// Posts
   static const String getPostByIdEndpoint = '/api/Timeline/Posts';
   static const String postsEndpoint = '/api/Timeline/Posts/paged';
   static const String userPostsEndpoint = '/api/Timeline/Posts/user-posts';
@@ -25,25 +32,29 @@ class Constants {
   static const String getPostLikes = '/api/Timeline/PostLikes/post';
   static const String savePostEndpoint = '/api/Timeline/PostSave';
   static const String unSavePostEndpoint = '/api/Timeline/PostSave';
-  static const String mySavedPostsEndpoint = '/api/Timeline/PostSave/my-saved-posts';
+  static const String mySavedPostsEndpoint =
+      '/api/Timeline/PostSave/my-saved-posts';
 
   //// Comments
   static const String commentsEndpoint = '/api/Timeline/Comments/param';
   static const String addCommentEndpoint = '/api/Timeline/Comments/post';
   static const String postCommentsCount = '/api/Timeline/Comments/post';
-  static const String commentLikesEndpoint = '/api/Timeline/CommentLikes/comment';
+  static const String commentLikesEndpoint =
+      '/api/Timeline/CommentLikes/comment';
   static const String addCommentLikesEndpoint = '/api/Timeline/CommentLikes';
-  static const String commentLikesCountEndpoint = '/api/Timeline/CommentLikes/comment';
+  static const String commentLikesCountEndpoint =
+      '/api/Timeline/CommentLikes/comment';
   static const String likeCommentEndpoint = '/api/Timeline/CommentLikes';
   static const String unlikeCommentEndpoint = '/api/Timeline/CommentLikes';
 
   //// Reports
   static const String addReportPostEndpoint = '/api/Timeline/PostReport';
-  static const String reportReasonsEndpoint = '/api/Timeline/PostReport/reasons';
+  static const String reportReasonsEndpoint =
+      '/api/Timeline/PostReport/reasons';
   static const String reportedPostsEndpoint = '/api/Timeline/PostReport/post';
 
   // ── Adoption & Pets ───────────────────────────────────────────────────────
-  
+
   //// Pets
   static const String pagedPetsEndpoint = '/api/Adoption/Pets/paged';
   static const String petsEndpoint = '/api/Adoption/Pets';
@@ -51,24 +62,34 @@ class Constants {
   static const String petCategoryEndpoint = '/api/Adoption/PetCategory';
   static const String petColorsEndpoint = '/api/Adoption/PetColors';
   static const String petMedicalsEndpoint = '/api/Adoption/PetMedicals';
-  static const String reportPetReasonsEndpoint = '/api/Adoption/Pets/report-reasons';
+  static const String reportPetReasonsEndpoint =
+      '/api/Adoption/Pets/report-reasons';
   static const String reportPetEndpoint = '/api/Adoption/Pets';
 
   //// Adoption Forms
   static const String adoptionFormsEndpoint = '/api/Adoption/AdoptionForms';
-  static const String adoptionOptionsEndpoint = '/api/Adoption/AdoptionForms/options';
-  static const String clientFormsEndpoint = '/api/Adoption/AdoptionForms/clients-forms';
-  static const String ownerFormsEndpoint = '/api/Adoption/AdoptionForms/owner-forms';
+  static const String adoptionOptionsEndpoint =
+      '/api/Adoption/AdoptionForms/options';
+  static const String clientFormsEndpoint =
+      '/api/Adoption/AdoptionForms/clients-forms';
+  static const String ownerFormsEndpoint =
+      '/api/Adoption/AdoptionForms/owner-forms';
 
   // ── Notifications ─────────────────────────────────────────────────────────
   static const String notificationSearchEndpoint = '/api/Notifications/Search';
-  static const String readAllNotificationsEndpoint = '/api/Notifications/ReadAll';
-  static const String readSingleNotificationEndpoint = '/api/Notifications/Read/param';
+  static const String readAllNotificationsEndpoint =
+      '/api/Notifications/ReadAll';
+  static const String readSingleNotificationEndpoint =
+      '/api/Notifications/Read/param';
   static const String sendNotificationEndpoint = '/api/Notifications/Send';
 
   // ── Support ───────────────────────────────────────────────────────────────
   static const String contactEndpoint = '/api/Security/Contact';
   static const String submitFeedbackEndpoint = '/api/Settings/Feedback/submit';
+  static const String submitProblemReportEndpoint =
+      '/api/Settings/ProblemReports/submit';
+  static const String submitContactSupportEndpoint =
+      '/api/Settings/ContactSupport/submit';
 
   // ── Account ──────────────────────────────────────────────────────────────
   static const String deleteAccountEndpoint = '/api/Security/Users';
@@ -77,4 +98,3 @@ class Constants {
   static const String contentTypeHeader = 'Content-Type';
   static const String applicationJson = 'application/json';
 }
-

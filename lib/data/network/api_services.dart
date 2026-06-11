@@ -7,9 +7,8 @@ import 'package:pettix/data/caching/i_cache_manager.dart';
 @lazySingleton
 class ApiService {
   final Dio _dio;
-  final ICacheManager _cache;
 
-  ApiService(this._dio, this._cache);
+  ApiService(this._dio, ICacheManager cache);
 
   ResponseModel _normalizeResponse(dynamic data) {
     if (data == null || (data is String && data.isEmpty)) {
@@ -94,13 +93,14 @@ class ApiService {
     FormData? formData,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? queryParameters,
+    Duration? receiveTimeout,
   }) async {
     var response = await _dio.post(
       endPoint,
       data: data ?? formData,
       options: Options(
         headers: headers,
-        receiveTimeout: const Duration(minutes: 2),
+        receiveTimeout: receiveTimeout ?? const Duration(minutes: 2),
       ),
       queryParameters: queryParameters,
     );
@@ -113,13 +113,14 @@ class ApiService {
     FormData? formData,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? queryParameters,
+    Duration? receiveTimeout,
   }) async {
     var response = await _dio.post(
       endPoint,
       data: data ?? formData,
       options: Options(
         headers: headers,
-        receiveTimeout: const Duration(minutes: 2),
+        receiveTimeout: receiveTimeout ?? const Duration(minutes: 2),
       ),
       queryParameters: queryParameters,
     );

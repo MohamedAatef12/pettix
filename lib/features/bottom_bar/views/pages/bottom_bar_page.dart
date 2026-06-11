@@ -14,7 +14,7 @@ import 'package:pettix/features/notification/presentation/bloc/notification_even
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
 import 'package:pettix/features/home/presentation/blocs/home_state.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/features/side_menu/presentation/view/widgets/custom_drawer.dart';
 import '../bloc/bottom_bar_bloc.dart';
 import '../bloc/bottom_bar_events.dart';
@@ -74,12 +74,12 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
                     curr.isPostUploadSuccess || curr.isPostUploadError,
             listener: (context, state) {
               if (state.isPostUploadSuccess) {
-                AuthToast.showSuccess(
+                PetToast.showSuccess(
                   context,
                   AppText.postUploadedSuccessfully,
                 );
               } else if (state.isPostUploadError) {
-                AuthToast.showError(context, AppText.failedToUploadPost);
+                PetToast.showError(context, AppText.failedToUploadPost);
               }
             },
           ),

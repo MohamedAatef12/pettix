@@ -7,7 +7,7 @@ import '../../../../config/di/di.dart';
 import '../../../../core/constants/app_texts.dart';
 import '../../../../core/services/app_review_service.dart';
 import '../../../../core/themes/app_colors.dart';
-import '../../../../core/utils/auth_toast.dart';
+import '../../../../core/utils/pet_toast.dart';
 import '../../../../core/utils/custom_text_form_field.dart';
 import '../../../../core/widgets/app_top_bar.dart';
 import '../../domain/entities/adoption_options_entity.dart';
@@ -93,15 +93,15 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
     if (_formKey.currentState!.validate()) {
       if (_selectedLivingSituationId == null ||
           _selectedResidenceTypeId == null) {
-        AuthToast.showError(context, AppText.pleaseSelectAllOptions);
+        PetToast.showError(context, AppText.pleaseSelectAllOptions);
         return;
       }
       if (!_hasReadAndUnderstood || !_agreesToTerms) {
-        AuthToast.showError(context, AppText.pleaseAgreeToTerms);
+        PetToast.showError(context, AppText.pleaseAgreeToTerms);
         return;
       }
       if (_selectedDate == null) {
-        AuthToast.showError(context, AppText.pleaseSelectDateOfBirth);
+        PetToast.showError(context, AppText.pleaseSelectDateOfBirth);
         return;
       }
 
@@ -131,7 +131,7 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
       body: BlocConsumer<AdoptionBloc, AdoptionState>(
         listener: (context, state) async {
           if (state.status == AdoptionStatus.success) {
-            AuthToast.showSuccess(
+            PetToast.showSuccess(
               context,
               AppText.applicationSubmittedSuccessfully,
             );
@@ -139,12 +139,12 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
             if (!context.mounted) return;
             context.pop();
           } else if (state.status == AdoptionStatus.submitError) {
-            AuthToast.showError(
+            PetToast.showError(
               context,
               state.errorMessage ?? AppText.submissionFailed,
             );
           } else if (state.status == AdoptionStatus.error) {
-            AuthToast.showError(
+            PetToast.showError(
               context,
               state.errorMessage ?? AppText.errorLoadingOptions,
             );

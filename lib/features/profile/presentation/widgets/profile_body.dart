@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pettix/core/constants/app_texts.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/features/auth/domain/entities/user_entity.dart';
 import 'package:pettix/features/profile/domain/entities/update_profile_entity.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_bloc.dart';
@@ -90,7 +90,7 @@ class _ProfileBodyState extends State<ProfileBody> {
         if (state.status == ProfileStatus.success) {
           _showSavedOverlay();
         } else if (state.status == ProfileStatus.error) {
-          AuthToast.showError(context, state.errorMessage ?? AppText.error);
+          PetToast.showError(context, state.errorMessage ?? AppText.error);
         }
       },
       builder: (context, state) {

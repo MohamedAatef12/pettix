@@ -8,7 +8,7 @@ import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/shimmers/report_shimmer.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/utils/date_formatter.dart';
 import 'package:pettix/core/widgets/app_icon_system.dart';
 import 'package:pettix/core/widgets/app_profile_image.dart';
@@ -450,7 +450,7 @@ class PostCardHeader extends StatelessWidget {
                                                                       Navigator.pop(
                                                                         ctx,
                                                                       );
-                                                                      AuthToast.showSuccess(
+                                                                      PetToast.showSuccess(
                                                                         context,
                                                                         AppText
                                                                             .reportSentSuccessfully,
@@ -506,7 +506,7 @@ class PostCardHeader extends StatelessWidget {
                                                 ),
                                               );
                                               Navigator.pop(context);
-                                              AuthToast.showSuccess(
+                                              PetToast.showSuccess(
                                                 context,
                                                 AppText.reportSentSuccessfully,
                                               );
