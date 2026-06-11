@@ -92,7 +92,7 @@ class ProfileAnimatedContent extends StatelessWidget {
               curve: ProfileAnimationTokens.curve,
               left: 0,
               right: 0,
-              bottom: isEditing ? 0 : -96,
+              bottom: isEditing ? 0 : -100,
               child: ProfileBottomActions(
                 isUpdating: isUpdating,
                 onCancel: onCancelEdit,

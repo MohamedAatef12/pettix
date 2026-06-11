@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
-import 'package:pettix/core/enums/app_enums.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
@@ -15,6 +14,7 @@ import 'package:pettix/features/my_pets/presentation/bloc/my_pets_state.dart';
 import 'package:pettix/features/my_pets/presentation/widgets/pet_image_picker.dart';
 import 'package:pettix/features/my_pets/presentation/widgets/vaccination_builder.dart';
 
+import 'package:pettix/core/widgets/app_dropdown.dart';
 import 'package:pettix/core/widgets/app_icon_system.dart';
 
 /// Scrollable form body for adding a new pet.
@@ -117,36 +117,57 @@ class AddPetForm extends StatelessWidget {
                       keyboardType: TextInputType.number,
                     ),
                     SizedBox(height: 12.h),
-                    _LookupDropdown(
-                      label: AppText.category,
-                      icon: Icons.category_outlined,
-                      iconColor: const Color(0xFF5EA8DF),
-                      items: state.categories,
-                      selectedId: state.selectedCategoryId,
-                      onChanged:
-                          (id) => context.read<MyPetsBloc>().add(
-                            SelectCategoryEvent(id),
-                          ),
+                    AppDropdown<int>(
+                      hint: AppText.category,
+                      prefixIcon: Icons.category_outlined,
+                      prefixIconColor: const Color(0xFF5EA8DF),
+                      items: state.categories
+                          .map((e) => AppDropdownItem<int>(
+                                value: e.id,
+                                label: e.name,
+                              ))
+                          .toList(),
+                      value: state.selectedCategoryId,
+                      onChanged: (id) =>
+                          context.read<MyPetsBloc>().add(SelectCategoryEvent(id)),
                     ),
                     SizedBox(height: 12.h),
-                    _GenderDropdown(
-                      selectedId: state.selectedGenderId,
-                      onChanged:
-                          (id) => context.read<MyPetsBloc>().add(
-                            SelectGenderEvent(id),
-                          ),
+                    AppDropdown<int>(
+                      hint: AppText.gender,
+                      prefixIcon: Icons.wc_rounded,
+                      prefixIconColor: const Color(0xFF3AAFA9),
+                      items: const [
+                        AppDropdownItem(
+                          value: 1,
+                          label: 'Male',
+                          icon: Icons.male_rounded,
+                          iconColor: Color(0xFF5EA8DF),
+                        ),
+                        AppDropdownItem(
+                          value: 2,
+                          label: 'Female',
+                          icon: Icons.female_rounded,
+                          iconColor: Color(0xFFE8A838),
+                        ),
+                      ],
+                      value: state.selectedGenderId,
+                      onChanged: (id) =>
+                          context.read<MyPetsBloc>().add(SelectGenderEvent(id)),
                     ),
                     SizedBox(height: 12.h),
-                    _LookupDropdown(
-                      label: AppText.color,
-                      icon: Icons.palette_outlined,
-                      iconColor: AppColors.current.brown,
-                      items: state.colors,
-                      selectedId: state.selectedColorId,
-                      onChanged:
-                          (id) => context.read<MyPetsBloc>().add(
-                            SelectColorEvent(id),
-                          ),
+                    AppDropdown<int>(
+                      hint: AppText.color,
+                      prefixIcon: Icons.palette_outlined,
+                      prefixIconColor: AppColors.current.brown,
+                      items: state.colors
+                          .map((e) => AppDropdownItem<int>(
+                                value: e.id,
+                                label: e.name,
+                              ))
+                          .toList(),
+                      value: state.selectedColorId,
+                      onChanged: (id) =>
+                          context.read<MyPetsBloc>().add(SelectColorEvent(id)),
                     ),
                     SizedBox(height: 24.h),
 
@@ -360,178 +381,3 @@ class _FilledField extends StatelessWidget {
   }
 }
 
-class _LookupDropdown extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final Color iconColor;
-  final List items;
-  final int? selectedId;
-  final ValueChanged<int?> onChanged;
-
-  const _LookupDropdown({
-    required this.label,
-    required this.icon,
-    required this.iconColor,
-    required this.items,
-    required this.selectedId,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      decoration: BoxDecoration(
-        color: AppColors.current.lightBlue,
-        borderRadius: BorderRadius.circular(14.r),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<int>(
-          isExpanded: true,
-          value: selectedId,
-          hint: Row(
-            children: [
-              AppIcon.raw(icon, color: iconColor, size: 20.w),
-              SizedBox(width: 12.w),
-              Text(
-                label,
-                style: TextStyle(
-                  color: AppColors.current.midGray,
-                  fontSize: 13.sp,
-                ),
-              ),
-            ],
-          ),
-          icon: AppIcon.raw(
-            Icons.expand_more_rounded,
-            color: AppColors.current.midGray,
-            size: 20.w,
-          ),
-          items:
-              items.map((item) {
-                return DropdownMenuItem<int>(
-                  value: item.id as int,
-                  child: Text(
-                    item.name as String,
-                    style: TextStyle(
-                      color: AppColors.current.text,
-                      fontSize: 14.sp,
-                    ),
-                  ),
-                );
-              }).toList(),
-          onChanged: onChanged,
-          selectedItemBuilder:
-              (context) =>
-                  items.map((item) {
-                    return Row(
-                      children: [
-                        AppIcon.raw(icon, color: iconColor, size: 20.w),
-                        SizedBox(width: 12.w),
-                        Text(
-                          item.name as String,
-                          style: TextStyle(
-                            color: AppColors.current.text,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    );
-                  }).toList(),
-        ),
-      ),
-    );
-  }
-}
-
-class _GenderDropdown extends StatelessWidget {
-  final int? selectedId;
-  final ValueChanged<int?> onChanged;
-
-  const _GenderDropdown({required this.selectedId, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    final genders = [
-      (id: Gender.male.value, name: AppText.male),
-      (id: Gender.female.value, name: AppText.female),
-    ];
-
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      decoration: BoxDecoration(
-        color: AppColors.current.lightBlue,
-        borderRadius: BorderRadius.circular(14.r),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<int>(
-          isExpanded: true,
-          value: selectedId,
-          hint: Row(
-            children: [
-              AppIcon.raw(
-                Icons.wc_rounded,
-                color: const Color(0xFF3AAFA9),
-                size: 20.w,
-              ),
-              SizedBox(width: 12.w),
-              Text(
-                AppText.gender,
-                style: TextStyle(
-                  color: AppColors.current.midGray,
-                  fontSize: 13.sp,
-                ),
-              ),
-            ],
-          ),
-          icon: AppIcon.raw(
-            Icons.expand_more_rounded,
-            color: AppColors.current.midGray,
-            size: 20.w,
-          ),
-          items:
-              genders
-                  .map(
-                    (g) => DropdownMenuItem<int>(
-                      value: g.id,
-                      child: Text(
-                        g.name,
-                        style: TextStyle(
-                          color: AppColors.current.text,
-                          fontSize: 14.sp,
-                        ),
-                      ),
-                    ),
-                  )
-                  .toList(),
-          onChanged: onChanged,
-          selectedItemBuilder:
-              (_) =>
-                  genders
-                      .map(
-                        (g) => Row(
-                          children: [
-                            AppIcon.raw(
-                              Icons.wc_rounded,
-                              color: const Color(0xFF3AAFA9),
-                              size: 20.w,
-                            ),
-                            SizedBox(width: 12.w),
-                            Text(
-                              g.name,
-                              style: TextStyle(
-                                color: AppColors.current.text,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                      .toList(),
-        ),
-      ),
-    );
-  }
-}

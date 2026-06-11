@@ -154,6 +154,7 @@ class _ConversationCard extends StatelessWidget {
                   ),
                   child: AppProfileImage(
                     imageUrl: displayMember?.avatar,
+                    name: displayMember?.displayName,
                     radius: 30.r,
                   ),
                 ),

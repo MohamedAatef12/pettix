@@ -1,4 +1,5 @@
 import 'package:pettix/core/widgets/app_cached_image.dart';
+import 'package:pettix/core/widgets/app_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/app_texts.dart';
@@ -53,6 +54,11 @@ class PetBrowseCard extends StatelessWidget {
                       child: AppCachedImage(
                         imageUrl: fullUrl ?? '',
                         fit: BoxFit.cover,
+                        placeholder: AppShimmer(
+                          width: double.infinity,
+                          height: double.infinity,
+                          borderRadius: BorderRadius.zero,
+                        ),
                         errorWidget: _PhotoPlaceholder(),
                       ),
                     ),

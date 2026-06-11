@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
-import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/utils/custom_text_form_field.dart';
+import 'package:pettix/core/widgets/app_search_bar.dart';
 import 'package:pettix/features/chat/presentation/bloc/chat_list_bloc.dart';
 import 'package:pettix/features/chat/presentation/bloc/chat_list_event.dart';
 import 'package:pettix/features/chat/presentation/view/widgets/chat_list/chat_list_taps.dart';
@@ -19,43 +16,14 @@ class ChatListBody extends StatelessWidget {
       padding: PaddingConstants.horizontalMedium,
       child: Column(
         children: [
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 2.h),
-            decoration: BoxDecoration(
-              color: AppColors.current.white.withValues(alpha: 0.8),
-              borderRadius: BorderRadius.circular(18.r),
-              border: Border.all(color: AppColors.current.white, width: 1.5),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 15,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-            ),
-            child: CustomTextFormField(
-              fillColor: true,
-              fillColorValue: Colors.transparent,
-              hintText: AppText.searchConversations,
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              onChanged: (value) {
-                context.read<ChatListBloc>().add(SearchConversationsEvent(value));
-              },
-              leading: Padding(
-                padding: EdgeInsets.only(right: 8.w),
-                child: SvgPicture.asset(
-                  'assets/icons/search_grey.svg',
-                  width: 16.w,
-                  colorFilter: ColorFilter.mode(AppColors.current.gray, BlendMode.srcIn),
-                ),
-              ),
-
-            ),
+          AppSearchBar(
+            hintText: AppText.searchConversations,
+            onChanged: (value) {
+              context.read<ChatListBloc>().add(SearchConversationsEvent(value));
+            },
           ),
-          SizedBox(height: 24.h),
-          const Expanded(child: ChatListTaps())
+          const SizedBox(height: 24),
+          const Expanded(child: ChatListTaps()),
         ],
       ),
     );

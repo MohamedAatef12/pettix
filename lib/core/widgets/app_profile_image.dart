@@ -5,6 +5,7 @@ import 'package:pettix/core/widgets/app_cached_image.dart';
 
 class AppProfileImage extends StatelessWidget {
   final String? imageUrl;
+  final String? name;
   final double radius;
   final BoxFit fit;
   final Color? backgroundColor;
@@ -13,6 +14,7 @@ class AppProfileImage extends StatelessWidget {
   const AppProfileImage({
     super.key,
     required this.imageUrl,
+    this.name,
     this.radius = 30,
     this.fit = BoxFit.cover,
     this.backgroundColor,
@@ -21,8 +23,7 @@ class AppProfileImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveRadius = radius;
-    final size = effectiveRadius * 2;
+    final size = radius * 2;
 
     final image = Container(
       width: size,
@@ -39,12 +40,7 @@ class AppProfileImage extends StatelessWidget {
         fit: fit,
         backgroundColor: backgroundColor ?? AppColors.current.blueGray,
         placeholder: AppShimmer.circular(radius: radius),
-        errorWidget: Image.asset(
-          'assets/images/no_user.png',
-          width: size,
-          height: size,
-          fit: BoxFit.cover,
-        ),
+        errorWidget: _InitialsAvatar(name: name ?? '', size: size),
       ),
     );
 
@@ -74,6 +70,71 @@ class AppProfileImage extends StatelessWidget {
         );
       },
       child: image,
+    );
+  }
+}
+
+// ── Initials + paw fallback ───────────────────────────────────────────────────
+
+class _InitialsAvatar extends StatelessWidget {
+  final String name;
+  final double size;
+
+  const _InitialsAvatar({required this.name, required this.size});
+
+  static const _palette = [
+    Color(0xFF5B8FB9), // steel blue
+    Color(0xFF7B6BA8), // purple
+    Color(0xFF5E9E7A), // teal green
+    Color(0xFFD17A5B), // terracotta
+    Color(0xFFB87D3A), // amber
+    Color(0xFF4A8FA8), // dark cyan
+    Color(0xFF6B8A5E), // olive green
+    Color(0xFF8B5E7A), // mauve
+  ];
+
+  Color get _color {
+    if (name.isEmpty) return _palette[0];
+    return _palette[name.hashCode.abs() % _palette.length];
+  }
+
+  String get _initials {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return '?';
+    final parts = trimmed.split(RegExp(r'\s+'));
+    if (parts.length >= 2) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    }
+    final word = parts[0];
+    return word.substring(0, word.length.clamp(1, 2)).toUpperCase();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      color: _color,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Icon(
+            Icons.pets_rounded,
+            size: size * 0.72,
+            color: Colors.white.withValues(alpha: 0.15),
+          ),
+          Text(
+            _initials,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: size * 0.34,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.5,
+              height: 1,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

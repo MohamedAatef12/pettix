@@ -30,7 +30,7 @@ class ChatAppBar extends StatelessWidget {
           shape: BoxShape.circle,
           border: Border.all(color: Colors.white, width: 1.5),
         ),
-        child: AppProfileImage(imageUrl: avatarUrl, radius: 18.r),
+        child: AppProfileImage(imageUrl: avatarUrl, name: text, radius: 18.r),
       );
 
       if (conversationId != null) {

@@ -9,6 +9,7 @@ import '../../../../core/services/app_review_service.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/utils/pet_toast.dart';
 import '../../../../core/utils/custom_text_form_field.dart';
+import '../../../../core/widgets/app_dropdown.dart';
 import '../../../../core/widgets/app_top_bar.dart';
 import '../../domain/entities/adoption_options_entity.dart';
 import '../bloc/adoption_bloc.dart';
@@ -219,40 +220,26 @@ class _AdoptionFormViewState extends State<AdoptionFormView> {
               validator: (value) => value!.isEmpty ? AppText.required : null,
             ),
             SizedBox(height: 10.h),
-            DropdownButtonFormField<int>(
-              initialValue: _selectedLivingSituationId,
-              hint: Text(AppText.livingSituation),
-              items:
-                  options.livingSituations.map((e) {
-                    return DropdownMenuItem(value: e.id, child: Text(e.name));
-                  }).toList(),
-              onChanged:
-                  (val) => setState(() => _selectedLivingSituationId = val),
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                filled: true,
-                fillColor: AppColors.current.lightGray,
-              ),
+            AppDropdown<int>(
+              hint: AppText.livingSituation,
+              prefixIcon: Icons.home_outlined,
+              items: options.livingSituations
+                  .map((e) => AppDropdownItem<int>(value: e.id, label: e.name))
+                  .toList(),
+              value: _selectedLivingSituationId,
+              onChanged: (val) =>
+                  setState(() => _selectedLivingSituationId = val),
             ),
             SizedBox(height: 10.h),
-            DropdownButtonFormField<int>(
-              initialValue: _selectedResidenceTypeId,
-              hint: Text(AppText.residenceType),
-              items:
-                  options.residenceTypes.map((e) {
-                    return DropdownMenuItem(value: e.id, child: Text(e.name));
-                  }).toList(),
-              onChanged:
-                  (val) => setState(() => _selectedResidenceTypeId = val),
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                filled: true,
-                fillColor: AppColors.current.lightGray,
-              ),
+            AppDropdown<int>(
+              hint: AppText.residenceType,
+              prefixIcon: Icons.apartment_outlined,
+              items: options.residenceTypes
+                  .map((e) => AppDropdownItem<int>(value: e.id, label: e.name))
+                  .toList(),
+              value: _selectedResidenceTypeId,
+              onChanged: (val) =>
+                  setState(() => _selectedResidenceTypeId = val),
             ),
             SizedBox(height: 20.h),
             SwitchListTile(

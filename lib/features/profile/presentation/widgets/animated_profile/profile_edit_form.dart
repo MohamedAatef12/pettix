@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_dropdown.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_event.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_state.dart';
@@ -76,6 +77,79 @@ class ProfileEditForm extends StatelessWidget {
   }
 }
 
+// ── Gender tile — matches ProfileInfoTile style, opens AppDropdown sheet ──────
+
+class _GenderTile extends StatelessWidget {
+  const _GenderTile();
+
+  static const _items = [
+    AppDropdownItem<int>(
+      value: 1,
+      label: 'Male',
+      icon: Icons.male_rounded,
+      iconColor: Color(0xFF5EA8DF),
+    ),
+    AppDropdownItem<int>(
+      value: 2,
+      label: 'Female',
+      icon: Icons.female_rounded,
+      iconColor: Color(0xFFE8A838),
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ProfileBloc, ProfileState>(
+      buildWhen:
+          (prev, curr) => prev.selectedGenderId != curr.selectedGenderId,
+      builder: (context, state) {
+        final selected =
+            _items.where((e) => e.value == state.selectedGenderId).firstOrNull;
+
+        return GestureDetector(
+          onTap: () async {
+            final result = await AppDropdown.openSheet<int>(
+              context,
+              hint: AppText.gender,
+              items: _items,
+              selected: state.selectedGenderId,
+            );
+            if (result != null && context.mounted) {
+              context.read<ProfileBloc>().add(UpdateGenderEvent(result));
+            }
+          },
+          child: ProfileInfoTile(
+            icon: Icons.wc_rounded,
+            iconColor: const Color(0xFF3AAFA9),
+            label: AppText.gender,
+            value: '',
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    selected?.label ?? '',
+                    style: AppTextStyles.bold.copyWith(
+                      color: ProfileAnimationTokens.titleText,
+                      fontSize: 11.sp,
+                    ),
+                  ),
+                ),
+                Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  color: ProfileAnimationTokens.mutedText,
+                  size: 16.w,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ── Section title ─────────────────────────────────────────────────────────────
+
 class _EditSectionTitle extends StatelessWidget {
   final String text;
 
@@ -92,50 +166,6 @@ class _EditSectionTitle extends StatelessWidget {
           fontSize: 12.sp,
         ),
       ),
-    );
-  }
-}
-
-class _GenderTile extends StatelessWidget {
-  const _GenderTile();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<ProfileBloc, ProfileState>(
-      buildWhen:
-          (previous, current) =>
-              previous.selectedGenderId != current.selectedGenderId,
-      builder: (context, state) {
-        return ProfileInfoTile(
-          icon: Icons.wc_rounded,
-          iconColor: const Color(0xFF3AAFA9),
-          label: AppText.gender,
-          value: '',
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<int>(
-              value: state.selectedGenderId,
-              isExpanded: true,
-              icon: Icon(
-                Icons.keyboard_arrow_down_rounded,
-                color: ProfileAnimationTokens.mutedText,
-                size: 18.w,
-              ),
-              dropdownColor: AppColors.current.white,
-              style: AppTextStyles.bold.copyWith(
-                color: ProfileAnimationTokens.titleText,
-                fontSize: 11.sp,
-              ),
-              onChanged:
-                  (value) =>
-                      context.read<ProfileBloc>().add(UpdateGenderEvent(value)),
-              items: [
-                DropdownMenuItem(value: 1, child: Text(AppText.male)),
-                DropdownMenuItem(value: 2, child: Text(AppText.female)),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }
