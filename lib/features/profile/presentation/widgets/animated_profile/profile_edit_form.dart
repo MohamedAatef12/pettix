@@ -120,7 +120,7 @@ class _GenderTile extends StatelessWidget {
                 color: ProfileAnimationTokens.mutedText,
                 size: 18.w,
               ),
-              dropdownColor: Colors.white,
+              dropdownColor: AppColors.current.white,
               style: AppTextStyles.bold.copyWith(
                 color: ProfileAnimationTokens.titleText,
                 fontSize: 11.sp,

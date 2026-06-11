@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 
@@ -48,14 +48,14 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
   void _submit() async {
     if (_titleController.text.trim().isEmpty ||
         _descController.text.trim().isEmpty) {
-      AuthToast.showError(context, AppText.fillTitleDescription);
+      PetToast.showError(context, AppText.fillTitleDescription);
       return;
     }
     setState(() => _submitting = true);
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
     setState(() => _submitting = false);
-    AuthToast.showSuccess(context, AppText.reportSubmittedThanks);
+    PetToast.showSuccess(context, AppText.reportSubmittedThanks);
     context.pop();
   }
 

@@ -7,7 +7,7 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/features/auth/data/models/login/login_model.dart';
@@ -51,7 +51,7 @@ class LoginForm extends StatelessWidget {
           bloc: authBloc,
           listener: (context, state) {
             if (state is OtpSent) {
-              AuthToast.showSuccess(
+              PetToast.showSuccess(
                 context,
                 'OTP sent! Please check your email.',
                 onDone: () {
@@ -60,7 +60,7 @@ class LoginForm extends StatelessWidget {
                 },
               );
             } else if (state is RegisterFailure) {
-              AuthToast.showError(context, state.message);
+              PetToast.showError(context, state.message);
             }
           },
           child: AlertDialog(

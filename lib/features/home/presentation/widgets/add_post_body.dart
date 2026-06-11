@@ -1,3 +1,4 @@
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:pettix/core/widgets/app_profile_image.dart';
 import 'dart:io';
@@ -114,13 +115,7 @@ class _AddPostBodyState extends State<AddPostBody> {
         if (state.isPostAdded) {
           context.pop();
         } else if (state.error != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.error!),
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: AppColors.current.red,
-            ),
-          );
+          PetToast.showError(context, state.error!);
           bloc.add(ClearErrorEvent());
         }
       },

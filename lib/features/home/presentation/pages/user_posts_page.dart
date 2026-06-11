@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_event.dart';
@@ -36,22 +36,22 @@ class UserPostsPage extends StatelessWidget {
             listener: (context, state) {
               switch (state.postOwnerActionResult) {
                 case PostOwnerActionResult.editSuccess:
-                  AuthToast.showSuccess(
+                  PetToast.showSuccess(
                     context,
                     AppText.postUpdatedSuccessfully,
                   );
                   break;
                 case PostOwnerActionResult.editFailure:
-                  AuthToast.showError(context, AppText.failedToUpdatePost);
+                  PetToast.showError(context, AppText.failedToUpdatePost);
                   break;
                 case PostOwnerActionResult.deleteSuccess:
-                  AuthToast.showSuccess(
+                  PetToast.showSuccess(
                     context,
                     AppText.postDeletedSuccessfully,
                   );
                   break;
                 case PostOwnerActionResult.deleteFailure:
-                  AuthToast.showError(context, AppText.failedToDeletePost);
+                  PetToast.showError(context, AppText.failedToDeletePost);
                   break;
                 case null:
                   break;

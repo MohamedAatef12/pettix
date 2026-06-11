@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
@@ -39,7 +39,7 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
     setState(() => _sending = false);
     _subjectController.clear();
     _messageController.clear();
-    AuthToast.showSuccess(context, AppText.messageSentSupport);
+    PetToast.showSuccess(context, AppText.messageSentSupport);
   }
 
   @override

@@ -7,7 +7,7 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/widgets/app_logo.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_state.dart';
@@ -59,13 +59,13 @@ class LoginBody extends StatelessWidget {
                     state is AppleLoginSuccess ||
                     state is LoginSuccess) {
                   context.go(AppRoutes.bottomNav);
-                  AuthToast.showSuccess(context, 'Login Successful!');
+                  PetToast.showSuccess(context, 'Login Successful!');
                 } else if (state is LoginFailure) {
-                  AuthToast.showError(context, state.error);
+                  PetToast.showError(context, state.error);
                 } else if (state is GoogleLoginFailure) {
-                  AuthToast.showError(context, state.error);
+                  PetToast.showError(context, state.error);
                 } else if (state is AppleLoginFailure) {
-                  AuthToast.showError(context, state.error);
+                  PetToast.showError(context, state.error);
                 }
               },
               child: const LoginForm(),

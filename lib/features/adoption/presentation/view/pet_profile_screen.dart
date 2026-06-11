@@ -7,6 +7,7 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/shimmers/report_shimmer.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_bloc.dart';
 import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_event.dart';
@@ -49,27 +50,23 @@ class PetProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocListener<AdoptionBrowseBloc, AdoptionBrowseState>(
-      listenWhen:
-          (p, c) =>
-              p.reportSuccess != c.reportSuccess ||
-              (p.isReportLoading != c.isReportLoading &&
-                  !c.isReportLoading &&
-                  c.errorMessage != null),
+      listenWhen: (p, c) =>
+          (!p.reportSuccess && c.reportSuccess) ||
+          (p.isReportLoading && !c.isReportLoading && c.errorMessage != null),
       listener: (context, state) {
         if (state.reportSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(AppText.reportSentSuccessfully),
-              backgroundColor: Colors.green,
-            ),
-          );
-        } else if (!state.isReportLoading && state.errorMessage != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage!),
-              backgroundColor: Colors.red,
-            ),
-          );
+          PetToast.showSuccess(context, AppText.reportSentSuccessfully);
+        } else if (state.errorMessage != null) {
+          final msg = state.errorMessage!.toLowerCase();
+          if (msg.contains('already') || msg.contains('reported before')) {
+            PetToast.showInfo(
+              context,
+              state.errorMessage!,
+              title: 'Already Reported',
+            );
+          } else {
+            PetToast.showError(context, state.errorMessage!);
+          }
         }
       },
       child: Scaffold(

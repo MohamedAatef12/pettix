@@ -7,7 +7,7 @@ import 'package:pettix/config/di/di.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
@@ -59,7 +59,7 @@ class ForgotPasswordPage extends StatelessWidget {
                 if (state is OtpSent) {
                   context.pushNamed('otp_forgot_password', extra: bloc);
                 } else if (state is AuthError) {
-                  AuthToast.showError(context, state.message);
+                  PetToast.showError(context, state.message);
                 }
               },
               builder: (context, state) {

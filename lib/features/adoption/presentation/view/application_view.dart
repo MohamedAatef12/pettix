@@ -6,7 +6,7 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/sized_box.dart';
 import 'package:pettix/core/services/app_review_service.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
@@ -82,7 +82,7 @@ class _ApplicationScreensState extends State<ApplicationScreens> {
             listener: (context, state) async {
               final msg = state.errorMessage;
               if (msg != null && msg.isNotEmpty) {
-                AuthToast.showError(context, msg);
+                PetToast.showError(context, msg);
               }
               if (state.status == AdoptionStatus.success) {
                 await AppReviewService.requestAfterFirstAdoption(context);

@@ -7,6 +7,7 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/enums/app_enums.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/widgets/app_cached_image.dart';
 import 'package:pettix/core/widgets/app_shimmer.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
@@ -51,29 +52,12 @@ class MyPetsScreen extends StatelessWidget {
             child: BlocConsumer<MyPetsBloc, MyPetsState>(
               listener: (context, state) {
                 if (state.status == MyPetsStatus.success) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(AppText.doneBang),
-                      backgroundColor: AppColors.current.green,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                    ),
-                  );
+                  PetToast.showSuccess(context, AppText.doneBang);
                 }
                 if (state.status == MyPetsStatus.error) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        state.errorMessage ?? AppText.anErrorOccurred,
-                      ),
-                      backgroundColor: AppColors.current.red,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                    ),
+                  PetToast.showError(
+                    context,
+                    state.errorMessage ?? AppText.anErrorOccurred,
                   );
                 }
               },

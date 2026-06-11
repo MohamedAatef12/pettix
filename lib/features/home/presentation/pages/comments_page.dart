@@ -16,7 +16,7 @@ import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/features/home/presentation/widgets/comments_body.dart';
 import 'package:pettix/features/home/presentation/widgets/post_card.dart';
 import 'package:pettix/core/constants/app_texts.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 
 class CommentsPage extends StatefulWidget {
   final PostEntity post;
@@ -201,7 +201,7 @@ class _CommentsPageState extends State<CommentsPage> {
     if (text.isEmpty) return;
 
     final userResult = await bloc.getUserDataUseCase.call();
-    userResult.fold((failure) => AuthToast.showError(context, failure.message), (
+    userResult.fold((failure) => PetToast.showError(context, failure.message), (
       userData,
     ) {
       // When replying to someone, the parentCommentId is already handled by the entity.

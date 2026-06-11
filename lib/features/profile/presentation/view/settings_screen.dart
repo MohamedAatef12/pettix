@@ -17,7 +17,9 @@ import 'package:pettix/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_event.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_state.dart';
 
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/widgets/app_icon_system.dart';
+import 'package:pettix/core/widgets/rtl_aware_icon.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -36,12 +38,7 @@ class SettingsScreen extends StatelessWidget {
             context.pushReplacement('/login');
           }
         } else if (state.status == ProfileStatus.error) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage ?? AppText.error),
-              backgroundColor: AppColors.current.red,
-            ),
-          );
+          PetToast.showError(context, state.errorMessage ?? AppText.error);
         }
       },
       child: BlocBuilder<ProfileBloc, ProfileState>(
@@ -58,10 +55,12 @@ class SettingsScreen extends StatelessWidget {
                   centerTitle: true,
                   leading: IconButton(
                     onPressed: () => context.pop(),
-                    icon: AppIcon.raw(
-                      Icons.arrow_back_ios_new_rounded,
-                      color: AppColors.current.text,
-                      size: 20.sp,
+                    icon: RtlAwareIcon(
+                      child: AppIcon.raw(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: AppColors.current.text,
+                        size: 20.sp,
+                      ),
                     ),
                   ),
                   title: Text(
@@ -796,10 +795,12 @@ class _SettingsTile extends StatelessWidget {
             ),
             if (trailing != null) ...[trailing!, SizedBox(width: 8.w)],
             if (showArrow)
-              AppIcon.raw(
-                Icons.arrow_forward_ios_rounded,
-                color: AppColors.current.midGray.withAlpha(100),
-                size: 14.sp,
+              RtlAwareIcon(
+                child: AppIcon.raw(
+                  Icons.arrow_forward_ios_rounded,
+                  color: AppColors.current.midGray.withAlpha(100),
+                  size: 14.sp,
+                ),
               ),
           ],
         ),
@@ -944,13 +945,9 @@ class _NotificationSettingsSheet extends StatelessWidget {
                             context.read<ProfileBloc>().add(
                               MuteNotificationsEvent(null),
                             );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  AppText.notificationsUnmutedSuccess,
-                                ),
-                                duration: const Duration(seconds: 2),
-                              ),
+                            PetToast.showSuccess(
+                              context,
+                              AppText.notificationsUnmutedSuccess,
                             );
                           },
                         ),
@@ -968,13 +965,9 @@ class _NotificationSettingsSheet extends StatelessWidget {
                             context.read<ProfileBloc>().add(
                               MuteNotificationsEvent(const Duration(hours: 1)),
                             );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  AppText.notificationsMutedSuccess,
-                                ),
-                                duration: const Duration(seconds: 2),
-                              ),
+                            PetToast.showInfo(
+                              context,
+                              AppText.notificationsMutedSuccess,
                             );
                           },
                         ),
@@ -996,13 +989,9 @@ class _NotificationSettingsSheet extends StatelessWidget {
                             context.read<ProfileBloc>().add(
                               MuteNotificationsEvent(const Duration(hours: 2)),
                             );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  AppText.notificationsMutedSuccess,
-                                ),
-                                duration: const Duration(seconds: 2),
-                              ),
+                            PetToast.showInfo(
+                              context,
+                              AppText.notificationsMutedSuccess,
                             );
                           },
                         ),
@@ -1024,13 +1013,9 @@ class _NotificationSettingsSheet extends StatelessWidget {
                             context.read<ProfileBloc>().add(
                               MuteNotificationsEvent(const Duration(hours: 8)),
                             );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  AppText.notificationsMutedSuccess,
-                                ),
-                                duration: const Duration(seconds: 2),
-                              ),
+                            PetToast.showInfo(
+                              context,
+                              AppText.notificationsMutedSuccess,
                             );
                           },
                         ),
@@ -1052,13 +1037,9 @@ class _NotificationSettingsSheet extends StatelessWidget {
                             context.read<ProfileBloc>().add(
                               MuteNotificationsEvent(const Duration(hours: 24)),
                             );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  AppText.notificationsMutedSuccess,
-                                ),
-                                duration: const Duration(seconds: 2),
-                              ),
+                            PetToast.showInfo(
+                              context,
+                              AppText.notificationsMutedSuccess,
                             );
                           },
                         ),
@@ -1071,13 +1052,9 @@ class _NotificationSettingsSheet extends StatelessWidget {
                             context.read<ProfileBloc>().add(
                               ToggleNotificationsEvent(false),
                             );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  AppText.notificationsMutedSuccess,
-                                ),
-                                duration: const Duration(seconds: 2),
-                              ),
+                            PetToast.showInfo(
+                              context,
+                              AppText.notificationsMutedSuccess,
                             );
                           },
                         ),
