@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
@@ -8,6 +11,11 @@ import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
+import 'package:pettix/features/help_support/domain/entities/contact_support_entity.dart';
+import 'package:pettix/features/help_support/presentation/bloc/contact_support_bloc.dart';
+import 'package:pettix/features/help_support/presentation/bloc/contact_support_event.dart';
+import 'package:pettix/features/help_support/presentation/bloc/contact_support_state.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:pettix/core/widgets/app_icon_system.dart';
 
@@ -22,7 +30,11 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
   final _subjectController = TextEditingController();
   final _messageController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  bool _sending = false;
+  static const _supportPhone = '201025143723';
+  static const _supportEmail = 'pettix007@gmail.com';
+  static const _supportSubject = 'Pettix Support Request';
+  static const _supportTemplate =
+      'Hello Pettix Support Team,\n\nI need assistance with...';
 
   @override
   void dispose() {
@@ -31,77 +43,139 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
     super.dispose();
   }
 
-  void _send() async {
+  void _send() {
     if (!_formKey.currentState!.validate()) return;
-    setState(() => _sending = true);
-    await Future.delayed(const Duration(seconds: 2));
+    context.read<ContactSupportBloc>().add(
+      SubmitContactSupportEvent(
+        ContactSupportEntity(
+          subject: _subjectController.text.trim(),
+          message: _messageController.text.trim(),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openWhatsApp() async {
+    final appUri = Uri.parse(
+      'whatsapp://send?phone=$_supportPhone&text=${Uri.encodeComponent(_supportTemplate)}',
+    );
+    final webUri = Uri.https('wa.me', _supportPhone, {
+      'text': _supportTemplate,
+    });
+    await _launchExternal(appUri, fallback: webUri);
+  }
+
+  Future<void> _sendEmail() async {
+    final uri = Uri(
+      scheme: 'mailto',
+      path: _supportEmail,
+      queryParameters: {'subject': _supportSubject, 'body': _supportTemplate},
+    );
+    await _launchExternal(uri);
+  }
+
+  Future<void> _launchExternal(Uri uri, {Uri? fallback}) async {
+    try {
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (launched) return;
+    } on PlatformException {
+      // Android can throw when no app can handle the intent.
+    }
+
+    if (fallback != null) {
+      try {
+        final fallbackLaunched = await launchUrl(
+          fallback,
+          mode: LaunchMode.externalApplication,
+        );
+        if (fallbackLaunched) return;
+      } on PlatformException {
+        // Fall through to the toast below.
+      }
+    }
     if (!mounted) return;
-    setState(() => _sending = false);
-    _subjectController.clear();
-    _messageController.clear();
     PetToast.showSuccess(context, AppText.messageSentSupport);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.current.lightBlue,
-      body: Column(
-        children: [
-          _buildHeader(context),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 32.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _SectionLabel(AppText.reachUsDirectly),
-                  SizedBox(height: 12.h),
-                  _ContactCard(
-                    icon: Icons.chat_bubble_rounded,
-                    iconColor: const Color(0xFF10B981),
-                    iconBg: const Color(0xFFECFDF5),
-                    title: AppText.liveChat,
-                    subtitle: AppText.liveChatSubtitle,
-                    actionLabel: AppText.chatNow,
-                    onAction: () {},
+    return BlocConsumer<ContactSupportBloc, ContactSupportState>(
+      listener: (context, state) {
+        if (state.status == ContactSupportStatus.success) {
+          _subjectController.clear();
+          _messageController.clear();
+          AuthToast.showSuccess(context, AppText.messageSentSupport);
+        } else if (state.status == ContactSupportStatus.error) {
+          AuthToast.showError(
+            context,
+            state.errorMessage ?? AppText.somethingWentWrong,
+          );
+        }
+      },
+      builder: (context, state) {
+        final sending = state.status == ContactSupportStatus.loading;
+
+        return Scaffold(
+          backgroundColor: AppColors.current.lightBlue,
+          body: Column(
+            children: [
+              _buildHeader(context),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 32.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _SectionLabel(AppText.reachUsDirectly),
+                      SizedBox(height: 12.h),
+                      _ContactCard(
+                        icon: FaIcon(
+                          FontAwesomeIcons.whatsapp,
+                          color: const Color(0xFF10B981),
+                          size: 22.w,
+                        ),
+                        iconColor: const Color(0xFF10B981),
+                        iconBg: const Color(0xFFECFDF5),
+                        title: 'WhatsApp',
+                        subtitle: AppText.liveChatSubtitle,
+                        actionLabel: AppText.chatNow,
+                        onAction: _openWhatsApp,
+                      ),
+                      SizedBox(height: 12.h),
+                      _ContactCard(
+                        icon: AppIcon.raw(
+                          Icons.email_outlined,
+                          color: const Color(0xFF5379B2),
+                          size: 22.w,
+                        ),
+                        iconColor: const Color(0xFF5379B2),
+                        iconBg: const Color(0xFFEEF2FF),
+                        title: AppText.emailSupport,
+                        subtitle: AppText.emailSupportSubtitle,
+                        actionLabel: AppText.sendEmail,
+                        onAction: _sendEmail,
+                      ),
+                      SizedBox(height: 28.h),
+                      _SectionLabel(AppText.sendUsMessage),
+                      SizedBox(height: 12.h),
+                      _MessageForm(
+                        formKey: _formKey,
+                        subjectController: _subjectController,
+                        messageController: _messageController,
+                        sending: sending,
+                        onSend: _send,
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 12.h),
-                  _ContactCard(
-                    icon: Icons.email_outlined,
-                    iconColor: const Color(0xFF5379B2),
-                    iconBg: const Color(0xFFEEF2FF),
-                    title: AppText.emailSupport,
-                    subtitle: AppText.emailSupportSubtitle,
-                    actionLabel: AppText.sendEmail,
-                    onAction: () {},
-                  ),
-                  SizedBox(height: 12.h),
-                  _ContactCard(
-                    icon: Icons.phone_outlined,
-                    iconColor: const Color(0xFFF97316),
-                    iconBg: const Color(0xFFFFF7ED),
-                    title: AppText.phoneSupport,
-                    subtitle: AppText.phoneSupportSubtitle,
-                    actionLabel: AppText.call,
-                    onAction: () {},
-                  ),
-                  SizedBox(height: 28.h),
-                  _SectionLabel(AppText.sendUsMessage),
-                  SizedBox(height: 12.h),
-                  _MessageForm(
-                    formKey: _formKey,
-                    subjectController: _subjectController,
-                    messageController: _messageController,
-                    sending: _sending,
-                    onSend: _send,
-                  ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -143,7 +217,7 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
 }
 
 class _ContactCard extends StatelessWidget {
-  final IconData icon;
+  final Widget icon;
   final Color iconColor;
   final Color iconBg;
   final String title;
@@ -185,7 +259,7 @@ class _ContactCard extends StatelessWidget {
               color: iconBg,
               borderRadius: BorderRadius.circular(13.r),
             ),
-            child: AppIcon.raw(icon, color: iconColor, size: 22.w),
+            child: Center(child: icon),
           ),
           SizedBox(width: 12.w),
           Expanded(
@@ -323,7 +397,7 @@ class _MessageForm extends StatelessWidget {
             SizedBox(height: 20.h),
             CustomFilledButton(
               isLoading: sending,
-              onPressed: onSend,
+              onPressed: sending ? null : onSend,
               text: AppText.sendMessage,
               backgroundColor: AppColors.current.primary,
               textColor: AppColors.current.white,
