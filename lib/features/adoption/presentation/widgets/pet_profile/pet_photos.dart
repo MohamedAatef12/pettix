@@ -35,7 +35,6 @@ class PetGallery extends StatelessWidget {
         height: 280.h,
         width: double.infinity,
         fit: BoxFit.cover,
-        heroTag: 'pet_image_${pet.id}',
         errorWidget: _placeholder(),
       ),
     );
@@ -66,7 +65,6 @@ class PetGallery extends StatelessWidget {
                 child: AppCachedImage(
                   imageUrl: shown[i],
                   fit: BoxFit.cover,
-                  heroTag: i == 0 ? 'pet_image_${pet.id}' : null,
                   errorWidget: _placeholder(),
                 ),
               ),

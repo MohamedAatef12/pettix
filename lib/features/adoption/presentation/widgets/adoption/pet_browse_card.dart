@@ -53,7 +53,6 @@ class PetBrowseCard extends StatelessWidget {
                       child: AppCachedImage(
                         imageUrl: fullUrl ?? '',
                         fit: BoxFit.cover,
-                        heroTag: 'pet_image_${pet.id}',
                         errorWidget: _PhotoPlaceholder(),
                       ),
                     ),
@@ -91,17 +90,14 @@ class PetBrowseCard extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: Hero(
-                            tag: 'cat_${pet.id}',
-                            child: Text(
-                              pet.categoryName ?? AppText.unknown,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: AppColors.current.primary,
-                                fontSize: 13.sp,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          child: Text(
+                            pet.categoryName ?? AppText.unknown,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: AppColors.current.primary,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pettix/core/widgets/pet_refresh_indicator.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/app_texts.dart';
@@ -111,9 +112,7 @@ class _HomeBodyState extends State<HomeBody> {
   }
 
   Widget _buildContent(HomeState state) {
-    if (state.isPostsLoading) {
-      return const Center(child: HomeShimmer());
-    } else if (state.error != null && state.posts.isEmpty) {
+    if (state.error != null && state.posts.isEmpty) {
       return Center(
         child: CircleAvatar(
           backgroundColor: AppColors.current.lightGray,
@@ -125,43 +124,53 @@ class _HomeBodyState extends State<HomeBody> {
           ),
         ),
       );
-    } else {
-      return RefreshIndicator(
-        onRefresh: () async {
-          context.read<HomeBloc>().add(FetchPostsEvent());
-        },
-        child: NotificationListener<ScrollNotification>(
-          onNotification: _onScrollNotification,
-          child: ListView.builder(
-            key: const PageStorageKey('posts_list'),
-            controller: _scrollController,
-            physics: const AlwaysScrollableScrollPhysics(),
-            itemCount:
-                state.isMorePostsLoading
-                    ? state.posts.length + 1
-                    : state.posts.length,
-            itemBuilder: (context, index) {
-              if (index >= state.posts.length) {
-                return HomeShimmer();
-              }
-              if (index == 9 && !_checkedTenPostsReviewPrompt) {
-                _checkedTenPostsReviewPrompt = true;
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (!mounted) return;
-                  AppReviewService.requestAfterTenPosts(context);
-                });
-              }
-              return Padding(
-                padding: PaddingConstants.verticalSmall,
-                child: PostCard(
-                  post: state.posts[index],
-                  showOwnerActions: widget.showPostOwnerActions,
-                ),
-              );
-            },
-          ),
-        ),
-      );
     }
+
+    // PetRefreshIndicator stays mounted during both shimmer and list states
+    // so the spinner keeps spinning while isPostsLoading is true.
+    return PetRefreshIndicator(
+      onRefresh: () async {
+        final bloc = context.read<HomeBloc>();
+        bloc.add(FetchPostsEvent());
+        await bloc.stream.firstWhere((s) => s.isPostsLoading);
+        await bloc.stream.firstWhere((s) => !s.isPostsLoading);
+      },
+      child: state.isPostsLoading
+          ? ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: const [HomeShimmer()],
+            )
+          : NotificationListener<ScrollNotification>(
+              onNotification: _onScrollNotification,
+              child: ListView.builder(
+                key: const PageStorageKey('posts_list'),
+                controller: _scrollController,
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount:
+                    state.isMorePostsLoading
+                        ? state.posts.length + 1
+                        : state.posts.length,
+                itemBuilder: (context, index) {
+                  if (index >= state.posts.length) {
+                    return HomeShimmer();
+                  }
+                  if (index == 9 && !_checkedTenPostsReviewPrompt) {
+                    _checkedTenPostsReviewPrompt = true;
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (!mounted) return;
+                      AppReviewService.requestAfterTenPosts(context);
+                    });
+                  }
+                  return Padding(
+                    padding: PaddingConstants.verticalSmall,
+                    child: PostCard(
+                      post: state.posts[index],
+                      showOwnerActions: widget.showPostOwnerActions,
+                    ),
+                  );
+                },
+              ),
+            ),
+    );
   }
 }

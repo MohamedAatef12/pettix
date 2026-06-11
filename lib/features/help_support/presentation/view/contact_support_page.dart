@@ -107,9 +107,9 @@ class _ContactSupportPageState extends State<ContactSupportPage> {
         if (state.status == ContactSupportStatus.success) {
           _subjectController.clear();
           _messageController.clear();
-          AuthToast.showSuccess(context, AppText.messageSentSupport);
+          PetToast.showSuccess(context, AppText.messageSentSupport);
         } else if (state.status == ContactSupportStatus.error) {
-          AuthToast.showError(
+          PetToast.showError(
             context,
             state.errorMessage ?? AppText.somethingWentWrong,
           );

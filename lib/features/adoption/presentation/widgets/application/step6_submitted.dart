@@ -148,149 +148,144 @@ class _StepSubmittedState extends State<StepSubmitted>
         ),
 
         // ── Main Content ─────────────────────────────────────────────────
-        Padding(
-          padding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 32.h),
-          child: Column(
-            children: [
-              const Spacer(flex: 2),
-
-              // ── Animated Wave Check Icon ────────────────────────────────
-              SizedBox(
-                width: 160.w,
-                height: 160.w,
-                child: Stack(
-                  alignment: Alignment.center,
+        Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: EdgeInsets.fromLTRB(24.w, 12.h, 24.w, 0),
+                child: Column(
                   children: [
-                    // Wave ring 3 (outermost)
-                    _WaveRing(
-                      controller: _wave3,
-                      color: primaryColor,
-                      maxSize: 600.w,
-                    ),
-                    // Wave ring 2
-                    _WaveRing(
-                      controller: _wave2,
-                      color: primaryColor,
-                      maxSize: 400.w,
-                    ),
-                    // Wave ring 1 (closest)
-                    _WaveRing(
-                      controller: _wave1,
-                      color: primaryColor,
-                      maxSize: 205.w,
+             
+
+                    // ── Animated Wave Check Icon ──────────────────────────
+                    SizedBox(
+                      width: 160.w,
+                      height: 160.w,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          _WaveRing(
+                            controller: _wave3,
+                            color: primaryColor,
+                            maxSize: 600.w,
+                          ),
+                          _WaveRing(
+                            controller: _wave2,
+                            color: primaryColor,
+                            maxSize: 400.w,
+                          ),
+                          _WaveRing(
+                            controller: _wave1,
+                            color: primaryColor,
+                            maxSize: 205.w,
+                          ),
+                          ScaleTransition(
+                            scale: _bounceAnim,
+                            child: Container(
+                              width: 80.w,
+                              height: 80.w,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: primaryColor,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: primaryColor.withValues(alpha: 0.35),
+                                    blurRadius: 20,
+                                    spreadRadius: 4,
+                                  ),
+                                ],
+                              ),
+                              child: AppIcon.raw(
+                                Icons.check_rounded,
+                                size: 42.w,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
 
-                    // Bounce-in icon
-                    ScaleTransition(
-                      scale: _bounceAnim,
+                    SizedBox(height: 24.h),
+
+                    Text(
+                      AppText.applicationSubmitted,
+                      style: TextStyle(
+                        fontSize: 22.sp,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.current.text,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      AppText.submittedThanks,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: AppColors.current.lightText,
+                        height: 1.6,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 24.h),
+
+                    _InfoCard(
+                      icon: Icons.check_circle_outline_rounded,
+                      iconColor: AppColors.current.green,
+                      title: AppText.yourPartIsDone,
+                      text: AppText.yourPartIsDoneDescription,
+                    ),
+                    SizedBox(height: 10.h),
+                    _InfoCard(
+                      icon: Icons.notifications_active_outlined,
+                      iconColor: AppColors.current.primary,
+                      title: AppText.stayAvailable,
+                      text: AppText.stayAvailableDescription,
+                    ),
+                    SizedBox(height: 24.h),
+
+                    // ── View My Application ──────────────────────────
+                    CustomFilledButton(
+                      onPressed: widget.onViewApplication,
+                      text: AppText.viewMyApplication,
+                      heightFactor: 0.065,
+                      backgroundColor: AppColors.current.primary,
+                      textStyle: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.current.white,
+                      ),
+                    ),
+                    SizedBox(height: 10.h),
+
+                    // ── Browse More Pets ─────────────────────────────
+                    GestureDetector(
+                      onTap: widget.onBrowseMore,
                       child: Container(
-                        width: 80.w,
-                        height: 80.w,
+                        width: double.infinity,
+                        height: 50.h,
+                        alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: primaryColor,
-                          boxShadow: [
-                            BoxShadow(
-                              color: primaryColor.withValues(alpha: 0.35),
-                              blurRadius: 20,
-                              spreadRadius: 4,
-                            ),
-                          ],
+                          color: AppColors.current.lightBlue,
+                          borderRadius: BorderRadius.circular(14.r),
                         ),
-                        child: AppIcon.raw(
-                          Icons.check_rounded,
-                          size: 42.w,
-                          color: Colors.white,
+                        child: Text(
+                          AppText.browseMorePets,
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.current.primary,
+                          ),
                         ),
                       ),
                     ),
+                    SizedBox(height: 32.h),
                   ],
                 ),
               ),
-
-              SizedBox(height: 28.h),
-
-              Text(
-                AppText.applicationSubmitted,
-                style: TextStyle(
-                  fontSize: 22.sp,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.current.text,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 10.h),
-              Text(
-                AppText.submittedThanks,
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  color: AppColors.current.lightText,
-                  height: 1.6,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 32.h),
-
-              _InfoCard(
-                icon: Icons.schedule_rounded,
-                iconColor: AppColors.current.gold,
-                title: AppText.whatHappensNext,
-                text: AppText.ownerReviewNext,
-              ),
-              SizedBox(height: 10.h),
-              _InfoCard(
-                icon: Icons.check_circle_outline_rounded,
-                iconColor: AppColors.current.green,
-                title: AppText.yourPartIsDone,
-                text: AppText.yourPartIsDoneDescription,
-              ),
-              SizedBox(height: 10.h),
-              _InfoCard(
-                icon: Icons.notifications_active_outlined,
-                iconColor: AppColors.current.primary,
-                title: AppText.stayAvailable,
-                text: AppText.stayAvailableDescription,
-              ),
-
-              const Spacer(flex: 2),
-
-              // ── View My Application ────────────────────────────────────
-              CustomFilledButton(
-                onPressed: widget.onViewApplication,
-                text: AppText.viewMyApplication,
-                heightFactor: 0.065,
-                backgroundColor: AppColors.current.primary,
-                textStyle: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.current.white,
-                ),
-              ),
-              SizedBox(height: 10.h),
-
-              // ── Browse More Pets ────────────────────────────────────────
-              GestureDetector(
-                onTap: widget.onBrowseMore,
-                child: Container(
-                  width: double.infinity,
-                  height: 50.h,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: AppColors.current.lightBlue,
-                    borderRadius: BorderRadius.circular(14.r),
-                  ),
-                  child: Text(
-                    AppText.browseMorePets,
-                    style: TextStyle(
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.current.primary,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ],
     );

@@ -77,10 +77,10 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
     return BlocConsumer<ProblemReportBloc, ProblemReportState>(
       listener: (context, state) {
         if (state.status == ProblemReportStatus.success) {
-          AuthToast.showSuccess(context, AppText.reportSubmittedThanks);
+          PetToast.showSuccess(context, AppText.reportSubmittedThanks);
           context.pop();
         } else if (state.status == ProblemReportStatus.error) {
-          AuthToast.showError(
+          PetToast.showError(
             context,
             state.errorMessage ?? AppText.somethingWentWrong,
           );

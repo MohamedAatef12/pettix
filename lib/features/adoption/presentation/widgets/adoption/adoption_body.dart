@@ -1,4 +1,5 @@
 import 'package:pettix/core/widgets/app_shimmer.dart';
+import 'package:pettix/core/widgets/pet_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -39,8 +40,7 @@ class AdoptionBody extends StatelessWidget {
       children: [
         _AdoptionHeader(searchController: bloc.searchController),
         Expanded(
-          child: RefreshIndicator(
-            color: AppColors.current.primary,
+          child: PetRefreshIndicator(
             onRefresh: () async {
               bloc.add(const RefreshPetsEvent());
               await bloc.stream.firstWhere(
