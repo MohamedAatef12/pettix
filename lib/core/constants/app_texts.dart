@@ -429,6 +429,14 @@ abstract class AppText {
   static String get ownerReviewNext =>
       'The pet owner will review your application. If they\'re interested, they\'ll reach out to you through the chat feature.'
           .tr();
+  static String get yourPartIsDone => 'Your Part is Done!'.tr();
+  static String get yourPartIsDoneDescription =>
+      'You\'ve successfully submitted your application. Sit back and relax — the rest is up to the owner.'
+          .tr();
+  static String get stayAvailable => 'Stay Available'.tr();
+  static String get stayAvailableDescription =>
+      'If you meet the requirements, the owner will contact you directly through chat. Keep your notifications on!'
+          .tr();
   static String get viewMyApplication => 'View My Application'.tr();
   static String get browseMorePets => 'Browse More Pets'.tr();
 

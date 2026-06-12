@@ -23,7 +23,7 @@ class PetApplication extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       padding: EdgeInsets.zero,
       children: [
-        _HeroSection(),
+        const _HeroSection(),
         SizedBoxConstants.verticalLarge,
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -97,33 +97,171 @@ class PetApplication extends StatelessWidget {
 }
 
 class _HeroSection extends StatelessWidget {
+  const _HeroSection();
+
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        SvgPicture.asset(
-          'assets/images/adopt_animal.svg',
-          fit: BoxFit.fill,
-          width: MediaQuery.of(context).size.width,
-        ),
-        PositionedDirectional(
-          top: MediaQuery.of(context).size.height * 0.03,
-          start: 10,
-          child: InkWell(
-            onTap: () => context.pop(),
-            highlightColor: Colors.transparent,
-            splashColor: Colors.transparent,
+    final topPadding = MediaQuery.paddingOf(context).top;
+    final theme = Theme.of(context);
+    final colors = AppColors.current;
+    final ovalColor = Color.alphaBlend(
+      colors.primary.withValues(
+        alpha: theme.brightness == Brightness.dark ? 0.12 : 0.07,
+      ),
+      theme.colorScheme.surface,
+    );
 
-            child: SizedBox(
-              width: 40.w,
-              height: 40.w,
-              child: AppTopBarBackButton(onPressed: () => context.pop()),
+    return SizedBox(
+      height: topPadding + 300.h,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          PositionedDirectional(
+            top: 0,
+            start: 0,
+            end: 0,
+            child: _OvalBottomHeroBackground(
+              height: topPadding + 300.h,
+              backgroundColor: ovalColor,
+              borderColor: colors.primary.withValues(alpha: 0.10),
             ),
           ),
-        ),
-      ],
+          Positioned.fill(
+            top: topPadding - 85.h,
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: SvgPicture.asset(
+                'assets/images/adopt_animal.svg',
+                width: 400.w,
+                height: 420.h,
+                fit: BoxFit.contain,
+                colorMapper: _AdoptionHeroBackgroundMapper(ovalColor),
+              ),
+            ),
+          ),
+          PositionedDirectional(
+            top: topPadding ,
+            start: 10.w,
+            child: InkWell(
+              onTap: () => context.pop(),
+              highlightColor: Colors.transparent,
+              splashColor: Colors.transparent,
+              child: SizedBox(
+                width: 40.w,
+                height: 40.w,
+                child: AppTopBarBackButton(onPressed: () => context.pop()),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
+}
+
+class _OvalBottomHeroBackground extends StatelessWidget {
+  final double height;
+  final Color backgroundColor;
+  final Color borderColor;
+
+  const _OvalBottomHeroBackground({
+    required this.height,
+    required this.backgroundColor,
+    required this.borderColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: height,
+      child: CustomPaint(
+        foregroundPainter: _OvalBottomHeroBorderPainter(borderColor),
+        child: ClipPath(
+          clipper: const _OvalBottomHeroClipper(),
+          child: ColoredBox(
+            color: backgroundColor,
+            child: const SizedBox.expand(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _OvalBottomHeroClipper extends CustomClipper<Path> {
+  const _OvalBottomHeroClipper();
+
+  @override
+  Path getClip(Size size) => _ovalBottomHeroPath(size);
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+class _OvalBottomHeroBorderPainter extends CustomPainter {
+  final Color color;
+
+  const _OvalBottomHeroBorderPainter(this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint =
+        Paint()
+          ..color = color
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1;
+
+    canvas.drawPath(_ovalBottomHeroPath(size), paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _OvalBottomHeroBorderPainter oldDelegate) {
+    return oldDelegate.color != color;
+  }
+}
+
+Path _ovalBottomHeroPath(Size size) {
+  final arcTop = size.height - size.width / 2;
+
+  return Path()
+    ..moveTo(0, 0)
+    ..lineTo(size.width, 0)
+    ..lineTo(size.width, arcTop)
+    ..arcToPoint(
+      Offset(0, arcTop),
+      radius: Radius.elliptical(size.width / 2, size.width / 2),
+      clockwise: true,
+    )
+    ..close();
+}
+
+class _AdoptionHeroBackgroundMapper extends ColorMapper {
+  final Color backgroundColor;
+
+  const _AdoptionHeroBackgroundMapper(this.backgroundColor);
+
+  @override
+  Color substitute(
+    String? id,
+    String elementName,
+    String attributeName,
+    Color color,
+  ) {
+    if (attributeName == 'fill' && color.toARGB32() == 0xFFF7F3ED) {
+      return Colors.transparent;
+    }
+
+    return color;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is _AdoptionHeroBackgroundMapper &&
+        other.backgroundColor == backgroundColor;
+  }
+
+  @override
+  int get hashCode => backgroundColor.hashCode;
 }
 
 class _ExpectationItem extends StatelessWidget {

@@ -15,6 +15,7 @@ import 'package:pettix/core/services/signalr_service.dart';
 import 'package:pettix/features/chat/data/data_source/chat_local_data_source.dart';
 
 import 'package:pettix/core/widgets/app_icon_system.dart';
+import 'package:pettix/core/widgets/pet_dialog.dart';
 import 'package:pettix/core/widgets/rtl_aware_icon.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -92,12 +93,6 @@ class CustomDrawer extends StatelessWidget {
                   //   onTap: () {},
                   // ),
 
-                  // _TileSvg(
-                  //   path: 'assets/icons/refund.svg',
-                  //   label: AppText.refundsReturns,
-                  //   color: AppColors.current.midGray,
-                  //   onTap: () {},
-                  // ),
                   // _Section(AppText.emergency),
                   // _Tile(
                   //   icon: Icons.emergency_rounded,
@@ -186,7 +181,11 @@ class _DrawerHeader extends StatelessWidget {
           padding: EdgeInsets.fromLTRB(20.w, topPad + 20.h, 20.w, 20.h),
           child: Row(
             children: [
-              _Avatar(url: user?.avatar ?? user?.image, id: user?.id),
+              _Avatar(
+                url: user?.avatar ?? user?.image,
+                id: user?.id,
+                name: user?.userName,
+              ),
               SizedBox(width: 14.w),
               Expanded(child: _UserInfo(user: user)),
               IconButton(
@@ -210,7 +209,8 @@ class _DrawerHeader extends StatelessWidget {
 class _Avatar extends StatelessWidget {
   final String? url;
   final int? id;
-  const _Avatar({this.url, this.id});
+  final String? name;
+  const _Avatar({this.url, this.id, this.name});
 
   @override
   Widget build(BuildContext context) {
@@ -228,6 +228,7 @@ class _Avatar extends StatelessWidget {
       ),
       child: AppProfileImage(
         imageUrl: url,
+        name: name,
         radius: 28.r,
         backgroundColor: AppColors.current.lightGray,
         heroTag: id == null ? null : 'user_avatar_$id',
@@ -402,6 +403,8 @@ class _TileBase extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
       borderRadius: BorderRadius.circular(10.r),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
@@ -454,56 +457,27 @@ class _LogoutTile extends StatelessWidget {
     if (context.mounted) context.pushReplacement('/login');
   }
 
-  void _showLogoutDialog(BuildContext context) {
-    showDialog<void>(
-      context: context,
-      builder:
-          (d) => AlertDialog(
-            backgroundColor: AppColors.current.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.r),
-            ),
-            title: Text(
-              AppText.logout,
-              style: AppTextStyles.bold.copyWith(fontSize: 18.sp),
-            ),
-            content: Text(
-              AppText.logoutDesc,
-              style: TextStyle(fontSize: 14.sp, color: AppColors.current.text),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(d).pop(),
-                child: Text(
-                  AppText.cancel,
-                  style: TextStyle(color: AppColors.current.midGray),
-                ),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.current.red,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.of(d).pop();
-                  _doLogout(context);
-                },
-                child: Text(
-                  AppText.logOut,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
-          ),
+  Future<void> _showLogoutDialog(BuildContext context) async {
+    final confirmed = await PetDialog.show(
+      context,
+      title: AppText.logout,
+      message: AppText.logoutDesc,
+      confirmLabel: AppText.logOut,
+      cancelLabel: AppText.cancel,
+      confirmColor: AppColors.current.red,
+      iconColor: AppColors.current.red,
     );
+    if (confirmed == true && context.mounted) {
+      _doLogout(context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () => _showLogoutDialog(context),
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
       borderRadius: BorderRadius.circular(10.r),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),

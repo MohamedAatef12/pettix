@@ -57,6 +57,7 @@ class ProfileHeader extends StatelessWidget {
                 ),
                 child: AppProfileImage(
                   imageUrl: profile.avatar,
+                  name: profile.nameEn ?? profile.userName,
                   radius: 46.r,
                   heroTag: 'user_avatar_${profile.id}',
                   backgroundColor: AppColors.current.lightGray,

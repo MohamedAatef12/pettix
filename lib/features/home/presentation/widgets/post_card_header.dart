@@ -59,7 +59,11 @@ class PostCardHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        AppProfileImage(imageUrl: post.author.avatar, radius: 30),
+        AppProfileImage(
+          imageUrl: post.author.avatar,
+          name: post.author.nameEn,
+          radius: 30,
+        ),
         SizedBox(width: 10.w),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -19,13 +19,11 @@ class NotificationPage extends StatelessWidget {
         value: DI.find<NotificationBloc>()
           ..add(const FetchAllUnreadCounts())
           ..add(GetNotificationsEvent(notificationTypeId: NotificationType.timeline.value)),
-        child: SafeArea(
-          child: Column(
-            children: [
-              const NotificationAppBar(),
-              const Expanded(child: NotificationBody()),
-            ],
-          ),
+        child: Column(
+          children: [
+            const NotificationAppBar(),
+            const Expanded(child: NotificationBody()),
+          ],
         ),
       ),
     );

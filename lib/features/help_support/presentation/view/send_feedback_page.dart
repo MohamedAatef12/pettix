@@ -8,6 +8,7 @@ import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 
+import 'package:pettix/core/widgets/app_dropdown.dart';
 import 'package:pettix/core/widgets/app_icon_system.dart';
 
 class SendFeedbackPage extends StatefulWidget {
@@ -224,47 +225,19 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
                     children: [
                       _FieldLabel(AppText.whichAreaOfApp),
                       SizedBox(height: 8.h),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 14.w),
-                        decoration: BoxDecoration(
-                          color: AppColors.current.lightBlue,
-                          borderRadius: BorderRadius.circular(12.r),
-                          border: Border.all(
-                            color: AppColors.current.lightGray,
+                      AppDropdown<int>(
+                        hint: AppText.selectArea,
+                        prefixIcon: Icons.apps_rounded,
+                        items: List.generate(
+                          _areas.length - 1,
+                          (i) => AppDropdownItem<int>(
+                            value: i + 1,
+                            label: _areas[i + 1],
                           ),
                         ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<int>(
-                            value: _selectedArea,
-                            isExpanded: true,
-                            icon: AppIcon.raw(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: AppColors.current.midGray,
-                            ),
-                            style: TextStyle(
-                              fontSize: 13.sp,
-                              color: AppColors.current.text,
-                            ),
-                            items: List.generate(
-                              _areas.length,
-                              (i) => DropdownMenuItem(
-                                value: i,
-                                child: Text(
-                                  _areas[i],
-                                  style: TextStyle(
-                                    fontSize: 13.sp,
-                                    color:
-                                        i == 0
-                                            ? AppColors.current.midGray
-                                            : AppColors.current.text,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            onChanged:
-                                (v) => setState(() => _selectedArea = v ?? 0),
-                          ),
-                        ),
+                        value: _selectedArea == 0 ? null : _selectedArea,
+                        onChanged: (v) =>
+                            setState(() => _selectedArea = v ?? 0),
                       ),
                       SizedBox(height: 16.h),
                       _FieldLabel(AppText.yourFeedback),

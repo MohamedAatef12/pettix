@@ -210,6 +210,7 @@ class _HeaderAvatar extends StatelessWidget {
                 ),
                 child: AppProfileImage(
                   imageUrl: avatarUrl,
+                  name: profile.nameEn ?? profile.userName,
                   radius: imageRadius,
                   heroTag: 'user_avatar_${profile.id}',
                 ),

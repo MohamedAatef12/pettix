@@ -19,7 +19,7 @@ class SplashScreen extends StatelessWidget {
       child: BlocListener<SplashBloc, SplashState>(
         listener: (context, state) {
           if (state is SplashNavigateToOnBoarding) {
-            context.pushReplacement(AppRoutes.selectLanguage);
+            context.pushReplacement(AppRoutes.onBoarding);
           } else if (state is SplashNavigateToHome) {
             context.pushReplacement(AppRoutes.bottomNav);
             // Wait for bottomNav to fully mount before pushing the comments route.

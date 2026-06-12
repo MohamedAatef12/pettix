@@ -40,6 +40,7 @@ class ProfileCard extends StatelessWidget {
             Expanded(
               child: AppProfileImage(
                 imageUrl: avatarUrl,
+                name: name,
                 radius: 100.r,
                 fit: BoxFit.fill,
               ),

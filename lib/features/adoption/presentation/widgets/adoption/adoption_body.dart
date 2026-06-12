@@ -1,4 +1,5 @@
 import 'package:pettix/core/widgets/app_shimmer.dart';
+import 'package:pettix/core/widgets/pet_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -14,6 +15,7 @@ import 'package:pettix/features/adoption/presentation/widgets/adoption/filter_sh
 import 'package:pettix/features/adoption/presentation/widgets/adoption/pet_browse_card.dart';
 
 import 'package:pettix/core/widgets/app_icon_system.dart';
+import 'package:pettix/core/widgets/app_search_bar.dart';
 
 class AdoptionBody extends StatelessWidget {
   const AdoptionBody({super.key});
@@ -39,8 +41,7 @@ class AdoptionBody extends StatelessWidget {
       children: [
         _AdoptionHeader(searchController: bloc.searchController),
         Expanded(
-          child: RefreshIndicator(
-            color: AppColors.current.primary,
+          child: PetRefreshIndicator(
             onRefresh: () async {
               bloc.add(const RefreshPetsEvent());
               await bloc.stream.firstWhere(
@@ -116,7 +117,15 @@ class _AdoptionHeader extends StatelessWidget {
               SizedBox(height: 18.h),
               Row(
                 children: [
-                  Expanded(child: _SearchField(controller: searchController)),
+                  Expanded(
+                    child: AppSearchBar(
+                      hintText: AppText.searchByName,
+                      controller: searchController,
+                      onChanged: (q) => context
+                          .read<AdoptionBrowseBloc>()
+                          .add(SearchPetsEvent(q)),
+                    ),
+                  ),
                   SizedBox(width: 12.w),
                   const _FilterButton(),
                 ],
@@ -129,74 +138,6 @@ class _AdoptionHeader extends StatelessWidget {
   }
 }
 
-class _SearchField extends StatelessWidget {
-  final TextEditingController controller;
-
-  const _SearchField({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 44.h,
-      decoration: BoxDecoration(
-        color: AppColors.current.white,
-        borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: AppColors.current.lightGray, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: TextField(
-        controller: controller,
-        onChanged:
-            (q) => context.read<AdoptionBrowseBloc>().add(SearchPetsEvent(q)),
-        style: TextStyle(color: AppColors.current.text, fontSize: 13.sp),
-        decoration: InputDecoration(
-          hintText: AppText.searchByName,
-          hintStyle: TextStyle(
-            color: AppColors.current.midGray,
-            fontSize: 13.sp,
-          ),
-          prefixIcon: AppIcon.raw(
-            Icons.search_rounded,
-            color: AppColors.current.midGray,
-            size: 18.w,
-          ),
-          suffixIcon: BlocBuilder<AdoptionBrowseBloc, AdoptionBrowseState>(
-            buildWhen:
-                (p, c) =>
-                    (p.searchQuery?.isNotEmpty ?? false) !=
-                    (c.searchQuery?.isNotEmpty ?? false),
-            builder: (context, state) {
-              final hasQuery =
-                  state.searchQuery != null && state.searchQuery!.isNotEmpty;
-              if (!hasQuery) return const SizedBox.shrink();
-              return IconButton(
-                icon: AppIcon.raw(
-                  Icons.close_rounded,
-                  color: AppColors.current.midGray,
-                  size: 16.w,
-                ),
-                onPressed: () {
-                  controller.clear();
-                  context.read<AdoptionBrowseBloc>().add(
-                    const SearchPetsEvent(''),
-                  );
-                },
-              );
-            },
-          ),
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(vertical: 12.h),
-        ),
-      ),
-    );
-  }
-}
 
 class _FilterButton extends StatelessWidget {
   const _FilterButton();

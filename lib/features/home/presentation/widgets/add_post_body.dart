@@ -284,6 +284,7 @@ class _UserHeader extends StatelessWidget {
           child: AppProfileImage(
             radius: 22.r,
             imageUrl: userData?.avatar ?? userData?.image,
+            name: userData?.userName,
           ),
         ),
         SizedBox(width: 12.w),

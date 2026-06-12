@@ -138,6 +138,7 @@ class CommentsBody extends StatelessWidget {
           children: [
             AppProfileImage(
               imageUrl: comment.author.avatar,
+              name: comment.author.nameEn,
               radius: isReply ? 18.r : 30.r,
             ),
             SizedBox(width: isReply ? 6.w : 10.w),

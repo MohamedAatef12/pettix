@@ -1,4 +1,5 @@
 import 'package:pettix/core/widgets/app_cached_image.dart';
+import 'package:pettix/core/widgets/app_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/app_texts.dart';
@@ -53,7 +54,11 @@ class PetBrowseCard extends StatelessWidget {
                       child: AppCachedImage(
                         imageUrl: fullUrl ?? '',
                         fit: BoxFit.cover,
-                        heroTag: 'pet_image_${pet.id}',
+                        placeholder: AppShimmer(
+                          width: double.infinity,
+                          height: double.infinity,
+                          borderRadius: BorderRadius.zero,
+                        ),
                         errorWidget: _PhotoPlaceholder(),
                       ),
                     ),
@@ -91,17 +96,14 @@ class PetBrowseCard extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: Hero(
-                            tag: 'cat_${pet.id}',
-                            child: Text(
-                              pet.categoryName ?? AppText.unknown,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: AppColors.current.primary,
-                                fontSize: 13.sp,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          child: Text(
+                            pet.categoryName ?? AppText.unknown,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: AppColors.current.primary,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),

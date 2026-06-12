@@ -371,3 +371,93 @@ ThemeData rubyDarkTheme = _extraTheme(
   onSurface: const Color(0xffFFF1F3),
   outline: const Color(0xff2C3040),
 );
+
+// Peach Blossom - light theme
+ThemeData peachLightTheme = _extraTheme(
+  brightness: Brightness.light,
+  background: const Color(0xffFFFBFE),
+  surface: const Color(0xffFEF2FA),
+  primary: const Color(0xffF472B6),
+  secondary: const Color(0xff06B6D4),
+  onSurface: const Color(0xff2A0A20),
+  outline: const Color(0xffFAD4EF),
+);
+
+// Sky Fresh - light theme
+ThemeData skyLightTheme = _extraTheme(
+  brightness: Brightness.light,
+  background: const Color(0xffF8FEFF),
+  surface: const Color(0xffE8F7FE),
+  primary: const Color(0xff0EA5E9),
+  secondary: const Color(0xff14B8A6),
+  onSurface: const Color(0xff061E2E),
+  outline: const Color(0xffBCDFF8),
+);
+
+// Warm Ivory - light theme
+ThemeData ivoryLightTheme = _extraTheme(
+  brightness: Brightness.light,
+  background: const Color(0xffFDFCF5),
+  surface: const Color(0xffFAF3DA),
+  primary: const Color(0xffB45309),
+  secondary: const Color(0xff0D9488),
+  onSurface: const Color(0xff201508),
+  outline: const Color(0xffEEE0AE),
+);
+
+// Slate Indigo - light theme
+ThemeData slateLightTheme = _extraTheme(
+  brightness: Brightness.light,
+  background: const Color(0xffF9F9FF),
+  surface: const Color(0xffEEEFFE),
+  primary: const Color(0xff6366F1),
+  secondary: const Color(0xff06B6D4),
+  onSurface: const Color(0xff0E1030),
+  outline: const Color(0xffDCDFF6),
+);
+
+// Void - near-black minimal, dark theme
+ThemeData voidDarkTheme = _extraTheme(
+  brightness: Brightness.dark,
+  background: const Color(0xff060608),
+  surface: const Color(0xff0D0D12),
+  primary: const Color(0xffA78BFA),
+  secondary: const Color(0xff22D3EE),
+  onSurface: const Color(0xffEEEDF8),
+  outline: const Color(0xff181820),
+);
+
+// Crimson Night - deep dark red, dark theme
+ThemeData crimsonDarkTheme = _extraTheme(
+  brightness: Brightness.dark,
+  background: const Color(0xff0A0405),
+  surface: const Color(0xff160808),
+  primary: const Color(0xffF87171),
+  secondary: const Color(0xff34D399),
+  onSurface: const Color(0xffFFF2F2),
+  outline: const Color(0xff251212),
+);
+
+// Deep Navy - dark professional blue, dark theme
+ThemeData navyDarkTheme = _extraTheme(
+  brightness: Brightness.dark,
+  background: const Color(0xff040C18),
+  surface: const Color(0xff081524),
+  primary: const Color(0xff60A5FA),
+  secondary: const Color(0xff38BDF8),
+  onSurface: const Color(0xffE8F2FF),
+  outline: const Color(0xff0E2035),
+  onPrimary: const Color(0xff040C18),
+);
+
+// Dark Jade - near-black with emerald, dark theme
+ThemeData jadeDarkTheme = _extraTheme(
+  brightness: Brightness.dark,
+  background: const Color(0xff030C08),
+  surface: const Color(0xff071510),
+  primary: const Color(0xff34D399),
+  secondary: const Color(0xff22D3EE),
+  onSurface: const Color(0xffE2FFF5),
+  outline: const Color(0xff0D2518),
+  onPrimary: const Color(0xff030C08),
+);

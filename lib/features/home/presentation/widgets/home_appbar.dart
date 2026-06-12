@@ -31,6 +31,7 @@ class HomeAppBar extends StatelessWidget {
                         ?.openDrawer(),
             child: AppProfileImage(
               imageUrl: user?.avatar ?? user?.image,
+              name: user?.userName,
               radius: 27.r,
             ),
           ),
