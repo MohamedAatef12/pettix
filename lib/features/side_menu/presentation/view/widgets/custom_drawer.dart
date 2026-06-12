@@ -93,12 +93,6 @@ class CustomDrawer extends StatelessWidget {
                   //   onTap: () {},
                   // ),
 
-                  // _TileSvg(
-                  //   path: 'assets/icons/refund.svg',
-                  //   label: AppText.refundsReturns,
-                  //   color: AppColors.current.midGray,
-                  //   onTap: () {},
-                  // ),
                   // _Section(AppText.emergency),
                   // _Tile(
                   //   icon: Icons.emergency_rounded,
@@ -187,7 +181,11 @@ class _DrawerHeader extends StatelessWidget {
           padding: EdgeInsets.fromLTRB(20.w, topPad + 20.h, 20.w, 20.h),
           child: Row(
             children: [
-              _Avatar(url: user?.avatar ?? user?.image, id: user?.id, name: user?.userName),
+              _Avatar(
+                url: user?.avatar ?? user?.image,
+                id: user?.id,
+                name: user?.userName,
+              ),
               SizedBox(width: 14.w),
               Expanded(child: _UserInfo(user: user)),
               IconButton(

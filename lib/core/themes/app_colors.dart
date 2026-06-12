@@ -8,6 +8,14 @@ class AppColors {
   static AppColors get light => _defaultLightColors;
   static AppColors get dark => _defaultDarkColors;
   static AppColors get roseLight => _roseLightColors;
+  static AppColors get peachLight => _peachLightColors;
+  static AppColors get skyLight => _skyLightColors;
+  static AppColors get ivoryLight => _ivoryLightColors;
+  static AppColors get slateLight => _slateLightColors;
+  static AppColors get voidDark => _voidDarkColors;
+  static AppColors get crimsonDark => _crimsonDarkColors;
+  static AppColors get navyDark => _navyDarkColors;
+  static AppColors get jadeDark => _jadeDarkColors;
   static AppColors get oceanDark => _oceanDarkColors;
   static AppColors get emeraldLight => _emeraldLightColors;
   static AppColors get sunriseLight => _sunriseLightColors;
@@ -587,4 +595,220 @@ var _defaultLightColors = AppColors(
   blueGray: const Color(0xffC0CCDD),
   brown: const Color(0xffE3D1B5),
   gold: const Color(0xffC8933D),
+);
+
+// Peach Blossom — soft warm pink, light
+var _peachLightColors = AppColors(
+  swatch: const MaterialColor(0xffF472B6, <int, Color>{
+    50: Color(0xffF472B6), 100: Color(0xffF472B6), 200: Color(0xffF472B6),
+    300: Color(0xffF472B6), 400: Color(0xffF472B6), 500: Color(0xffF472B6),
+    600: Color(0xffF472B6), 700: Color(0xffF472B6), 800: Color(0xffF472B6),
+    900: Color(0xffF472B6),
+  }),
+  primary: const Color(0xffF472B6),
+  lightBlue: const Color(0xffFEF2FA),
+  lightGray: const Color(0xffFAD4EF),
+  midGray: const Color(0xffB87898),
+  gray: const Color(0xff7A5268),
+  white: const Color(0xffFFFBFE),
+  text: const Color(0xff2A0A20),
+  lightText: const Color(0xffA87090),
+  green: const Color(0xff22C55E),
+  red: const Color(0xffEF4444),
+  yellow: const Color(0xffF59E0B),
+  lightYellow: const Color(0xffFFF8ED),
+  teal: const Color(0xff06B6D4),
+  transparent: Colors.transparent,
+  blueGray: const Color(0xffD8B8D4),
+  brown: const Color(0xffF0D8D0),
+  gold: const Color(0xffC8883A),
+);
+
+// Sky Fresh — airy sky blue, light
+var _skyLightColors = AppColors(
+  swatch: const MaterialColor(0xff0EA5E9, <int, Color>{
+    50: Color(0xff0EA5E9), 100: Color(0xff0EA5E9), 200: Color(0xff0EA5E9),
+    300: Color(0xff0EA5E9), 400: Color(0xff0EA5E9), 500: Color(0xff0EA5E9),
+    600: Color(0xff0EA5E9), 700: Color(0xff0EA5E9), 800: Color(0xff0EA5E9),
+    900: Color(0xff0EA5E9),
+  }),
+  primary: const Color(0xff0EA5E9),
+  lightBlue: const Color(0xffE8F7FE),
+  lightGray: const Color(0xffBCDFF8),
+  midGray: const Color(0xff4E8FAE),
+  gray: const Color(0xff326A88),
+  white: const Color(0xffF8FEFF),
+  text: const Color(0xff061E2E),
+  lightText: const Color(0xff4A8AAE),
+  green: const Color(0xff22C55E),
+  red: const Color(0xffEF4444),
+  yellow: const Color(0xffF59E0B),
+  lightYellow: const Color(0xffFFFAE0),
+  teal: const Color(0xff14B8A6),
+  transparent: Colors.transparent,
+  blueGray: const Color(0xffA8D8EE),
+  brown: const Color(0xffDDD0C0),
+  gold: const Color(0xffC8903A),
+);
+
+// Warm Ivory — earthy amber, light
+var _ivoryLightColors = AppColors(
+  swatch: const MaterialColor(0xffB45309, <int, Color>{
+    50: Color(0xffB45309), 100: Color(0xffB45309), 200: Color(0xffB45309),
+    300: Color(0xffB45309), 400: Color(0xffB45309), 500: Color(0xffB45309),
+    600: Color(0xffB45309), 700: Color(0xffB45309), 800: Color(0xffB45309),
+    900: Color(0xffB45309),
+  }),
+  primary: const Color(0xffB45309),
+  lightBlue: const Color(0xffFAF3DA),
+  lightGray: const Color(0xffEEE0AE),
+  midGray: const Color(0xff9A8258),
+  gray: const Color(0xff6E5C38),
+  white: const Color(0xffFDFCF5),
+  text: const Color(0xff201508),
+  lightText: const Color(0xff9A8058),
+  green: const Color(0xff16A34A),
+  red: const Color(0xffDC2626),
+  yellow: const Color(0xffD97706),
+  lightYellow: const Color(0xffFFF8DC),
+  teal: const Color(0xff0D9488),
+  transparent: Colors.transparent,
+  blueGray: const Color(0xffC8D0D0),
+  brown: const Color(0xffE8D4B0),
+  gold: const Color(0xffB87820),
+);
+
+// Slate Indigo — cool modern indigo, light
+var _slateLightColors = AppColors(
+  swatch: const MaterialColor(0xff6366F1, <int, Color>{
+    50: Color(0xff6366F1), 100: Color(0xff6366F1), 200: Color(0xff6366F1),
+    300: Color(0xff6366F1), 400: Color(0xff6366F1), 500: Color(0xff6366F1),
+    600: Color(0xff6366F1), 700: Color(0xff6366F1), 800: Color(0xff6366F1),
+    900: Color(0xff6366F1),
+  }),
+  primary: const Color(0xff6366F1),
+  lightBlue: const Color(0xffEEEFFE),
+  lightGray: const Color(0xffDCDFF6),
+  midGray: const Color(0xff7276AA),
+  gray: const Color(0xff525480),
+  white: const Color(0xffF9F9FF),
+  text: const Color(0xff0E1030),
+  lightText: const Color(0xff7274A8),
+  green: const Color(0xff22C55E),
+  red: const Color(0xffEF4444),
+  yellow: const Color(0xffF59E0B),
+  lightYellow: const Color(0xffFFF8E8),
+  teal: const Color(0xff06B6D4),
+  transparent: Colors.transparent,
+  blueGray: const Color(0xffC4C8E8),
+  brown: const Color(0xffDDD0C8),
+  gold: const Color(0xffD0922A),
+);
+
+// Void — near-black ultra minimal, dark
+var _voidDarkColors = AppColors(
+  swatch: const MaterialColor(0xffA78BFA, <int, Color>{
+    50: Color(0xffA78BFA), 100: Color(0xffA78BFA), 200: Color(0xffA78BFA),
+    300: Color(0xffA78BFA), 400: Color(0xffA78BFA), 500: Color(0xffA78BFA),
+    600: Color(0xffA78BFA), 700: Color(0xffA78BFA), 800: Color(0xffA78BFA),
+    900: Color(0xffA78BFA),
+  }),
+  primary: const Color(0xffA78BFA),
+  lightBlue: const Color(0xff0D0D12),
+  lightGray: const Color(0xff181820),
+  midGray: const Color(0xff5C5870),
+  gray: const Color(0xff8A88A8),
+  white: const Color(0xff060608),
+  text: const Color(0xffEEEDF8),
+  lightText: const Color(0xff6A6880),
+  green: const Color(0xff4ADE80),
+  red: const Color(0xffF87171),
+  yellow: const Color(0xffFACC15),
+  lightYellow: const Color(0xff1A1808),
+  teal: const Color(0xff22D3EE),
+  transparent: Colors.transparent,
+  blueGray: const Color(0xff1C1C28),
+  brown: const Color(0xff201818),
+  gold: const Color(0xffF59E0B),
+);
+
+// Crimson Night — deep dark red, dark
+var _crimsonDarkColors = AppColors(
+  swatch: const MaterialColor(0xffF87171, <int, Color>{
+    50: Color(0xffF87171), 100: Color(0xffF87171), 200: Color(0xffF87171),
+    300: Color(0xffF87171), 400: Color(0xffF87171), 500: Color(0xffF87171),
+    600: Color(0xffF87171), 700: Color(0xffF87171), 800: Color(0xffF87171),
+    900: Color(0xffF87171),
+  }),
+  primary: const Color(0xffF87171),
+  lightBlue: const Color(0xff160808),
+  lightGray: const Color(0xff251212),
+  midGray: const Color(0xff7A5252),
+  gray: const Color(0xffB08080),
+  white: const Color(0xff0A0405),
+  text: const Color(0xffFFF2F2),
+  lightText: const Color(0xffB07878),
+  green: const Color(0xff4ADE80),
+  red: const Color(0xffFCA5A5),
+  yellow: const Color(0xffFBBF24),
+  lightYellow: const Color(0xff1E1308),
+  teal: const Color(0xff34D399),
+  transparent: Colors.transparent,
+  blueGray: const Color(0xff2A1A1A),
+  brown: const Color(0xff301A12),
+  gold: const Color(0xffF59E0B),
+);
+
+// Deep Navy — dark professional blue, dark
+var _navyDarkColors = AppColors(
+  swatch: const MaterialColor(0xff60A5FA, <int, Color>{
+    50: Color(0xff60A5FA), 100: Color(0xff60A5FA), 200: Color(0xff60A5FA),
+    300: Color(0xff60A5FA), 400: Color(0xff60A5FA), 500: Color(0xff60A5FA),
+    600: Color(0xff60A5FA), 700: Color(0xff60A5FA), 800: Color(0xff60A5FA),
+    900: Color(0xff60A5FA),
+  }),
+  primary: const Color(0xff60A5FA),
+  lightBlue: const Color(0xff081524),
+  lightGray: const Color(0xff0E2035),
+  midGray: const Color(0xff3A6080),
+  gray: const Color(0xff6090B8),
+  white: const Color(0xff040C18),
+  text: const Color(0xffE8F2FF),
+  lightText: const Color(0xff4A80A8),
+  green: const Color(0xff4ADE80),
+  red: const Color(0xffFB7185),
+  yellow: const Color(0xffFDE047),
+  lightYellow: const Color(0xff151A08),
+  teal: const Color(0xff38BDF8),
+  transparent: Colors.transparent,
+  blueGray: const Color(0xff102840),
+  brown: const Color(0xff1A2020),
+  gold: const Color(0xffFACC15),
+);
+
+// Dark Jade — near-black with emerald green, dark
+var _jadeDarkColors = AppColors(
+  swatch: const MaterialColor(0xff34D399, <int, Color>{
+    50: Color(0xff34D399), 100: Color(0xff34D399), 200: Color(0xff34D399),
+    300: Color(0xff34D399), 400: Color(0xff34D399), 500: Color(0xff34D399),
+    600: Color(0xff34D399), 700: Color(0xff34D399), 800: Color(0xff34D399),
+    900: Color(0xff34D399),
+  }),
+  primary: const Color(0xff34D399),
+  lightBlue: const Color(0xff071510),
+  lightGray: const Color(0xff0D2518),
+  midGray: const Color(0xff2B6048),
+  gray: const Color(0xff50987A),
+  white: const Color(0xff030C08),
+  text: const Color(0xffE2FFF5),
+  lightText: const Color(0xff408060),
+  green: const Color(0xff86EFAC),
+  red: const Color(0xffFB7185),
+  yellow: const Color(0xffFBBF24),
+  lightYellow: const Color(0xff141C08),
+  teal: const Color(0xff22D3EE),
+  transparent: Colors.transparent,
+  blueGray: const Color(0xff102820),
+  brown: const Color(0xff1C2018),
+  gold: const Color(0xffF59E0B),
 );

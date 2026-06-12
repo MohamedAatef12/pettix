@@ -76,19 +76,44 @@ CustomTransitionPage<T> _customTransition<T>({
   return CustomTransitionPage<T>(
     key: state.pageKey,
     child: child,
+    transitionDuration: const Duration(milliseconds: 280),
+    reverseTransitionDuration: const Duration(milliseconds: 220),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      // Entering page: fade + slide from slight right, eased out (fast start → soft stop)
+      final enterFade = Tween<double>(begin: 0.0, end: 1.0)
+          .chain(CurveTween(curve: Curves.easeOutCubic))
+          .animate(animation);
+
+      final enterSlide = Tween<Offset>(
+        begin: const Offset(0.06, 0.0),
+        end: Offset.zero,
+      ).chain(CurveTween(curve: Curves.easeOutCubic)).animate(animation);
+
+      // Background page when something is pushed on top:
+      // drifts slightly left + dims, reverses when top page is popped
+      final leaveFade = Tween<double>(begin: 1.0, end: 0.88)
+          .chain(CurveTween(curve: Curves.easeInCubic))
+          .animate(secondaryAnimation);
+
+      final leaveSlide = Tween<Offset>(
+        begin: Offset.zero,
+        end: const Offset(-0.05, 0.0),
+      ).chain(CurveTween(curve: Curves.easeInCubic)).animate(secondaryAnimation);
+
       return FadeTransition(
-        opacity: animation,
+        opacity: leaveFade,
         child: SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(0.02, 0),
-            end: Offset.zero,
-          ).animate(animation),
-          child: child,
+          position: leaveSlide,
+          child: FadeTransition(
+            opacity: enterFade,
+            child: SlideTransition(
+              position: enterSlide,
+              child: child,
+            ),
+          ),
         ),
       );
     },
-    transitionDuration: const Duration(milliseconds: 300),
   );
 }
 

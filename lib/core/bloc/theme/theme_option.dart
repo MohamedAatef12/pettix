@@ -18,6 +18,14 @@ enum AppThemeOption {
   auroraDark,
   plumDark,
   rubyDark,
+  peachLight,
+  skyLight,
+  ivoryLight,
+  slateLight,
+  voidDark,
+  crimsonDark,
+  navyDark,
+  jadeDark,
 }
 
 extension AppThemeOptionX on AppThemeOption {
@@ -29,7 +37,11 @@ extension AppThemeOptionX on AppThemeOption {
     AppThemeOption.neonDark ||
     AppThemeOption.auroraDark ||
     AppThemeOption.plumDark ||
-    AppThemeOption.rubyDark => true,
+    AppThemeOption.rubyDark ||
+    AppThemeOption.voidDark ||
+    AppThemeOption.crimsonDark ||
+    AppThemeOption.navyDark ||
+    AppThemeOption.jadeDark => true,
     _ => false,
   };
 
@@ -52,6 +64,14 @@ extension AppThemeOptionX on AppThemeOption {
     AppThemeOption.auroraDark => 'Aurora Dark'.tr(),
     AppThemeOption.plumDark => 'Plum Velvet'.tr(),
     AppThemeOption.rubyDark => 'Slate Ruby'.tr(),
+    AppThemeOption.peachLight => 'Peach Blossom'.tr(),
+    AppThemeOption.skyLight => 'Sky Fresh'.tr(),
+    AppThemeOption.ivoryLight => 'Warm Ivory'.tr(),
+    AppThemeOption.slateLight => 'Slate Indigo'.tr(),
+    AppThemeOption.voidDark => 'Void'.tr(),
+    AppThemeOption.crimsonDark => 'Crimson Night'.tr(),
+    AppThemeOption.navyDark => 'Deep Navy'.tr(),
+    AppThemeOption.jadeDark => 'Dark Jade'.tr(),
   };
 
   String get brightnessLabel => isDark ? 'Dark'.tr() : 'Light'.tr();
@@ -73,6 +93,14 @@ extension AppThemeOptionX on AppThemeOption {
     AppThemeOption.auroraDark => const Color(0xff38BDF8),
     AppThemeOption.plumDark => const Color(0xffD946EF),
     AppThemeOption.rubyDark => const Color(0xffFB7185),
+    AppThemeOption.peachLight => const Color(0xffF472B6),
+    AppThemeOption.skyLight => const Color(0xff0EA5E9),
+    AppThemeOption.ivoryLight => const Color(0xffB45309),
+    AppThemeOption.slateLight => const Color(0xff6366F1),
+    AppThemeOption.voidDark => const Color(0xffA78BFA),
+    AppThemeOption.crimsonDark => const Color(0xffF87171),
+    AppThemeOption.navyDark => const Color(0xff60A5FA),
+    AppThemeOption.jadeDark => const Color(0xff34D399),
   };
 
   Color get previewAccent => switch (this) {
@@ -92,5 +120,13 @@ extension AppThemeOptionX on AppThemeOption {
     AppThemeOption.auroraDark => const Color(0xffA3E635),
     AppThemeOption.plumDark => const Color(0xffF59E0B),
     AppThemeOption.rubyDark => const Color(0xff60A5FA),
+    AppThemeOption.peachLight => const Color(0xff06B6D4),
+    AppThemeOption.skyLight => const Color(0xff14B8A6),
+    AppThemeOption.ivoryLight => const Color(0xff0D9488),
+    AppThemeOption.slateLight => const Color(0xff06B6D4),
+    AppThemeOption.voidDark => const Color(0xff22D3EE),
+    AppThemeOption.crimsonDark => const Color(0xff34D399),
+    AppThemeOption.navyDark => const Color(0xff38BDF8),
+    AppThemeOption.jadeDark => const Color(0xff22D3EE),
   };
 }

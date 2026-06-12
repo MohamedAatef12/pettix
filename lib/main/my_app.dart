@@ -42,6 +42,14 @@ class MyApp extends StatelessWidget {
             AppThemeOption.auroraDark => AppColors.auroraDark,
             AppThemeOption.plumDark => AppColors.plumDark,
             AppThemeOption.rubyDark => AppColors.rubyDark,
+            AppThemeOption.peachLight => AppColors.peachLight,
+            AppThemeOption.skyLight => AppColors.skyLight,
+            AppThemeOption.ivoryLight => AppColors.ivoryLight,
+            AppThemeOption.slateLight => AppColors.slateLight,
+            AppThemeOption.voidDark => AppColors.voidDark,
+            AppThemeOption.crimsonDark => AppColors.crimsonDark,
+            AppThemeOption.navyDark => AppColors.navyDark,
+            AppThemeOption.jadeDark => AppColors.jadeDark,
           };
           AppColors.current = colors;
           final effectiveTheme = switch (themeOption) {
@@ -61,6 +69,14 @@ class MyApp extends StatelessWidget {
             AppThemeOption.auroraDark => auroraDarkTheme,
             AppThemeOption.plumDark => plumDarkTheme,
             AppThemeOption.rubyDark => rubyDarkTheme,
+            AppThemeOption.peachLight => peachLightTheme,
+            AppThemeOption.skyLight => skyLightTheme,
+            AppThemeOption.ivoryLight => ivoryLightTheme,
+            AppThemeOption.slateLight => slateLightTheme,
+            AppThemeOption.voidDark => voidDarkTheme,
+            AppThemeOption.crimsonDark => crimsonDarkTheme,
+            AppThemeOption.navyDark => navyDarkTheme,
+            AppThemeOption.jadeDark => jadeDarkTheme,
           };
           return ScreenUtilInit(
             designSize: const Size(360, 760),
