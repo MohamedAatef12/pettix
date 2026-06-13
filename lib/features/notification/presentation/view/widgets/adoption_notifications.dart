@@ -1,3 +1,4 @@
+import 'package:pettix/features/notification/presentation/view/widgets/notification_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pettix/core/enums/app_enums.dart';
@@ -18,7 +19,7 @@ class AdoptionNotifications extends StatelessWidget {
             .toList();
 
         if (state.status == NotificationStatus.loading) {
-          return const Center(child: CircularProgressIndicator());
+          return const NotificationShimmer();
         }
         if (state.status == NotificationStatus.error) {
           return Center(child: Text(state.errorMessage));

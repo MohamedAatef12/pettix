@@ -27,7 +27,7 @@ class OnboardingStepper extends StatelessWidget {
           decoration: BoxDecoration(
             color: isActive
                 ? AppColors.current.primary
-                : AppColors.current.lightText.withOpacity(0.4),
+                : AppColors.current.lightText.withValues(alpha: 0.4),
             borderRadius: BorderRadius.circular(8),
           ),
         );

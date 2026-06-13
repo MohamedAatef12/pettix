@@ -1,0 +1,271 @@
+import 'dart:convert';
+
+import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:injectable/injectable.dart';
+import 'package:pettix/core/constants/app_texts.dart';
+import 'package:pettix/core/enums/app_enums.dart';
+import 'package:pettix/data/caching/i_cache_manager.dart';
+import 'package:pettix/features/auth/data/models/user_model.dart';
+import 'package:pettix/features/profile/domain/entities/update_profile_entity.dart';
+import 'package:pettix/features/profile/domain/usecases/get_profile_usecase.dart';
+import 'package:pettix/features/profile/domain/usecases/update_profile_usecase.dart';
+import 'package:pettix/features/profile/domain/usecases/delete_account_usecase.dart';
+
+import 'profile_event.dart';
+import 'profile_state.dart';
+
+@injectable
+class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
+  final GetProfileUseCase _getProfileUseCase;
+  final UpdateProfileUseCase _updateProfileUseCase;
+  final DeleteAccountUseCase _deleteAccountUseCase;
+  final ICacheManager _cacheManager;
+  final ImagePicker _imagePicker = ImagePicker();
+
+  // Form controllers — populated by InitEditFormEvent
+  final nameEnController = TextEditingController();
+  final nameArController = TextEditingController();
+  final ageController = TextEditingController();
+  final addressController = TextEditingController();
+  final phoneController = TextEditingController();
+
+  ProfileBloc(
+    this._getProfileUseCase,
+    this._updateProfileUseCase,
+    this._deleteAccountUseCase,
+    this._cacheManager,
+  ) : super(const ProfileState()) {
+    on<FetchProfileEvent>(_onFetchProfile);
+    on<InitEditFormEvent>(_onInitEditForm);
+    on<UpdateProfileEvent>(_onUpdateProfile);
+    on<PickAvatarEvent>(_onPickAvatar);
+    on<UpdateGenderEvent>(
+      (event, emit) => emit(state.copyWith(selectedGenderId: event.genderId)),
+    );
+    on<DeleteAccountEvent>(_onDeleteAccount);
+    on<LoadNotificationSettingsEvent>(_onLoadNotificationSettings);
+    on<ToggleNotificationsEvent>(_onToggleNotifications);
+    on<MuteNotificationsEvent>(_onMuteNotifications);
+  }
+
+  Future<void> _onFetchProfile(
+    FetchProfileEvent event,
+    Emitter<ProfileState> emit,
+  ) async {
+    final userId = event.userId ?? _cacheManager.getUserData()?.id;
+    if (userId == null) {
+      emit(
+        state.copyWith(
+          status: ProfileStatus.error,
+          errorMessage: AppText.userNotFound,
+        ),
+      );
+      return;
+    }
+    emit(state.copyWith(status: ProfileStatus.loading));
+    final result = await _getProfileUseCase(userId);
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          status: ProfileStatus.error,
+          errorMessage: failure.message,
+        ),
+      ),
+      (profile) =>
+          emit(state.copyWith(status: ProfileStatus.loaded, profile: profile)),
+    );
+  }
+
+  void _onInitEditForm(InitEditFormEvent event, Emitter<ProfileState> emit) {
+    final profile = state.profile;
+    if (profile == null) return;
+    nameEnController.text = profile.nameEn ?? '';
+    nameArController.text = profile.nameAr ?? '';
+    ageController.text = profile.age?.toString() ?? '';
+    addressController.text = profile.address ?? '';
+    phoneController.text = profile.phone ?? '';
+    emit(state.copyWith(selectedGenderId: profile.genderId, clearAvatar: true));
+  }
+
+  Future<void> _onUpdateProfile(
+    UpdateProfileEvent event,
+    Emitter<ProfileState> emit,
+  ) async {
+    emit(state.copyWith(status: ProfileStatus.updating));
+
+    UpdateProfileEntity request = event.request;
+
+    if (state.pickedAvatarBytes != null) {
+      final base64Str = base64Encode(state.pickedAvatarBytes!);
+      final filename = state.pickedAvatarFilename ?? 'avatar.jpg';
+      request = UpdateProfileEntity(
+        id: event.request.id,
+        nameAr: event.request.nameAr,
+        nameEn: event.request.nameEn,
+        phone: event.request.phone,
+        genderId: event.request.genderId,
+        contactTypeId: event.request.contactTypeId,
+        statusId: event.request.statusId,
+        age: event.request.age,
+        address: event.request.address,
+        avatar: AvatarEntity(
+          filename: filename,
+          base64: base64Str,
+          state:
+              (state.profile?.avatar == null)
+                  ? ImageFileState.newFile
+                  : ImageFileState.modified,
+        ),
+      );
+    }
+
+    final result = await _updateProfileUseCase(request);
+
+    if (result.isLeft()) {
+      result.fold(
+        (failure) => emit(
+          state.copyWith(
+            status: ProfileStatus.error,
+            errorMessage: failure.message,
+          ),
+        ),
+        (_) {},
+      );
+      return;
+    }
+
+    final userId = _cacheManager.getUserData()?.id ?? event.request.id;
+    final fetchResult = await _getProfileUseCase(userId);
+    fetchResult.fold(
+      (_) => emit(
+        state.copyWith(status: ProfileStatus.success, clearAvatar: true),
+      ),
+      (updated) {
+        _cacheManager.setUserData(UserModel.fromEntity(updated));
+        emit(
+          state.copyWith(
+            status: ProfileStatus.success,
+            profile: updated,
+            clearAvatar: true,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onPickAvatar(
+    PickAvatarEvent event,
+    Emitter<ProfileState> emit,
+  ) async {
+    final picked = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
+    );
+    if (picked != null) {
+      // Read bytes immediately — avoids stale temp-cache path issues on Android
+      final bytes = await picked.readAsBytes();
+      emit(
+        state.copyWith(
+          pickedAvatarBytes: bytes,
+          pickedAvatarFilename: picked.name,
+        ),
+      );
+    }
+  }
+
+  Future<void> _onDeleteAccount(
+    DeleteAccountEvent event,
+    Emitter<ProfileState> emit,
+  ) async {
+    final userId = _cacheManager.getUserData()?.id;
+    if (userId == null) {
+      emit(
+        state.copyWith(
+          status: ProfileStatus.error,
+          errorMessage: AppText.userNotFound,
+        ),
+      );
+      return;
+    }
+
+    emit(state.copyWith(status: ProfileStatus.loading));
+
+    final result = await _deleteAccountUseCase(userId);
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          status: ProfileStatus.error,
+          errorMessage: failure.message,
+        ),
+      ),
+      (_) => emit(state.copyWith(status: ProfileStatus.deleteSuccess)),
+    );
+  }
+
+  void _onLoadNotificationSettings(
+    LoadNotificationSettingsEvent event,
+    Emitter<ProfileState> emit,
+  ) {
+    final enabled = _cacheManager.isNotificationsEnabled();
+    var mutedUntil = _cacheManager.getNotificationsMutedUntil();
+    if (mutedUntil != null && DateTime.now().isAfter(mutedUntil)) {
+      mutedUntil = null;
+      _cacheManager.setNotificationsMutedUntil(null);
+    }
+    emit(state.copyWith(
+      notificationsEnabled: enabled,
+      notificationsMutedUntil: mutedUntil,
+      clearMute: mutedUntil == null,
+    ));
+  }
+
+  void _onToggleNotifications(
+    ToggleNotificationsEvent event,
+    Emitter<ProfileState> emit,
+  ) {
+    _cacheManager.setNotificationsEnabled(event.enabled);
+    if (!event.enabled) {
+      _cacheManager.setNotificationsMutedUntil(null);
+      emit(state.copyWith(
+        notificationsEnabled: false,
+        clearMute: true,
+      ));
+    } else {
+      emit(state.copyWith(
+        notificationsEnabled: true,
+      ));
+    }
+  }
+
+  void _onMuteNotifications(
+    MuteNotificationsEvent event,
+    Emitter<ProfileState> emit,
+  ) {
+    if (event.duration == null) {
+      _cacheManager.setNotificationsMutedUntil(null);
+      emit(state.copyWith(
+        clearMute: true,
+      ));
+    } else {
+      final mutedUntil = DateTime.now().add(event.duration!);
+      _cacheManager.setNotificationsMutedUntil(mutedUntil);
+      _cacheManager.setNotificationsEnabled(true);
+      emit(state.copyWith(
+        notificationsEnabled: true,
+        notificationsMutedUntil: mutedUntil,
+      ));
+    }
+  }
+
+  @override
+  Future<void> close() {
+    nameEnController.dispose();
+    nameArController.dispose();
+    ageController.dispose();
+    addressController.dispose();
+    phoneController.dispose();
+    return super.close();
+  }
+}

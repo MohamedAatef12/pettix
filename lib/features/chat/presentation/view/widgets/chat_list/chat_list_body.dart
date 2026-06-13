@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
-import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/utils/custom_text_form_field.dart';
+import 'package:pettix/core/widgets/app_search_bar.dart';
+import 'package:pettix/features/chat/presentation/bloc/chat_list_bloc.dart';
+import 'package:pettix/features/chat/presentation/bloc/chat_list_event.dart';
 import 'package:pettix/features/chat/presentation/view/widgets/chat_list/chat_list_taps.dart';
 
 class ChatListBody extends StatelessWidget {
@@ -15,18 +16,14 @@ class ChatListBody extends StatelessWidget {
       padding: PaddingConstants.horizontalMedium,
       child: Column(
         children: [
-          CustomTextFormField(
-            fillColor: true,
-            fillColorValue: AppColors.current.lightGray,
-            hintText: 'Search',
-            border: InputBorder.none, // ⬅️ مفيش border أساسي
-            enabledBorder: InputBorder.none, // ⬅️ مفيش border لما يبقى enabled
-            focusedBorder: InputBorder.none,
-            leading: SvgPicture.asset('assets/icons/search_grey.svg'),
-            suffixIcon: SvgPicture.asset('assets/icons/filter.svg'),
+          AppSearchBar(
+            hintText: AppText.searchConversations,
+            onChanged: (value) {
+              context.read<ChatListBloc>().add(SearchConversationsEvent(value));
+            },
           ),
-          SizedBox(height: 15.h,),
-          Expanded(child: ChatListTaps())
+          const SizedBox(height: 24),
+          const Expanded(child: ChatListTaps()),
         ],
       ),
     );

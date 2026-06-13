@@ -3,20 +3,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:pettix/config/router/app_router.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
-import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_event.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_state.dart';
 import 'package:pinput/pinput.dart';
 
 class OTPForgotPasswordBody extends StatelessWidget {
-   OTPForgotPasswordBody({super.key});
+   const OTPForgotPasswordBody({super.key});
 
 
   @override
@@ -26,19 +24,18 @@ class OTPForgotPasswordBody extends StatelessWidget {
       child: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is RegisterOtpSuccess) {
-             AuthToast.showSuccess(
+             PetToast.showSuccess(
               context,
               'Verification Successful!',
               onDone: () => context.go('/verified'),
             );
           } else if (state is RegisterFailure) {
-            AuthToast.showError(context, state.message);
+            PetToast.showError(context, state.message);
           } else if (state is OtpSent) {
-             AuthToast.showSuccess(context, 'OTP resent successfully!');
+             PetToast.showSuccess(context, 'OTP resent successfully!');
           }
         },
         builder: (context, state) {
-          final isLoading = state is ForgotPasswordLoading;
           return Column(
             children: [
               SvgPicture.asset(

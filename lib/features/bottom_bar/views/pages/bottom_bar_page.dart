@@ -1,103 +1,183 @@
-import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:pettix/core/themes/app_colors.dart';
+import 'package:go_router/go_router.dart';
+import 'package:pettix/config/di/di_wrapper.dart';
+import 'package:pettix/config/router/routes.dart';
+import 'package:pettix/core/bloc/theme/theme_cubit.dart';
+import 'package:pettix/core/bloc/theme/theme_option.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/features/adoption/presentation/view/adoption_screen.dart';
-import '../../../home/presentation/pages/home_page.dart';
+import 'package:pettix/features/home/presentation/pages/home_page.dart';
+import 'package:pettix/features/notification/presentation/bloc/notification_bloc.dart';
+import 'package:pettix/features/notification/presentation/bloc/notification_event.dart';
+import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
+import 'package:pettix/features/home/presentation/blocs/home_event.dart';
+import 'package:pettix/features/home/presentation/blocs/home_state.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
+import 'package:pettix/features/side_menu/presentation/view/widgets/custom_drawer.dart';
 import '../bloc/bottom_bar_bloc.dart';
 import '../bloc/bottom_bar_events.dart';
 import '../bloc/bottom_bar_states.dart';
+import '../widgets/android_nav_bar.dart';
+import '../widgets/ios_nav_bar.dart';
 
-class BottomNavigationScreen extends StatelessWidget {
-  const BottomNavigationScreen({super.key});
+/// Root scaffold that hosts the bottom navigation and switches pages.
+///
+/// Renders [IosNavBar] on iOS and [AndroidNavBar] on all other platforms
+/// based on [defaultTargetPlatform]. Uses [IndexedStack] to preserve each
+/// page's state across tab switches.
+class BottomNavigationScreen extends StatefulWidget {
+  final int initialTab;
+
+  const BottomNavigationScreen({super.key, this.initialTab = 0});
+
+  @override
+  State<BottomNavigationScreen> createState() => _BottomNavigationScreenState();
+}
+
+class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
+  static const _pages = <Widget>[
+    HomePage(),
+    AdoptionScreen(),
+    // AdoptionScreen(), // Placeholder for Store
+    // ProfileScreen(), // Placeholder for Clinics (showing profile for now)
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    DI.find<NotificationBloc>().add(const FetchAllUnreadCounts());
+  }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => BottomNavigationBloc(),
-      child: BlocBuilder<BottomNavigationBloc, BottomNavigationState>(
-        builder: (context, state) {
-          Widget page;
-          if (state is HomePageState) {
-            page = const HomePage();}
-          else if (state is AdoptionState) {
-            page = const AdoptionScreen();
-          }
-          else if (state is AdoptionState) {
-            page = const AdoptionScreen();
-          }
-          else if (state is StoreState) {
-            page = const AdoptionScreen();
-          }
-          else if (state is ClinicsState) {
-            page = const AdoptionScreen();
-          }
-            else {
-            page = const HomePage();
-          }
-
-          return Scaffold(
-            body: page,
-            bottomNavigationBar: Theme(
-              data: Theme.of(context).copyWith(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-              ),
-              child: BottomNavigationBar(
-                type: BottomNavigationBarType.fixed,
-                backgroundColor: AppColors.current.primary,
-                selectedItemColor: AppColors.current.white,
-                unselectedItemColor: AppColors.current.white,
-                showUnselectedLabels: false,
-                selectedFontSize: 12.sp,
-                currentIndex: state.index,
-                onTap: (index) {
-                  final bloc = context.read<BottomNavigationBloc>();
-                  bloc.add(NavigateToPage(index));
-                },
-                items: [
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      'assets/icons/home.svg',
-                      height: 30.r,
-                      color: state.index == 0 ? AppColors.current.white : AppColors.current.lightGray,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) {
+            final bloc = BottomNavigationBloc();
+            if (widget.initialTab != 0) {
+              bloc.add(NavigateToPage(widget.initialTab));
+            }
+            return bloc;
+          },
+        ),
+        BlocProvider(create: (_) => HomeBloc.fromDI()..add(FetchPostsEvent())),
+        BlocProvider.value(value: DI.find<NotificationBloc>()),
+      ],
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<HomeBloc, HomeState>(
+            listenWhen:
+                (prev, curr) =>
+                    curr.isPostUploadSuccess || curr.isPostUploadError,
+            listener: (context, state) {
+              if (state.isPostUploadSuccess) {
+                PetToast.showSuccess(
+                  context,
+                  AppText.postUploadedSuccessfully,
+                );
+              } else if (state.isPostUploadError) {
+                PetToast.showError(context, AppText.failedToUploadPost);
+              }
+            },
+          ),
+        ],
+        child: BlocBuilder<BottomNavigationBloc, BottomNavigationState>(
+          builder: (context, state) {
+            return BlocBuilder<ThemeCubit, AppThemeOption>(
+              builder: (context, themeOption) {
+                final isIos = defaultTargetPlatform == TargetPlatform.iOS;
+                return Scaffold(
+                  extendBody: !isIos,
+                  drawer: const CustomDrawer(),
+                  body: IndexedStack(
+                    index: state.index,
+                    children: List.generate(
+                      _pages.length,
+                      (i) => _LazyLoadWrapper(
+                        key: ValueKey('tab_${i}_${themeOption.name}'),
+                        isSelected: state.index == i,
+                        child: _pages[i],
+                      ),
                     ),
-                    label: 'Home'.tr(),
-
                   ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      'assets/icons/adoption.svg',
-                      height: 30.r,
-                      color: state.index == 1 ? AppColors.current.white : AppColors.current.lightGray,
-                    ),
-                    label: 'Adoption'.tr(),
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      'assets/icons/store.svg',
-                      height: 30.r,
-                      color: state.index == 2 ? AppColors.current.white : AppColors.current.lightGray,
-                    ),
-                    label: 'Store'.tr(),
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      'assets/icons/clinics.svg',
-                      height: 30.r,
-                      color: state.index == 3 ? AppColors.current.white : AppColors.current.lightGray,
-                    ),
-                    label: 'Clinics'.tr(),
-                  ),
-                ],
-              )
-
-            ),
-          );
-        },
+                  bottomNavigationBar:
+                      isIos
+                          ? IosNavBar(
+                            currentIndex: state.index,
+                            onTabChanged:
+                                (i) => context.read<BottomNavigationBloc>().add(
+                                  NavigateToPage(i),
+                                ),
+                            onAddPost:
+                                () => context.push(
+                                  AppRoutes.addPost,
+                                  extra: context.read<HomeBloc>(),
+                                ),
+                            onChatList: () => context.push(AppRoutes.chatList),
+                          )
+                          : AndroidNavBar(
+                            currentIndex: state.index,
+                            onTabChanged:
+                                (i) => context.read<BottomNavigationBloc>().add(
+                                  NavigateToPage(i),
+                                ),
+                            onAddPost:
+                                () => context.push(
+                                  AppRoutes.addPost,
+                                  extra: context.read<HomeBloc>(),
+                                ),
+                            onChatList: () => context.push(AppRoutes.chatList),
+                          ),
+                );
+              },
+            );
+          },
+        ),
       ),
     );
+  }
+}
+
+/// A wrapper that defers building its child until it is first selected.
+/// This prevents Bloc initialization and API calls in [IndexedStack]
+/// for tabs that haven't been visited yet.
+class _LazyLoadWrapper extends StatefulWidget {
+  final Widget child;
+  final bool isSelected;
+
+  const _LazyLoadWrapper({
+    super.key,
+    required this.child,
+    required this.isSelected,
+  });
+
+  @override
+  State<_LazyLoadWrapper> createState() => _LazyLoadWrapperState();
+}
+
+class _LazyLoadWrapperState extends State<_LazyLoadWrapper> {
+  bool _initialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isSelected) _initialized = true;
+  }
+
+  @override
+  void didUpdateWidget(_LazyLoadWrapper oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isSelected && !_initialized) {
+      setState(() => _initialized = true);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_initialized) return const SizedBox.shrink();
+    return widget.child;
   }
 }

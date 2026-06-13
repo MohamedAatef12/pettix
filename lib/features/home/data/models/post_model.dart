@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'dart:io';
 import 'package:path/path.dart' as p;
+import 'package:pettix/core/enums/app_enums.dart';
+import 'package:pettix/data/network/constants.dart';
 import '../../domain/entities/post_entity.dart';
 import 'author_model.dart';
 import 'comments_model.dart';
@@ -18,47 +21,107 @@ class PostModel extends PostEntity {
     super.modifyDate,
     required super.images,
     required super.statusId,
-    required super.isSaved
+    required super.isSaved,
+    required super.isLiked,
+    required super.totalComments,
+    required super.totalLikes,
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) {
     return PostModel(
-      id: (json['id'] ?? 0) is int ? json['id'] ?? 0 : int.tryParse(json['id'].toString()) ?? 0,
-      author: json['author'] != null
-          ? AuthorModel.fromJson(json['author'] as Map<String, dynamic>)
-          : const AuthorModel(
-        id: 0,
-        nameAr: '',
-        nameEn: '',
-        avatar: '',
-        email: null,
-        phone: null,
-        genderId: null,
-        genderName: null,
-        contactTypeId: 4,
-        statusId: 3,
-        age: null,
-      ),
+      id:
+          (json['id'] ?? 0) is int
+              ? json['id'] ?? 0
+              : int.tryParse(json['id'].toString()) ?? 0,
+      author:
+          json['author'] != null
+              ? AuthorModel.fromJson(json['author'] as Map<String, dynamic>)
+              : const AuthorModel(
+                id: 0,
+                nameAr: '',
+                nameEn: '',
+                avatar: '',
+                email: null,
+                phone: null,
+                genderId: null,
+                genderName: null,
+                contactTypeId: 4,
+                statusId: 3,
+                age: null,
+              ),
       content: json['content']?.toString() ?? '',
       creationDate: json['creationDate']?.toString() ?? '',
       modifyDate: json['modifyDate']?.toString(),
-      comments: (json['comments'] as List<dynamic>?)
-          ?.map((e) => CommentModel.fromJson(e as Map<String, dynamic>))
-          .toList() ??
+      comments:
+          (json['comments'] as List<dynamic>?)
+              ?.map((e) => CommentModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
           [],
-      likes: (json['likes'] as List<dynamic>?)
-          ?.map((e) => LikesModel.fromJson(e as Map<String, dynamic>))
-          .toList() ??
+      likes:
+          (json['likes'] as List<dynamic>?)
+              ?.map((e) => LikesModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
           [],
-      images: (json['images'] as List<dynamic>?)
-          ?.map((e) => e.toString())
-          .toList() ??
-          [],
+      images: _parseImages(json['images'] as List<dynamic>?),
       statusId: json['statusId'],
-      isSaved: json['isSaved'] ,
+      isSaved: json['isSaved'],
+      isLiked: json['isLiked'] ?? false,
+      totalComments:
+          json['totalComments'] is int
+              ? json['totalComments']
+              : int.tryParse(json['totalComments']?.toString() ?? '0') ?? 0,
+      totalLikes:
+          json['totalLikes'] is int
+              ? json['totalLikes']
+              : int.tryParse(json['totalLikes']?.toString() ?? '0') ?? 0,
     );
   }
 
+  /// Normalizes the raw image list from the API into usable URLs.
+  ///
+  /// The backend can return three different formats:
+  ///  1. A proper `https://` URL  → kept as-is.
+  ///  2. A malformed data-URL like `data:image/png;base64,Resources/PostsUploads/file.jpg`
+  ///     → extracted path is appended to [Constants.baseUrl].
+  ///  3. A real base64 data-URL  → kept as-is.
+  static List<String> _parseImages(List<dynamic>? rawList) {
+    if (rawList == null) return [];
+
+    final result = <String>[];
+    for (final item in rawList) {
+      final raw = item.toString().trim();
+      if (raw.isEmpty) continue;
+
+      if (raw.startsWith('http')) {
+        // ✅ Already a proper URL
+        // Workaround: Backend sometimes returns ContactsUploads instead of PostsUploads for post images.
+        final correctedUrl = raw.replaceAll('ContactsUploads', 'PostsUploads');
+        result.add(correctedUrl);
+      } else if (raw.startsWith('data:image') && raw.contains('Resources/')) {
+        // ⚠️ Malformed: "data:image/png;base64,Resources/PostsUploads/xyz.jpg"
+        // Extract the relative path and build a real URL.
+        final pathPart = raw.split(',').last.trim();
+        final cleanPath =
+            pathPart.startsWith('/') ? pathPart.substring(1) : pathPart;
+        final properUrl = '${Constants.baseUrl}/$cleanPath';
+        final correctedUrl = properUrl.replaceAll(
+          'ContactsUploads',
+          'PostsUploads',
+        );
+        debugPrint('🔧 [PostModel] Fixed malformed image URL → $correctedUrl');
+        result.add(correctedUrl);
+      } else if (raw.startsWith('data:image')) {
+        // ✅ Real base64 image data
+        result.add(raw);
+      } else {
+        // Unknown format – log and skip
+        debugPrint(
+          '⚠️ [PostModel] Unknown image format, skipping: ${raw.length > 80 ? raw.substring(0, 80) : raw}',
+        );
+      }
+    }
+    return result;
+  }
 
   Future<Map<String, dynamic>> toJson() async {
     List<Map<String, dynamic>> encodedImages = [];
@@ -92,7 +155,7 @@ class PostModel extends PostEntity {
         }
       }
 
-      final String extension = p.extension(image).replaceFirst('.', '') ?? 'jpg';
+      final String extension = p.extension(image).replaceFirst('.', '');
 
       encodedImages.add({
         "filename": "image_${DateTime.now().millisecondsSinceEpoch}.$extension",
@@ -104,23 +167,126 @@ class PostModel extends PostEntity {
     return {
       "content": content,
       "images": encodedImages,
-      "statusId":statusId,
-    "isSaved": isSaved
+      "statusId": statusId,
+      "isSaved": isSaved,
+      "isLiked": isLiked,
+      "totalComments": totalComments,
+      "totalLikes": totalLikes,
     };
   }
+
+  Future<Map<String, dynamic>> toEditJson({
+    List<String> deletedImages = const [],
+  }) async {
+    final encodedImages = <Map<String, dynamic>>[];
+
+    for (final image in images) {
+      if (_isRemoteImage(image)) {
+        encodedImages.add(_imageReferenceJson(image, ImageFileState.none));
+      } else {
+        encodedImages.add(await _newImageJson(image));
+      }
+    }
+
+    for (final image in deletedImages) {
+      encodedImages.add(_imageReferenceJson(image, ImageFileState.deleted));
+    }
+
+    return {
+      "content": content,
+      "images": encodedImages,
+      "statusId": statusId,
+      "isSaved": isSaved,
+      "isLiked": isLiked,
+      "totalComments": totalComments,
+      "totalLikes": totalLikes,
+    };
+  }
+
+  bool _isRemoteImage(String image) {
+    return image.startsWith('http') ||
+        image.startsWith('Resources/') ||
+        image.contains('/Resources/');
+  }
+
+  Map<String, dynamic> _imageReferenceJson(String image, ImageFileState state) {
+    return {
+      "filename": _filenameFromImage(image),
+      "base64": "",
+      "state": state.value,
+    };
+  }
+
+  Future<Map<String, dynamic>> _newImageJson(String image) async {
+    var base64Image = '';
+
+    if (image.startsWith('data:image')) {
+      base64Image = image;
+    } else {
+      final file = File(image);
+      if (await file.exists()) {
+        try {
+          final result = await FlutterImageCompress.compressWithFile(
+            file.absolute.path,
+            minWidth: 1024,
+            minHeight: 1024,
+            quality: 70,
+          );
+          base64Image =
+              result != null
+                  ? base64Encode(result)
+                  : base64Encode(await file.readAsBytes());
+        } catch (_) {
+          base64Image = base64Encode(await file.readAsBytes());
+        }
+      }
+    }
+
+    return {
+      "filename":
+          "image_${DateTime.now().millisecondsSinceEpoch}.${_extensionFromImage(image)}",
+      "base64": base64Image,
+      "state": ImageFileState.newFile.value,
+    };
+  }
+
+  String _filenameFromImage(String image) {
+    final uri = Uri.tryParse(image);
+    final segment =
+        uri != null && uri.pathSegments.isNotEmpty
+            ? uri.pathSegments.last
+            : p.basename(image);
+    return segment.isEmpty
+        ? 'image_${DateTime.now().millisecondsSinceEpoch}.jpg'
+        : segment;
+  }
+
+  String _extensionFromImage(String image) {
+    if (image.startsWith('data:image/')) {
+      final mime = image.split(';').first;
+      return mime.replaceFirst('data:image/', '').replaceAll('jpeg', 'jpg');
+    }
+
+    final extension = p.extension(image).replaceFirst('.', '');
+    return extension.isEmpty ? 'jpg' : extension;
+  }
+
   PostModel.fromEntity(PostEntity postEntity)
-      : super(
-    id: postEntity.id,
-    author: postEntity.author,
-    comments: postEntity.comments,
-    likes: postEntity.likes,
-    content: postEntity.content,
-    creationDate: postEntity.creationDate,
-    modifyDate: postEntity.modifyDate,
-    images: postEntity.images,
-    statusId: postEntity.statusId,
-    isSaved:  postEntity.isSaved
-  );
+    : super(
+        id: postEntity.id,
+        author: postEntity.author,
+        comments: postEntity.comments,
+        likes: postEntity.likes,
+        content: postEntity.content,
+        creationDate: postEntity.creationDate,
+        modifyDate: postEntity.modifyDate,
+        images: postEntity.images,
+        statusId: postEntity.statusId,
+        isSaved: postEntity.isSaved,
+        isLiked: postEntity.isLiked,
+        totalComments: postEntity.totalComments,
+        totalLikes: postEntity.totalLikes,
+      );
 
   PostEntity toEntity() => PostEntity(
     id: id,
@@ -132,6 +298,9 @@ class PostModel extends PostEntity {
     modifyDate: modifyDate,
     images: images,
     statusId: statusId,
-    isSaved: isSaved
+    isSaved: isSaved,
+    isLiked: isLiked,
+    totalComments: totalComments,
+    totalLikes: totalLikes,
   );
 }

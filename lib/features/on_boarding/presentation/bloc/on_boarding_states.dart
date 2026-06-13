@@ -8,6 +8,5 @@ class OnBoardingInitial extends OnBoardingState {
 }
 
 class OnBoardingPageChanged extends OnBoardingState {
-  const OnBoardingPageChanged({required int currentPage})
-      : super(currentPage: currentPage);
+  const OnBoardingPageChanged({required super.currentPage});
 }

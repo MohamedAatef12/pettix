@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:pettix/features/auth/data/models/register/register_model.dart';
 import 'package:pettix/features/auth/data/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'i_cache_manager.dart';
@@ -87,7 +86,7 @@ class CacheManager implements ICacheManager {
 
   @override
   getSavedLogin() async {
-    final rememberMe = await _prefs?.getBool('remember_me');
+    final rememberMe =  _prefs?.getBool('remember_me');
     if (rememberMe != null) {
       return {'remember_me': rememberMe};
     }
@@ -139,5 +138,33 @@ class CacheManager implements ICacheManager {
   @override
   Future<String?> getFcmToken() async {
     return _prefs?.getString('fcm_token');
+  }
+
+  @override
+  Future<void> setNotificationsEnabled(bool enabled) async {
+    await _prefs?.setBool('notifications_enabled', enabled);
+  }
+
+  @override
+  bool isNotificationsEnabled() {
+    return _prefs?.getBool('notifications_enabled') ?? true;
+  }
+
+  @override
+  Future<void> setNotificationsMutedUntil(DateTime? dateTime) async {
+    if (dateTime == null) {
+      await _prefs?.remove('notifications_muted_until');
+    } else {
+      await _prefs?.setString('notifications_muted_until', dateTime.toIso8601String());
+    }
+  }
+
+  @override
+  DateTime? getNotificationsMutedUntil() {
+    final str = _prefs?.getString('notifications_muted_until');
+    if (str != null) {
+      return DateTime.tryParse(str);
+    }
+    return null;
   }
 }

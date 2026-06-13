@@ -16,4 +16,5 @@ abstract class NotificationRepo {
   Future<Either<Failure, void>> markAsRead({
     required int id,
   });
+
 }

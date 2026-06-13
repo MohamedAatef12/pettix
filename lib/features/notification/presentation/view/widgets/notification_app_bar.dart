@@ -1,36 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:pettix/core/constants/text_styles.dart';
-import 'package:pettix/core/widgets/rtl_aware_icon.dart';
+import 'package:pettix/core/constants/app_texts.dart';
+import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
 
-class NotificationAppBar extends StatelessWidget {
+class NotificationAppBar extends StatelessWidget
+    implements PreferredSizeWidget {
   const NotificationAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        GestureDetector(
-          onTap: (){
-            Navigator.pop(context);
-          },
-          child: RtlAwareIcon(
-            child: SvgPicture.asset('assets/icons/backButton.svg'),
-          ),
-        ),
-       Spacer(),
-         Text(
-          'Notifications',
-          style: AppTextStyles.appbar
-        ),
-        Spacer(),
-        GestureDetector(
-          onTap: (){},
-          child: Image.asset('assets/icons/settings.png'),
-        ),
-        SizedBox(width: 15.w,),
-      ],
+    return AppTopBar.back(
+      title: AppText.notificationsText,
+      backgroundColor: AppColors.current.white,
+      onBack: () => Navigator.pop(context),
     );
   }
+
+  @override
+  Size get preferredSize => Size.fromHeight(kToolbarHeight + 4.h);
 }

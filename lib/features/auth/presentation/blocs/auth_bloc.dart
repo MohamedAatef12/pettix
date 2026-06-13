@@ -1,17 +1,16 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/data/network/email_auth_service.dart';
-import 'package:pettix/data/network/twilio_service.dart';
-import 'package:pettix/features/auth/data/models/login/google_login_model.dart';
 import 'package:pettix/features/auth/data/models/user_model.dart';
+import 'package:pettix/features/auth/domain/entities/apple_login_entity.dart';
 import 'package:pettix/features/auth/domain/entities/google_login_entity.dart';
 import 'package:pettix/features/auth/domain/entities/register_domain_entity.dart';
 import 'package:pettix/features/auth/domain/entities/user_entity.dart';
+import 'package:pettix/features/auth/domain/usecases/apple_login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/forgot_password.dart';
 import 'package:pettix/features/auth/domain/usecases/google_login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/login_use_case.dart';
@@ -21,11 +20,13 @@ import 'package:pettix/features/auth/domain/usecases/reset_password.dart';
 import 'package:pettix/features/auth/domain/usecases/verify_otp.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_event.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_state.dart';
+import 'package:pettix/core/services/signalr_service.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final RegisterUseCase registerUseCase;
   final LoginUseCase loginUseCase;
   final GoogleLoginUseCase googleLoginUseCase;
+  final AppleLoginUseCase appleLoginUseCase;
   final EmailAuthService emailAuthService;
   final VerifyOtp verifyOtp;
   final ResendOtpUseCase resendOtpUseCase;
@@ -57,15 +58,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final newPasswordForgotController = TextEditingController();
   final confirmNewPasswordForgotController = TextEditingController();
   final forgotFormKey = GlobalKey<FormState>();
-  AuthBloc( {
+  final SignalRService signalRService;
+
+  AuthBloc({
     required this.registerUseCase,
     required this.loginUseCase,
     required this.googleLoginUseCase,
+    required this.appleLoginUseCase,
     required this.emailAuthService,
     required this.verifyOtp,
     required this.resendOtpUseCase,
     required this.forgotPasswordUseCase,
     required this.resetPasswordUseCase,
+    required this.signalRService,
   }) : super(AuthInitial()) {
     // Register events
     on<RegisterStepOneSubmitted>(_registerStepOne);
@@ -100,13 +105,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(LoginRememberMeChanged(rememberMe));
     });
     on<GoogleLoginSubmitted>(_googleLoginSubmitted);
+    on<AppleLoginSubmitted>(_appleLoginSubmitted);
     on<ForgotPasswordEvent>(_forgotPassword);
     on<ResetPasswordEvent>(_resetPassword);
   }
 
   /// Handle Register
   Future<void> _registerStepOne(
-      RegisterStepOneSubmitted event, Emitter<AuthState> emit) async {
+    RegisterStepOneSubmitted event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(RegisterLoading());
 
     _tempRegisterData = RegisterEntity(
@@ -128,10 +136,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(RegisterStepOneSuccess());
   }
 
-
-// Step 2: Confirm Password
+  // Step 2: Confirm Password
   Future<void> _registerStepTwo(
-      RegisterStepTwoSubmitted event, Emitter<AuthState> emit) async {
+    RegisterStepTwoSubmitted event,
+    Emitter<AuthState> emit,
+  ) async {
     if (_tempRegisterData == null) {
       emit(RegisterFailure("Step one not completed"));
       return;
@@ -142,24 +151,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       return;
     }
 
-    _tempRegisterData = _tempRegisterData!.copyWith(
-      password: event.password,
-    );
-    
+    _tempRegisterData = _tempRegisterData!.copyWith(password: event.password);
+
     emit(RegisterLoading());
-    
+
     // Call the register endpoint to send the OTP to the user's email
     final result = await registerUseCase(_tempRegisterData!);
 
     result.fold(
-          (failure) => emit(RegisterFailure(failure.message)),
-          (_) => emit(RegisterStepTwoSuccess()),
+      (failure) => emit(RegisterFailure(failure.message)),
+      (_) => emit(RegisterStepTwoSuccess()),
     );
   }
 
-// Step 3: OTP
+  // Step 3: OTP
   Future<void> _registerOtp(
-      RegisterOtpSubmitted event, Emitter<AuthState> emit) async {
+    RegisterOtpSubmitted event,
+    Emitter<AuthState> emit,
+  ) async {
     // Support both the registration flow (_tempRegisterData) and the
     // login "activate email" flow (_pendingEmail set by ResendOtpEvent).
     final email = _tempRegisterData?.email ?? _pendingEmail;
@@ -172,48 +181,57 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     final verified = await verifyOtp(email, event.otp);
 
-    verified.fold(
-          (failure) => emit(RegisterFailure(failure.message)),
-          (_) {
-            if (_tempRegisterData != null) {
-              _tempRegisterData = _tempRegisterData!.copyWith(otp: event.otp);
-            }
-            _pendingEmail = null; // clear after successful verification
-            emit(RegisterOtpSuccess());
-          },
-    );
+    verified.fold((failure) => emit(RegisterFailure(failure.message)), (_) {
+      if (_tempRegisterData != null) {
+        _tempRegisterData = _tempRegisterData!.copyWith(otp: event.otp);
+      }
+      _pendingEmail = null; // clear after successful verification
+      emit(RegisterOtpSuccess());
+    });
   }
 
-Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) async {
+  Future<void> _loginSubmitted(
+    LoginSubmitted event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(LoginLoading());
 
-    final result = await loginUseCase(event.model);
+    final fcmToken = await DI.find<ICacheManager>().getFcmToken();
+    debugPrint('🚀 FCM TOKEN FOR LOGIN: $fcmToken');
+    final result = await loginUseCase(event.model.copyWith(fcmToken: fcmToken));
     await result.fold(
           (failure) async {
-            print('failure message: ${failure.message}');
+            debugPrint('failure message: ${failure.message}');
             emit(LoginFailure(failure.message));} ,
           (loginResponse) async {
         await DI.find<ICacheManager>()
             .setUserData(UserModel.fromEntity(loginResponse.contact));
         await DI.find<ICacheManager>().setToken(loginResponse.token);
-        await DI.find<ICacheManager>().setRefreshToken(loginResponse.refreshToken.toString());
+        await DI.find<ICacheManager>().setRefreshToken(
+          loginResponse.refreshToken.toString(),
+        );
         await DI.find<ICacheManager>().setSavedCredentials(
           event.model.email,
           event.model.password,
         );
-        
+
         if (event.rememberMe) {
           await DI.find<ICacheManager>().saveLogin(true);
         } else {
           await DI.find<ICacheManager>().clearLogin();
         }
 
+        signalRService.start();
+
         emit(LoginSuccess(loginResponse.contact));
       },
     );
   }
+
   Future<void> _googleLoginSubmitted(
-      GoogleLoginSubmitted event, Emitter<AuthState> emit) async {
+    GoogleLoginSubmitted event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(GoogleLoginLoading());
 
     try {
@@ -232,19 +250,25 @@ Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) asyn
         return;
       }
 
+      final fcmToken = await DI.find<ICacheManager>().getFcmToken();
+      debugPrint('🚀 FCM TOKEN FOR GOOGLE LOGIN: $fcmToken');
       final result = await googleLoginUseCase(
-        GoogleLoginEntity(idToken: googleAuth.idToken!),
+        GoogleLoginEntity(idToken: googleAuth.idToken!, fcmToken: fcmToken),
       );
 
       await result.fold(
-            (failure) {
+        (failure) {
           emit(GoogleLoginFailure(failure.message));
         },
-            (loginResponse) async {
+        (loginResponse) async {
           // هنا loginResponse.result عبارة عن String
           await DI.find<ICacheManager>().setToken(loginResponse.token);
-          await DI.find<ICacheManager>().setRefreshToken(loginResponse.refreshToken);
-          await DI.find<ICacheManager>().setUserData(UserModel.fromEntity(loginResponse.user));
+          await DI.find<ICacheManager>().setRefreshToken(
+            loginResponse.refreshToken,
+          );
+          await DI.find<ICacheManager>().setUserData(
+            UserModel.fromEntity(loginResponse.user),
+          );
 
           if (event.rememberMe) {
             await DI.find<ICacheManager>().saveLogin(true);
@@ -252,28 +276,71 @@ Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) asyn
             await DI.find<ICacheManager>().clearLogin();
           }
 
+          signalRService.start();
+
           emit(GoogleLoginSuccess(loginResponse.user)); // مفيش User entity جديد
         },
       );
-    } catch (e, st) {
+    } catch (e) {
       emit(GoogleLoginFailure(e.toString()));
     }
   }
+  Future<void> _appleLoginSubmitted(
+      AppleLoginSubmitted event, Emitter<AuthState> emit) async {
+    emit(AppleLoginLoading());
+    try {
+      // Import is: package:sign_in_with_apple/sign_in_with_apple.dart
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      final idToken = credential.identityToken;
+      if (idToken == null) {
+        emit(AppleLoginFailure('Failed to get Apple identity token'));
+        return;
+      }
+
+      final result = await appleLoginUseCase(AppleLoginEntity(idToken: idToken));
+
+      await result.fold(
+        (failure) async => emit(AppleLoginFailure(failure.message)),
+        (loginResponse) async {
+          await DI.find<ICacheManager>().setToken(loginResponse.token);
+          if (event.rememberMe) {
+            await DI.find<ICacheManager>().saveLogin(true);
+          } else {
+            await DI.find<ICacheManager>().clearLogin();
+          }
+          
+          signalRService.start();
+
+          emit(AppleLoginSuccess(loginResponse.user));
+        },
+      );
+    } catch (e) {
+      emit(AppleLoginFailure(e.toString()));
+    }
+  }
+
   Future<void> _resendOtp(ResendOtpEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     _pendingEmail = event.email; // store for OTP verification step
 
     final result = await resendOtpUseCase(event.email);
 
-    result.fold(
-          (failure) {
-            _pendingEmail = null; // clear on failure
-            emit(RegisterFailure(failure.message));
-          },
-          (_) => emit(OtpSent()),
-    );
+    result.fold((failure) {
+      _pendingEmail = null; // clear on failure
+      emit(RegisterFailure(failure.message));
+    }, (_) => emit(OtpSent()));
   }
-  Future<void> _forgotPassword(ForgotPasswordEvent event, Emitter<AuthState> emit) async {
+
+  Future<void> _forgotPassword(
+    ForgotPasswordEvent event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(ForgotPasswordLoading());
 
     _pendingEmail = event.email; // ensure OTP verification can use this email
@@ -281,11 +348,15 @@ Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) asyn
     final result = await forgotPasswordUseCase(event.email);
 
     result.fold(
-          (failure) => emit(AuthError(failure.message)),
-          (_) => emit(OtpSent()),
+      (failure) => emit(AuthError(failure.message)),
+      (_) => emit(OtpSent()),
     );
   }
-  Future<void> _resetPassword(ResetPasswordEvent event, Emitter<AuthState> emit) async {
+
+  Future<void> _resetPassword(
+    ResetPasswordEvent event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
 
     final result = await resetPasswordUseCase(
@@ -296,20 +367,24 @@ Future<void> _loginSubmitted(LoginSubmitted event, Emitter<AuthState> emit) asyn
     );
 
     result.fold(
-          (failure) => emit(AuthError(failure.message)),
-          (_) => emit(AuthSuccess(UserEntity(
-        id: 0,
-        email: event.email,
-        userName: '',
-        phone: '',
-        country: '',
-        city: '',
-        image: '',
-        gender: '',
-        age: 0,
-        address: '',
-        idImage: '',
-      ))),
+      (failure) => emit(AuthError(failure.message)),
+      (_) => emit(
+        AuthSuccess(
+          UserEntity(
+            id: 0,
+            email: event.email,
+            userName: '',
+            phone: '',
+            country: '',
+            city: '',
+            image: '',
+            gender: '',
+            age: 0,
+            address: '',
+            idImage: '',
+          ),
+        ),
+      ),
     );
-    }
+  }
 }

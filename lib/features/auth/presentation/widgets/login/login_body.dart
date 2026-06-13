@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:pettix/config/di/di_wrapper.dart';
 import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
-import 'package:pettix/data/caching/i_cache_manager.dart';
+import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
+import 'package:pettix/core/widgets/app_logo.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_state.dart';
 import 'package:pettix/features/auth/presentation/widgets/login/login_form.dart';
@@ -24,40 +24,52 @@ class LoginBody extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.asset('assets/images/horizontal_logo.png',
-              height: 25.h,width: 100.w,
-            fit: BoxFit.fill,
+            Row(
+              children: [
+                AppLogo(size: 50.w),
+                Text(
+                  'Pettix',
+                  style: TextStyle(
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.current.primary,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 20.h,),
+
             SizedBox(
               width: 250.w,
-              child: Text(AppText.loginTitle,
-              style: AppTextStyles.title,),
+              child: Text(AppText.loginTitle, style: AppTextStyles.title),
             ),
-        
-            Text(AppText.loginSubtitle,style: AppTextStyles.smallDescription,),
-            SizedBox(height: 50.h,),
+
+            Text(AppText.loginSubtitle, style: AppTextStyles.smallDescription),
+            SizedBox(height: 50.h),
             BlocListener<AuthBloc, AuthState>(
-              listenWhen: (previous, current) =>
-                  current is GoogleLoginSuccess ||
-                  current is LoginSuccess ||
-                  current is LoginFailure ||
-                  current is GoogleLoginFailure,
+              listenWhen:
+                  (previous, current) =>
+                      current is GoogleLoginSuccess ||
+                      current is AppleLoginSuccess ||
+                      current is LoginSuccess ||
+                      current is LoginFailure ||
+                      current is GoogleLoginFailure ||
+                      current is AppleLoginFailure,
               listener: (context, state) {
-                if (state is GoogleLoginSuccess || state is LoginSuccess) {
-                  AuthToast.showSuccess(
-                    context,
-                    'Login Successful!',
-                    onDone: () => context.push(AppRoutes.bottomNav),
-                  );
+                if (state is GoogleLoginSuccess ||
+                    state is AppleLoginSuccess ||
+                    state is LoginSuccess) {
+                  context.go(AppRoutes.bottomNav);
+                  PetToast.showSuccess(context, 'Login Successful!');
                 } else if (state is LoginFailure) {
-                  AuthToast.showError(context, state.error);
+                  PetToast.showError(context, state.error);
                 } else if (state is GoogleLoginFailure) {
-                  AuthToast.showError(context, state.error);
+                  PetToast.showError(context, state.error);
+                } else if (state is AppleLoginFailure) {
+                  PetToast.showError(context, state.error);
                 }
               },
               child: const LoginForm(),
-            )
+            ),
           ],
         ),
       ),

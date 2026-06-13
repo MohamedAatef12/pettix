@@ -80,6 +80,7 @@ class CustomTextFormField extends StatelessWidget {
       enabled: enabled,
       decoration: InputDecoration(
         hintText: hintText,
+        hintStyle: TextStyle(color: AppColors.current.lightText),
         labelText: labelText,
         filled: fillColor,
         fillColor: fillColorValue,
@@ -93,18 +94,23 @@ class CustomTextFormField extends StatelessWidget {
         suffixIconConstraints: BoxConstraints(
           minWidth: 24.w,
           minHeight: 24.h,
-          maxWidth: 24.w,
-          maxHeight: 24.h,
         ),
-        suffixIcon: suffixIcon ,
+        suffixIcon: suffixIcon != null
+            ? Padding(
+          padding: EdgeInsetsDirectional.only(end: 12.w),
+          child: suffixIcon,
+        )
+            : null,
         contentPadding: contentPadding ??
             const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
         border: border ?? const OutlineInputBorder(),
-        focusedBorder: focusedBorder ??
+        focusedBorder:
+            focusedBorder ??
             const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.blue),
             ),
-        enabledBorder: enabledBorder ??
+        enabledBorder:
+            enabledBorder ??
             const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.grey),
             ),

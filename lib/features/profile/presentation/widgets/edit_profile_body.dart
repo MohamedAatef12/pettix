@@ -1,0 +1,371 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:pettix/core/constants/app_texts.dart';
+import 'package:pettix/core/constants/text_styles.dart';
+import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
+import 'package:pettix/features/profile/domain/entities/update_profile_entity.dart';
+import 'package:pettix/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:pettix/features/profile/presentation/bloc/profile_event.dart';
+import 'package:pettix/features/profile/presentation/bloc/profile_state.dart';
+import 'package:pettix/features/profile/presentation/widgets/address_map_picker.dart';
+import 'package:pettix/features/profile/presentation/widgets/avatar_picker.dart';
+import 'package:pettix/features/profile/presentation/widgets/edit_profile_shimmer.dart';
+import 'package:pettix/features/profile/presentation/widgets/gender_dropdown.dart';
+
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
+class EditProfileBody extends StatelessWidget {
+  const EditProfileBody({super.key});
+
+  void _submit(BuildContext context, ProfileState state) {
+    final bloc = context.read<ProfileBloc>();
+    final profile = state.profile;
+    if (profile == null) return;
+
+    final phone = bloc.phoneController.text.trim();
+    bloc.add(
+      UpdateProfileEvent(
+        UpdateProfileEntity(
+          id: profile.id,
+          nameEn: bloc.nameEnController.text.trim(),
+          nameAr: bloc.nameArController.text.trim(),
+          phone: phone.isEmpty ? null : phone,
+          age: int.tryParse(bloc.ageController.text.trim()),
+          address: bloc.addressController.text.trim(),
+          genderId: state.selectedGenderId,
+          contactTypeId: profile.contactTypeId,
+          statusId: profile.statusId,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<ProfileBloc, ProfileState>(
+      listenWhen: (prev, curr) => curr.status != prev.status,
+      listener: (context, state) {
+        if (state.status == ProfileStatus.success) {
+          PetToast.showSuccess(context, AppText.profileUpdated);
+          context.pop();
+        }
+        if (state.status == ProfileStatus.error) {
+          PetToast.showError(context, state.errorMessage ?? AppText.error);
+        }
+      },
+      builder: (context, state) {
+        final bloc = context.read<ProfileBloc>();
+        final profile = state.profile;
+        if (profile == null) {
+          return const EditProfileShimmer();
+        }
+
+        final isUpdating = state.status == ProfileStatus.updating;
+
+        return Column(
+          children: [
+            // ── Top bar ──────────────────────────────────────────────────────
+            Padding(
+              padding: EdgeInsets.fromLTRB(8.w, 8.h, 16.w, 0),
+              child: Row(
+                children: [
+                  AppTopBarBackButton(onPressed: () => context.pop()),
+                  Expanded(
+                    child: Text(
+                      AppText.editProfile,
+                      style: AppTextStyles.appbar.copyWith(
+                        color: AppColors.current.text,
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  isUpdating
+                      ? SizedBox(
+                        width: 20.w,
+                        height: 20.w,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.current.primary,
+                        ),
+                      )
+                      : TextButton(
+                        onPressed: () => _submit(context, state),
+                        child: Text(
+                          AppText.save,
+                          style: TextStyle(
+                            color: AppColors.current.primary,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                ],
+              ),
+            ),
+
+            // ── Scrollable form ───────────────────────────────────────────────
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Column(
+                  children: [
+                    SizedBox(height: 20.h),
+                    AvatarPicker(currentAvatarUrl: profile.avatar),
+                    SizedBox(height: 32.h),
+
+                    _SectionLabel(AppText.personalInfo),
+                    SizedBox(height: 10.h),
+                    _FilledField(
+                      controller: bloc.nameEnController,
+                      label: AppText.fullName,
+                      icon: Icons.person_outline_rounded,
+                      iconColor: AppColors.current.primary,
+                    ),
+
+                    SizedBox(height: 12.h),
+                    _FilledField(
+                      controller: bloc.phoneController,
+                      label: AppText.phone,
+                      icon: Icons.phone_outlined,
+                      iconColor: const Color(0xFF56C590),
+                      keyboardType: TextInputType.phone,
+                    ),
+                    SizedBox(height: 24.h),
+
+                    _SectionLabel(AppText.details),
+                    SizedBox(height: 10.h),
+                    _FilledField(
+                      controller: bloc.ageController,
+                      label: AppText.age,
+                      icon: Icons.cake_outlined,
+                      iconColor: const Color(0xFFE8A838),
+                      keyboardType: TextInputType.number,
+                    ),
+                    SizedBox(height: 12.h),
+                    const GenderDropdown(),
+                    SizedBox(height: 12.h),
+
+                    // ── Address field with map picker ─────────────────────────
+                    _AddressPickerField(
+                      controller: bloc.addressController,
+                      onTap: () async {
+                        final picked = await Navigator.of(context).push<String>(
+                          MaterialPageRoute(
+                            builder:
+                                (_) => AddressMapPickerPage(
+                                  initialAddress: bloc.addressController.text,
+                                ),
+                          ),
+                        );
+                        if (!context.mounted) return;
+                        if (picked != null && picked.isNotEmpty) {
+                          bloc.addressController.text = picked;
+                        }
+                      },
+                    ),
+                    SizedBox(height: 32.h),
+
+                    // ── Save button ────────────────────────────────────────────
+                    GestureDetector(
+                      onTap: isUpdating ? null : () => _submit(context, state),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        height: 52.h,
+                        decoration: BoxDecoration(
+                          color:
+                              isUpdating
+                                  ? AppColors.current.primary.withAlpha(140)
+                                  : AppColors.current.primary,
+                          borderRadius: BorderRadius.circular(16.r),
+                          boxShadow:
+                              isUpdating
+                                  ? []
+                                  : [
+                                    BoxShadow(
+                                      color: AppColors.current.primary
+                                          .withAlpha(80),
+                                      blurRadius: 16,
+                                      offset: const Offset(0, 6),
+                                    ),
+                                  ],
+                        ),
+                        child: Center(
+                          child:
+                              isUpdating
+                                  ? SizedBox(
+                                    width: 22.w,
+                                    height: 22.w,
+                                    child: const CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2.5,
+                                    ),
+                                  )
+                                  : Text(
+                                    AppText.saveChanges,
+                                    style: AppTextStyles.bold.copyWith(
+                                      color: Colors.white,
+                                      fontSize: 15.sp,
+                                    ),
+                                  ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 32.h),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+// ─── Address picker field ─────────────────────────────────────────────────────
+
+class _AddressPickerField extends StatelessWidget {
+  final TextEditingController controller;
+  final VoidCallback onTap;
+
+  const _AddressPickerField({required this.controller, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      readOnly: true,
+      maxLines: 2,
+      onTap: onTap,
+      style: TextStyle(
+        color: AppColors.current.text,
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+      ),
+      decoration: InputDecoration(
+        labelText: AppText.address,
+        labelStyle: TextStyle(
+          color: AppColors.current.midGray,
+          fontSize: 13.sp,
+        ),
+        prefixIcon: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 14.w),
+          child: AppIcon.raw(
+            Icons.location_on_outlined,
+            color: AppColors.current.red,
+            size: 20.w,
+          ),
+        ),
+        prefixIconConstraints: BoxConstraints(minWidth: 52.w),
+        suffixIcon: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12.w),
+          child: AppIcon.raw(
+            Icons.map_outlined,
+            color: AppColors.current.primary,
+            size: 20.w,
+          ),
+        ),
+        suffixIconConstraints: BoxConstraints(minWidth: 52.w),
+        filled: true,
+        fillColor: AppColors.current.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14.r),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14.r),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14.r),
+          borderSide: BorderSide(color: AppColors.current.primary, width: 1.5),
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      ),
+    );
+  }
+}
+
+// ─── Reusable filled text field ───────────────────────────────────────────────
+
+class _FilledField extends StatelessWidget {
+  final TextEditingController controller;
+  final String label;
+  final IconData icon;
+  final Color iconColor;
+  final TextInputType? keyboardType;
+
+  const _FilledField({
+    required this.controller,
+    required this.label,
+    required this.icon,
+    required this.iconColor,
+    this.keyboardType,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      style: TextStyle(
+        color: AppColors.current.text,
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+      ),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(
+          color: AppColors.current.midGray,
+          fontSize: 13.sp,
+        ),
+        prefixIcon: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 14.w),
+          child: AppIcon.raw(icon, color: iconColor, size: 20.w),
+        ),
+        prefixIconConstraints: BoxConstraints(minWidth: 52.w),
+        filled: true,
+        fillColor: AppColors.current.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14.r),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14.r),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14.r),
+          borderSide: BorderSide(color: AppColors.current.primary, width: 1.5),
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      ),
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  final String text;
+  const _SectionLabel(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: Text(
+        text.toUpperCase(),
+        style: AppTextStyles.smallDescription.copyWith(
+          color: AppColors.current.midGray,
+          fontSize: 10.sp,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.8,
+        ),
+      ),
+    );
+  }
+}

@@ -1,235 +1,227 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pettix/config/router/routes.dart';
-import 'package:pettix/core/constants/padding.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/features/chat/presentation/bloc/chat_list_bloc.dart';
+import 'package:pettix/features/chat/presentation/bloc/chat_list_state.dart';
+import 'package:pettix/features/chat/domain/entity/conversation_entity.dart';
+import 'package:pettix/features/chat/presentation/view/widgets/updating_banner.dart';
+import 'package:pettix/core/widgets/app_profile_image.dart';
 
-class ChatListTaps extends StatefulWidget {
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
+class ChatListTaps extends StatelessWidget {
   const ChatListTaps({super.key});
 
   @override
-  State<ChatListTaps> createState() => _ChatListTapsState();
+  Widget build(BuildContext context) {
+    return BlocBuilder<ChatListBloc, ChatListState>(
+      builder: (context, state) {
+        if (state is ChatListLoading) {
+          return const Center(child: UpdatingBanner());
+        } else if (state is ChatListError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AppIcon.raw(Icons.error_outline, size: 48.r, color: Colors.red),
+                SizedBox(height: 10.h),
+                Text(state.message, style: TextStyle(color: Colors.red)),
+              ],
+            ),
+          );
+        } else if (state is ChatListSuccess) {
+          final conversations = state.filteredConversations;
+          if (conversations.isEmpty) {
+            return Center(
+              child: Text(
+                state.searchQuery.isEmpty
+                    ? AppText.noConversationsFound
+                    : AppText.noResultsFor(state.searchQuery),
+                style: AppTextStyles.description,
+              ),
+            );
+          }
+          return Stack(
+            children: [
+              ListView.builder(
+                itemCount: conversations.length,
+                padding: EdgeInsets.symmetric(vertical: 10.h),
+                itemBuilder: (context, index) {
+                  return _ConversationCard(
+                    conversation: conversations[index],
+                    currentUserId: state.currentUserId,
+                  );
+                },
+              ),
+              // Animated "Updating…" banner — slides in from top when refreshing
+              AnimatedSlide(
+                offset:
+                    state.isRefreshing ? Offset.zero : const Offset(0, -1.5),
+                duration: const Duration(milliseconds: 350),
+                curve: Curves.easeOutCubic,
+                child: AnimatedOpacity(
+                  opacity: state.isRefreshing ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 300),
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 12.h),
+                      child: const UpdatingBanner(),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+        return const SizedBox();
+      },
+    );
+  }
 }
 
-class _ChatListTapsState extends State<ChatListTaps>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+/// Animated pill banner with pulsing dots
+// Removing private _UpdatingBanner classes as they are now public in updating_banner.dart
 
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    _tabController.addListener(() => setState(() {}));
-  }
+class _ConversationCard extends StatelessWidget {
+  final ConversationEntity conversation;
+  final int? currentUserId;
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+  const _ConversationCard({
+    required this.conversation,
+    required this.currentUserId,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final isAllChatsSelected = _tabController.index == 0;
-    final isGroupsSelected = _tabController.index == 1;
+    final otherMember =
+        conversation.members
+            .where((m) => m.user.id != currentUserId)
+            .firstOrNull ??
+        (conversation.members.isNotEmpty ? conversation.members.first : null);
+    final displayMember = otherMember?.user;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 🔹 Custom Tabs Row
-        Row(
-          children: [
-            Expanded(
-              child: GestureDetector(
-                onTap: () => _tabController.animateTo(0),
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 10.h),
-                  decoration: BoxDecoration(
-                    color: isAllChatsSelected
-                        ? AppColors.current.blueGray
-                        : AppColors.current.lightGray,
-                    borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(
-                      color: isAllChatsSelected
-                          ? AppColors.current.primary
-                          : Colors.transparent,
-
-                    )
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    'Available',
-                    style: TextStyle(
-                      color: isAllChatsSelected
-                          ? AppColors.current.primary
-                          : AppColors.current.lightText,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14.sp,
-                    ),
-                  ),
-                ),
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12.h),
+      child: GestureDetector(
+        onTap: () {
+          context.pushNamed(
+            AppRouteNames.chat,
+            pathParameters: {'index': conversation.id.toString()},
+            extra: {
+              'name': displayMember?.displayName,
+              'avatar': displayMember?.avatar,
+            },
+          );
+        },
+        child: Container(
+          padding: EdgeInsets.all(14.r),
+          decoration: BoxDecoration(
+            color: AppColors.current.white,
+            borderRadius: BorderRadius.circular(24.r),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.02),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
-            ),
-            SizedBox(width: 10.w),
-            Expanded(
-              child: GestureDetector(
-                onTap: () => _tabController.animateTo(1),
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 10.h),
-                  decoration:  BoxDecoration(
-                      color: isAllChatsSelected
-                          ? AppColors.current.lightGray
-                          : AppColors.current.blueGray,
-                      borderRadius: BorderRadius.circular(12.r),
-                      border: Border.all(
-                        color: isAllChatsSelected
-                            ? AppColors.current.transparent
-                            : AppColors.current.primary
-
-                      )
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    'Archived',
-                    style: TextStyle(
-                      color: isGroupsSelected
-                          ? AppColors.current.primary
-                          : AppColors.current.lightText,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14.sp,
-                    ),
-                  ),
-                ),
+              BoxShadow(
+                color: AppColors.current.primary.withValues(alpha: 0.03),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
               ),
-            ),
-          ],
-        ),
-
-        SizedBox(height: 12.h),
-
-        // 🔹 Tab content
-        Expanded(
-          child: TabBarView(
-            controller: _tabController,
+            ],
+          ),
+          child: Row(
             children: [
-              // 🟢 All Chats
-              ListView.builder(
-                itemCount: 8,
-                itemBuilder: (context, index) => Column(
-                  children: [
-                    GestureDetector(
-                      onTap: (){
-                        context.pushNamed(
-                          AppRouteNames.chat,
-                          pathParameters: {'index': index.toString()},
-                        ); },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 5.w),
-                      decoration: BoxDecoration(
-                        color: AppColors.current.white,
-                        borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(
-                          color: AppColors.current.blueGray,
-                        ),
-                      ),
-                      child:Padding(
-                        padding: PaddingConstants.small,
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 35.r,
-                              backgroundColor:AppColors.current.transparent,
-                              backgroundImage: const AssetImage(
-                                'assets/images/profile_photo.png',
-                              ),
-                            ),
-                            SizedBox(width: 8.w,),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('User $index',
-                                  style: AppTextStyles.appbar,
-                                  ),
-                                  SizedBox(height: 3.h,),
-                                  Row(
-                                    children: [
-                                      Text('Latest message...'),
-                                      Spacer(),
-                                      Text('2:30 PM',),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      ),
+              Hero(
+                tag: 'conversation_avatar_${conversation.id}',
+                child: Container(
+                  padding: EdgeInsets.all(2.r),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.current.primary.withValues(alpha: 0.2),
+                        AppColors.current.primary.withValues(alpha: 0.05),
+                      ],
                     ),
-                    SizedBox(height: 10.h,),
-                  ],
+                  ),
+                  child: AppProfileImage(
+                    imageUrl: displayMember?.avatar,
+                    name: displayMember?.displayName,
+                    radius: 30.r,
+                  ),
                 ),
               ),
-
-              // 🟢 Groups
-              ListView.builder(
-                itemCount: 4,
-                itemBuilder: (context, index) => Column(
+              SizedBox(width: 14.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 5.w),
-                      decoration: BoxDecoration(
-                        color: AppColors.current.white,
-                        borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(
-                          color: AppColors.current.blueGray,
-                        ),
-                      ),
-                      child:Padding(
-                        padding: PaddingConstants.small,
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 35.r,
-                              backgroundColor:AppColors.current.transparent,
-                              backgroundImage: const AssetImage(
-                                'assets/images/profile_photo.png',
-                              ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            displayMember?.displayName ??
+                                AppText.conversationFallback(conversation.id),
+                            style: AppTextStyles.bold.copyWith(
+                              color: AppColors.current.text,
+                              fontSize: 15.sp,
                             ),
-                            SizedBox(width: 8.w,),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('User $index',
-                                    style: AppTextStyles.appbar,
-                                  ),
-                                  SizedBox(height: 3.h,),
-                                  Row(
-                                    children: [
-                                      Text('Latest message...'),
-                                      Spacer(),
-                                      Text('2:30 PM',),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                      ),
+                        if (conversation.lastMessage != null)
+                          Text(
+                            _formatDate(conversation.lastMessage!.sentAt),
+                            style: TextStyle(
+                              fontSize: 10.sp,
+                              color: AppColors.current.gray,
+                            ),
+                          ),
+                      ],
                     ),
-                    SizedBox(height: 10.h,),
+                    SizedBox(height: 6.h),
+                    Text(
+                      conversation.lastMessage?.content ??
+                          AppText.noMessagesYet,
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: AppColors.current.lightText,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ],
                 ),
               ),
             ],
           ),
         ),
-      ],
+      ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inMinutes < 1) return AppText.justNow;
+    if (difference.inMinutes < 60) {
+      return AppText.minutesAgo(difference.inMinutes);
+    }
+    if (difference.inHours < 24) {
+      return '${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+    }
+    if (difference.inDays < 7) return AppText.weekdayAbbr(date.weekday);
+    return '${date.day}/${date.month}';
   }
 }

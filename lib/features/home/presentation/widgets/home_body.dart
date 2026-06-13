@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:pettix/core/widgets/pet_refresh_indicator.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:go_router/go_router.dart';
+import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
+import 'package:pettix/core/services/app_review_service.dart';
 import 'package:pettix/core/shimmers/home_shimmer.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_icon_system.dart';
 import 'package:pettix/features/home/presentation/blocs/home_bloc.dart';
 import 'package:pettix/features/home/presentation/blocs/home_state.dart';
 import 'package:pettix/features/home/presentation/widgets/post_card.dart';
 
 import '../blocs/home_event.dart';
+
 class HomeBody extends StatefulWidget {
-  const HomeBody({super.key});
+  final bool showPostOwnerActions;
+
+  const HomeBody({super.key, this.showPostOwnerActions = false});
 
   @override
   State<HomeBody> createState() => _HomeBodyState();
@@ -20,6 +25,7 @@ class HomeBody extends StatefulWidget {
 
 class _HomeBodyState extends State<HomeBody> {
   final ScrollController _scrollController = ScrollController();
+  bool _checkedTenPostsReviewPrompt = false;
 
   @override
   void initState() {
@@ -47,86 +53,124 @@ class _HomeBodyState extends State<HomeBody> {
     return Expanded(
       child: BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) {
-          Widget content;
-
-          if (state.isPostsLoading) {
-            content = const Center(child: HomeShimmer());
-          } else if (state.error != null && state.posts.isEmpty) {
-            content = Center(
-              child: CircleAvatar(
-                backgroundColor: AppColors.current.lightGray,
-                radius: 100.r,
-                child: Icon(
-                  Icons.cloud_off_outlined,
-                  color: AppColors.current.primary,
-                  size: 50.w,
-                ),
-              ),
-            );
-          } else {
-            content = RefreshIndicator(
-              onRefresh: () async {
-                context.read<HomeBloc>().add(FetchPostsEvent());
-              },
-              child: NotificationListener<ScrollNotification>(
-                onNotification: _onScrollNotification,
-                child: ListView.builder(
-                  key: const PageStorageKey('posts_list'),
-                  controller: _scrollController,
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: state.isMorePostsLoading
-                      ? state.posts.length + 1
-                      : state.posts.length,
-                  itemBuilder: (context, index) {
-                    if (index >= state.posts.length) {
-                      return HomeShimmer();
-                    }
-                    return Padding(
-                      padding: PaddingConstants.verticalSmall,
-                      child: PostCard(post: state.posts[index]),
-                    );
-                  },
-                ),
-              ),
-            );
-          }
-
-          return Stack(
+          return Column(
             children: [
-              content,
-              Positioned(
-                bottom: 10.h,
-                right: 10.w,
-                child: GestureDetector(
-                  onTap: () {
-                    context.push('/add_post');
-                  },
-                  child: Container(
-                    width: 50.w,
-                    height: 50.h,
-                    decoration: BoxDecoration(
-                      color: AppColors.current.primary,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: SvgPicture.asset(
-                        'assets/icons/add_circle.svg',
-                        width: 24.w,
-                        height: 24.h,
-                        colorFilter: ColorFilter.mode(
-                          AppColors.current.white,
-                          BlendMode.srcIn,
+              if (state.isUploadingPost)
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                  padding: EdgeInsets.symmetric(
+                    vertical: 12.h,
+                    horizontal: 16.w,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.current.white,
+                    borderRadius: BorderRadius.circular(12.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            AppText.uploadingPost,
+                            style: TextStyle(
+                              color: AppColors.current.text,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14.sp,
+                            ),
+                          ),
+                          const Spacer(),
+                        ],
+                      ),
+                      SizedBox(height: 8.h),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4.r),
+                        child: LinearProgressIndicator(
+                          minHeight: 4.h,
+                          backgroundColor: AppColors.current.lightGray,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            AppColors.current.primary,
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
-              ),
+              Expanded(child: _buildContent(state)),
             ],
           );
         },
       ),
     );
   }
-}
 
+  Widget _buildContent(HomeState state) {
+    if (state.error != null && state.posts.isEmpty) {
+      return Center(
+        child: CircleAvatar(
+          backgroundColor: AppColors.current.lightGray,
+          radius: 100.r,
+          child: AppIcon(
+            token: AppIconToken.offline,
+            color: AppColors.current.primary,
+            size: 50.w,
+          ),
+        ),
+      );
+    }
+
+    // PetRefreshIndicator stays mounted during both shimmer and list states
+    // so the spinner keeps spinning while isPostsLoading is true.
+    return PetRefreshIndicator(
+      onRefresh: () async {
+        final bloc = context.read<HomeBloc>();
+        bloc.add(FetchPostsEvent());
+        await bloc.stream.firstWhere((s) => s.isPostsLoading);
+        await bloc.stream.firstWhere((s) => !s.isPostsLoading);
+      },
+      child: state.isPostsLoading
+          ? ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: const [HomeShimmer()],
+            )
+          : NotificationListener<ScrollNotification>(
+              onNotification: _onScrollNotification,
+              child: ListView.builder(
+                key: const PageStorageKey('posts_list'),
+                controller: _scrollController,
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount:
+                    state.isMorePostsLoading
+                        ? state.posts.length + 1
+                        : state.posts.length,
+                itemBuilder: (context, index) {
+                  if (index >= state.posts.length) {
+                    return HomeShimmer();
+                  }
+                  if (index == 9 && !_checkedTenPostsReviewPrompt) {
+                    _checkedTenPostsReviewPrompt = true;
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (!mounted) return;
+                      AppReviewService.requestAfterTenPosts(context);
+                    });
+                  }
+                  return Padding(
+                    padding: PaddingConstants.verticalSmall,
+                    child: PostCard(
+                      post: state.posts[index],
+                      showOwnerActions: widget.showPostOwnerActions,
+                    ),
+                  );
+                },
+              ),
+            ),
+    );
+  }
+}

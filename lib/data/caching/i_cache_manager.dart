@@ -1,4 +1,3 @@
-import 'package:pettix/features/auth/data/models/register/register_model.dart';
 import 'package:pettix/features/auth/data/models/user_model.dart';
 
 abstract class ICacheManager {
@@ -28,4 +27,9 @@ abstract class ICacheManager {
   Future<void> setThemeDark(bool isDark);
   Future<bool> isThemeDark();
   Future<bool> isLoggedIn();
+
+  Future<void> setNotificationsEnabled(bool enabled);
+  bool isNotificationsEnabled();
+  Future<void> setNotificationsMutedUntil(DateTime? dateTime);
+  DateTime? getNotificationsMutedUntil();
 }

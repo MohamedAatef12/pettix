@@ -1,0 +1,648 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:pettix/config/router/routes.dart';
+import 'package:pettix/core/constants/app_texts.dart';
+import 'package:pettix/core/enums/app_enums.dart';
+import 'package:pettix/core/constants/text_styles.dart';
+import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
+import 'package:pettix/features/adoption_history/domain/entities/adoption_form_entity.dart';
+import 'package:pettix/features/adoption_history/presentation/bloc/adoption_history_bloc.dart';
+import 'package:pettix/features/adoption_history/presentation/bloc/adoption_history_event.dart';
+import 'package:pettix/features/adoption_history/presentation/widgets/adoption_form_card.dart';
+
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
+/// Full detail view for a single adoption form.
+/// [isOwnerView] controls whether Accept / Reject action buttons are shown.
+class AdoptionFormDetailBody extends StatelessWidget {
+  final AdoptionFormEntity form;
+  final bool isOwnerView;
+
+  const AdoptionFormDetailBody({
+    super.key,
+    required this.form,
+    required this.isOwnerView,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _DetailHeader(form: form),
+        Expanded(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _SectionTitle(AppText.applicant),
+                SizedBox(height: 10.h),
+                _InfoGroup(
+                  rows: [
+                    _InfoRow(
+                      icon: Icons.person_outline_rounded,
+                      iconColor: AppColors.current.primary,
+                      label: AppText.fullName,
+                      value: form.fullName,
+                    ),
+                    _InfoRow(
+                      icon: Icons.email_outlined,
+                      iconColor: const Color(0xFF5EA8DF),
+                      label: AppText.email,
+                      value: form.email,
+                    ),
+                    if (form.phoneNumber != null)
+                      _InfoRow(
+                        icon: Icons.phone_outlined,
+                        iconColor: const Color(0xFF56C590),
+                        label: AppText.phone,
+                        value: form.phoneNumber!,
+                      ),
+                    if (form.dateOfBirth != null)
+                      _InfoRow(
+                        icon: Icons.cake_outlined,
+                        iconColor: const Color(0xFFE8A838),
+                        label: AppText.dateOfBirth,
+                        value: _formatDate(form.dateOfBirth!),
+                      ),
+                  ],
+                ),
+                SizedBox(height: 16.h),
+                _SectionTitle(AppText.livingSituation),
+                SizedBox(height: 10.h),
+                _InfoGroup(
+                  rows: [
+                    if (form.livingSituation != null)
+                      _InfoRow(
+                        icon: Icons.home_outlined,
+                        iconColor: const Color(0xFF7A6FD8),
+                        label: AppText.housing,
+                        value: form.livingSituation!,
+                      ),
+                    if (form.typeOfResidence != null)
+                      _InfoRow(
+                        icon: Icons.vpn_key_outlined,
+                        iconColor: AppColors.current.gold,
+                        label: AppText.residence,
+                        value: form.typeOfResidence!,
+                      ),
+                    _InfoRow(
+                      icon: Icons.pets_rounded,
+                      iconColor: AppColors.current.teal,
+                      label: AppText.ownedAPetBefore,
+                      value:
+                          form.hasOwnedOrCaredForPetBefore
+                              ? AppText.yes
+                              : AppText.no,
+                    ),
+                    _InfoRow(
+                      icon: Icons.check_circle_outline_rounded,
+                      iconColor: AppColors.current.green,
+                      label: AppText.agreesToTerms,
+                      value: form.agreesToTerms ? AppText.yes : AppText.no,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 24.h),
+                _MessageButton(form: form, isOwnerView: isOwnerView),
+                if (isOwnerView) _ActionButtons(form: form),
+                SizedBox(height: 32.h),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatDate(DateTime date) =>
+      '${date.day.toString().padLeft(2, '0')}/'
+      '${date.month.toString().padLeft(2, '0')}/'
+      '${date.year}';
+}
+
+// ─── Header ───────────────────────────────────────────────────────────────────
+
+class _DetailHeader extends StatelessWidget {
+  final AdoptionFormEntity form;
+
+  const _DetailHeader({required this.form});
+
+  @override
+  Widget build(BuildContext context) {
+    final style = adoptionStatusStyle(form.status);
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppColors.current.white,
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(30.r),
+          bottomRight: Radius.circular(30.r),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(8),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(4.w, 4.h, 4.w, 15.h),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  SizedBox(width: 12.w),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: AppColors.current.lightBlue.withValues(
+                        alpha: 0.75,
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: SizedBox(
+                      width: 38.w,
+                      height: 38.w,
+                      child: AppTopBarBackButton(
+                        onPressed:
+                            () =>
+                                context.canPop()
+                                    ? context.pop()
+                                    : Navigator.of(context).maybePop(),
+                        size: 17.sp,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        form.petName ?? AppText.unknownPet,
+                        textAlign: TextAlign.start,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: AppColors.current.text,
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 10.w),
+                  Flexible(
+                    flex: 0,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10.w,
+                        vertical: 5.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: style.bg,
+                        borderRadius: BorderRadius.circular(20.r),
+                      ),
+                      child: Text(
+                        style.label,
+                        style: TextStyle(
+                          color: style.text,
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Shared section components ────────────────────────────────────────────────
+
+class _SectionTitle extends StatelessWidget {
+  final String text;
+  const _SectionTitle(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(width: 3.w, height: 16.h, color: AppColors.current.primary),
+        SizedBox(width: 8.w),
+        Text(
+          text.toUpperCase(),
+          style: AppTextStyles.smallDescription.copyWith(
+            color: AppColors.current.primary,
+            fontSize: 10.sp,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _InfoGroup extends StatelessWidget {
+  final List<Widget> rows;
+  const _InfoGroup({required this.rows});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.current.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(10),
+            blurRadius: 12,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: rows.length,
+        separatorBuilder:
+            (_, __) => Divider(
+              height: 1,
+              indent: 52.w,
+              color: AppColors.current.lightGray,
+            ),
+        itemBuilder: (_, i) => rows[i],
+      ),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  final String value;
+
+  const _InfoRow({
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      child: Row(
+        children: [
+          Container(
+            width: 32.w,
+            height: 32.w,
+            decoration: BoxDecoration(
+              color: iconColor.withAlpha(20),
+              shape: BoxShape.circle,
+            ),
+            child: AppIcon.raw(icon, color: iconColor, size: 16.w),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: AppColors.current.midGray,
+                    fontSize: 10.sp,
+                  ),
+                ),
+                Text(
+                  value,
+                  style: TextStyle(
+                    color: AppColors.current.text,
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Accept / Reject buttons (owner view, pending only) ───────────────────────
+
+class _ActionButtons extends StatelessWidget {
+  final AdoptionFormEntity form;
+
+  const _ActionButtons({required this.form});
+
+  @override
+  Widget build(BuildContext context) {
+    final status = AdoptionFormStatus.fromValue(form.status);
+    final isPending = status == AdoptionFormStatus.pending;
+
+    if (!isPending) return const SizedBox.shrink();
+
+    return Column(
+      children: [
+        _SectionTitle(AppText.reviewApplication),
+        SizedBox(height: 12.h),
+        Row(
+          children: [
+            Expanded(
+              child: _ActionButton(
+                label: AppText.accept,
+                icon: Icons.check_circle_outline_rounded,
+                color: AppColors.current.green,
+                onTap:
+                    () => _confirmAction(
+                      context,
+                      title: AppText.acceptApplication,
+                      message: AppText.acceptApplicationFor(
+                        form.petName ?? AppText.unknownPet,
+                      ),
+                      confirm: AppText.accept,
+                      isAccept: true,
+                      confirmColor: AppColors.current.green,
+                      onConfirm: () {
+                        context.read<AdoptionHistoryBloc>().add(
+                          UpdateFormStatusEvent(
+                            formId: form.id,
+                            status: AdoptionFormStatus.approved.value,
+                          ),
+                        );
+                        Navigator.of(context).pop();
+                      },
+                    ),
+              ),
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: _ActionButton(
+                label: AppText.reject,
+                icon: Icons.cancel_outlined,
+                color: AppColors.current.red,
+                outlined: true,
+                onTap:
+                    () => _confirmAction(
+                      context,
+                      title: AppText.rejectApplication,
+                      message: AppText.rejectApplicationFor(
+                        form.petName ?? AppText.unknownPet,
+                      ),
+                      confirm: AppText.reject,
+                      isAccept: false,
+                      confirmColor: AppColors.current.red,
+                      onConfirm: () {
+                        context.read<AdoptionHistoryBloc>().add(
+                          UpdateFormStatusEvent(
+                            formId: form.id,
+                            status: AdoptionFormStatus.rejected.value,
+                          ),
+                        );
+                        Navigator.of(context).pop();
+                      },
+                    ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  void _confirmAction(
+    BuildContext context, {
+    required String title,
+    required String message,
+    required String confirm,
+    required bool isAccept,
+    required Color confirmColor,
+    required VoidCallback onConfirm,
+  }) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: '',
+      barrierColor: Colors.black54,
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
+      transitionBuilder: (context, anim1, anim2, child) {
+        final curveValue = Curves.easeInOutBack.transform(anim1.value);
+        return Transform.scale(
+          scale: curveValue,
+          child: Opacity(
+            opacity: anim1.value,
+            child: Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24.r),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(24.w),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(16.w),
+                      decoration: BoxDecoration(
+                        color: confirmColor.withAlpha(20),
+                        shape: BoxShape.circle,
+                      ),
+                      child: AppIcon.raw(
+                        isAccept
+                            ? Icons.check_circle_rounded
+                            : Icons.cancel_rounded,
+                        color: confirmColor,
+                        size: 48.w,
+                      ),
+                    ),
+                    SizedBox(height: 20.h),
+                    Text(
+                      title,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.current.text,
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+                    Text(
+                      message,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppColors.current.midGray,
+                        fontSize: 14.sp,
+                        height: 1.5,
+                      ),
+                    ),
+                    SizedBox(height: 24.h),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 12.h),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                            ),
+                            child: Text(
+                              AppText.cancel,
+                              style: TextStyle(
+                                color: AppColors.current.midGray,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              onConfirm();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: confirmColor,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              padding: EdgeInsets.symmetric(vertical: 12.h),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                            ),
+                            child: Text(
+                              confirm,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14.sp,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final Color color;
+  final bool outlined;
+  final VoidCallback onTap;
+
+  const _ActionButton({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+    this.outlined = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 48.h,
+        decoration: BoxDecoration(
+          color: outlined ? Colors.transparent : color,
+          borderRadius: BorderRadius.circular(14.r),
+          border: Border.all(color: color, width: 1.5),
+          boxShadow:
+              outlined
+                  ? []
+                  : [
+                    BoxShadow(
+                      color: color.withAlpha(60),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AppIcon.raw(
+              icon,
+              color: outlined ? color : Colors.white,
+              size: 18.w,
+            ),
+            SizedBox(width: 6.w),
+            Text(
+              label,
+              style: TextStyle(
+                color: outlined ? color : Colors.white,
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MessageButton extends StatelessWidget {
+  final AdoptionFormEntity form;
+  final bool isOwnerView;
+
+  const _MessageButton({required this.form, required this.isOwnerView});
+
+  @override
+  Widget build(BuildContext context) {
+    final targetId = isOwnerView ? form.clientContactId : form.ownerContactId;
+
+    if (targetId == null || targetId == 0) return const SizedBox.shrink();
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: 24.h),
+      child: _ActionButton(
+        label: isOwnerView ? AppText.messageApplicant : AppText.messageOwner,
+        icon: Icons.chat_bubble_outline_rounded,
+        color: AppColors.current.primary,
+        onTap: () {
+          context.pushNamed(
+            AppRouteNames.chat,
+            pathParameters: {'index': targetId.toString()},
+            queryParameters: {'isUserId': 'true'},
+            extra: {
+              'adoptionForm': form,
+              'adoptionHistoryBloc': context.read<AdoptionHistoryBloc>(),
+            },
+          );
+        },
+      ),
+    );
+  }
+}

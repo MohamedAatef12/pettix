@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
+import 'package:pettix/features/home/domain/entities/post_sync_update.dart';
 import '../../domain/entities/comments_entity.dart';
 import '../../domain/entities/post_entity.dart';
 
@@ -10,6 +11,14 @@ abstract class HomeEvent extends Equatable {
 }
 
 class FetchPostsEvent extends HomeEvent {}
+
+class GetUserPostsEvent extends HomeEvent {
+  GetUserPostsEvent();
+  @override
+  List<Object?> get props => [];
+}
+
+class GetSavedPostsEvent extends HomeEvent {}
 
 class AddPostEvent extends HomeEvent {
   final PostEntity post;
@@ -25,6 +34,14 @@ class DeletePostEvent extends HomeEvent {
   List<Object?> get props => [id];
 }
 
+class EditPostEvent extends HomeEvent {
+  final PostEntity post;
+  final List<String> deletedImages;
+  EditPostEvent(this.post, {this.deletedImages = const []});
+  @override
+  List<Object?> get props => [post, deletedImages];
+}
+
 class FetchPostsCommentsEvent extends HomeEvent {
   final int postId;
   FetchPostsCommentsEvent(this.postId);
@@ -35,9 +52,10 @@ class FetchPostsCommentsEvent extends HomeEvent {
 class AddCommentEvent extends HomeEvent {
   final CommentEntity comment;
   final int? creatorId;
-  AddCommentEvent(this.comment, {this.creatorId});
+  final int? initialCount;
+  AddCommentEvent(this.comment, {this.creatorId, this.initialCount});
   @override
-  List<Object?> get props => [comment, creatorId];
+  List<Object?> get props => [comment, creatorId, initialCount];
 }
 
 class FetchPostsLikesEvent extends HomeEvent {
@@ -54,22 +72,31 @@ class AddLikeEvent extends HomeEvent {
   @override
   List<Object?> get props => [postId, creatorId];
 }
+
 class GetPostCommentsCountsEvent extends HomeEvent {
   final int postId;
   GetPostCommentsCountsEvent(this.postId);
   @override
   List<Object?> get props => [postId];
 }
+
 class DeleteLikeEvent extends HomeEvent {
   final int postId;
   DeleteLikeEvent(this.postId);
   @override
   List<Object?> get props => [postId];
 }
+
 class ClearPostDetailsEvent extends HomeEvent {}
+
+class ClearErrorEvent extends HomeEvent {}
+
 class PickImageEvent extends HomeEvent {}
+
 class SubmitPostEvent extends HomeEvent {}
+
 class PickImagesFromGalleryEvent extends HomeEvent {}
+
 class AddImageFromCameraEvent extends HomeEvent {
   final File image;
   AddImageFromCameraEvent(this.image);
@@ -83,24 +110,36 @@ class RemoveSelectedImageEvent extends HomeEvent {
   @override
   List<Object?> get props => [index];
 }
+
+class ClearSelectedImagesEvent extends HomeEvent {}
+
 class AddReplyEvent extends HomeEvent {
   final CommentEntity reply;
   final int parentCommentId;
   final int? creatorId;
-  AddReplyEvent(this.reply, this.parentCommentId, {this.creatorId});
+  final int? initialCount;
+  AddReplyEvent(
+    this.reply,
+    this.parentCommentId, {
+    this.creatorId,
+    this.initialCount,
+  });
   @override
-  List<Object?> get props => [reply, parentCommentId, creatorId];
+  List<Object?> get props => [reply, parentCommentId, creatorId, initialCount];
 }
+
 class SetReplyingToEvent extends HomeEvent {
   final CommentEntity? comment;
   SetReplyingToEvent(this.comment);
 }
+
 class ToggleCommentRepliesEvent extends HomeEvent {
   final int commentId;
-   ToggleCommentRepliesEvent(this.commentId);
+  ToggleCommentRepliesEvent(this.commentId);
   @override
   List<Object?> get props => [commentId];
 }
+
 class RefreshCommentsSilentlyEvent extends HomeEvent {
   final int postId;
   RefreshCommentsSilentlyEvent(this.postId);
@@ -108,6 +147,7 @@ class RefreshCommentsSilentlyEvent extends HomeEvent {
   @override
   List<Object?> get props => [postId];
 }
+
 class UpdatePostCommentsCountEvent extends HomeEvent {
   final int postId;
   UpdatePostCommentsCountEvent(this.postId);
@@ -115,26 +155,30 @@ class UpdatePostCommentsCountEvent extends HomeEvent {
   @override
   List<Object?> get props => [postId];
 }
-class AddCommentLikeEvent extends HomeEvent{
+
+class AddCommentLikeEvent extends HomeEvent {
   final int commentId;
   final int? creatorId;
   AddCommentLikeEvent(this.commentId, {this.creatorId});
   @override
   List<Object?> get props => [commentId, creatorId];
 }
-class GetCommentsLikeEvent extends HomeEvent{
+
+class GetCommentsLikeEvent extends HomeEvent {
   final int commentId;
   GetCommentsLikeEvent(this.commentId);
   @override
   List<Object?> get props => [commentId];
 }
-class UnLikeCommentEvent extends HomeEvent{
+
+class UnLikeCommentEvent extends HomeEvent {
   final int commentId;
   UnLikeCommentEvent(this.commentId);
   @override
   List<Object?> get props => [commentId];
 }
-class ReportPostEvent extends HomeEvent{
+
+class ReportPostEvent extends HomeEvent {
   final int postId;
   final int reasonId;
   final String reason;
@@ -142,24 +186,35 @@ class ReportPostEvent extends HomeEvent{
   @override
   List<Object?> get props => [postId, reasonId, reason];
 }
-class GetReportReasonsEvent extends HomeEvent{}
-class GetReportedPostsEvent extends HomeEvent{
+
+class GetReportReasonsEvent extends HomeEvent {}
+
+class GetReportedPostsEvent extends HomeEvent {
   final int postId;
   GetReportedPostsEvent(this.postId);
   @override
   List<Object?> get props => [postId];
 }
-class SavePostEvent extends HomeEvent{
+
+class SavePostEvent extends HomeEvent {
   final int postId;
   SavePostEvent(this.postId);
   @override
   List<Object?> get props => [postId];
 }
-class UnSavePostEvent extends HomeEvent{
+
+class UnSavePostEvent extends HomeEvent {
   final int postId;
   UnSavePostEvent(this.postId);
   @override
   List<Object?> get props => [postId];
+}
+
+class SynchronizePostUpdateEvent extends HomeEvent {
+  final PostSyncUpdate update;
+  SynchronizePostUpdateEvent(this.update);
+  @override
+  List<Object?> get props => [update];
 }
 
 class LoadMorePostsEvent extends HomeEvent {}

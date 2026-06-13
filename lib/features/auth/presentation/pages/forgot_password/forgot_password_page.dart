@@ -6,13 +6,13 @@ import 'package:go_router/go_router.dart';
 import 'package:pettix/config/di/di.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/padding.dart';
-import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
-import 'package:pettix/core/widgets/rtl_aware_icon.dart';
+import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/data/network/email_auth_service.dart';
+import 'package:pettix/features/auth/domain/usecases/apple_login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/forgot_password.dart';
 import 'package:pettix/features/auth/domain/usecases/google_login_use_case.dart';
 import 'package:pettix/features/auth/domain/usecases/login_use_case.dart';
@@ -23,120 +23,121 @@ import 'package:pettix/features/auth/domain/usecases/verify_otp.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_event.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_state.dart';
+import 'package:pettix/core/services/signalr_service.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
   const ForgotPasswordPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-     bool isValidEmail(String email) {
+    bool isValidEmail(String email) {
       final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
       return emailRegex.hasMatch(email);
     }
+
     return Scaffold(
       backgroundColor: AppColors.current.white,
       body: BlocProvider(
-        create: (context) => AuthBloc(
-          googleLoginUseCase: getIt<GoogleLoginUseCase>(),
-          loginUseCase: getIt<LoginUseCase>(),
-          registerUseCase: getIt<RegisterUseCase>(),
-          emailAuthService: getIt<EmailAuthService>(),
-          verifyOtp: getIt<VerifyOtp>(),
-          resendOtpUseCase: getIt<ResendOtpUseCase>(),
-          forgotPasswordUseCase: getIt<ForgotPasswordUseCase>(),
-          resetPasswordUseCase: getIt<ResetPasswordUseCase>(),
-        ),
+        create:
+            (context) => AuthBloc(
+              googleLoginUseCase: getIt<GoogleLoginUseCase>(),
+              appleLoginUseCase: getIt<AppleLoginUseCase>(),
+              loginUseCase: getIt<LoginUseCase>(),
+              registerUseCase: getIt<RegisterUseCase>(),
+              emailAuthService: getIt<EmailAuthService>(),
+              verifyOtp: getIt<VerifyOtp>(),
+              resendOtpUseCase: getIt<ResendOtpUseCase>(),
+              forgotPasswordUseCase: getIt<ForgotPasswordUseCase>(),
+              resetPasswordUseCase: getIt<ResetPasswordUseCase>(),
+              signalRService: getIt<SignalRService>(),
+            ),
         child: Builder(
           builder: (context) {
             final bloc = context.read<AuthBloc>();
             return BlocConsumer<AuthBloc, AuthState>(
               listener: (context, state) {
                 if (state is OtpSent) {
-                 context.pushNamed('otp_forgot_password', extra: bloc);
+                  context.pushNamed('otp_forgot_password', extra: bloc);
                 } else if (state is AuthError) {
-                  AuthToast.showError(context, state.message);
+                  PetToast.showError(context, state.message);
                 }
               },
               builder: (context, state) {
-                final isLoading = state is AuthLoading;
-                return Column(
-                  children: [
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        SvgPicture.asset(
-                          'assets/images/reset_password.svg',
-                          fit: BoxFit.fill,
-                          width: MediaQuery.sizeOf(context).width,
-                        ),
-                        Positioned(
-                          top: 40.h,
-                          left: 20.w,
-                          child: GestureDetector(
-                            onTap: () => context.pop(),
-                            child: RtlAwareIcon(
-                              child: Icon(
-                                Icons.chevron_left,
-                                size: 34.r,
-                                color: AppColors.current.text,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20.h,
-                    ),
-                    Padding(
-                      padding: PaddingConstants.horizontalMedium,
-                      child: Column(
+                return SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Stack(
+                        clipBehavior: Clip.none,
                         children: [
-                          GestureDetector(
-                            onTap: () => FocusScope.of(context).unfocus(),
-                            child: CustomTextFormField(
-                              controller: bloc.emailForgotController,
-                              hintText: AppText.enterYourEmail,
-                              keyboardType: TextInputType.emailAddress,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return AppText.required;
-                                } else if (!isValidEmail(value)) {
-                                  return AppText.validEmail;
-                                }
-                                return null;
-                              },
-                              fillColor: true,
-                              fillColorValue: AppColors.current.white,
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: AppColors.current.lightGray),
-                              ),
+                          SvgPicture.asset(
+                            'assets/images/reset_password.svg',
+                            fit: BoxFit.fill,
+                            width: MediaQuery.sizeOf(context).width,
+                          ),
+                          PositionedDirectional(
+                            top: 40.h,
+                            start: 20.w,
+                            child: AppTopBarBackButton(
+                              onPressed: () => context.pop(),
+                              size: 34.r,
                             ),
                           ),
-                          SizedBox(height: 10.h),
-                          BlocBuilder<AuthBloc, AuthState>(
-                            builder: (context, state) {
-                              final isLoading = state is ForgotPasswordLoading;
-                              return CustomFilledButton(
-                                isLoading: isLoading,
-                                onPressed: () {
-                                  bloc.add(
-                                    ForgotPasswordEvent(
-                                      bloc.emailForgotController.text,
-                                    ),
-                                  );
-                                },
-                                text: AppText.sendOtp,
-                                backgroundColor: AppColors.current.primary,
-                                textColor: AppColors.current.white,
-                              );
-                            },
-                          )
                         ],
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 20.h),
+                      Padding(
+                        padding: PaddingConstants.horizontalMedium,
+                        child: Column(
+                          children: [
+                            GestureDetector(
+                              onTap: () => FocusScope.of(context).unfocus(),
+                              child: CustomTextFormField(
+                                controller: bloc.emailForgotController,
+                                hintText: AppText.enterYourEmail,
+                                keyboardType: TextInputType.emailAddress,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return AppText.required;
+                                  } else if (!isValidEmail(value)) {
+                                    return AppText.validEmail;
+                                  }
+                                  return null;
+                                },
+                                fillColor: true,
+                                fillColorValue: AppColors.current.white,
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    color: AppColors.current.lightGray,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 10.h),
+                            BlocBuilder<AuthBloc, AuthState>(
+                              builder: (context, state) {
+                                final isLoading =
+                                    state is ForgotPasswordLoading;
+                                return CustomFilledButton(
+                                  isLoading: isLoading,
+                                  onPressed: () {
+                                    bloc.add(
+                                      ForgotPasswordEvent(
+                                        bloc.emailForgotController.text,
+                                      ),
+                                    );
+                                  },
+                                  text: AppText.sendOtp,
+                                  backgroundColor: AppColors.current.primary,
+                                  textColor: AppColors.current.white,
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 );
               },
             );

@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/features/on_boarding/presentation/bloc/on_boarding_events.dart';
@@ -15,12 +14,13 @@ class OnBoardingBloc extends Bloc<OnBoardingEvent, OnBoardingState> {
     OnBoardingSlide(
       image: "assets/images/on_boarding2.svg",
       title: AppText.careSafetySecondChances,
-      desc:  AppText.findLovingHomes
+      desc: AppText.findLovingHomes,
     ),
     OnBoardingSlide(
       image: "assets/images/on_boarding3.svg",
       title: AppText.everythingYourPetNeeds,
-      desc: AppText.discoverFoodToys  ),
+      desc: AppText.discoverFoodToys,
+    ),
   ];
 
   OnBoardingBloc() : super(OnBoardingInitial()) {

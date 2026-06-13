@@ -2,59 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/core/widgets/app_shimmer.dart';
 
-class HomeShimmer extends StatefulWidget {
+class HomeShimmer extends StatelessWidget {
   const HomeShimmer({super.key});
-  @override
-  State<HomeShimmer> createState() => _HomeShimmerState();
-}
-
-class _HomeShimmerState extends State<HomeShimmer>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
 
   @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat(reverse: true);
-    _animation = Tween<double>(
-      begin: 0.4,
-      end: 0.7,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  Widget _shimmerBox({
-    required double width,
-    required double height,
-    double? borderRadius,
-    BoxShape shape = BoxShape.rectangle,
-  }) {
-    return AnimatedBuilder(
-      animation: _animation,
-      builder: (context, child) {
-        return Container(
-          width: width,
-          height: height,
-          decoration: BoxDecoration(
-            color: AppColors.current.lightGray,
-            borderRadius:
-                shape == BoxShape.rectangle
-                    ? BorderRadius.circular(borderRadius ?? 8.r)
-                    : null,
-            shape: shape,
-          ),
-        );
-      },
+  Widget build(BuildContext context) {
+    return ListView(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: PaddingConstants.horizontalSmall,
+      children: [
+        _buildPostCardShimmer(),
+        SizedBox(height: 16.h),
+        _buildPostCardShimmer(),
+      ],
     );
   }
 
@@ -69,69 +32,38 @@ class _HomeShimmerState extends State<HomeShimmer>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Author row
           Row(
             children: [
-              _shimmerBox(width: 54.r, height: 54.r, shape: BoxShape.circle),
+              AppShimmer.circular(radius: 27.r),
               SizedBox(width: 10.w),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _shimmerBox(width: 120.w, height: 12.h, borderRadius: 6.r),
+                  AppShimmer(width: 120.w, height: 12.h),
                   SizedBox(height: 6.h),
-                  _shimmerBox(width: 80.w, height: 10.h, borderRadius: 6.r),
+                  AppShimmer(width: 80.w, height: 10.h),
                 ],
               ),
             ],
           ),
           SizedBox(height: 14.h),
-          _shimmerBox(width: 260.w, height: 10.h, borderRadius: 6.r),
+          const AppShimmer(width: double.infinity, height: 10),
           SizedBox(height: 6.h),
-          _shimmerBox(width: 200.w, height: 10.h, borderRadius: 6.r),
-          SizedBox(height: 6.h),
-          _shimmerBox(width: 240.w, height: 10.h, borderRadius: 6.r),
+          AppShimmer(width: 200.w, height: 10.h),
           SizedBox(height: 14.h),
-
-          // Image placeholder
-          _shimmerBox(
-            width: double.infinity,
-            height: 200.h,
-            borderRadius: 15.r,
-          ),
+          AppShimmer(width: double.infinity, height: 200.h, borderRadius: BorderRadius.circular(15.r)),
           SizedBox(height: 14.h),
-
-          // Action row
           Row(
             children: [
-              _shimmerBox(width: 24.w, height: 24.h, borderRadius: 4.r),
-              SizedBox(width: 6.w),
-              _shimmerBox(width: 20.w, height: 10.h, borderRadius: 4.r),
+              AppShimmer(width: 24.w, height: 24.h),
               SizedBox(width: 16.w),
-              _shimmerBox(width: 24.w, height: 24.h, borderRadius: 4.r),
-              SizedBox(width: 6.w),
-              _shimmerBox(width: 20.w, height: 10.h, borderRadius: 4.r),
+              AppShimmer(width: 24.w, height: 24.h),
               const Spacer(),
-              // _shimmerBox(width: 24.w, height: 24.h, borderRadius: 4.r),
-              // SizedBox(width: 10.w),
-              _shimmerBox(width: 24.w, height: 24.h, borderRadius: 4.r),
+              AppShimmer(width: 24.w, height: 24.h),
             ],
           ),
         ],
       ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: PaddingConstants.horizontalSmall,
-      children: [
-        _buildPostCardShimmer(),
-        SizedBox(height: 16.h),
-        _buildPostCardShimmer(),
-      ],
     );
   }
 }

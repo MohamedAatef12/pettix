@@ -28,7 +28,7 @@ class ResponseModel extends ResponseEntity{
       success: json['success'] as bool? ?? false,
       message: json['message'] as String? ?? '',
       traceId: json['traceId'] as String? ?? '',
-      result: json['result'],
+      result: json['result'] ?? json['data'] ?? json['items'] ?? json['value'],
     );
   }
 

@@ -1,35 +1,70 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
   <uses-permission android:name="android.permission.INTERNET"/>
+  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
   <uses-permission android:name="android.permission.CAMERA"/>
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29"/>
   <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
-  <application android:label="@string/app_name" android:name="${applicationName}" android:icon="@mipmap/ic_launcher">
-    <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTop" android:taskAffinity="" android:theme="@style/LaunchTheme" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode" android:hardwareAccelerated="true" android:windowSoftInputMode="adjustResize">
-      <meta-data android:name="io.flutter.embedding.android.NormalTheme" android:resource="@style/NormalTheme"/>
+  <!-- Remove Advertising ID permission added by SDKs -->
+  <uses-permission
+      android:name="com.google.android.gms.permission.AD_ID"
+      tools:node="remove"/>
+
+  <application
+      android:label="@string/app_name"
+      android:name="${applicationName}"
+      android:icon="@mipmap/ic_launcher">
+
+    <activity
+        android:name=".MainActivity"
+        android:exported="true"
+        android:launchMode="singleTop"
+        android:taskAffinity=""
+        android:theme="@style/LaunchTheme"
+        android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+        android:hardwareAccelerated="true"
+        android:windowSoftInputMode="adjustResize">
+
+      <meta-data
+          android:name="io.flutter.embedding.android.NormalTheme"
+          android:resource="@style/NormalTheme"/>
+
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
         <category android:name="android.intent.category.LAUNCHER"/>
       </intent-filter>
-      
-      <!-- Required for flutter_local_notifications action handling -->
+
       <intent-filter>
-          <action android:name="FLUTTER_NOTIFICATION_CLICK" />
-          <category android:name="android.intent.category.DEFAULT" />
+        <action android:name="FLUTTER_NOTIFICATION_CLICK"/>
+        <category android:name="android.intent.category.DEFAULT"/>
       </intent-filter>
     </activity>
 
-    <!-- FCM Default Channel ID -->
     <meta-data
         android:name="com.google.firebase.messaging.default_notification_channel_id"
-        android:value="pettix_high_importance_channel" />
+        android:value="pettix_high_importance_channel"/>
 
-    <meta-data android:name="flutterEmbedding" android:value="2"/>
-    <provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.fileprovider" android:exported="false" android:grantUriPermissions="true">
-      <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths"/>
+    <meta-data
+        android:name="flutterEmbedding"
+        android:value="2"/>
+
+    <provider
+        android:name="androidx.core.content.FileProvider"
+        android:authorities="${applicationId}.fileprovider"
+        android:exported="false"
+        android:grantUriPermissions="true">
+
+      <meta-data
+          android:name="android.support.FILE_PROVIDER_PATHS"
+          android:resource="@xml/file_paths"/>
     </provider>
+
   </application>
 
   <queries>
@@ -38,4 +73,5 @@
       <data android:mimeType="text/plain"/>
     </intent>
   </queries>
+
 </manifest>

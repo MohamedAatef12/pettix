@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/padding.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
-import 'package:pettix/core/utils/auth_toast.dart';
+import 'package:pettix/core/utils/pet_toast.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/utils/custom_text_form_field.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_bloc.dart';
@@ -12,6 +12,8 @@ import 'package:pettix/features/auth/presentation/blocs/auth_event.dart';
 import 'package:pettix/features/auth/presentation/blocs/auth_state.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:go_router/go_router.dart';
+
+import 'package:pettix/core/widgets/app_icon_system.dart';
 
 class ResetPasswordBody extends StatelessWidget {
   final String email;
@@ -29,23 +31,20 @@ class ResetPasswordBody extends StatelessWidget {
             // navigate to password reset done
             context.pushNamed('password_reset_done');
           } else if (state is AuthError) {
-           AuthToast.showError(context, state.message);
+            PetToast.showError(context, state.message);
           }
         },
         builder: (context, state) {
           final isLoading = state is AuthLoading;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children:  [
-          Text(AppText.newPassword,
-          style: AppTextStyles.title,),
-          SizedBox(height: 4.h,),
-          Text(AppText.enterNewPassword,
-          style: AppTextStyles.description,
-          ),
-          SizedBox(height: 30.h,),
-              Text(AppText.password,style: AppTextStyles.smallDescription,),
-              SizedBox(height: 4.h,),
+            children: [
+              Text(AppText.newPassword, style: AppTextStyles.title),
+              SizedBox(height: 4.h),
+              Text(AppText.enterNewPassword, style: AppTextStyles.description),
+              SizedBox(height: 30.h),
+              Text(AppText.password, style: AppTextStyles.smallDescription),
+              SizedBox(height: 4.h),
               CustomTextFormField(
                 controller: bloc.newPasswordForgotController,
                 hintText: AppText.enterPassword,
@@ -54,16 +53,14 @@ class ResetPasswordBody extends StatelessWidget {
                 fillColorValue: AppColors.current.white,
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(
-                    color: AppColors.current.lightGray,
-                  ),
+                  borderSide: BorderSide(color: AppColors.current.lightGray),
                 ),
                 enablePasswordToggle: false,
                 suffixIcon: GestureDetector(
                   onTap: () {
                     bloc.add(ResetPasswordTogglePasswordVisibility());
                   },
-                  child: Icon(
+                  child: AppIcon.raw(
                     bloc.obscurePasswordReset
                         ? Icons.visibility_off
                         : Icons.visibility,
@@ -71,9 +68,12 @@ class ResetPasswordBody extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: 10.h,),
-              Text(AppText.confirmPassword,style: AppTextStyles.smallDescription,),
-              SizedBox(height: 4.h,),
+              SizedBox(height: 10.h),
+              Text(
+                AppText.confirmPassword,
+                style: AppTextStyles.smallDescription,
+              ),
+              SizedBox(height: 4.h),
               CustomTextFormField(
                 controller: bloc.confirmNewPasswordForgotController,
                 hintText: AppText.confirmPassword,
@@ -82,17 +82,14 @@ class ResetPasswordBody extends StatelessWidget {
                 obscureText: bloc.obscureConfirmPasswordReset,
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(
-                    color: AppColors.current.lightGray,
-                  ),
+                  borderSide: BorderSide(color: AppColors.current.lightGray),
                 ),
                 enablePasswordToggle: false,
                 suffixIcon: GestureDetector(
                   onTap: () {
-                    bloc.add(ResetPasswordToggleConfirmPasswordVisibility()
-                    );
+                    bloc.add(ResetPasswordToggleConfirmPasswordVisibility());
                   },
-                  child: Icon(
+                  child: AppIcon.raw(
                     bloc.obscureConfirmPasswordReset
                         ? Icons.visibility_off
                         : Icons.visibility,
@@ -101,26 +98,25 @@ class ResetPasswordBody extends StatelessWidget {
                 ),
               ),
               Spacer(),
-            CustomFilledButton(
-          isLoading:isLoading,
-                      onPressed: () {
-                        final newPass = bloc.newPasswordForgotController.text;
-                        final confirm = bloc.confirmNewPasswordForgotController.text;
-                        context.read<AuthBloc>().add(ResetPasswordEvent(
-                          email: email,
-                          otp: otp,
-                          newPassword: newPass,
-                          confirmPassword: confirm,
-                        ));
-                      },
-                      text: AppText.resetPassword,
-                      backgroundColor: AppColors.current.primary,
-                      textColor: AppColors.current.white,
-
+              CustomFilledButton(
+                isLoading: isLoading,
+                onPressed: () {
+                  final newPass = bloc.newPasswordForgotController.text;
+                  final confirm = bloc.confirmNewPasswordForgotController.text;
+                  context.read<AuthBloc>().add(
+                    ResetPasswordEvent(
+                      email: email,
+                      otp: otp,
+                      newPassword: newPass,
+                      confirmPassword: confirm,
                     ),
-              SizedBox(
-                height: 10.h,
+                  );
+                },
+                text: AppText.resetPassword,
+                backgroundColor: AppColors.current.primary,
+                textColor: AppColors.current.white,
               ),
+              SizedBox(height: 10.h),
             ],
           );
         },

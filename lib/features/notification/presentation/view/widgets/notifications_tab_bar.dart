@@ -3,11 +3,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
 class NotificationsTabButton extends StatelessWidget {
   final String title;
   final IconData icon;
   final int index;
   final int currentIndex;
+  final int unreadCount;
   final VoidCallback onTap;
 
   const NotificationsTabButton({
@@ -16,6 +19,7 @@ class NotificationsTabButton extends StatelessWidget {
     required this.icon,
     required this.index,
     required this.currentIndex,
+    required this.unreadCount,
     required this.onTap,
   });
 
@@ -35,13 +39,13 @@ class NotificationsTabButton extends StatelessWidget {
           boxShadow: [
             if (isActive)
               BoxShadow(
-                color: AppColors.current.primary.withOpacity(0.3),
+                color: AppColors.current.primary.withValues(alpha: 0.3),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               )
             else
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -50,17 +54,51 @@ class NotificationsTabButton extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 18.sp,
-              color: isActive ? AppColors.current.white : AppColors.current.primary,
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                AppIcon.raw(
+                  icon,
+                  size: 18.sp,
+                  color:
+                      isActive
+                          ? AppColors.current.white
+                          : AppColors.current.primary,
+                ),
+                if (unreadCount > 0)
+                  Positioned(
+                    top: -5,
+                    right: -5,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: BoxConstraints(
+                        minWidth: 14.w,
+                        minHeight: 14.w,
+                      ),
+                      child: Text(
+                        unreadCount.toString(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 8.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
             ),
             SizedBox(width: 8.w),
             Text(
               title,
               style: AppTextStyles.bold.copyWith(
                 fontSize: 14.sp,
-                color: isActive ? AppColors.current.white : AppColors.current.text,
+                color:
+                    isActive ? AppColors.current.white : AppColors.current.text,
               ),
             ),
           ],

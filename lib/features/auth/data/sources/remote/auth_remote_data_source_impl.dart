@@ -1,10 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pettix/config/di/di_wrapper.dart';
-import 'package:pettix/core/models/response_model.dart';
 import 'package:pettix/data/caching/i_cache_manager.dart';
 import 'package:pettix/data/network/api_services.dart';
 import 'package:pettix/data/network/constants.dart';
 import 'package:pettix/data/network/email_auth_service.dart';
+import 'package:pettix/features/auth/data/models/login/apple_login_model.dart';
 import 'package:pettix/features/auth/data/models/login/google_login_model.dart';
 import 'package:pettix/features/auth/data/models/login/google_login_response_model.dart';
 import 'package:pettix/features/auth/data/models/login/login_response_model.dart';
@@ -35,7 +36,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         await DI.find<ICacheManager>().setUserData(loginResponse.contact);
         await DI.find<ICacheManager>().setToken(loginResponse.token);
         await DI.find<ICacheManager>().setRefreshToken(
-            loginResponse.refreshToken);
+          loginResponse.refreshToken,
+        );
         return Right(loginResponse);
       }
 
@@ -68,29 +70,34 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<Either<Failure, GoogleLoginResponseModel>> loginWithGoogle(
-      GoogleLoginModel model,) async {
+    GoogleLoginModel model,
+  ) async {
     try {
-      print('[DEBUG] Google Login - Sending idToken');
+      debugPrint('[DEBUG] Google Login - Sending idToken');
 
       final response = await apiService.post(
         endPoint: Constants.googleLoginEndpoint,
-        data: {'idToken': model.idToken},
+        data: model.toJson(),
       );
 
-      print('[DEBUG] Google Login Response: $response');
+      debugPrint('[DEBUG] Google Login Response: $response');
 
       final result = response.result as Map<String, dynamic>?;
       if (result == null || response.success != true) {
-        return Left(Failure(response.message.isNotEmpty
-            ? response.message
-            : "Invalid response format - result is null"));
+        return Left(
+          Failure(
+            response.message.isNotEmpty
+                ? response.message
+                : "Invalid response format - result is null",
+          ),
+        );
       }
 
       final userJson = result['contact'];
       final token = result['token'];
 
       if (userJson == null || token == null) {
-        print(
+        debugPrint(
             '[DEBUG] Google Login - Missing contact or token. Contact: $userJson, Token: $token');
         return Left(Failure("Invalid response format from server"));
       }
@@ -99,7 +106,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       await DI.find<ICacheManager>().setUserData(userModel);
       await DI.find<ICacheManager>().setToken(token);
-      await DI.find<ICacheManager>().setRefreshToken(result['refreshToken'] ?? '');
+      await DI.find<ICacheManager>().setRefreshToken(
+        result['refreshToken'] ?? '',
+      );
 
       return Right(
         GoogleLoginResponseModel(
@@ -115,77 +124,124 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         ),
       );
     } catch (e) {
-      print('[ERROR] Google Login failed: $e');
+      debugPrint('[ERROR] Google Login failed: $e');
       return Left(DioFailure.fromDioError(e));
     }
   }
 
+  @override
+  Future<Either<Failure, GoogleLoginResponseModel>> loginWithApple(AppleLoginModel model) async {
+    try {
+      final response = await apiService.post(
+        endPoint: Constants.appleLoginEndpoint,
+        data: {'idToken': model.idToken},
+      );
+
+      final result = response.result as Map<String, dynamic>?;
+      if (result == null || response.success != true) {
+        return Left(Failure(response.message.isNotEmpty
+            ? response.message
+            : 'Invalid response from server'));
+      }
+
+      final userJson = result['contact'];
+      final token = result['token'];
+
+      if (userJson == null || token == null) {
+        return Left(Failure('Invalid response format from server'));
+      }
+
+      final userModel = UserModel.fromJson(userJson);
+      await DI.find<ICacheManager>().setUserData(userModel);
+
+      return Right(
+        GoogleLoginResponseModel(
+          success: response.success,
+          message: response.message,
+          traceId: response.traceId,
+          resultSuccess: result['success'] ?? true,
+          resultMessage: result['message'] ?? '',
+          token: token,
+          refreshToken: result['refreshToken'] ?? '',
+          role: result['role'] ?? '',
+          user: userModel,
+        ),
+      );
+    } catch (e) {
+      return Left(DioFailure.fromDioError(e));
+    }
+  }
 
   @override
   Future<Either<Failure, bool>> verifyOtp(String email, String otp) async {
     try {
       final response = await apiService.post(
-          endPoint: Constants.verifyOtpEndpoint, data: {
-        'email': email,
-        'otp': otp,
-      });
+        endPoint: Constants.verifyOtpEndpoint,
+        data: {'email': email, 'otp': otp},
+      );
       if (response.success == true) {
         return Right(true);
       }
       return Left(Failure(response.message));
-    }
-    catch (e) {
+    } catch (e) {
       return Left(DioFailure.fromDioError(e));
     }
   }
+
   @override
   Future<Either<Failure, void>> resendOtp(String email) async {
     try {
       final response = await apiService.post(
-          endPoint: Constants.resendOtpEndpoint, data: {
-        'email': email,
-      });
+        endPoint: Constants.resendOtpEndpoint,
+        data: {'email': email},
+      );
       if (response.success == true) {
-        return Right(response.message);
+        return Right(null);
       }
       return Left(Failure(response.message));
-    }
-    catch (e) {
+    } catch (e) {
       return Left(DioFailure.fromDioError(e));
     }
   }
+
   @override
   Future<Either<Failure, void>> forgotPassword(String email) async {
     try {
       final response = await apiService.post(
-          endPoint: Constants.forgotPasswordEndpoint, data: {
-        'email': email,
-      });
+        endPoint: Constants.forgotPasswordEndpoint,
+        data: {'email': email},
+      );
       if (response.success == true) {
-        return Right(response.message);
+        return Right(null);
       }
       return Left(Failure(response.message));
-    }
-    catch (e) {
+    } catch (e) {
       return Left(DioFailure.fromDioError(e));
     }
   }
+
   @override
-  Future<Either<Failure, void>> resetPassword(String email, String otp, String newPassword, String confirmPassword) async {
+  Future<Either<Failure, void>> resetPassword(
+    String email,
+    String otp,
+    String newPassword,
+    String confirmPassword,
+  ) async {
     try {
       final response = await apiService.post(
-          endPoint: Constants.resetPasswordEndpoint, data: {
-        'email': email,
-        'otp': otp,
-        'newPassword': newPassword,
-        'confirmPassword': confirmPassword,
-      });
+        endPoint: Constants.resetPasswordEndpoint,
+        data: {
+          'email': email,
+          'otp': otp,
+          'newPassword': newPassword,
+          'confirmPassword': confirmPassword,
+        },
+      );
       if (response.success == true) {
-        return Right(response.message);
+        return Right(null);
       }
       return Left(Failure(response.message));
-    }
-    catch (e) {
+    } catch (e) {
       return Left(DioFailure.fromDioError(e));
     }
   }

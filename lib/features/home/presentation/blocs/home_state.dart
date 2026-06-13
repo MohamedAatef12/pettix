@@ -10,6 +10,15 @@ import '../../domain/entities/post_entity.dart';
 // Sentinel used by copyWith to allow explicitly passing `null` for nullable fields
 const _copyWithSentinel = Object();
 
+enum PostFetchType { timeline, userPosts, savedPosts }
+
+enum PostOwnerActionResult {
+  editSuccess,
+  editFailure,
+  deleteSuccess,
+  deleteFailure,
+}
+
 class HomeState extends Equatable {
   final List<PostEntity> posts;
   final List<CommentEntity> comments;
@@ -27,6 +36,9 @@ class HomeState extends Equatable {
   final bool isCommentsLoading;
   final bool isLikesLoading;
   final bool isPostAdded;
+  final bool isUploadingPost;
+  final bool isPostUploadSuccess;
+  final bool isPostUploadError;
   final String? error;
   final int pageIndex;
   final int totalCount;
@@ -38,6 +50,10 @@ class HomeState extends Equatable {
   final bool isReportLoading;
   final int postId;
   final bool isSaved;
+  final PostFetchType postFetchType;
+  final PostOwnerActionResult? postOwnerActionResult;
+  final String? postOwnerActionError;
+  final int postOwnerActionVersion;
   const HomeState({
     this.posts = const [],
     this.comments = const [],
@@ -53,6 +69,9 @@ class HomeState extends Equatable {
     this.isCommentsLoading = false,
     this.isLikesLoading = false,
     this.isPostAdded = false,
+    this.isUploadingPost = false,
+    this.isPostUploadSuccess = false,
+    this.isPostUploadError = false,
     this.error,
     this.pageIndex = 1,
     this.totalCount = 0,
@@ -65,7 +84,11 @@ class HomeState extends Equatable {
     this.reports = const [],
     this.isReportLoading = false,
     this.postId = 0,
-    this.isSaved = false
+    this.isSaved = false,
+    this.postFetchType = PostFetchType.timeline,
+    this.postOwnerActionResult,
+    this.postOwnerActionError,
+    this.postOwnerActionVersion = 0,
   });
 
   HomeState copyWith({
@@ -82,6 +105,9 @@ class HomeState extends Equatable {
     bool? isCommentsLoading,
     bool? isLikesLoading,
     bool? isPostAdded,
+    bool? isUploadingPost,
+    bool? isPostUploadSuccess,
+    bool? isPostUploadError,
     String? error,
     int? pageIndex,
     int? totalCount,
@@ -96,7 +122,11 @@ class HomeState extends Equatable {
     List<ReportEntity>? reports,
     bool? isReportLoading,
     int? postId,
-    bool? isSaved
+    bool? isSaved,
+    PostFetchType? postFetchType,
+    Object? postOwnerActionResult = _copyWithSentinel,
+    Object? postOwnerActionError = _copyWithSentinel,
+    int? postOwnerActionVersion,
   }) {
     return HomeState(
       posts: posts ?? this.posts,
@@ -112,12 +142,18 @@ class HomeState extends Equatable {
       isCommentsLoading: isCommentsLoading ?? this.isCommentsLoading,
       isLikesLoading: isLikesLoading ?? this.isLikesLoading,
       isPostAdded: isPostAdded ?? this.isPostAdded,
+      isUploadingPost: isUploadingPost ?? this.isUploadingPost,
+      isPostUploadSuccess: isPostUploadSuccess ?? this.isPostUploadSuccess,
+      isPostUploadError: isPostUploadError ?? this.isPostUploadError,
       error: error,
       pageIndex: pageIndex ?? this.pageIndex,
       totalCount: totalCount ?? this.totalCount,
       selectedImages: selectedImages ?? this.selectedImages,
       // If the caller did not pass a value, keep current. If they passed null explicitly, set to null.
-      replyingTo: replyingTo == _copyWithSentinel ? this.replyingTo : (replyingTo as CommentEntity?),
+      replyingTo:
+          replyingTo == _copyWithSentinel
+              ? this.replyingTo
+              : (replyingTo as CommentEntity?),
       expandedComments: expandedComments ?? this.expandedComments,
       commentLikes: commentLikes ?? this.commentLikes,
       likedCommentId: likedCommentId ?? this.likedCommentId,
@@ -125,8 +161,19 @@ class HomeState extends Equatable {
       reportReasons: reportReasons ?? this.reportReasons,
       reports: reports ?? this.reports,
       isReportLoading: isReportLoading ?? this.isReportLoading,
-        postId: postId ?? this.postId,
-        isSaved: isSaved ?? this.isSaved
+      postId: postId ?? this.postId,
+      isSaved: isSaved ?? this.isSaved,
+      postFetchType: postFetchType ?? this.postFetchType,
+      postOwnerActionResult:
+          postOwnerActionResult == _copyWithSentinel
+              ? this.postOwnerActionResult
+              : postOwnerActionResult as PostOwnerActionResult?,
+      postOwnerActionError:
+          postOwnerActionError == _copyWithSentinel
+              ? this.postOwnerActionError
+              : postOwnerActionError as String?,
+      postOwnerActionVersion:
+          postOwnerActionVersion ?? this.postOwnerActionVersion,
     );
   }
 
@@ -145,6 +192,9 @@ class HomeState extends Equatable {
     isCommentsLoading,
     isLikesLoading,
     isPostAdded,
+    isUploadingPost,
+    isPostUploadSuccess,
+    isPostUploadError,
     error,
     pageIndex,
     totalCount,
@@ -158,6 +208,10 @@ class HomeState extends Equatable {
     reports,
     isReportLoading,
     postId,
-    isSaved
+    isSaved,
+    postFetchType,
+    postOwnerActionResult,
+    postOwnerActionError,
+    postOwnerActionVersion,
   ];
 }

@@ -1,6 +1,5 @@
 import 'dart:ui' as ui;
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -38,11 +37,12 @@ class OnBoardingBody extends StatelessWidget {
               Expanded(
                 child: Stack(
                   children: [
-                    SvgPicture.asset(
-                      'assets/images/on_boarding_background.svg',
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                    ),
+                    if (Theme.of(context).brightness == Brightness.light)
+                      SvgPicture.asset(
+                        'assets/images/on_boarding_background.svg',
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      ),
 
                     // ✅ PageView
                     PageView.builder(
@@ -58,8 +58,10 @@ class OnBoardingBody extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                              child:  SvgPicture.asset(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10.0,
+                              ),
+                              child: SvgPicture.asset(
                                 slide.image,
                                 fit: BoxFit.fill,
                                 width: double.infinity,
@@ -121,8 +123,7 @@ class OnBoardingBody extends StatelessWidget {
                       onTap: () {
                         if (state.currentPage == bloc.slides.length - 1) {
                           context.go(AppRoutes.login);
-                           SharedPrefsHelper.setBool('isFirstOpen', false);
-
+                          SharedPrefsHelper.setBool('isFirstOpen', false);
                         } else {
                           _pageController.nextPage(
                             duration: const Duration(milliseconds: 300),
@@ -143,7 +144,7 @@ class OnBoardingBody extends StatelessWidget {
                     ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         );
@@ -151,4 +152,3 @@ class OnBoardingBody extends StatelessWidget {
     );
   }
 }
-

@@ -1,0 +1,112 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pettix/core/constants/app_texts.dart';
+import 'package:pettix/core/constants/sized_box.dart';
+import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_bloc.dart';
+import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_event.dart';
+import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_state.dart';
+import 'package:pettix/features/adoption/presentation/widgets/pet_profile/pet_description.dart';
+import 'package:pettix/features/adoption/presentation/widgets/pet_profile/pet_details.dart';
+import 'package:pettix/features/adoption/presentation/widgets/pet_profile/pet_medical_history.dart';
+import 'package:pettix/features/adoption/presentation/widgets/pet_profile/pet_photos.dart';
+import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:pettix/core/widgets/app_icon_system.dart';
+
+class PetBody extends StatelessWidget {
+  final PetEntity pet;
+
+  const PetBody({super.key, required this.pet});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              PetGallery(pet: pet),
+              PetDetails(pet: pet),
+              PetDescription(pet: pet),
+              PetMedicalHistory(pet: pet),
+              SizedBoxConstants.verticalExtraLarge,
+            ],
+          ),
+        ),
+        _AdoptBottomBar(pet: pet),
+      ],
+    );
+  }
+}
+
+class _AdoptBottomBar extends StatelessWidget {
+  final PetEntity pet;
+
+  const _AdoptBottomBar({required this.pet});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 24.h),
+      decoration: BoxDecoration(
+        color: AppColors.current.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: BlocBuilder<AdoptionBrowseBloc, AdoptionBrowseState>(
+        buildWhen:
+            (previous, current) =>
+                previous.applyingPetId != current.applyingPetId,
+        builder: (context, state) {
+          final isLoading = state.applyingPetId == pet.id;
+          return ElevatedButton.icon(
+            onPressed:
+                isLoading
+                    ? null
+                    : () => context.read<AdoptionBrowseBloc>().add(
+                      CheckApplyPetEvent(pet.id),
+                    ),
+            icon:
+                isLoading
+                    ? SizedBox(
+                      width: 20.w,
+                      height: 20.w,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.3,
+                        color: AppColors.current.white,
+                      ),
+                    )
+                    : const AppIcon.raw(
+                      Icons.pets_rounded,
+                      size: 20,
+                      color: Colors.white,
+                    ),
+            label: Text(AppText.applyToAdopt),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.current.primary,
+              disabledBackgroundColor: AppColors.current.primary,
+              foregroundColor: AppColors.current.white,
+              disabledForegroundColor: AppColors.current.white,
+              minimumSize: Size(double.infinity, 50.h),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14.r),
+              ),
+              textStyle: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
