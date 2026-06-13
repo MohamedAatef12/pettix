@@ -80,9 +80,10 @@ CustomTransitionPage<T> _customTransition<T>({
     reverseTransitionDuration: const Duration(milliseconds: 220),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       // Entering page: fade + slide from slight right, eased out (fast start → soft stop)
-      final enterFade = Tween<double>(begin: 0.0, end: 1.0)
-          .chain(CurveTween(curve: Curves.easeOutCubic))
-          .animate(animation);
+      final enterFade = Tween<double>(
+        begin: 0.0,
+        end: 1.0,
+      ).chain(CurveTween(curve: Curves.easeOutCubic)).animate(animation);
 
       final enterSlide = Tween<Offset>(
         begin: const Offset(0.06, 0.0),
@@ -96,9 +97,11 @@ CustomTransitionPage<T> _customTransition<T>({
           .animate(secondaryAnimation);
 
       final leaveSlide = Tween<Offset>(
-        begin: Offset.zero,
-        end: const Offset(-0.05, 0.0),
-      ).chain(CurveTween(curve: Curves.easeInCubic)).animate(secondaryAnimation);
+            begin: Offset.zero,
+            end: const Offset(-0.05, 0.0),
+          )
+          .chain(CurveTween(curve: Curves.easeInCubic))
+          .animate(secondaryAnimation);
 
       return FadeTransition(
         opacity: leaveFade,
@@ -106,10 +109,7 @@ CustomTransitionPage<T> _customTransition<T>({
           position: leaveSlide,
           child: FadeTransition(
             opacity: enterFade,
-            child: SlideTransition(
-              position: enterSlide,
-              child: child,
-            ),
+            child: SlideTransition(position: enterSlide, child: child),
           ),
         ),
       );
@@ -400,10 +400,30 @@ final List<RouteBase> _adoptionRoutes = [
     path: AppRoutes.applications,
     name: AppRouteNames.applications,
     pageBuilder: (context, state) {
-      final petId = state.extra as int? ?? 0;
+      final extra = state.extra;
+      final int petId;
+      final bool showOwnPetBlockedOnOpen;
+      final bool hasCheckedOwnPetOnOpen;
+
+      if (extra is Map<String, dynamic>) {
+        petId = extra['petId'] as int? ?? 0;
+        showOwnPetBlockedOnOpen =
+            extra['showOwnPetBlockedOnOpen'] as bool? ?? false;
+        hasCheckedOwnPetOnOpen =
+            extra['hasCheckedOwnPetOnOpen'] as bool? ?? false;
+      } else {
+        petId = extra as int? ?? 0;
+        showOwnPetBlockedOnOpen = false;
+        hasCheckedOwnPetOnOpen = false;
+      }
+
       return _customTransition(
         state: state,
-        child: ApplicationScreens(petId: petId),
+        child: ApplicationScreens(
+          petId: petId,
+          showOwnPetBlockedOnOpen: showOwnPetBlockedOnOpen,
+          hasCheckedOwnPetOnOpen: hasCheckedOwnPetOnOpen,
+        ),
       );
     },
   ),

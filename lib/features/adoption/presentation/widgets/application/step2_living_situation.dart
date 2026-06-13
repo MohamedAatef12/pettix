@@ -23,7 +23,7 @@ class Step2LivingSituation extends StatelessWidget {
             _SectionLabel(label: AppText.livingSituation),
             SizedBox(height: 12.h),
             if (options == null || options.livingSituations.isEmpty)
-              _EmptyHint()
+              _OptionsPlaceholder(status: state.status)
             else
               GridView.count(
                 shrinkWrap: true,
@@ -49,7 +49,7 @@ class Step2LivingSituation extends StatelessWidget {
             _SectionLabel(label: AppText.typeOfResidence),
             SizedBox(height: 12.h),
             if (options == null || options.residenceTypes.isEmpty)
-              _EmptyHint()
+              _OptionsPlaceholder(status: state.status)
             else
               GridView.count(
                 shrinkWrap: true,
@@ -114,18 +114,53 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-class _EmptyHint extends StatelessWidget {
+class _OptionsPlaceholder extends StatelessWidget {
+  final AdoptionStatus status;
+
+  const _OptionsPlaceholder({required this.status});
+
   @override
   Widget build(BuildContext context) {
+    final isLoading = status == AdoptionStatus.loading;
+    final isError = status == AdoptionStatus.error;
+
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: AppColors.current.lightBlue,
         borderRadius: BorderRadius.circular(12.r),
       ),
-      child: Text(
-        AppText.loadingOptions,
-        style: TextStyle(fontSize: 13.sp, color: AppColors.current.midGray),
+      child: Row(
+        children: [
+          if (isLoading) ...[
+            SizedBox(
+              width: 18.w,
+              height: 18.w,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppColors.current.primary,
+              ),
+            ),
+            SizedBox(width: 10.w),
+          ],
+          Expanded(
+            child: Text(
+              isError ? AppText.errorLoadingOptions : AppText.loadingOptions,
+              style: TextStyle(
+                fontSize: 13.sp,
+                color: AppColors.current.midGray,
+              ),
+            ),
+          ),
+          if (isError)
+            TextButton(
+              onPressed:
+                  () => context.read<AdoptionBloc>().add(
+                    const FetchAdoptionOptions(),
+                  ),
+              child: Text(AppText.retry),
+            ),
+        ],
       ),
     );
   }

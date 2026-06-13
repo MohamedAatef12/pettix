@@ -8,6 +8,7 @@ enum MyPetsStatus { initial, loading, loaded, submitting, success, error }
 class MyPetsState extends Equatable {
   final MyPetsStatus status;
   final List<PetEntity> pets;
+  final Set<int> statusUpdatingPetIds;
 
   // Lookup data for the add-pet form dropdowns.
   final List<LookupEntity> categories;
@@ -27,6 +28,7 @@ class MyPetsState extends Equatable {
   const MyPetsState({
     this.status = MyPetsStatus.initial,
     this.pets = const [],
+    this.statusUpdatingPetIds = const {},
     this.categories = const [],
     this.colors = const [],
     this.medicals = const [],
@@ -42,6 +44,7 @@ class MyPetsState extends Equatable {
   MyPetsState copyWith({
     MyPetsStatus? status,
     List<PetEntity>? pets,
+    Set<int>? statusUpdatingPetIds,
     List<LookupEntity>? categories,
     List<LookupEntity>? colors,
     List<LookupEntity>? medicals,
@@ -60,32 +63,46 @@ class MyPetsState extends Equatable {
     return MyPetsState(
       status: status ?? this.status,
       pets: pets ?? this.pets,
+      statusUpdatingPetIds: statusUpdatingPetIds ?? this.statusUpdatingPetIds,
       categories: categories ?? this.categories,
       colors: colors ?? this.colors,
       medicals: medicals ?? this.medicals,
-      pickedImageBytes: clearForm ? [] : (pickedImageBytes ?? this.pickedImageBytes),
-      pickedImageFilenames: clearForm ? [] : (pickedImageFilenames ?? this.pickedImageFilenames),
-      formVaccinations: clearForm ? [] : (formVaccinations ?? this.formVaccinations),
-      selectedCategoryId: clearForm || clearCategory ? null : (selectedCategoryId ?? this.selectedCategoryId),
-      selectedColorId: clearForm || clearColor ? null : (selectedColorId ?? this.selectedColorId),
-      selectedGenderId: clearForm || clearGender ? null : (selectedGenderId ?? this.selectedGenderId),
+      pickedImageBytes:
+          clearForm ? [] : (pickedImageBytes ?? this.pickedImageBytes),
+      pickedImageFilenames:
+          clearForm ? [] : (pickedImageFilenames ?? this.pickedImageFilenames),
+      formVaccinations:
+          clearForm ? [] : (formVaccinations ?? this.formVaccinations),
+      selectedCategoryId:
+          clearForm || clearCategory
+              ? null
+              : (selectedCategoryId ?? this.selectedCategoryId),
+      selectedColorId:
+          clearForm || clearColor
+              ? null
+              : (selectedColorId ?? this.selectedColorId),
+      selectedGenderId:
+          clearForm || clearGender
+              ? null
+              : (selectedGenderId ?? this.selectedGenderId),
       errorMessage: errorMessage,
     );
   }
 
   @override
   List<Object?> get props => [
-        status,
-        pets,
-        categories,
-        colors,
-        medicals,
-        pickedImageBytes,
-        pickedImageFilenames,
-        formVaccinations,
-        selectedCategoryId,
-        selectedColorId,
-        selectedGenderId,
-        errorMessage,
-      ];
+    status,
+    pets,
+    statusUpdatingPetIds,
+    categories,
+    colors,
+    medicals,
+    pickedImageBytes,
+    pickedImageFilenames,
+    formVaccinations,
+    selectedCategoryId,
+    selectedColorId,
+    selectedGenderId,
+    errorMessage,
+  ];
 }

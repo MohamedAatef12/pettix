@@ -6,16 +6,16 @@ import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/pet_toast.dart';
+import 'package:pettix/core/widgets/app_dropdown.dart';
+import 'package:pettix/core/widgets/app_icon_system.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_request_entity.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_bloc.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_event.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_state.dart';
+import 'package:pettix/features/my_pets/presentation/widgets/pet_gender_selector.dart';
 import 'package:pettix/features/my_pets/presentation/widgets/pet_image_picker.dart';
 import 'package:pettix/features/my_pets/presentation/widgets/vaccination_builder.dart';
-
-import 'package:pettix/core/widgets/app_dropdown.dart';
-import 'package:pettix/core/widgets/app_icon_system.dart';
 
 /// Scrollable form body for adding a new pet.
 class AddPetForm extends StatelessWidget {
@@ -73,114 +73,111 @@ class AddPetForm extends StatelessWidget {
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 24.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 16.h),
                     const PetImagePickerRow(),
-                    SizedBox(height: 24.h),
-
-                    _SectionLabel(AppText.basicInfo),
-                    SizedBox(height: 10.h),
-                    _FilledField(
-                      controller: bloc.nameController,
-                      label: AppText.petName,
-                      icon: Icons.pets_rounded,
+                    SizedBox(height: 20.h),
+                    _SectionCard(
+                      icon: Icons.info_outline_rounded,
                       iconColor: AppColors.current.primary,
-                    ),
-                    SizedBox(height: 12.h),
-                    _FilledField(
-                      controller: bloc.descriptionController,
-                      label: AppText.description,
-                      icon: Icons.notes_rounded,
-                      iconColor: const Color(0xFF7A6FD8),
-                      maxLines: 3,
-                    ),
-                    SizedBox(height: 12.h),
-                    _FilledField(
-                      controller: bloc.detailsController,
-                      label: AppText.healthPersonalityDetails,
-                      icon: Icons.health_and_safety_outlined,
-                      iconColor: AppColors.current.teal,
-                      maxLines: 3,
-                    ),
-                    SizedBox(height: 24.h),
-
-                    _SectionLabel(AppText.detailsSection),
-                    SizedBox(height: 10.h),
-                    _FilledField(
-                      controller: bloc.ageController,
-                      label: AppText.ageYears,
-                      icon: Icons.cake_outlined,
-                      iconColor: const Color(0xFFE8A838),
-                      keyboardType: TextInputType.number,
-                    ),
-                    SizedBox(height: 12.h),
-                    AppDropdown<int>(
-                      hint: AppText.category,
-                      prefixIcon: Icons.category_outlined,
-                      prefixIconColor: const Color(0xFF5EA8DF),
-                      items: state.categories
-                          .map((e) => AppDropdownItem<int>(
-                                value: e.id,
-                                label: e.name,
-                              ))
-                          .toList(),
-                      value: state.selectedCategoryId,
-                      onChanged: (id) =>
-                          context.read<MyPetsBloc>().add(SelectCategoryEvent(id)),
-                    ),
-                    SizedBox(height: 12.h),
-                    AppDropdown<int>(
-                      hint: AppText.gender,
-                      prefixIcon: Icons.wc_rounded,
-                      prefixIconColor: const Color(0xFF3AAFA9),
-                      items: const [
-                        AppDropdownItem(
-                          value: 1,
-                          label: 'Male',
-                          icon: Icons.male_rounded,
-                          iconColor: Color(0xFF5EA8DF),
+                      label: AppText.basicInfo,
+                      children: [
+                        _FilledField(
+                          controller: bloc.nameController,
+                          label: AppText.petName,
+                          icon: Icons.pets_rounded,
+                          iconColor: AppColors.current.primary,
                         ),
-                        AppDropdownItem(
-                          value: 2,
-                          label: 'Female',
-                          icon: Icons.female_rounded,
-                          iconColor: Color(0xFFE8A838),
+                        SizedBox(height: 10.h),
+                        _FilledField(
+                          controller: bloc.descriptionController,
+                          label: AppText.description,
+                          icon: Icons.notes_rounded,
+                          iconColor: const Color(0xFF7A6FD8),
+                          maxLines: 3,
+                        ),
+                        SizedBox(height: 10.h),
+                        _FilledField(
+                          controller: bloc.detailsController,
+                          label: AppText.healthPersonalityDetails,
+                          icon: Icons.health_and_safety_outlined,
+                          iconColor: AppColors.current.teal,
+                          maxLines: 3,
                         ),
                       ],
-                      value: state.selectedGenderId,
-                      onChanged: (id) =>
-                          context.read<MyPetsBloc>().add(SelectGenderEvent(id)),
                     ),
-                    SizedBox(height: 12.h),
-                    AppDropdown<int>(
-                      hint: AppText.color,
-                      prefixIcon: Icons.palette_outlined,
-                      prefixIconColor: AppColors.current.brown,
-                      items: state.colors
-                          .map((e) => AppDropdownItem<int>(
-                                value: e.id,
-                                label: e.name,
-                              ))
-                          .toList(),
-                      value: state.selectedColorId,
-                      onChanged: (id) =>
-                          context.read<MyPetsBloc>().add(SelectColorEvent(id)),
+                    SizedBox(height: 14.h),
+                    _SectionCard(
+                      icon: Icons.tune_rounded,
+                      iconColor: const Color(0xFF5EA8DF),
+                      label: AppText.detailsSection,
+                      children: [
+                        _FilledField(
+                          controller: bloc.ageController,
+                          label: AppText.ageYears,
+                          icon: Icons.cake_outlined,
+                          iconColor: const Color(0xFFE8A838),
+                          keyboardType: TextInputType.number,
+                        ),
+                        SizedBox(height: 10.h),
+                        AppDropdown<int>(
+                          hint: AppText.category,
+                          prefixIcon: Icons.category_outlined,
+                          prefixIconColor: const Color(0xFF5EA8DF),
+                          items:
+                              state.categories
+                                  .map(
+                                    (e) => AppDropdownItem<int>(
+                                      value: e.id,
+                                      label: e.name,
+                                    ),
+                                  )
+                                  .toList(),
+                          value: state.selectedCategoryId,
+                          onChanged:
+                              (id) => context.read<MyPetsBloc>().add(
+                                SelectCategoryEvent(id),
+                              ),
+                        ),
+                        SizedBox(height: 10.h),
+                        PetGenderSelector(
+                          selected: state.selectedGenderId,
+                          onSelected:
+                              (id) => context.read<MyPetsBloc>().add(
+                                SelectGenderEvent(id),
+                              ),
+                        ),
+                        SizedBox(height: 10.h),
+                        AppDropdown<int>(
+                          hint: AppText.color,
+                          prefixIcon: Icons.palette_outlined,
+                          prefixIconColor: AppColors.current.brown,
+                          items:
+                              state.colors
+                                  .map(
+                                    (e) => AppDropdownItem<int>(
+                                      value: e.id,
+                                      label: e.name,
+                                    ),
+                                  )
+                                  .toList(),
+                          value: state.selectedColorId,
+                          onChanged:
+                              (id) => context.read<MyPetsBloc>().add(
+                                SelectColorEvent(id),
+                              ),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: 24.h),
-
-                    _SectionLabel(AppText.medicalRecords),
-                    SizedBox(height: 10.h),
-                    const VaccinationBuilder(),
-                    SizedBox(height: 24.h),
-
-                    _SaveButton(
-                      isSubmitting: isSubmitting,
-                      onTap: () => _submit(context),
+                    SizedBox(height: 14.h),
+                    _SectionCard(
+                      icon: Icons.vaccines_rounded,
+                      iconColor: AppColors.current.teal,
+                      label: AppText.medicalRecords,
+                      children: [const VaccinationBuilder()],
                     ),
-                    SizedBox(height: 32.h),
                   ],
                 ),
               ),
@@ -192,7 +189,7 @@ class AddPetForm extends StatelessWidget {
   }
 }
 
-// ─── Top app bar ──────────────────────────────────────────────────────────────
+// ── Top app bar ───────────────────────────────────────────────────────────────
 
 class _FormTopBar extends StatelessWidget {
   final bool isSubmitting;
@@ -202,125 +199,185 @@ class _FormTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(8.w, 8.h, 16.w, 0),
-      child: Row(
-        children: [
-          AppTopBarBackButton(onPressed: () => context.pop()),
-          Expanded(
-            child: Text(
-              AppText.addPet,
-              style: AppTextStyles.appbar.copyWith(
-                color: AppColors.current.text,
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.current.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
-          isSubmitting
-              ? SizedBox(
-                width: 20.w,
-                height: 20.w,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: AppColors.current.primary,
-                ),
-              )
-              : TextButton(
-                onPressed: onSave,
+        ],
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(8.w, 8.h, 16.w, 8.h),
+          child: Row(
+            children: [
+              AppTopBarBackButton(onPressed: () => context.pop()),
+              Expanded(
                 child: Text(
-                  AppText.save,
-                  style: TextStyle(
-                    color: AppColors.current.primary,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w700,
+                  AppText.addPet,
+                  style: AppTextStyles.appbar.copyWith(
+                    color: AppColors.current.text,
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
+              _TopBarActionButton(
+                label: AppText.add,
+                onTap: isSubmitting ? null : onSave,
+                isLoading: isSubmitting,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Section card ──────────────────────────────────────────────────────────────
+
+class _SectionCard extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  final List<Widget> children;
+
+  const _SectionCard({
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    required this.children,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.current.white,
+        borderRadius: BorderRadius.circular(18.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(14.w, 14.h, 14.w, 10.h),
+            child: Row(
+              children: [
+                Container(
+                  width: 30.w,
+                  height: 30.w,
+                  decoration: BoxDecoration(
+                    color: iconColor.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: AppIcon.raw(icon, color: iconColor, size: 16.w),
+                ),
+                SizedBox(width: 10.w),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: AppColors.current.text,
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Divider(height: 1, thickness: 1, color: AppColors.current.lightGray),
+          Padding(
+            padding: EdgeInsets.fromLTRB(14.w, 12.h, 14.w, 14.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: children,
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-// ─── Save button ──────────────────────────────────────────────────────────────
+// ── Save button ───────────────────────────────────────────────────────────────
 
-class _SaveButton extends StatelessWidget {
-  final bool isSubmitting;
-  final VoidCallback onTap;
+class _TopBarActionButton extends StatelessWidget {
+  final String label;
+  final VoidCallback? onTap;
+  final bool isLoading;
 
-  const _SaveButton({required this.isSubmitting, required this.onTap});
+  const _TopBarActionButton({
+    required this.label,
+    required this.onTap,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: isSubmitting ? null : onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        height: 52.h,
-        decoration: BoxDecoration(
-          color:
-              isSubmitting
-                  ? AppColors.current.primary.withAlpha(140)
-                  : AppColors.current.primary,
-          borderRadius: BorderRadius.circular(16.r),
-          boxShadow:
-              isSubmitting
-                  ? []
-                  : [
-                    BoxShadow(
-                      color: AppColors.current.primary.withAlpha(80),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
+    return Tooltip(
+      message: label,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12.r),
+          child: Container(
+            height: 40.w,
+            padding: EdgeInsets.symmetric(horizontal: 12.w),
+            decoration: BoxDecoration(
+              color: AppColors.current.primary.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            alignment: Alignment.center,
+            child:
+                isLoading
+                    ? SizedBox(
+                      width: 18.w,
+                      height: 18.w,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.current.primary,
+                      ),
+                    )
+                    : Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AppIcon.raw(
+                          Icons.check_rounded,
+                          color: AppColors.current.primary,
+                          size: 18.w,
+                        ),
+                        SizedBox(width: 5.w),
+                        Text(
+                          label,
+                          style: TextStyle(
+                            color: AppColors.current.primary,
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-        ),
-        child: Center(
-          child:
-              isSubmitting
-                  ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2.5,
-                    ),
-                  )
-                  : Text(
-                    AppText.addPet,
-                    style: AppTextStyles.bold.copyWith(
-                      color: Colors.white,
-                      fontSize: 15.sp,
-                    ),
-                  ),
+          ),
         ),
       ),
     );
   }
 }
 
-// ─── Shared form widgets ──────────────────────────────────────────────────────
-
-class _SectionLabel extends StatelessWidget {
-  final String text;
-  const _SectionLabel(this.text);
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: AlignmentDirectional.centerStart,
-      child: Text(
-        text.toUpperCase(),
-        style: AppTextStyles.smallDescription.copyWith(
-          color: AppColors.current.midGray,
-          fontSize: 10.sp,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.8,
-        ),
-      ),
-    );
-  }
-}
+// ── Form field ────────────────────────────────────────────────────────────────
 
 class _FilledField extends StatelessWidget {
   final TextEditingController controller;
@@ -364,20 +421,19 @@ class _FilledField extends StatelessWidget {
         filled: true,
         fillColor: AppColors.current.lightBlue,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14.r),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14.r),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14.r),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: AppColors.current.primary, width: 1.5),
         ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
       ),
     );
   }
 }
-

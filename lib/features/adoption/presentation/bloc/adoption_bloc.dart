@@ -61,10 +61,12 @@ class AdoptionBloc extends Bloc<AdoptionEvent, AdoptionState> {
 
     // Register UI-interactive events
     on<ToggleEditingPersonal>(
-      (event, emit) => emit(state.copyWith(isEditingPersonal: !state.isEditingPersonal)),
+      (event, emit) =>
+          emit(state.copyWith(isEditingPersonal: !state.isEditingPersonal)),
     );
     on<ToggleEditingLiving>(
-      (event, emit) => emit(state.copyWith(isEditingLiving: !state.isEditingLiving)),
+      (event, emit) =>
+          emit(state.copyWith(isEditingLiving: !state.isEditingLiving)),
     );
     on<ToggleEditingPet>(
       (event, emit) => emit(state.copyWith(isEditingPet: !state.isEditingPet)),
@@ -82,12 +84,19 @@ class AdoptionBloc extends Bloc<AdoptionEvent, AdoptionState> {
 
   void _onJumpToStep(JumpToStep event, Emitter<AdoptionState> emit) {
     emit(state.copyWith(currentStep: event.step));
+    if (_shouldLoadOptionsForStep(event.step, state)) {
+      add(const FetchAdoptionOptions());
+    }
   }
 
   Future<void> _onFetchAdoptionOptions(
     FetchAdoptionOptions event,
     Emitter<AdoptionState> emit,
   ) async {
+    if (state.options != null || state.status == AdoptionStatus.loading) {
+      return;
+    }
+
     emit(state.copyWith(status: AdoptionStatus.loading));
     final result = await _getAdoptionOptionsUseCase();
     result.fold(
@@ -107,15 +116,27 @@ class AdoptionBloc extends Bloc<AdoptionEvent, AdoptionState> {
     if (state.currentStep < 5) {
       if (_validateCurrentStep(state)) {
         final nextStep = state.currentStep + 1;
+        final shouldLoadOptions = _shouldLoadOptionsForStep(nextStep, state);
         emit(state.copyWith(currentStep: nextStep, isSubmitted: false));
+        if (shouldLoadOptions) {
+          add(const FetchAdoptionOptions());
+        }
       } else {
-        emit(state.copyWith(
-          errorMessage: "Please fill all required fields",
-          isSubmitted: true,
-        ));
+        emit(
+          state.copyWith(
+            errorMessage: "Please fill all required fields",
+            isSubmitted: true,
+          ),
+        );
         emit(state.copyWith(errorMessage: null));
       }
     }
+  }
+
+  bool _shouldLoadOptionsForStep(int step, AdoptionState state) {
+    return step >= 1 &&
+        state.options == null &&
+        state.status != AdoptionStatus.loading;
   }
 
   void _onPreviousStep(PreviousStep event, Emitter<AdoptionState> emit) {
@@ -136,14 +157,18 @@ class AdoptionBloc extends Bloc<AdoptionEvent, AdoptionState> {
             state.dateOfBirth.isEmpty) {
           return false;
         }
-        if (state.fullName.trim().length < 3 || !state.fullName.trim().contains(' ')) {
+        if (state.fullName.trim().length < 3 ||
+            !state.fullName.trim().contains(' ')) {
           return false;
         }
         final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
         if (!emailRegex.hasMatch(state.email)) {
           return false;
         }
-        final cleanPhone = state.phoneNumber.replaceAll(RegExp(r'[\s\-\(\)\+]'), '');
+        final cleanPhone = state.phoneNumber.replaceAll(
+          RegExp(r'[\s\-\(\)\+]'),
+          '',
+        );
         if (cleanPhone.length != 11) {
           return false;
         }
@@ -151,7 +176,8 @@ class AdoptionBloc extends Bloc<AdoptionEvent, AdoptionState> {
           final dob = DateTime.parse(state.dateOfBirth);
           final today = DateTime.now();
           int age = today.year - dob.year;
-          if (today.month < dob.month || (today.month == dob.month && today.day < dob.day)) {
+          if (today.month < dob.month ||
+              (today.month == dob.month && today.day < dob.day)) {
             age--;
           }
           if (age < 18) return false;

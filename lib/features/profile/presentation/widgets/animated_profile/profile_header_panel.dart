@@ -55,7 +55,7 @@ class ProfileHeaderPanel extends StatelessWidget {
                 angle: 0.45,
                 child: Icon(
                   Icons.pets,
-                  color: Colors.white.withAlpha(22),
+                  color: Colors.white.withAlpha(48),
                   size: 72.r,
                 ),
               ),
@@ -67,7 +67,7 @@ class ProfileHeaderPanel extends StatelessWidget {
                 angle: -0.3,
                 child: Icon(
                   Icons.pets,
-                  color: Colors.white.withAlpha(16),
+                  color: Colors.white.withAlpha(38),
                   size: 56.r,
                 ),
               ),
@@ -79,7 +79,7 @@ class ProfileHeaderPanel extends StatelessWidget {
                 angle: 0.7,
                 child: Icon(
                   Icons.pets,
-                  color: Colors.white.withAlpha(12),
+                  color: Colors.white.withAlpha(32),
                   size: 26.r,
                 ),
               ),
@@ -91,7 +91,7 @@ class ProfileHeaderPanel extends StatelessWidget {
                 angle: -0.5,
                 child: Icon(
                   Icons.pets,
-                  color: Colors.white.withAlpha(10),
+                  color: Colors.white.withAlpha(28),
                   size: 20.r,
                 ),
               ),
@@ -103,7 +103,7 @@ class ProfileHeaderPanel extends StatelessWidget {
                 angle: 0.25,
                 child: Icon(
                   Icons.pets,
-                  color: Colors.white.withAlpha(14),
+                  color: Colors.white.withAlpha(34),
                   size: 32.r,
                 ),
               ),
@@ -115,7 +115,7 @@ class ProfileHeaderPanel extends StatelessWidget {
                 angle: -0.8,
                 child: Icon(
                   Icons.pets,
-                  color: Colors.white.withAlpha(9),
+                  color: Colors.white.withAlpha(24),
                   size: 18.r,
                 ),
               ),

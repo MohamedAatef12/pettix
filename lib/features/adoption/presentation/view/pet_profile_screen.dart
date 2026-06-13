@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pettix/config/router/routes.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/shimmers/report_shimmer.dart';
@@ -50,10 +51,26 @@ class PetProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocListener<AdoptionBrowseBloc, AdoptionBrowseState>(
-      listenWhen: (p, c) =>
-          (!p.reportSuccess && c.reportSuccess) ||
-          (p.isReportLoading && !c.isReportLoading && c.errorMessage != null),
+      listenWhen:
+          (p, c) =>
+              (!p.reportSuccess && c.reportSuccess) ||
+              (p.isReportLoading &&
+                  !c.isReportLoading &&
+                  c.errorMessage != null) ||
+              p.applyCheckedPetId != c.applyCheckedPetId,
       listener: (context, state) {
+        if (state.applyCheckedPetId == pet.id && state.applyIsOwnPet != null) {
+          context.push(
+            AppRoutes.applications,
+            extra: {
+              'petId': pet.id,
+              'showOwnPetBlockedOnOpen': state.applyIsOwnPet!,
+              'hasCheckedOwnPetOnOpen': true,
+            },
+          );
+          return;
+        }
+
         if (state.reportSuccess) {
           PetToast.showSuccess(context, AppText.reportSentSuccessfully);
         } else if (state.errorMessage != null) {

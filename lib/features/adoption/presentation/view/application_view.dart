@@ -28,8 +28,15 @@ import 'package:pettix/core/widgets/app_icon_system.dart';
 
 class ApplicationScreens extends StatefulWidget {
   final int petId;
+  final bool showOwnPetBlockedOnOpen;
+  final bool hasCheckedOwnPetOnOpen;
 
-  const ApplicationScreens({super.key, required this.petId});
+  const ApplicationScreens({
+    super.key,
+    required this.petId,
+    this.showOwnPetBlockedOnOpen = false,
+    this.hasCheckedOwnPetOnOpen = false,
+  });
 
   static List<String> get _stepTitles => [
     AppText.setUpYourInformation,
@@ -43,13 +50,9 @@ class ApplicationScreens extends StatefulWidget {
 }
 
 class _ApplicationScreensState extends State<ApplicationScreens> {
-  late final Future<bool> _isOwnPetFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _isOwnPetFuture = _isOwnPet();
-  }
+  bool _isCheckingOwnPet = false;
+  bool _isOwnPetBlocked = false;
+  bool _hasCheckedOwnPet = false;
 
   Future<bool> _isOwnPet() async {
     final userId = getIt<ICacheManager>().getUserData()?.id;
@@ -62,6 +65,35 @@ class _ApplicationScreensState extends State<ApplicationScreens> {
     );
   }
 
+  Future<void> _startApplication(BuildContext context) async {
+    if (_isCheckingOwnPet) return;
+
+    final bloc = context.read<AdoptionBloc>();
+    final hasConfirmedNotOwnPet =
+        (_hasCheckedOwnPet || widget.hasCheckedOwnPetOnOpen) &&
+        !_isOwnPetBlocked &&
+        !widget.showOwnPetBlockedOnOpen;
+
+    if (hasConfirmedNotOwnPet) {
+      bloc.add(const NextStep());
+      return;
+    }
+
+    setState(() => _isCheckingOwnPet = true);
+    final isOwnPet = await _isOwnPet();
+    if (!mounted) return;
+
+    setState(() {
+      _isCheckingOwnPet = false;
+      _isOwnPetBlocked = isOwnPet;
+      _hasCheckedOwnPet = true;
+    });
+
+    if (!isOwnPet) {
+      bloc.add(const NextStep());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -69,63 +101,60 @@ class _ApplicationScreensState extends State<ApplicationScreens> {
           (context) =>
               getIt<AdoptionBloc>()
                 ..add(const ResetForm())
-                ..add(SetPetId(widget.petId))
-                ..add(FetchAdoptionOptions()),
-      child: FutureBuilder<bool>(
-        future: _isOwnPetFuture,
-        builder: (context, snapshot) {
-          if (snapshot.data == true) {
+                ..add(SetPetId(widget.petId)),
+      child: BlocConsumer<AdoptionBloc, AdoptionState>(
+        listener: (context, state) async {
+          final msg = state.errorMessage;
+          if (msg != null && msg.isNotEmpty) {
+            PetToast.showError(context, msg);
+          }
+          if (state.status == AdoptionStatus.success) {
+            await AppReviewService.requestAfterFirstAdoption(context);
+          }
+        },
+        builder: (context, state) {
+          if (_isOwnPetBlocked || widget.showOwnPetBlockedOnOpen) {
             return _buildOwnPetBlocked(context);
           }
 
-          return BlocConsumer<AdoptionBloc, AdoptionState>(
-            listener: (context, state) async {
-              final msg = state.errorMessage;
-              if (msg != null && msg.isNotEmpty) {
-                PetToast.showError(context, msg);
-              }
-              if (state.status == AdoptionStatus.success) {
-                await AppReviewService.requestAfterFirstAdoption(context);
-              }
-            },
-            builder: (context, state) {
-              if (state.status == AdoptionStatus.success) {
-                return Scaffold(
-                  backgroundColor: AppColors.current.white,
-                  appBar: _buildAppBar(context),
-                  body: StepSubmitted(
-                    onViewApplication: () {
-                      context.goNamed(AppRouteNames.adoptionHistory);
-                    },
-                    onBrowseMore: () {
-                      context.go(AppRoutes.bottomNav, extra: 1);
-                    },
-                  ),
-                );
-              }
+          if (state.status == AdoptionStatus.success) {
+            return Scaffold(
+              backgroundColor: AppColors.current.white,
+              appBar: _buildAppBar(context),
+              body: StepSubmitted(
+                onViewApplication: () {
+                  context.goNamed(AppRouteNames.adoptionHistory);
+                },
+                onBrowseMore: () {
+                  context.go(AppRoutes.bottomNav, extra: 1);
+                },
+              ),
+            );
+          }
 
-              if (state.currentStep == 0) {
-                return Scaffold(
-                  backgroundColor: AppColors.current.white,
-                  body: PetApplication(),
-                );
-              }
+          if (state.currentStep == 0) {
+            return Scaffold(
+              backgroundColor: AppColors.current.white,
+              body: PetApplication(
+                isStarting: _isCheckingOwnPet,
+                onStart: () => _startApplication(context),
+              ),
+            );
+          }
 
-              return Scaffold(
-                backgroundColor: AppColors.current.white,
-                appBar: _buildAppBar(context),
-                body: Column(
-                  children: [
-                    SizedBoxConstants.verticalSmall,
-                    _StepHeader(state: state),
-                    SizedBoxConstants.verticalMedium,
-                    Expanded(child: _StepContent(state: state)),
-                    _BottomNav(state: state),
-                    SizedBox(height: 30.h),
-                  ],
-                ),
-              );
-            },
+          return Scaffold(
+            backgroundColor: AppColors.current.white,
+            appBar: _buildAppBar(context),
+            body: Column(
+              children: [
+                SizedBoxConstants.verticalSmall,
+                _StepHeader(state: state),
+                SizedBoxConstants.verticalMedium,
+                Expanded(child: _StepContent(state: state)),
+                _BottomNav(state: state),
+                SizedBox(height: 30.h),
+              ],
+            ),
           );
         },
       ),

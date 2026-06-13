@@ -35,7 +35,8 @@ class MyPetsRemoteDataSourceImpl implements MyPetsRemoteDataSource {
       );
       if (response.success == true) {
         final raw = response.result;
-        final list = raw is List ? raw : (raw as Map<String, dynamic>?)?['result'] ?? [];
+        final list =
+            raw is List ? raw : (raw as Map<String, dynamic>?)?['result'] ?? [];
         return Right(
           (list as List)
               .map((e) => PetModel.fromJson(e as Map<String, dynamic>))
@@ -57,8 +58,10 @@ class MyPetsRemoteDataSourceImpl implements MyPetsRemoteDataSource {
       _fetchLookup(Constants.petColorsEndpoint);
 
   @override
-  Future<Either<Failure, List<LookupEntity>>> getPetMedicals() =>
-      _fetchLookup(Constants.petMedicalsEndpoint);
+  Future<Either<Failure, List<LookupEntity>>> getPetMedicals() => _fetchLookup(
+    Constants.petMedicalsEndpoint,
+    queryParameters: {'FromAdmin': true},
+  );
 
   @override
   Future<Either<Failure, void>> addPet(PetRequestModel request) async {
@@ -88,7 +91,10 @@ class MyPetsRemoteDataSourceImpl implements MyPetsRemoteDataSource {
   }
 
   @override
-  Future<Either<Failure, void>> updatePet(int petId, PetRequestModel request) async {
+  Future<Either<Failure, void>> updatePet(
+    int petId,
+    PetRequestModel request,
+  ) async {
     try {
       final response = await _apiService.put(
         endPoint: '${Constants.petsEndpoint}/$petId',
@@ -117,10 +123,14 @@ class MyPetsRemoteDataSourceImpl implements MyPetsRemoteDataSource {
 
   /// Shared helper for endpoints that return a plain list of {id, name} objects.
   Future<Either<Failure, List<LookupEntity>>> _fetchLookup(
-    String endpoint,
-  ) async {
+    String endpoint, {
+    Map<String, dynamic>? queryParameters,
+  }) async {
     try {
-      final response = await _apiService.get(endPoint: endpoint);
+      final response = await _apiService.get(
+        endPoint: endpoint,
+        queryParameters: queryParameters,
+      );
       if (response.success == true) {
         final raw = response.result;
         final list = raw is List ? raw : <dynamic>[];

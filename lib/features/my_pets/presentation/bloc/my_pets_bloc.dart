@@ -181,10 +181,20 @@ class MyPetsBloc extends Bloc<MyPetsEvent, MyPetsState> {
     Emitter<MyPetsState> emit,
   ) async {
     emit(state.copyWith(status: MyPetsStatus.submitting));
-
-    final result = await _updatePet(
-      UpdatePetParams(event.petId, event.request),
+    final request = PetRequestEntity(
+      id: event.petId,
+      name: event.request.name,
+      description: event.request.description,
+      details: event.request.details,
+      age: event.request.age,
+      categoryId: event.request.categoryId,
+      genderId: event.request.genderId,
+      colorId: event.request.colorId,
+      images: event.request.images,
+      vaccinations: event.request.vaccinations,
     );
+
+    final result = await _updatePet(UpdatePetParams(event.petId, request));
 
     if (result.isLeft()) {
       result.fold(
@@ -260,15 +270,28 @@ class MyPetsBloc extends Bloc<MyPetsEvent, MyPetsState> {
     UpdatePetStatusEvent event,
     Emitter<MyPetsState> emit,
   ) async {
+    if (state.statusUpdatingPetIds.contains(event.petId)) return;
+
+    emit(
+      state.copyWith(
+        statusUpdatingPetIds: {...state.statusUpdatingPetIds, event.petId},
+      ),
+    );
+
     final result = await _updatePetStatus((
       petId: event.petId,
       status: event.status,
     ));
+
+    final remainingUpdatingIds = Set<int>.of(state.statusUpdatingPetIds)
+      ..remove(event.petId);
+
     result.fold(
       (failure) => emit(
         state.copyWith(
           status: MyPetsStatus.error,
           errorMessage: failure.message,
+          statusUpdatingPetIds: remainingUpdatingIds,
         ),
       ),
       (_) {
@@ -294,7 +317,13 @@ class MyPetsBloc extends Bloc<MyPetsEvent, MyPetsState> {
               }
               return p;
             }).toList();
-        emit(state.copyWith(status: MyPetsStatus.loaded, pets: updated));
+        emit(
+          state.copyWith(
+            status: MyPetsStatus.loaded,
+            pets: updated,
+            statusUpdatingPetIds: remainingUpdatingIds,
+          ),
+        );
       },
     );
   }
