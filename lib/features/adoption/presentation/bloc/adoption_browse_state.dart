@@ -27,6 +27,9 @@ class AdoptionBrowseState extends Equatable {
   final List<ReportReasonEntity> reportReasons;
   final bool isReportLoading;
   final bool reportSuccess;
+  final int? applyingPetId;
+  final int? applyCheckedPetId;
+  final bool? applyIsOwnPet;
 
   const AdoptionBrowseState({
     this.status = AdoptionBrowseStatus.initial,
@@ -44,6 +47,9 @@ class AdoptionBrowseState extends Equatable {
     this.reportReasons = const [],
     this.isReportLoading = false,
     this.reportSuccess = false,
+    this.applyingPetId,
+    this.applyCheckedPetId,
+    this.applyIsOwnPet,
   });
 
   bool get hasActiveFilters =>
@@ -72,6 +78,11 @@ class AdoptionBrowseState extends Equatable {
     List<ReportReasonEntity>? reportReasons,
     bool? isReportLoading,
     bool? reportSuccess,
+    int? applyingPetId,
+    int? applyCheckedPetId,
+    bool? applyIsOwnPet,
+    bool clearApplyingPet = false,
+    bool clearApplyResult = false,
   }) {
     return AdoptionBrowseState(
       status: status ?? this.status,
@@ -81,7 +92,9 @@ class AdoptionBrowseState extends Equatable {
       hasMore: hasMore ?? this.hasMore,
       searchQuery: clearSearch ? null : (searchQuery ?? this.searchQuery),
       selectedCategoryId:
-          clearCategory ? null : (selectedCategoryId ?? this.selectedCategoryId),
+          clearCategory
+              ? null
+              : (selectedCategoryId ?? this.selectedCategoryId),
       selectedGenderId:
           clearGender ? null : (selectedGenderId ?? this.selectedGenderId),
       sortBy: clearSort ? null : (sortBy ?? this.sortBy),
@@ -91,25 +104,36 @@ class AdoptionBrowseState extends Equatable {
       reportReasons: reportReasons ?? this.reportReasons,
       isReportLoading: isReportLoading ?? this.isReportLoading,
       reportSuccess: reportSuccess ?? this.reportSuccess,
+      applyingPetId:
+          clearApplyingPet ? null : (applyingPetId ?? this.applyingPetId),
+      applyCheckedPetId:
+          clearApplyResult
+              ? null
+              : (applyCheckedPetId ?? this.applyCheckedPetId),
+      applyIsOwnPet:
+          clearApplyResult ? null : (applyIsOwnPet ?? this.applyIsOwnPet),
     );
   }
 
   @override
   List<Object?> get props => [
-        status,
-        pets,
-        totalCount,
-        currentPage,
-        hasMore,
-        searchQuery,
-        selectedCategoryId,
-        selectedGenderId,
-        sortBy,
-        sortDescending,
-        categories,
-        errorMessage,
-        reportReasons,
-        isReportLoading,
-        reportSuccess,
-      ];
+    status,
+    pets,
+    totalCount,
+    currentPage,
+    hasMore,
+    searchQuery,
+    selectedCategoryId,
+    selectedGenderId,
+    sortBy,
+    sortDescending,
+    categories,
+    errorMessage,
+    reportReasons,
+    isReportLoading,
+    reportSuccess,
+    applyingPetId,
+    applyCheckedPetId,
+    applyIsOwnPet,
+  ];
 }

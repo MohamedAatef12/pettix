@@ -82,3 +82,12 @@ class ReportPetEvent extends AdoptionBrowseEvent {
   @override
   List<Object?> get props => [petId, reasonId, customReason];
 }
+
+class CheckApplyPetEvent extends AdoptionBrowseEvent {
+  final int petId;
+
+  const CheckApplyPetEvent(this.petId);
+
+  @override
+  List<Object?> get props => [petId];
+}

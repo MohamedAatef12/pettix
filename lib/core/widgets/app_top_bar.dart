@@ -55,6 +55,8 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
             ? AppTopBarBackButton(onPressed: onBack, color: backButtonColor)
             : const SizedBox.shrink());
     final hasLeading = leading != null || showBackButton;
+    final trailingEdgePadding = trailing != null ? 8.w : 0.0;
+    final sideWidth = 56.w + trailingEdgePadding;
 
     return AppBar(
       automaticallyImplyLeading: false,
@@ -62,7 +64,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
       scrolledUnderElevation: 0,
       elevation: 0,
       centerTitle: centerTitle,
-      leadingWidth: hasLeading ? 56.w : 0,
+      leadingWidth: hasLeading ? sideWidth : 0,
       leading: hasLeading ? Center(child: effectiveLeading) : null,
       title: Text(
         title,
@@ -79,7 +81,10 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       actions: [
         if (trailing != null)
-          SizedBox(width: 56.w, child: Center(child: trailing))
+          Padding(
+            padding: EdgeInsetsDirectional.only(end: trailingEdgePadding),
+            child: SizedBox(width: 56.w, child: Center(child: trailing)),
+          )
         else if (centerTitle && hasLeading)
           SizedBox(width: 56.w),
       ],

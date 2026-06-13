@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -9,13 +8,18 @@ import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/utils/custom_button.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
-import 'package:pettix/features/adoption/presentation/bloc/adoption_bloc.dart';
-import 'package:pettix/features/adoption/presentation/bloc/adoption_event.dart';
 
 import 'package:pettix/core/widgets/app_icon_system.dart';
 
 class PetApplication extends StatelessWidget {
-  const PetApplication({super.key});
+  final VoidCallback onStart;
+  final bool isStarting;
+
+  const PetApplication({
+    super.key,
+    required this.onStart,
+    this.isStarting = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +84,8 @@ class PetApplication extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: CustomFilledButton(
             text: AppText.startApplication,
-            onPressed: () => context.read<AdoptionBloc>().add(NextStep()),
+            onPressed: onStart,
+            isLoading: isStarting,
             heightFactor: 0.06,
             backgroundColor: AppColors.current.primary,
             textStyle: TextStyle(
@@ -140,7 +145,7 @@ class _HeroSection extends StatelessWidget {
             ),
           ),
           PositionedDirectional(
-            top: topPadding ,
+            top: topPadding,
             start: 10.w,
             child: InkWell(
               onTap: () => context.pop(),

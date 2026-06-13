@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pettix/core/constants/app_texts.dart';
 import 'package:pettix/core/constants/sized_box.dart';
 import 'package:pettix/core/themes/app_colors.dart';
+import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_bloc.dart';
+import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_event.dart';
+import 'package:pettix/features/adoption/presentation/bloc/adoption_browse_state.dart';
 import 'package:pettix/features/adoption/presentation/widgets/pet_profile/pet_description.dart';
 import 'package:pettix/features/adoption/presentation/widgets/pet_profile/pet_details.dart';
 import 'package:pettix/features/adoption/presentation/widgets/pet_profile/pet_medical_history.dart';
 import 'package:pettix/features/adoption/presentation/widgets/pet_profile/pet_photos.dart';
 import 'package:pettix/features/my_pets/domain/entities/pet_entity.dart';
-import 'package:go_router/go_router.dart';
-import 'package:pettix/config/router/routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:pettix/core/widgets/app_icon_system.dart';
@@ -59,19 +61,51 @@ class _AdoptBottomBar extends StatelessWidget {
           ),
         ],
       ),
-      child: ElevatedButton.icon(
-        onPressed: () => context.push(AppRoutes.applications, extra: pet.id),
-        icon: const AppIcon.raw(Icons.pets_rounded, size: 20, color: Colors.white),
-        label: Text(AppText.applyToAdopt),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.current.primary,
-          foregroundColor: AppColors.current.white,
-          minimumSize: Size(double.infinity, 50.h),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14.r),
-          ),
-          textStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
-        ),
+      child: BlocBuilder<AdoptionBrowseBloc, AdoptionBrowseState>(
+        buildWhen:
+            (previous, current) =>
+                previous.applyingPetId != current.applyingPetId,
+        builder: (context, state) {
+          final isLoading = state.applyingPetId == pet.id;
+          return ElevatedButton.icon(
+            onPressed:
+                isLoading
+                    ? null
+                    : () => context.read<AdoptionBrowseBloc>().add(
+                      CheckApplyPetEvent(pet.id),
+                    ),
+            icon:
+                isLoading
+                    ? SizedBox(
+                      width: 20.w,
+                      height: 20.w,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.3,
+                        color: AppColors.current.white,
+                      ),
+                    )
+                    : const AppIcon.raw(
+                      Icons.pets_rounded,
+                      size: 20,
+                      color: Colors.white,
+                    ),
+            label: Text(AppText.applyToAdopt),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.current.primary,
+              disabledBackgroundColor: AppColors.current.primary,
+              foregroundColor: AppColors.current.white,
+              disabledForegroundColor: AppColors.current.white,
+              minimumSize: Size(double.infinity, 50.h),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14.r),
+              ),
+              textStyle: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          );
+        },
       ),
     );
   }

@@ -115,25 +115,17 @@ class _InitialsAvatar extends StatelessWidget {
       width: size,
       height: size,
       color: _color,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Icon(
-            Icons.pets_rounded,
-            size: size * 0.72,
-            color: Colors.white.withValues(alpha: 0.15),
+      child: Center(
+        child: Text(
+          _initials,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: size * 0.34,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.5,
+            height: 1,
           ),
-          Text(
-            _initials,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: size * 0.34,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.5,
-              height: 1,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
