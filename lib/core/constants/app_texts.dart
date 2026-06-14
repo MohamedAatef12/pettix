@@ -523,6 +523,7 @@ abstract class AppText {
   static String get addVaccinationUpper => 'ADD VACCINATION'.tr();
   static String get customVaccinationName => 'Or type a custom name'.tr();
   static String get selectVaccinationDate => 'Select vaccination date'.tr();
+  static String get selectMultiple => 'Select multiple'.tr();
   static String get userNotFound => 'User not found'.tr();
 
   static String deletePetConfirmation(String petName) =>

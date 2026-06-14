@@ -22,6 +22,8 @@ import 'package:pettix/features/my_pets/presentation/bloc/my_pets_bloc.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_event.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_state.dart';
 import 'package:pettix/features/my_pets/presentation/widgets/pet_gender_selector.dart';
+import 'package:pettix/features/my_pets/presentation/widgets/pet_passport.dart';
+import 'package:pettix/features/my_pets/presentation/widgets/vaccination_builder.dart';
 
 class MyPetsScreen extends StatelessWidget {
   const MyPetsScreen({super.key});
@@ -301,14 +303,14 @@ class _PetManageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
+      margin: EdgeInsets.only(bottom: 14.h),
       decoration: BoxDecoration(
         color: AppColors.current.white,
-        borderRadius: BorderRadius.circular(20.r),
+        borderRadius: BorderRadius.circular(18.r),
         boxShadow: [
           BoxShadow(
-            color: AppColors.current.primary.withValues(alpha: 0.06),
-            blurRadius: 18,
+            color: AppColors.current.primary.withValues(alpha: 0.08),
+            blurRadius: 16,
             offset: const Offset(0, 6),
           ),
           BoxShadow(
@@ -318,30 +320,82 @@ class _PetManageCard extends StatelessWidget {
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20.r),
-        child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _CardAccentBar(),
-              Expanded(
-                child: Column(
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // ── Tappable body (PetIdCard style) ─────────────────────────────
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => showPetPassport(
+                context,
+                pet,
+                onToggleStatus: onToggleStatus,
+                onEditPet: onEdit,
+                onDeletePet: onDelete,
+              ),
+              child: SizedBox(
+                height: 118.h,
+                child: Stack(
                   children: [
-                    _CardBody(pet: pet),
-                    _CardFooter(
-                      pet: pet,
-                      isStatusUpdating: isStatusUpdating,
-                      onEdit: onEdit,
-                      onDelete: onDelete,
-                      onToggle: onToggleStatus,
+                    _CardAccentBar(),
+                    PositionedDirectional(
+                      end: -16.w,
+                      bottom: -16.w,
+                      child: AppIcon.raw(
+                        Icons.pets_rounded,
+                        size: 80.w,
+                        color: AppColors.current.primary.withValues(alpha: 0.05),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(
+                        16.w,
+                        10.h,
+                        14.w,
+                        10.h,
+                      ),
+                      child: Row(
+                        children: [
+                          _CardPhoto(imageUrl: pet.imageUrls.firstOrNull),
+                          SizedBox(width: 12.w),
+                          Expanded(child: _ManageCardInfo(pet: pet)),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+          // ── Actions footer ────────────────────────────────────────────────
+          Container(
+            color: AppColors.current.lightBlue.withValues(alpha: 0.55),
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+            child: Row(
+              children: [
+                _StatusTogglePill(
+                  isAvailable: pet.adoptionStatus == 1,
+                  isLoading: isStatusUpdating,
+                  onToggle: onToggleStatus,
+                ),
+                const Spacer(),
+                _FooterIconBtn(
+                  icon: Icons.edit_rounded,
+                  color: AppColors.current.primary,
+                  onTap: onEdit,
+                ),
+                SizedBox(width: 8.w),
+                _FooterIconBtn(
+                  icon: Icons.delete_rounded,
+                  color: AppColors.current.red,
+                  onTap: onDelete,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -350,35 +404,19 @@ class _PetManageCard extends StatelessWidget {
 class _CardAccentBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 5.w,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [AppColors.current.primary, AppColors.current.teal],
+    return PositionedDirectional(
+      start: 0,
+      top: 0,
+      bottom: 0,
+      child: Container(
+        width: 6.w,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [AppColors.current.primary, AppColors.current.teal],
+          ),
         ),
-      ),
-    );
-  }
-}
-
-class _CardBody extends StatelessWidget {
-  final PetEntity pet;
-
-  const _CardBody({required this.pet});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(12.w, 14.h, 14.w, 12.h),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _CardPhoto(imageUrl: pet.imageUrls.firstOrNull),
-          SizedBox(width: 12.w),
-          Expanded(child: _CardInfo(pet: pet)),
-        ],
       ),
     );
   }
@@ -391,14 +429,28 @@ class _CardPhoto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(14.r),
-      child: SizedBox(
-        width: 84.w,
-        height: 84.w,
+    return Container(
+      width: 76.w,
+      height: 96.h,
+      decoration: BoxDecoration(
+        color: AppColors.current.lightBlue,
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(
+          color: AppColors.current.lightGray.withValues(alpha: 0.8),
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(9.r),
         child: AppCachedImage(
           imageUrl: imageUrl ?? '',
           fit: BoxFit.cover,
+          errorWidget: Center(
+            child: AppIcon.raw(
+              Icons.pets_rounded,
+              color: AppColors.current.primary.withValues(alpha: 0.35),
+              size: 28.w,
+            ),
+          ),
           backgroundColor: AppColors.current.lightBlue,
         ),
       ),
@@ -406,74 +458,72 @@ class _CardPhoto extends StatelessWidget {
   }
 }
 
-class _CardInfo extends StatelessWidget {
+class _ManageCardInfo extends StatelessWidget {
   final PetEntity pet;
 
-  const _CardInfo({required this.pet});
+  const _ManageCardInfo({required this.pet});
 
   @override
   Widget build(BuildContext context) {
-    final isAvailable = pet.adoptionStatus == 1;
+    final hasVax = pet.vaccinations.isNotEmpty;
+    final details = [
+      if (pet.categoryName?.isNotEmpty ?? false) pet.categoryName!,
+      if (pet.genderName?.isNotEmpty ?? false) pet.genderName!,
+    ].join(' · ');
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                pet.name,
-                style: AppTextStyles.bold.copyWith(
-                  fontSize: 16.sp,
-                  color: AppColors.current.text,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            SizedBox(width: 6.w),
-            _StatusBadge(isAvailable: isAvailable),
-          ],
+        Text(
+          AppText.pettixPetId,
+          style: TextStyle(
+            color: AppColors.current.primary,
+            fontSize: 8.sp,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.5,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
-        if (pet.code.isNotEmpty) ...[
-          SizedBox(height: 4.h),
+        SizedBox(height: 3.h),
+        Text(
+          pet.name.toUpperCase(),
+          style: TextStyle(
+            color: AppColors.current.text,
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w800,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        SizedBox(height: 4.h),
+        _ManageCodeStrip(code: pet.code),
+        SizedBox(height: 5.h),
+        if (details.isNotEmpty)
           Text(
-            pet.code,
+            details,
             style: TextStyle(
               color: AppColors.current.midGray,
               fontSize: 9.sp,
-              letterSpacing: 0.8,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-        ],
-        SizedBox(height: 9.h),
-        Wrap(
-          spacing: 5.w,
-          runSpacing: 5.h,
+        SizedBox(height: 6.h),
+        Row(
           children: [
-            if (pet.categoryName != null)
-              _InfoChip(
-                label: pet.categoryName!,
-                color: AppColors.current.primary,
-              ),
-            if (pet.genderName != null)
-              _InfoChip(
-                label: pet.genderName!,
-                color: const Color(0xFFC8933D),
-                bgColor: const Color(0xFFF7F3ED),
-              ),
             if (pet.age != null)
-              _InfoChip(
-                label: '${pet.age}yr',
-                icon: Icons.cake_outlined,
-                color: AppColors.current.midGray,
-                bgColor: AppColors.current.lightBlue,
+              _ManageMiniBadge(
+                icon: Icons.cake_rounded,
+                label: '${pet.age} ${AppText.yearsShort}',
               ),
-            if (pet.vaccinations.isNotEmpty)
-              _InfoChip(
-                label: '${pet.vaccinations.length} vax',
-                icon: Icons.vaccines_rounded,
+            if (pet.age != null && hasVax) SizedBox(width: 5.w),
+            if (hasVax)
+              _ManageMiniBadge(
+                icon: Icons.verified_rounded,
+                label: '${pet.vaccinations.length}',
                 color: AppColors.current.teal,
-                bgColor: AppColors.current.teal.withValues(alpha: 0.08),
               ),
           ],
         ),
@@ -482,128 +532,68 @@ class _CardInfo extends StatelessWidget {
   }
 }
 
-class _StatusBadge extends StatelessWidget {
-  final bool isAvailable;
+class _ManageCodeStrip extends StatelessWidget {
+  final String code;
 
-  const _StatusBadge({required this.isAvailable});
+  const _ManageCodeStrip({required this.code});
 
   @override
   Widget build(BuildContext context) {
-    final color =
-        isAvailable ? AppColors.current.teal : AppColors.current.midGray;
-    final label = isAvailable ? AppText.available : AppText.private;
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 3.h),
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(20.r),
+        color: AppColors.current.lightBlue,
+        borderRadius: BorderRadius.circular(5.r),
+      ),
+      child: Text(
+        code,
+        style: TextStyle(
+          color: AppColors.current.text,
+          fontSize: 8.sp,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.5,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+}
+
+class _ManageMiniBadge extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color? color;
+
+  const _ManageMiniBadge({
+    required this.icon,
+    required this.label,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final badgeColor = color ?? AppColors.current.primary;
+    return Container(
+      height: 20.h,
+      padding: EdgeInsets.symmetric(horizontal: 6.w),
+      decoration: BoxDecoration(
+        color: badgeColor.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(5.r),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 5.w,
-            height: 5.w,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          ),
-          SizedBox(width: 4.w),
+          AppIcon.raw(icon, color: badgeColor, size: 11.w),
+          SizedBox(width: 3.w),
           Text(
             label,
             style: TextStyle(
-              color: color,
+              color: badgeColor,
               fontSize: 9.sp,
               fontWeight: FontWeight.w700,
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _InfoChip extends StatelessWidget {
-  final String label;
-  final Color color;
-  final Color? bgColor;
-  final IconData? icon;
-
-  const _InfoChip({
-    required this.label,
-    required this.color,
-    this.bgColor,
-    this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 3.h),
-      decoration: BoxDecoration(
-        color: bgColor ?? color.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(6.r),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            AppIcon.raw(icon!, color: color, size: 10.w),
-            SizedBox(width: 3.w),
-          ],
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 10.sp,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Card footer ───────────────────────────────────────────────────────────────
-
-class _CardFooter extends StatelessWidget {
-  final PetEntity pet;
-  final bool isStatusUpdating;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
-  final ValueChanged<int> onToggle;
-
-  const _CardFooter({
-    required this.pet,
-    required this.isStatusUpdating,
-    required this.onEdit,
-    required this.onDelete,
-    required this.onToggle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isAvailable = pet.adoptionStatus == 1;
-    return Container(
-      color: AppColors.current.lightBlue.withValues(alpha: 0.55),
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-      child: Row(
-        children: [
-          _StatusTogglePill(
-            isAvailable: isAvailable,
-            isLoading: isStatusUpdating,
-            onToggle: onToggle,
-          ),
-          const Spacer(),
-          _FooterIconBtn(
-            icon: Icons.edit_rounded,
-            color: AppColors.current.primary,
-            onTap: onEdit,
-          ),
-          SizedBox(width: 8.w),
-          _FooterIconBtn(
-            icon: Icons.delete_rounded,
-            color: AppColors.current.red,
-            onTap: onDelete,
           ),
         ],
       ),
@@ -934,6 +924,7 @@ class _EditPetSheetState extends State<_EditPetSheet> {
   late final TextEditingController _details;
   late final TextEditingController _age;
   int? _catId, _colorId, _genderId;
+  late List<VaccinationEntity> _vaccinations;
 
   LookupEntity? _findById(List<LookupEntity> list, String? name) {
     if (name == null) return null;
@@ -953,6 +944,7 @@ class _EditPetSheetState extends State<_EditPetSheet> {
     _age = TextEditingController(text: widget.pet.age?.toString() ?? '');
     _catId = _findById(widget.categories, widget.pet.categoryName)?.id;
     _colorId = _findById(widget.colors, widget.pet.colorName)?.id;
+    _vaccinations = List.from(widget.pet.vaccinations);
     final g = widget.pet.genderName?.toLowerCase();
     _genderId =
         g == 'male'
@@ -985,7 +977,7 @@ class _EditPetSheetState extends State<_EditPetSheet> {
           categoryId: _catId,
           genderId: _genderId,
           colorId: _colorId,
-          vaccinations: widget.pet.vaccinations,
+          vaccinations: _vaccinations,
         ),
       ),
     );
@@ -1002,21 +994,22 @@ class _EditPetSheetState extends State<_EditPetSheet> {
       builder: (context, state) {
         final isSubmitting = state.status == MyPetsStatus.submitting;
 
-        return Container(
-          decoration: BoxDecoration(
-            color: AppColors.current.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-          ),
-          padding: EdgeInsets.fromLTRB(
-            20.w,
-            16.h,
-            20.w,
-            MediaQuery.of(context).viewInsets.bottom + 20.h,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+        return SizedBox(
+          height: MediaQuery.of(context).size.height * 0.85,
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.current.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+            ),
+            padding: EdgeInsets.fromLTRB(
+              20.w,
+              16.h,
+              20.w,
+              MediaQuery.of(context).viewInsets.bottom + 20.h,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Center(
                   child: Container(
@@ -1122,8 +1115,103 @@ class _EditPetSheetState extends State<_EditPetSheet> {
                           .toList(),
                   onChanged: (v) => setState(() => _colorId = v),
                 ),
+                SizedBox(height: 16.h),
+                Row(
+                  children: [
+                    Container(
+                      width: 26.w,
+                      height: 26.w,
+                      decoration: BoxDecoration(
+                        color: AppColors.current.teal.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(7.r),
+                      ),
+                      child: AppIcon.raw(
+                        Icons.vaccines_rounded,
+                        color: AppColors.current.teal,
+                        size: 14.w,
+                      ),
+                    ),
+                    SizedBox(width: 8.w),
+                    Text(
+                      AppText.medicalRecords,
+                      style: TextStyle(
+                        color: AppColors.current.text,
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10.h),
+                ..._vaccinations.asMap().entries.map(
+                  (e) => VaccinationChip(
+                    vaccination: e.value,
+                    onRemove:
+                        () => setState(() => _vaccinations.removeAt(e.key)),
+                  ),
+                ),
+                if (_vaccinations.isNotEmpty) SizedBox(height: 4.h),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => showVaccinationSheet(
+                      context,
+                      medicals: state.medicals,
+                      onAdd:
+                          (list) =>
+                              setState(() => _vaccinations.addAll(list)),
+                    ),
+                    borderRadius: BorderRadius.circular(12.r),
+                    child: Ink(
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(vertical: 13.h),
+                      decoration: BoxDecoration(
+                        color: AppColors.current.primary.withValues(
+                          alpha: 0.05,
+                        ),
+                        borderRadius: BorderRadius.circular(12.r),
+                        border: Border.all(
+                          color: AppColors.current.primary.withValues(
+                            alpha: 0.25,
+                          ),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 22.w,
+                            height: 22.w,
+                            decoration: BoxDecoration(
+                              color: AppColors.current.primary.withValues(
+                                alpha: 0.12,
+                              ),
+                              shape: BoxShape.circle,
+                            ),
+                            child: AppIcon.raw(
+                              Icons.add_rounded,
+                              color: AppColors.current.primary,
+                              size: 14.w,
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          Text(
+                            AppText.addVaccination,
+                            style: TextStyle(
+                              color: AppColors.current.primary,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
+          ),
           ),
         );
       },

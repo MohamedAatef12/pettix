@@ -12,6 +12,7 @@ import 'package:pettix/features/my_pets/presentation/bloc/my_pets_event.dart';
 import 'package:pettix/features/my_pets/presentation/bloc/my_pets_state.dart';
 
 /// Shows the list of added vaccinations + an "Add Vaccination" button.
+/// Used in the add-pet form; manages state via [MyPetsBloc].
 class VaccinationBuilder extends StatelessWidget {
   const VaccinationBuilder({super.key});
 
@@ -23,7 +24,7 @@ class VaccinationBuilder extends StatelessWidget {
         return Column(
           children: [
             ...state.formVaccinations.asMap().entries.map(
-              (entry) => _VaccinationChip(
+              (entry) => VaccinationChip(
                 vaccination: entry.value,
                 onRemove:
                     () => context.read<MyPetsBloc>().add(
@@ -40,23 +41,27 @@ class VaccinationBuilder extends StatelessWidget {
   }
 }
 
-String _formatDateInEnglish(DateTime date) {
+String formatVaccinationDate(DateTime date) {
   final year = date.year.toString().padLeft(4, '0');
   final month = date.month.toString().padLeft(2, '0');
   final day = date.day.toString().padLeft(2, '0');
   return '$year-$month-$day';
 }
 
-class _VaccinationChip extends StatelessWidget {
+class VaccinationChip extends StatelessWidget {
   final VaccinationEntity vaccination;
   final VoidCallback onRemove;
 
-  const _VaccinationChip({required this.vaccination, required this.onRemove});
+  const VaccinationChip({
+    super.key,
+    required this.vaccination,
+    required this.onRemove,
+  });
 
   @override
   Widget build(BuildContext context) {
     final date = vaccination.vaccinationDate;
-    final dateLabel = date != null ? _formatDateInEnglish(date) : '';
+    final dateLabel = date != null ? formatVaccinationDate(date) : '';
 
     return Container(
       margin: EdgeInsets.only(bottom: 8.h),
@@ -140,7 +145,15 @@ class _AddVaccinationButton extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () => _showVaccinationSheet(context, medicals),
+        onTap: () => showVaccinationSheet(
+          context,
+          medicals: medicals,
+          onAdd: (vaccinations) {
+            for (final v in vaccinations) {
+              context.read<MyPetsBloc>().add(AddVaccinationEvent(v));
+            }
+          },
+        ),
         borderRadius: BorderRadius.circular(12.r),
         child: Ink(
           width: double.infinity,
@@ -186,24 +199,26 @@ class _AddVaccinationButton extends StatelessWidget {
   }
 }
 
-// ── Vaccination bottom sheet ──────────────────────────────────────────────────
+// ── Public helper — used by both add-pet form and edit sheet ──────────────────
 
-void _showVaccinationSheet(BuildContext context, List<LookupEntity> medicals) {
+void showVaccinationSheet(
+  BuildContext context, {
+  required List<LookupEntity> medicals,
+  required void Function(List<VaccinationEntity>) onAdd,
+}) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder:
-        (_) => _VaccinationSheet(
-          medicals: medicals,
-          onAdd: (v) => context.read<MyPetsBloc>().add(AddVaccinationEvent(v)),
-        ),
+    builder: (_) => _VaccinationSheet(medicals: medicals, onAdd: onAdd),
   );
 }
 
+// ── Vaccination bottom sheet ──────────────────────────────────────────────────
+
 class _VaccinationSheet extends StatefulWidget {
   final List<LookupEntity> medicals;
-  final ValueChanged<VaccinationEntity> onAdd;
+  final void Function(List<VaccinationEntity>) onAdd;
 
   const _VaccinationSheet({required this.medicals, required this.onAdd});
 
@@ -212,7 +227,8 @@ class _VaccinationSheet extends StatefulWidget {
 }
 
 class _VaccinationSheetState extends State<_VaccinationSheet> {
-  String? _selectedName;
+  final Set<String> _selectedNames = {};
+  bool _multiSelectMode = false;
   DateTime? _selectedDate;
   final _customController = TextEditingController();
 
@@ -220,6 +236,30 @@ class _VaccinationSheetState extends State<_VaccinationSheet> {
   void dispose() {
     _customController.dispose();
     super.dispose();
+  }
+
+  bool get _canSubmit {
+    final hasName =
+        _selectedNames.isNotEmpty ||
+        _customController.text.trim().isNotEmpty;
+    return hasName && _selectedDate != null;
+  }
+
+  void _toggleSingle(String name) {
+    setState(() {
+      _selectedNames.clear();
+      _selectedNames.add(name);
+    });
+  }
+
+  void _toggleMulti(String name) {
+    setState(() {
+      if (_selectedNames.contains(name)) {
+        _selectedNames.remove(name);
+      } else {
+        _selectedNames.add(name);
+      }
+    });
   }
 
   void _pickDate() {
@@ -279,15 +319,14 @@ class _VaccinationSheetState extends State<_VaccinationSheet> {
                         onTap: () {
                           final now = DateTime.now().toUtc();
                           setState(
-                            () =>
-                                _selectedDate = DateTime.utc(
-                                  selected.year,
-                                  selected.month,
-                                  selected.day,
-                                  now.hour,
-                                  now.minute,
-                                  now.second,
-                                ),
+                            () => _selectedDate = DateTime.utc(
+                              selected.year,
+                              selected.month,
+                              selected.day,
+                              now.hour,
+                              now.minute,
+                              now.second,
+                            ),
                           );
                           Navigator.pop(context);
                         },
@@ -325,9 +364,7 @@ class _VaccinationSheetState extends State<_VaccinationSheet> {
                       initialDateTime: selected,
                       maximumDate: DateTime.now(),
                       minimumDate: DateTime(2000),
-                      onDateTimeChanged: (value) {
-                        selected = value;
-                      },
+                      onDateTimeChanged: (value) => selected = value,
                     ),
                   ),
                 ),
@@ -338,14 +375,28 @@ class _VaccinationSheetState extends State<_VaccinationSheet> {
   }
 
   void _submit() {
-    final name = _selectedName ?? _customController.text.trim();
-    if (name.isEmpty) return;
-    widget.onAdd(VaccinationEntity(name: name, vaccinationDate: _selectedDate));
+    if (!_canSubmit) return;
+    final custom = _customController.text.trim();
+    final names = {..._selectedNames, if (custom.isNotEmpty) custom};
+    widget.onAdd(
+      names
+          .map(
+            (name) =>
+                VaccinationEntity(name: name, vaccinationDate: _selectedDate),
+          )
+          .toList(),
+    );
     Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
+    final selectedCount = _selectedNames.length;
+    final addLabel =
+        selectedCount > 1
+            ? '${AppText.add} ($selectedCount)'
+            : AppText.add;
+
     return Container(
       padding: EdgeInsets.fromLTRB(
         20.w,
@@ -372,58 +423,143 @@ class _VaccinationSheetState extends State<_VaccinationSheet> {
             ),
           ),
           SizedBox(height: 16.h),
-          Text(
-            AppText.addVaccinationUpper,
-            style: TextStyle(
-              color: AppColors.current.text,
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w700,
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  AppText.addVaccinationUpper,
+                  style: TextStyle(
+                    color: AppColors.current.text,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              if (_multiSelectMode && selectedCount > 0)
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 8.w,
+                    vertical: 3.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.current.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                  child: Text(
+                    '$selectedCount selected',
+                    style: TextStyle(
+                      color: AppColors.current.primary,
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+            ],
           ),
-          SizedBox(height: 16.h),
+          if (widget.medicals.isNotEmpty) ...[
+            SizedBox(height: 8.h),
+            GestureDetector(
+              onTap: () => setState(() {
+                _multiSelectMode = !_multiSelectMode;
+                _selectedNames.clear();
+              }),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 20.w,
+                    height: 20.w,
+                    child: Checkbox(
+                      value: _multiSelectMode,
+                      onChanged: (val) => setState(() {
+                        _multiSelectMode = val ?? false;
+                        _selectedNames.clear();
+                      }),
+                      activeColor: AppColors.current.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4.r),
+                      ),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+                  SizedBox(width: 6.w),
+                  Text(
+                    AppText.selectMultiple,
+                    style: TextStyle(
+                      color: _multiSelectMode
+                          ? AppColors.current.primary
+                          : AppColors.current.midGray,
+                      fontSize: 12.sp,
+                      fontWeight: _multiSelectMode
+                          ? FontWeight.w600
+                          : FontWeight.w400,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          SizedBox(height: 14.h),
           if (widget.medicals.isNotEmpty) ...[
             Wrap(
               spacing: 8.w,
               runSpacing: 8.h,
-              children:
-                  widget.medicals.map((m) {
-                    final selected = _selectedName == m.name;
-                    return GestureDetector(
-                      onTap: () => setState(() => _selectedName = m.name),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 160),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12.w,
-                          vertical: 7.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color:
-                              selected
-                                  ? AppColors.current.primary
-                                  : AppColors.current.lightBlue,
-                          borderRadius: BorderRadius.circular(20.r),
-                          border: Border.all(
-                            color:
-                                selected
-                                    ? AppColors.current.primary
-                                    : AppColors.current.lightGray,
+              children: widget.medicals.map((m) {
+                final isSelected = _selectedNames.contains(m.name);
+                return GestureDetector(
+                  onTap: () => _multiSelectMode
+                      ? _toggleMulti(m.name)
+                      : _toggleSingle(m.name),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 160),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 7.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color:
+                          isSelected
+                              ? AppColors.current.primary
+                              : AppColors.current.lightBlue,
+                      borderRadius: BorderRadius.circular(20.r),
+                      border: Border.all(
+                        color:
+                            isSelected
+                                ? AppColors.current.primary
+                                : AppColors.current.lightGray,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (isSelected) ...[
+                          AppIcon.raw(
+                            Icons.check_rounded,
+                            color: Colors.white,
+                            size: 12.w,
                           ),
-                        ),
-                        child: Text(
+                          SizedBox(width: 4.w),
+                        ],
+                        Text(
                           m.name,
                           style: TextStyle(
                             color:
-                                selected
+                                isSelected
                                     ? Colors.white
                                     : AppColors.current.text,
                             fontSize: 12.sp,
                             fontWeight:
-                                selected ? FontWeight.w600 : FontWeight.w500,
+                                isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.w500,
                           ),
                         ),
-                      ),
-                    );
-                  }).toList(),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
             SizedBox(height: 14.h),
           ],
@@ -449,48 +585,66 @@ class _VaccinationSheetState extends State<_VaccinationSheet> {
                 ),
               ),
             ),
-            onChanged: (_) => setState(() => _selectedName = null),
+            onChanged: (_) => setState(() => _selectedNames.clear()),
           ),
           SizedBox(height: 10.h),
+          // Date picker row — highlighted red when missing
           Material(
             color: Colors.transparent,
             child: InkWell(
               onTap: _pickDate,
               borderRadius: BorderRadius.circular(12.r),
               child: Ink(
-                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 14.w,
+                  vertical: 14.h,
+                ),
                 decoration: BoxDecoration(
-                  color: AppColors.current.lightBlue,
+                  color:
+                      _selectedDate == null
+                          ? AppColors.current.red.withValues(alpha: 0.06)
+                          : AppColors.current.lightBlue,
                   borderRadius: BorderRadius.circular(12.r),
+                  border:
+                      _selectedDate == null
+                          ? Border.all(
+                            color: AppColors.current.red.withValues(
+                              alpha: 0.30,
+                            ),
+                          )
+                          : null,
                 ),
                 child: Row(
                   children: [
                     AppIcon.raw(
                       Icons.calendar_today_rounded,
-                      color: AppColors.current.primary,
+                      color:
+                          _selectedDate == null
+                              ? AppColors.current.red
+                              : AppColors.current.primary,
                       size: 18.w,
                     ),
                     SizedBox(width: 10.w),
-                    Text(
-                      _selectedDate != null
-                          ? _formatDateInEnglish(_selectedDate!)
-                          : AppText.selectVaccinationDate,
-                      style: TextStyle(
-                        color:
-                            _selectedDate != null
-                                ? AppColors.current.text
-                                : AppColors.current.midGray,
-                        fontSize: 13.sp,
+                    Expanded(
+                      child: Text(
+                        _selectedDate != null
+                            ? formatVaccinationDate(_selectedDate!)
+                            : '${AppText.selectVaccinationDate} *',
+                        style: TextStyle(
+                          color:
+                              _selectedDate != null
+                                  ? AppColors.current.text
+                                  : AppColors.current.red,
+                          fontSize: 13.sp,
+                        ),
                       ),
                     ),
-                    if (_selectedDate != null) ...[
-                      const Spacer(),
+                    if (_selectedDate != null)
                       AppIcon.raw(
                         Icons.check_circle_rounded,
                         color: AppColors.current.teal,
                         size: 16.w,
                       ),
-                    ],
                   ],
                 ),
               ),
@@ -501,16 +655,17 @@ class _VaccinationSheetState extends State<_VaccinationSheet> {
             width: double.infinity,
             height: 50.h,
             child: ElevatedButton(
-              onPressed: _submit,
+              onPressed: _canSubmit ? _submit : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.current.primary,
+                disabledBackgroundColor: AppColors.current.lightGray,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14.r),
                 ),
               ),
               child: Text(
-                AppText.add,
+                addLabel,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 14.sp,
