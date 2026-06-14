@@ -8,6 +8,7 @@ import 'package:pettix/core/widgets/app_dropdown.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_event.dart';
 import 'package:pettix/features/profile/presentation/bloc/profile_state.dart';
+import 'package:pettix/features/profile/presentation/widgets/address_map_picker.dart';
 import 'package:pettix/features/profile/presentation/widgets/animated_profile/profile_animation_tokens.dart';
 import 'package:pettix/features/profile/presentation/widgets/animated_profile/profile_info_tile.dart';
 
@@ -61,16 +62,7 @@ class ProfileEditForm extends StatelessWidget {
             ),
           ),
           const _GenderTile(),
-          ProfileInfoTile(
-            icon: Icons.location_on,
-            iconColor: AppColors.current.red,
-            label: AppText.address,
-            value: '',
-            child: ProfileTileTextField(
-              controller: bloc.addressController,
-              maxLines: 2,
-            ),
-          ),
+          _AddressMapTile(controller: bloc.addressController),
         ],
       ),
     );
@@ -164,6 +156,104 @@ class _EditSectionTitle extends StatelessWidget {
         style: AppTextStyles.bold.copyWith(
           color: ProfileAnimationTokens.titleText,
           fontSize: 12.sp,
+        ),
+      ),
+    );
+  }
+}
+
+// ── Address tile — read-only, opens map picker on tap ─────────────────────────
+
+class _AddressMapTile extends StatelessWidget {
+  final TextEditingController controller;
+
+  const _AddressMapTile({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () async {
+        final picked = await Navigator.of(context).push<String>(
+          MaterialPageRoute(
+            builder: (_) => AddressMapPickerPage(
+              initialAddress: controller.text,
+            ),
+          ),
+        );
+        if (!context.mounted) return;
+        if (picked != null && picked.isNotEmpty) {
+          controller.text = picked;
+        }
+      },
+      child: Container(
+        constraints: BoxConstraints(minHeight: 56.h),
+        margin: EdgeInsets.only(bottom: 10.h),
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 9.h),
+        decoration: BoxDecoration(
+          color: ProfileAnimationTokens.cardBackground,
+          borderRadius: BorderRadius.circular(8.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(12),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 28.w,
+              height: 28.w,
+              decoration: BoxDecoration(
+                color: AppColors.current.red.withAlpha(20),
+                borderRadius: BorderRadius.circular(6.r),
+              ),
+              child: Icon(
+                Icons.location_on,
+                color: AppColors.current.red,
+                size: 15.w,
+              ),
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    AppText.address,
+                    style: AppTextStyles.smallDescription.copyWith(
+                      color: ProfileAnimationTokens.mutedText,
+                      fontSize: 8.sp,
+                    ),
+                  ),
+                  SizedBox(height: 2.h),
+                  ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: controller,
+                    builder: (_, value, __) => Text(
+                      value.text,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.bold.copyWith(
+                        color: ProfileAnimationTokens.titleText,
+                        fontSize: 11.sp,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(left: 8.w),
+              child: Icon(
+                Icons.map_outlined,
+                color: AppColors.current.primary,
+                size: 16.w,
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -60,7 +60,7 @@ class MyPetsRemoteDataSourceImpl implements MyPetsRemoteDataSource {
   @override
   Future<Either<Failure, List<LookupEntity>>> getPetMedicals() => _fetchLookup(
     Constants.petMedicalsEndpoint,
-    queryParameters: {'FromAdmin': true},
+    queryParameters: {'isUserDefined': false},
   );
 
   @override

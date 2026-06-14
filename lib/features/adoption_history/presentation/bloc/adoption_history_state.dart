@@ -39,8 +39,8 @@ class AdoptionHistoryState extends Equatable {
       ownerStatus: ownerStatus ?? this.ownerStatus,
       clientForms: clientForms ?? this.clientForms,
       ownerForms: ownerForms ?? this.ownerForms,
-      clientError: clientError,
-      ownerError: ownerError,
+      clientError: clientError ?? this.clientError,
+      ownerError: ownerError ?? this.ownerError,
       updatedFormId: updatedFormId ?? this.updatedFormId,
       updatedStatus: updatedStatus ?? this.updatedStatus,
     );

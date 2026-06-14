@@ -11,7 +11,6 @@ import '../../features/adoption/presentation/view/application_view.dart';
 import '../../features/notification/presentation/view/pages/notification_page.dart';
 import '../../features/profile/presentation/bloc/profile_bloc.dart';
 import '../../features/profile/presentation/bloc/profile_event.dart';
-import '../../features/profile/presentation/view/edit_profile_screen.dart';
 import '../../features/profile/presentation/view/profile_screen.dart';
 import '../../features/profile/presentation/view/user_profile_screen.dart';
 import '../../features/profile/presentation/view/settings_screen.dart';
@@ -451,27 +450,6 @@ final List<RouteBase> _profileRoutes = [
         state: state,
         child: UserProfileScreen(contactId: contactId),
       );
-    },
-  ),
-  GoRoute(
-    path: AppRoutes.editProfile,
-    name: AppRouteNames.editProfile,
-    pageBuilder: (context, state) {
-      final existingBloc =
-          state.extra is ProfileBloc ? state.extra as ProfileBloc : null;
-      Widget child;
-      if (existingBloc != null) {
-        child = BlocProvider.value(
-          value: existingBloc,
-          child: const EditProfileScreen(),
-        );
-      } else {
-        child = BlocProvider(
-          create: (_) => DI.find<ProfileBloc>()..add(FetchProfileEvent()),
-          child: const EditProfileScreen(),
-        );
-      }
-      return _customTransition(state: state, child: child);
     },
   ),
   GoRoute(

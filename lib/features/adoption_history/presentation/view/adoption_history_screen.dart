@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,6 +10,7 @@ import 'package:pettix/core/constants/text_styles.dart';
 import 'package:pettix/core/themes/app_colors.dart';
 import 'package:pettix/core/widgets/app_shimmer.dart';
 import 'package:pettix/core/widgets/app_top_bar.dart';
+import 'package:pettix/core/widgets/pet_refresh_indicator.dart';
 import 'package:pettix/features/adoption_history/domain/entities/adoption_form_entity.dart';
 import 'package:pettix/features/adoption_history/presentation/bloc/adoption_history_bloc.dart';
 import 'package:pettix/features/adoption_history/presentation/bloc/adoption_history_event.dart';
@@ -249,6 +252,23 @@ class _FormsTabState extends State<_FormsTab>
   bool get wantKeepAlive => true;
 
   int? _selectedStatusFilter;
+  Completer<void>? _refreshCompleter;
+
+  @override
+  void dispose() {
+    _refreshCompleter?.complete();
+    super.dispose();
+  }
+
+  Future<void> _onRefresh() {
+    _refreshCompleter = Completer<void>();
+    context.read<AdoptionHistoryBloc>().add(
+      widget.isOwnerView
+          ? const FetchOwnerFormsEvent()
+          : const FetchClientFormsEvent(),
+    );
+    return _refreshCompleter!.future;
+  }
 
   @override
   void initState() {
@@ -372,64 +392,108 @@ class _FormsTabState extends State<_FormsTab>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Column(
-      children: [
-        _buildFilterChips(),
-        Expanded(
-          child: BlocBuilder<AdoptionHistoryBloc, AdoptionHistoryState>(
-            buildWhen:
-                (prev, curr) =>
+    return PetRefreshIndicator(
+      onRefresh: _onRefresh,
+      child: Column(
+        children: [
+          _buildFilterChips(),
+          Expanded(
+            child: BlocConsumer<AdoptionHistoryBloc, AdoptionHistoryState>(
+              listenWhen:
+                  (prev, curr) =>
+                      widget.isOwnerView
+                          ? prev.ownerStatus != curr.ownerStatus
+                          : prev.clientStatus != curr.clientStatus,
+              listener: (context, state) {
+                final status =
                     widget.isOwnerView
-                        ? prev.ownerStatus != curr.ownerStatus ||
-                            prev.ownerForms != curr.ownerForms
-                        : prev.clientStatus != curr.clientStatus ||
-                            prev.clientForms != curr.clientForms,
-            builder: (context, state) {
-              final status =
-                  widget.isOwnerView ? state.ownerStatus : state.clientStatus;
-              final forms =
-                  widget.isOwnerView ? state.ownerForms : state.clientForms;
-              final error =
-                  widget.isOwnerView ? state.ownerError : state.clientError;
+                        ? state.ownerStatus
+                        : state.clientStatus;
+                if ((status == AdoptionHistoryStatus.loaded ||
+                        status == AdoptionHistoryStatus.error) &&
+                    _refreshCompleter != null &&
+                    !_refreshCompleter!.isCompleted) {
+                  _refreshCompleter!.complete();
+                }
+              },
+              buildWhen:
+                  (prev, curr) =>
+                      widget.isOwnerView
+                          ? prev.ownerStatus != curr.ownerStatus ||
+                              prev.ownerForms != curr.ownerForms
+                          : prev.clientStatus != curr.clientStatus ||
+                              prev.clientForms != curr.clientForms,
+              builder: (context, state) {
+                final status =
+                    widget.isOwnerView
+                        ? state.ownerStatus
+                        : state.clientStatus;
+                final forms =
+                    widget.isOwnerView ? state.ownerForms : state.clientForms;
+                final error =
+                    widget.isOwnerView ? state.ownerError : state.clientError;
 
-              if (status == AdoptionHistoryStatus.loading) {
-                return _LoadingList();
-              }
+                if (status == AdoptionHistoryStatus.loading) {
+                  return _LoadingList();
+                }
 
-              if (status == AdoptionHistoryStatus.error) {
-                return _ErrorView(
-                  message: error,
-                  onRetry:
-                      () => context.read<AdoptionHistoryBloc>().add(
-                        widget.isOwnerView
-                            ? const FetchOwnerFormsEvent()
-                            : const FetchClientFormsEvent(),
-                      ),
+                if (status == AdoptionHistoryStatus.error) {
+                  return LayoutBuilder(
+                    builder:
+                        (context, constraints) => SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: SizedBox(
+                            height: constraints.maxHeight,
+                            child: _ErrorView(
+                              message: error,
+                              onRetry:
+                                  () =>
+                                      context
+                                          .read<AdoptionHistoryBloc>()
+                                          .add(
+                                            widget.isOwnerView
+                                                ? const FetchOwnerFormsEvent()
+                                                : const FetchClientFormsEvent(),
+                                          ),
+                            ),
+                          ),
+                        ),
+                  );
+                }
+
+                List<AdoptionFormEntity> filteredForms = forms;
+                if (_selectedStatusFilter != null) {
+                  filteredForms =
+                      forms
+                          .where(
+                            (element) =>
+                                element.status == _selectedStatusFilter,
+                          )
+                          .toList();
+                }
+
+                if (filteredForms.isEmpty) {
+                  return LayoutBuilder(
+                    builder:
+                        (context, constraints) => SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: SizedBox(
+                            height: constraints.maxHeight,
+                            child: _EmptyView(isOwnerView: widget.isOwnerView),
+                          ),
+                        ),
+                  );
+                }
+
+                return _FormsList(
+                  forms: filteredForms,
+                  isOwnerView: widget.isOwnerView,
                 );
-              }
-
-              List<AdoptionFormEntity> filteredForms = forms;
-              if (_selectedStatusFilter != null) {
-                filteredForms =
-                    forms
-                        .where(
-                          (element) => element.status == _selectedStatusFilter,
-                        )
-                        .toList();
-              }
-
-              if (filteredForms.isEmpty) {
-                return _EmptyView(isOwnerView: widget.isOwnerView);
-              }
-
-              return _FormsList(
-                forms: filteredForms,
-                isOwnerView: widget.isOwnerView,
-              );
-            },
+              },
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -446,6 +510,7 @@ class _FormsList extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.builder(
       padding: EdgeInsets.symmetric(vertical: 12.h),
+      physics: const AlwaysScrollableScrollPhysics(),
       itemCount: forms.length,
       itemBuilder: (_, i) {
         final form = forms[i];
