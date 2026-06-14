@@ -149,20 +149,20 @@ class SettingsScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        // SizedBox(height: 24.h),
-                        // _buildSectionHeader(AppText.dangerZone),
-                        // SizedBox(height: 12.h),
-                        // _SettingsGroup(
-                        //   tiles: [
-                        //     _SettingsTile(
-                        //       icon: Icons.delete_forever_rounded,
-                        //       iconColor: AppColors.current.red,
-                        //       title: AppText.removeAccount,
-                        //       showArrow: true,
-                        //       onTap: () => _showDeleteAccountDialog(context),
-                        //     ),
-                        //   ],
-                        // ),
+                        SizedBox(height: 24.h),
+                        _buildSectionHeader(AppText.dangerZone),
+                        SizedBox(height: 12.h),
+                        _SettingsGroup(
+                          tiles: [
+                            _SettingsTile(
+                              icon: Icons.delete_forever_rounded,
+                              iconColor: AppColors.current.red,
+                              title: AppText.removeAccount,
+                              showArrow: true,
+                              onTap: () => _showDeleteAccountDialog(context),
+                            ),
+                          ],
+                        ),
                         SizedBox(height: 24.h),
                       ],
                     ),

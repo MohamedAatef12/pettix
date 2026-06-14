@@ -17,6 +17,7 @@ import 'package:talker_flutter/talker_flutter.dart' as _i207;
 import '../../core/services/signalr_service.dart' as _i797;
 import '../../data/caching/i_cache_manager.dart' as _i694;
 import '../../data/network/api_services.dart' as _i655;
+import '../../data/network/auth_token_refresher.dart' as _i444;
 import '../../data/network/dio_factory.dart' as _i719;
 import '../../data/network/email_auth_service.dart' as _i1;
 import '../../features/adoption/data/datasources/adoption_browse_data_source.dart'
@@ -204,6 +205,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i719.DioFactory>(() => registerModule.dioFactory);
     gh.lazySingleton<_i694.ICacheManager>(() => registerModule.cacheManager);
     gh.lazySingleton<_i1.EmailAuthService>(() => _i1.EmailAuthService());
+    gh.lazySingleton<_i444.AuthTokenRefresher>(
+      () => _i444.AuthTokenRefresher(
+        gh<_i694.ICacheManager>(),
+        gh<_i207.Talker>(),
+      ),
+    );
     gh.lazySingleton<_i617.ChatLocalDataSource>(
       () => _i617.ChatLocalDataSourceImpl(),
     );
@@ -251,6 +258,7 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i694.ICacheManager>(),
         gh<_i207.Talker>(),
         gh<_i617.ChatLocalDataSource>(),
+        gh<_i444.AuthTokenRefresher>(),
       ),
       dispose: (i) => i.dispose(),
     );

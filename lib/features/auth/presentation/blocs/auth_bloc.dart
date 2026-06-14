@@ -200,12 +200,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     debugPrint('🚀 FCM TOKEN FOR LOGIN: $fcmToken');
     final result = await loginUseCase(event.model.copyWith(fcmToken: fcmToken));
     await result.fold(
-          (failure) async {
-            debugPrint('failure message: ${failure.message}');
-            emit(LoginFailure(failure.message));} ,
-          (loginResponse) async {
-        await DI.find<ICacheManager>()
-            .setUserData(UserModel.fromEntity(loginResponse.contact));
+      (failure) async {
+        debugPrint('failure message: ${failure.message}');
+        emit(LoginFailure(failure.message));
+      },
+      (loginResponse) async {
+        await DI.find<ICacheManager>().setUserData(
+          UserModel.fromEntity(loginResponse.contact),
+        );
         await DI.find<ICacheManager>().setToken(loginResponse.token);
         await DI.find<ICacheManager>().setRefreshToken(
           loginResponse.refreshToken.toString(),
@@ -285,8 +287,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(GoogleLoginFailure(e.toString()));
     }
   }
+
   Future<void> _appleLoginSubmitted(
-      AppleLoginSubmitted event, Emitter<AuthState> emit) async {
+    AppleLoginSubmitted event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AppleLoginLoading());
     try {
       // Import is: package:sign_in_with_apple/sign_in_with_apple.dart
@@ -303,18 +308,26 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         return;
       }
 
-      final result = await appleLoginUseCase(AppleLoginEntity(idToken: idToken));
+      final result = await appleLoginUseCase(
+        AppleLoginEntity(idToken: idToken),
+      );
 
       await result.fold(
         (failure) async => emit(AppleLoginFailure(failure.message)),
         (loginResponse) async {
           await DI.find<ICacheManager>().setToken(loginResponse.token);
+          await DI.find<ICacheManager>().setRefreshToken(
+            loginResponse.refreshToken,
+          );
+          await DI.find<ICacheManager>().setUserData(
+            UserModel.fromEntity(loginResponse.user),
+          );
           if (event.rememberMe) {
             await DI.find<ICacheManager>().saveLogin(true);
           } else {
             await DI.find<ICacheManager>().clearLogin();
           }
-          
+
           signalRService.start();
 
           emit(AppleLoginSuccess(loginResponse.user));

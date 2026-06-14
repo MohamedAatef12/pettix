@@ -98,7 +98,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (userJson == null || token == null) {
         debugPrint(
-            '[DEBUG] Google Login - Missing contact or token. Contact: $userJson, Token: $token');
+          '[DEBUG] Google Login - Missing contact or token. Contact: $userJson, Token: $token',
+        );
         return Left(Failure("Invalid response format from server"));
       }
 
@@ -130,7 +131,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<Either<Failure, GoogleLoginResponseModel>> loginWithApple(AppleLoginModel model) async {
+  Future<Either<Failure, GoogleLoginResponseModel>> loginWithApple(
+    AppleLoginModel model,
+  ) async {
     try {
       final response = await apiService.post(
         endPoint: Constants.appleLoginEndpoint,
@@ -139,9 +142,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       final result = response.result as Map<String, dynamic>?;
       if (result == null || response.success != true) {
-        return Left(Failure(response.message.isNotEmpty
-            ? response.message
-            : 'Invalid response from server'));
+        return Left(
+          Failure(
+            response.message.isNotEmpty
+                ? response.message
+                : 'Invalid response from server',
+          ),
+        );
       }
 
       final userJson = result['contact'];
@@ -153,6 +160,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       final userModel = UserModel.fromJson(userJson);
       await DI.find<ICacheManager>().setUserData(userModel);
+      await DI.find<ICacheManager>().setToken(token);
+      await DI.find<ICacheManager>().setRefreshToken(
+        result['refreshToken'] ?? '',
+      );
 
       return Right(
         GoogleLoginResponseModel(
