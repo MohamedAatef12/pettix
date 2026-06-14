@@ -99,14 +99,17 @@ class MyApp extends StatelessWidget {
                   debugShowCheckedModeBanner: false,
                   theme: effectiveTheme,
                   routerConfig: router,
-                  builder:
-                      (context, child) => UpgradeAlert(
-                        navigatorKey: rootNavigatorKey,
-                        child: KeyedSubtree(
-                          key: ValueKey('app_theme_${themeOption.name}'),
-                          child: child ?? const SizedBox.shrink(),
-                        ),
+                  builder: (context, child) => MediaQuery.withClampedTextScaling(
+                    minScaleFactor: 0.85,
+                    maxScaleFactor: 1.2,
+                    child: UpgradeAlert(
+                      navigatorKey: rootNavigatorKey,
+                      child: KeyedSubtree(
+                        key: ValueKey('app_theme_${themeOption.name}'),
+                        child: child ?? const SizedBox.shrink(),
                       ),
+                    ),
+                  ),
                 ),
           );
         },
